@@ -49,6 +49,8 @@
 - Cons:
     - we have to rewrite everything
     - maybe: lacks RDF processing
+#### Flask
+- simple, flexible framework
 
 ### Java
 - REST
@@ -70,14 +72,32 @@
     - Not expressive (Alex recalls doing simple REST client was quite a lot of work ...)
     - We have to rewrite everything
 
+#### Play framework
+- currently used
+- simple, flexible, fast development
+- inspired by ASP.NET MVC, Ruby on Rails, Django (ie. fairly common model)
+- built in JSON support
+- asynchronous requests
+
+#### Spring
+- flexible, powerful, widely used
+- complex, has steep learning curve
+
+#### JSF
+- part of Java EE (ie. standard)
+- complex framework, slower development
+
+
 ### Groovy
 - Cons:
     - Again, very little experience with the language 
 - Pros:
     - Easy to learn
+#### Grails
+- simple, easy framework
 	
 ## Final Decision
+Java seams to be the most fitting choice for a language, as it is a common language for the team. No member is experienced with Scala or Groovy while most are familiar with Java. It is a time proven industry standard language and even for web development it is as good as any. Also it stays close to the original Scala solution (a sibling JVM language), proving its workability and possibly offering at least partial reuse of the current code (high level architecture, etc.).
 
-We have decided to go with Java since most of us are actually familiar with the language and some of the available libraries, and it doesn't require a steep learning curve.
-
+Without prior experience it is difficult to pick the most appropriate framework, as all the major ones appear to be reasonable picks. Based on the available info and reviews we decided to go with Play, as it looks simple and flexible and also it might be helpful that it is used by the current implementation.
 
