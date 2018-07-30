@@ -8,11 +8,6 @@
 - How (easily) are HTTP requests done, incl. JSON processing
 - Pros and cons
 
-### Play 2.7 (required)
-- Written in Scala
-- Usable from other programming languages that are compiled to Bytecode
-- Primarily designed to be used with Scala and Java
-
 ## Language Options
 
 ### Scala
@@ -73,6 +68,9 @@
     - We have to rewrite everything
 
 #### Play framework
+- Written in Scala
+- Usable from other programming languages that are compiled to Bytecode
+- Primarily designed to be used with Scala and Java
 - currently used
 - simple, flexible, fast development
 - inspired by ASP.NET MVC, Ruby on Rails, Django (ie. fairly common model)
@@ -80,8 +78,11 @@
 - asynchronous requests
 
 #### Spring
-- flexible, powerful, widely used
-- complex, has steep learning curve
+- flexible, powerful, general
+- more complex, has steeper learning curve
+- mature, widely used
+- excelent documentation
+- rich ecosystem, many available tools
 
 #### JSF
 - part of Java EE (ie. standard)
@@ -99,5 +100,4 @@
 ## Final Decision
 Java seams to be the most fitting choice for a language, as it is a common language for the team. No member is experienced with Scala or Groovy while most are familiar with Java. It is a time proven industry standard language and even for web development it is as good as any. Also it stays close to the original Scala solution (a sibling JVM language), proving its workability and possibly offering at least partial reuse of the current code (high level architecture, etc.).
 
-Without prior experience it is difficult to pick the most appropriate framework, as all the major ones appear to be reasonable picks. Based on the available info and reviews we decided to go with Play, as it looks simple and flexible and also it might be helpful that it is used by the current implementation.
-
+It is difficult to pick a clear winner among the frameworks, as all the major ones appear to be reasonable picks. Based on the available info and members' experience we decided to go with Spring, due to its plenty of resources and tools, maturity and because Play (the strongest competitor) is in our opinion more geared towards Scala developers.
