@@ -11,6 +11,7 @@
 1. [`ETL`](https://en.wikipedia.org/wiki/Extract,_transform,_load) - Extract, transform, load
 1. `LDVMi` - Stands for LDVM implementation
 1. [`Linked Data`](https://en.wikipedia.org/wiki/Linked_data) - a method of publishing structured data so that it can be interlinked.
+1. [`LPA`] - Stands for Linked Pipes Application.
 1. `Pipeline` -  In the current context, refers to the process in which the application takes any data source, applies a series of transformations to it
 and then hands over the output to a visualizer component, which then produces a visual representation of the data.
 1. `Pipeline discovery` - The process taking input descriptors for all visualizers and attempt to combine the respective registered transformation to achieve a specific data format.
