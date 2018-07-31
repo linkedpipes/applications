@@ -22,7 +22,7 @@
 |`Pipeline discovery` | The process taking input descriptors for all visualizers and attempt to combine the respective registered transformation to achieve a specific data format.|
 |[`RDF`](https://en.wikipedia.org/wiki/Resource_Description_Framework) | Resource Description Framework.|
 |[`Semantic web`](https://en.wikipedia.org/wiki/Semantic_Web) | an extension of the World Wide Web through standards by the World Wide Web Consortium.|
-|[`Single Page Application (SPA)`](https://en.wikipedia.org/wiki/Single|page_application) | A web application or web site that interacts with the user by dynamically rewriting the current page rather than loading entire new pages from a server.|
+|[`Single Page Application (SPA)`](https://en.wikipedia.org/wiki/Single-page_application) | A web application or web site that interacts with the user by dynamically rewriting the current page rather than loading entire new pages from a server.|
 |[`SPARQL`](https://en.wikipedia.org/wiki/SPARQL) | stands for SPARQL Protocol and RDF Query Language. It is a query language able to retrieve and manipulate data stored in RDF format.|
 |`URI`| A Uniform Resource Identifier (URI) is a string of characters designed for unambiguous identification of resources and extensibility via the URI scheme. They provide a standard way for resources to be accessed by other computers across a network or over the World Wide Web.|
 |`URL`| A URL is a specific type of Uniform Resource Identifier.|
