@@ -1,4 +1,4 @@
-package com.linkedpipes.application;
+package com.linkedpipes.backend;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
