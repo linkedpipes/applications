@@ -6,9 +6,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DataSourceController {
 
-    @RequestMapping("/datasource")
+    @RequestMapping("/datasources")
     public String getDataSources(){
-        return "called /datasources";
+        return "called GET /datasources";
+    }
+
+    @RequestMapping("/datasources")
+    public String createDataSources(){
+        return "called POST /datasources";
+    }
+
+    @RequestMapping("/datasource")
+    public String getDataSource(){
+        return "called /datasource";
     }
     
 }
