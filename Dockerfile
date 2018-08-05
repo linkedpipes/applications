@@ -10,6 +10,9 @@ ARG JAR_FILE
 # Copy the JAR file in the current directory
 COPY ${JAR_FILE} app.jar
 
+# Exposeport 8080
+EXPOSE 8080
+
 # Start the container running the JAR file
 # using dev/urandom (refer to https://hackernoon.com/hack-how-to-use-securerandom-with-kubernetes-and-docker-a375945a7b21)
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
