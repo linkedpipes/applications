@@ -11,9 +11,17 @@ Current App that we will be extracting, modifying and adding to: https://github.
 
 High level documentation markdown (updated regularly) : [HackMD](https://hackmd.io/lymLxN5AR4KTX4x3kPyiiQ#)
 
-# Runnning the app
+# Running the app
 
-The application is meant to be run inside a Docker container. However, it can also be run as any jar file. The following steps show how to build the jar file and run it as a container:
+The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
+
+`docker run --name lpa -p 5000:8080 linkedpipes/application`
+
+The application should then by available through port `5000`
+
+# Building the image
+
+In case you wanna build the image locally, follow the next steps:
 
 - Navigate to the backend folder
 
@@ -23,12 +31,6 @@ The application is meant to be run inside a Docker container. However, it can al
 
 `$ gradle build`
 
-- If the app is to be run as a Docker container then you will first need to build the image by executing in the root folder
+- Build the image by executing in the project's root folder the next command, replacing `<some_tag>` by the name you want the image to have
 
-`$ docker build -t linkedpipes/application --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar .`
-
-- Then simply run the container by executing
-
-`docker run --name lpa-backend -p 5000:8080 linkedpipes/application`
-
-- Application should then by available through port `5000`
+`$ docker build -t <some_tag> --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar .`
