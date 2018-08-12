@@ -1,16 +1,20 @@
 package com.linkedpipes.lpa.backend;
 
 import com.linkedpipes.lpa.backend.entities.DataSourceList;
+import com.linkedpipes.lpa.backend.helpers.StreamHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.DataOutputStream;
 
 @RestController
 public class DiscoveryController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DiscoveryController.class);
 
     @RequestMapping("/pipelines/discover")
     public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
@@ -41,26 +45,18 @@ public class DiscoveryController {
             conn.connect();
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed: HTTP error code: "
-                        + conn.getResponseCode());
+                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
+                        + StreamHelper.getStringFromStream(conn.getErrorStream());
+                logger.error(errorMsg);
+                return errorMsg;
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            StringBuilder sb = new StringBuilder();
-            while ((output = br.readLine()) != null) {
-                sb.append(output);
-                sb.append("\n");
-            }
-
-            br.close();
+            String response = StreamHelper.getStringFromStream(conn.getInputStream());
             conn.disconnect();
-            return sb.toString();
+            return response;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception: ", e);
         }
 
         return "Error";
@@ -77,27 +73,19 @@ public class DiscoveryController {
             conn.connect();
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed: HTTP error code: "
-                        + conn.getResponseCode());
+                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
+                        + StreamHelper.getStringFromStream(conn.getErrorStream());
+                logger.error(errorMsg);
+                return errorMsg;
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            StringBuilder sb = new StringBuilder();
-            while ((output = br.readLine()) != null) {
-                sb.append(output);
-                sb.append("\n");
-            }
-
-            br.close();
+            String response = StreamHelper.getStringFromStream(conn.getInputStream());
 
             conn.disconnect();
-            return sb.toString();
+            return response;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception: ", e);
         }
         return "Error";
     }
@@ -114,30 +102,22 @@ public class DiscoveryController {
             conn.connect();
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed: HTTP error code: "
-                        + conn.getResponseCode());
+                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
+                        + StreamHelper.getStringFromStream(conn.getErrorStream());
+                logger.error(errorMsg);
+                return errorMsg;
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            StringBuilder sb = new StringBuilder();
-            while ((output = br.readLine()) != null) {
-                sb.append(output);
-                sb.append("\n");
-            }
-
-            br.close();
+            String response = StreamHelper.getStringFromStream(conn.getInputStream());
 
             conn.disconnect();
-            return sb.toString();
+            return response;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception: ", e);
         }
 
-        return "called /discovery/pipelineGroups";
+        return "An error occurred.";
     }
 
 }
