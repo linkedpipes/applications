@@ -6,9 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 @RestController
 public class DiscoveryController {
@@ -31,11 +30,13 @@ public class DiscoveryController {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Content-Type", "text/plain");
             conn.setDoOutput(true);
 
-            OutputStream os = conn.getOutputStream();
-            os.write(discoveryConfig.getBytes("UTF-8"));
-            os.close();
+            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+            wr.writeBytes(discoveryConfig);
+            wr.flush();
+            wr.close();
 
             conn.connect();
 
@@ -49,9 +50,7 @@ public class DiscoveryController {
 
             String output;
             StringBuilder sb = new StringBuilder();
-            //System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
-                //System.out.println(output);
                 sb.append(output);
                 sb.append("\n");
             }
@@ -87,9 +86,7 @@ public class DiscoveryController {
 
             String output;
             StringBuilder sb = new StringBuilder();
-            //System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
-                //System.out.println(output);
                 sb.append(output);
                 sb.append("\n");
             }
@@ -126,9 +123,7 @@ public class DiscoveryController {
 
             String output;
             StringBuilder sb = new StringBuilder();
-            //System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
-                //System.out.println(output);
                 sb.append(output);
                 sb.append("\n");
             }
