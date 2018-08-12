@@ -7,6 +7,8 @@
 
 Meeting Logs: https://docs.google.com/document/d/1tvJgEbRWb9dYM34grGARRXQ9gE0fcITw0Rayu2mEbmA/edit
 
+Wireframe Designs: https://app.moqups.com/ponsietta/LMyuSmiQKD/view
+
 Current App that we will be extracting, modifying and adding to: https://github.com/ld-viz-swp/LDVMi
 
 High level documentation markdown (updated regularly) : [HackMD](https://hackmd.io/lymLxN5AR4KTX4x3kPyiiQ#)
