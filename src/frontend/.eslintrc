@@ -1,0 +1,9 @@
+{
+    "extends": "indecision_app",
+    "plugins": [
+        "prettier"
+    ],
+    "rules": {
+        "prettier/prettier": "error"
+    }
+}
