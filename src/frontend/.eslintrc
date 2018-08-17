@@ -1,9 +1,7 @@
 {
-    "extends": "indecision_app",
-    "plugins": [
-        "prettier"
-    ],
-    "rules": {
-        "prettier/prettier": "error"
-    }
+  "extends": "assistant",
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error"
+  }
 }
