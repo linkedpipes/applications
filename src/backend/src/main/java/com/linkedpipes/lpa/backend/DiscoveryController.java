@@ -30,7 +30,7 @@ public class DiscoveryController {
 
         try {
 
-            URL url = new URL("http://demo.visualization.linkedpipes.com:8080/discovery/startFromInput");
+            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept", "application/json");
@@ -65,7 +65,7 @@ public class DiscoveryController {
     @RequestMapping("/discovery/status")
     public String getDiscoveryStatus(@RequestParam( value="discoveryId") String discoveryId){
         try {
-            URL url = new URL("http://demo.visualization.linkedpipes.com:8080/discovery/" + discoveryId);
+            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -94,7 +94,7 @@ public class DiscoveryController {
     @ResponseBody
     public String getPipelineGroups(@RequestParam( value="discoveryId") String discoveryId){
         try {
-            URL url = new URL("http://demo.visualization.linkedpipes.com:8080/discovery/" + discoveryId + "/pipelines");
+            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
