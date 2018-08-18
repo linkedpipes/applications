@@ -7,9 +7,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import Typography from "@material-ui/core/Typography";
+import ReactJson from "react-json-view";
 import { withStyles } from "@material-ui/core/styles";
 import withRoot from "./withRoot";
 import AppBar from "./AppBar";
+import "whatwg-fetch";
 
 const styles = theme => ({
   root: {
@@ -26,82 +28,153 @@ const styles = theme => ({
 
 class Index extends React.Component {
   state = {
-    open: false
+    ttlFile: undefined,
+    discoveryId: "",
+    discoveryDialogOpen: false,
+    pipelinesDialogOpen: false,
+    pipelines: ""
   };
 
   handleClose = () => {
     this.setState({
-      open: false
-    });
-  };
-
-  handleClick = () => {
-    this.setState({
-      open: true
-    });
-  };
-
-  makeRequest = () => {
-    fetch("http://localhost:8080/datasources")
-      .then(response => response.json())
-      .then(responseData => console.log(responseData))
-      .catch("motherfuckeeeeeeer");
-  };
-
-  onFormSubmit = e => {
-    e.preventDefault(); // Stop form submit
-    this.fileUpload(this.state.file).then(response => {
-      console.log(response.data);
+      discoveryDialogOpen: false,
+      pipelinesDialogOpen: false
     });
   };
 
   onChange = e => {
     console.log("got file");
-    this.setState({ file: e.target.files[0] });
+    this.setState({ ttlFile: e.target.files[0] });
   };
 
-  fileUpload = file => {
-    const url = "http://example.com/file-upload";
-    const formData = new FormData();
-    formData.append("file", file);
-    const config = {
+  postStartFromInput = () => {
+    const url = "http://localhost:8080/pipelines/discoverFromInput";
+    const self = this;
+    fetch(url, {
+      method: "POST",
+      body: this.state.ttlFile,
       headers: {
-        "content-type": "multipart/form-data"
-      }
-    };
-    console.log("Something something");
-    return post(url, formData, config);
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin"
+    })
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(error) {
+          console.log(error);
+          error.message; //=> String
+        }
+      )
+      .then(function(jsonResponse) {
+        self.setState({
+          discoveryId: jsonResponse.id,
+          discoveryDialogOpen: true
+        });
+      });
+  };
+
+  getPipelineGroups = () => {
+    const url =
+      "http://localhost:8080/discovery/pipelineGroups?discoveryId=" +
+      this.state.discoveryId;
+    console.log(url);
+    const self = this;
+    fetch(url)
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(error) {
+          console.log(error);
+          error.message; //=> String
+        }
+      )
+      .then(function(jsonResponse) {
+        console.log(jsonResponse);
+        self.setState({
+          pipelines: jsonResponse,
+          pipelinesDialogOpen: true
+        });
+      });
   };
 
   render() {
     const { classes } = this.props;
-    const { open } = this.state;
+    const {
+      discoveryDialogOpen,
+      discoveryId,
+      pipelinesDialogOpen
+    } = this.state;
 
     return (
       <header>
         <AppBar />
         <div className={classes.root}>
+          <Dialog open={discoveryDialogOpen} onClose={this.handleClose}>
+            <DialogTitle>Discovery Response</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Your id is : {discoveryId}</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button color="primary" onClick={this.handleClose}>
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
           <Typography variant="display1" gutterBottom>
             Select TTL config file
           </Typography>
-          <form onSubmit={this.onFormSubmit}>
-            <input
-              accept=".ttl"
-              className={classes.input}
-              onChange={this.onChange}
-              id="contained-button-file"
-              type="file"
-            />
-            <label htmlFor="contained-button-file">
-              <Button
-                variant="contained"
-                component="span"
-                className={classes.button}
-              >
-                Upload
+          <input
+            accept=".ttl"
+            className={classes.input}
+            onChange={this.onChange}
+            id="contained-button-file"
+            type="file"
+          />
+          <label htmlFor="contained-button-file">
+            <Button
+              variant="contained"
+              component="span"
+              className={classes.button}
+            >
+              Upload
+            </Button>
+          </label>
+          <Button
+            variant="contained"
+            component="span"
+            className={classes.button}
+            disabled={!this.state.ttlFile}
+            onClick={this.postStartFromInput}
+          >
+            Start
+          </Button>
+
+          <Dialog open={pipelinesDialogOpen} onClose={this.handleClose}>
+            <DialogTitle>Pipelines Response</DialogTitle>
+            <DialogContent>
+              <ReactJson src={this.state.pipelines} />
+            </DialogContent>
+            <DialogActions>
+              <Button color="primary" onClick={this.handleClose}>
+                OK
               </Button>
-            </label>
-          </form>
+            </DialogActions>
+          </Dialog>
+          <Typography variant="display1" gutterBottom>
+            Get pipeline groups
+          </Typography>
+          <Button
+            variant="contained"
+            component="span"
+            className={classes.button}
+            disabled={!this.state.discoveryId}
+            onClick={this.getPipelineGroups}
+          >
+            Start
+          </Button>
         </div>
       </header>
     );

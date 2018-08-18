@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "live-server public/",
     "build": "webpack",
-    "dev-server": "webpack-dev-server"
+    "dev-server": "webpack-dev-server --port 9000"
   },
   "dependencies": {
     "@material-ui/core": "^1.5.0",
@@ -24,12 +24,14 @@
     "normalize.css": "^8.0.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-json-view": "^1.19.1",
     "react-modal": "^3.5.1",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.22.1",
     "validator": "10.6.0",
     "webpack": "4.16.5",
-    "webpack-dev-server": "3.1.5"
+    "webpack-dev-server": "3.1.5",
+    "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
     "eslint-plugin-prettier": "^2.6.2",
