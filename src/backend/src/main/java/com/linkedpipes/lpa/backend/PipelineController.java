@@ -27,11 +27,11 @@ public class PipelineController {
         return testPipeline;
     }
 
-    @RequestMapping("/pipeline/create")
+    @RequestMapping("/pipeline/export")
     @ResponseBody
-    public String createPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri){
+    public String exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri){
         try {
-            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/execute/" + pipelineUri);
+            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/export/" + pipelineUri);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -54,6 +54,12 @@ public class PipelineController {
         }
 
         return "An error occurred";
+    }
+
+    @RequestMapping("/pipeline/create")
+    @ResponseBody
+    public void createPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri){
+
     }
 
     @RequestMapping("/pipeline/execute")
