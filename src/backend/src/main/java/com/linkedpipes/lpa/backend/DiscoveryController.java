@@ -62,8 +62,8 @@ public class DiscoveryController {
         return "Error";
     }
 
-    @RequestMapping("/discovery/status")
-    public String getDiscoveryStatus(@RequestParam( value="discoveryId") String discoveryId){
+    @RequestMapping("/discovery/{id}/status")
+    public String getDiscoveryStatus(@PathVariable("id") String discoveryId){
         try {
             URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -90,9 +90,9 @@ public class DiscoveryController {
         return "Error";
     }
 
-    @RequestMapping("/discovery/pipelineGroups")
+    @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
-    public String getPipelineGroups(@RequestParam( value="discoveryId") String discoveryId){
+    public String getPipelineGroups(@PathVariable("id") String discoveryId){
         try {
             URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
