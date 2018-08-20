@@ -76,8 +76,9 @@ class Index extends React.Component {
 
   getPipelineGroups = () => {
     const url =
-      "http://localhost:8080/discovery/pipelineGroups?discoveryId=" +
-      this.state.discoveryId;
+      "http://localhost:8080/discovery/" +
+      this.state.discoveryId +
+      "/pipelineGroups";
     console.log(url);
     const self = this;
     fetch(url)
