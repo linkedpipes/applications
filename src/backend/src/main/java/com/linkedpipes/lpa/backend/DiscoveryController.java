@@ -2,11 +2,17 @@ package com.linkedpipes.lpa.backend;
 
 import com.linkedpipes.lpa.backend.entities.DataSourceList;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
+import jdk.incubator.http.HttpClient;
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.net.URI;
+
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;
 
 @RestController
 public class DiscoveryController {
@@ -15,6 +21,9 @@ public class DiscoveryController {
             LoggerFactory.getLogger(DiscoveryController.class);
 
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+    private static final HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
 
     @RequestMapping("/pipelines/discover")
     public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
@@ -28,15 +37,28 @@ public class DiscoveryController {
             return "Discovery config not provided";
         }
 
-        try {
-            return httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
-                    discoveryConfig, "text/plain", "application/json");
+        HttpResponse<String> response;
 
-        } catch (IOException e) {
+        try {
+            URI requestUri = new URI(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
+            HttpRequest request = HttpRequest.newBuilder(requestUri)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "text/plain")
+                    .POST(fromString(discoveryConfig))
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandler.asString());
+        } catch (Exception e) {
             logger.error("Exception: ", e);
+            return e.toString();
         }
 
-        return "Error";
+        if (response.statusCode() != 200) {
+            String errorMsg = response.statusCode() + ": " + response.body();
+            logger.error(errorMsg);
+            return errorMsg;
+        }
+
+        return response.body();
     }
 
     @RequestMapping("/discovery/{id}/status")
