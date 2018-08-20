@@ -10,7 +10,6 @@ import Typography from "@material-ui/core/Typography";
 import ReactJson from "react-json-view";
 import { withStyles } from "@material-ui/core/styles";
 import withRoot from "./withRoot";
-import AppBar from "./AppBar";
 import "whatwg-fetch";
 
 const styles = theme => ({
@@ -110,7 +109,6 @@ class Index extends React.Component {
 
     return (
       <header>
-        <AppBar />
         <div className={classes.root}>
           <Dialog open={discoveryDialogOpen} onClose={this.handleClose}>
             <DialogTitle>Discovery Response</DialogTitle>
@@ -123,9 +121,11 @@ class Index extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
+
           <Typography variant="display1" gutterBottom>
             Select TTL config file
           </Typography>
+
           <input
             accept=".ttl"
             className={classes.input}
@@ -133,6 +133,7 @@ class Index extends React.Component {
             id="contained-button-file"
             type="file"
           />
+
           <label htmlFor="contained-button-file">
             <Button
               variant="contained"
@@ -142,6 +143,7 @@ class Index extends React.Component {
               Upload
             </Button>
           </label>
+
           <Button
             variant="contained"
             component="span"
@@ -163,9 +165,11 @@ class Index extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
+
           <Typography variant="display1" gutterBottom>
             Get pipeline groups
           </Typography>
+
           <Button
             variant="contained"
             component="span"
