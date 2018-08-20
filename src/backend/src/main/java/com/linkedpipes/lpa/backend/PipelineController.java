@@ -63,9 +63,33 @@ public class PipelineController {
     }
 
     @RequestMapping("/pipeline/execute")
-    public Integer executePipeline(@RequestParam( value="pipelineUri") String pipelineUri){
-        Integer testExecutionId = 1;
-        return testExecutionId;
+    public String executePipeline(@RequestParam( value="etlPipelineIri") String etlPipelineIri){
+        try {
+            String urlStr = Application.config.getProperty("etlServiceUrl") + "/executions";
+            urlStr += "?pipeline=" + etlPipelineIri;
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            if (conn.getResponseCode() != 200) {
+                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
+                        + StreamHelper.getStringFromStream(conn.getErrorStream());
+                logger.error(errorMsg);
+                return errorMsg;
+            }
+
+            String response = StreamHelper.getStringFromStream(conn.getInputStream());
+            conn.disconnect();
+            return response;
+
+        } catch (IOException e) {
+            logger.error("Exception: ", e);
+        }
+
+        return "An error occurred";
     }
 
 }
