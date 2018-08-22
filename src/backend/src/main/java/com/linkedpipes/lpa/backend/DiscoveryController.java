@@ -8,10 +8,8 @@ import jdk.incubator.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.net.URI;
-
 import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;
 
 @RestController
@@ -21,6 +19,7 @@ public class DiscoveryController {
             LoggerFactory.getLogger(DiscoveryController.class);
 
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+
     private static final HttpClient client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NEVER)
             .build();
