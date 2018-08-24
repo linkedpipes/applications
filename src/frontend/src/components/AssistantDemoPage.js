@@ -68,7 +68,7 @@ class Index extends React.Component {
       )
       .then(function(jsonResponse) {
         self.setState({
-          discoveryId: jsonResponse.id,
+          discoveryId: jsonResponse.ID,
           discoveryDialogOpen: true
         });
       });
