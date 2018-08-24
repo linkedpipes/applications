@@ -17,15 +17,31 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'com.linkedpipes.lpa'
 version = '0.0.1'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.10
 
 repositories {
 	mavenCentral()
 }
 
+compileJava {
+	options.compilerArgs += ["--add-modules", "jdk.incubator.httpclient"]
+}
+
+compileTestJava {
+	options.compilerArgs += ["--add-modules", "jdk.incubator.httpclient"]
+}
+
+test {
+	jvmArgs += ["--add-modules", "jdk.incubator.httpclient"]
+}
+
+bootRun {
+	args = ["--add-modules jdk.incubator.httpclient"]
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile 'com.google.code.gson:gson:2.8.5'
 }

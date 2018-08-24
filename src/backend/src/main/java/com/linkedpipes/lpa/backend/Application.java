@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -20,12 +19,12 @@ public class Application {
 	private static final Logger logger =
 			LoggerFactory.getLogger(Application.class);
 
-	private static final String NAME = "config.properties";
+	private static final String CONFIG_FILE_NAME = "config.properties";
 
 	public static final Properties config;
 
 	static {
-		File configFile = new File(NAME);
+		File configFile = new File(CONFIG_FILE_NAME);
 		config = new Properties();
 
 		try {

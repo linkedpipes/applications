@@ -1,13 +1,13 @@
 package com.linkedpipes.lpa.backend;
 
-import com.linkedpipes.lpa.backend.helpers.StreamHelper;
+import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 @RestController
 public class ExecutionController {
@@ -15,67 +15,43 @@ public class ExecutionController {
     private static final Logger logger =
             LoggerFactory.getLogger(DiscoveryController.class);
 
+    private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+
     @RequestMapping("/execution/status")
-    public String getStatus(@RequestParam( value="executionIri") String executionIri){
+    public ResponseEntity<String> getStatus(@RequestParam( value="executionIri") String executionIri){
         if(executionIri == null || executionIri.isEmpty()) {
-            return "Execution IRI not provided.";
+            return new ResponseEntity("Execution IRI not provided.", HttpStatus.BAD_REQUEST);
         }
 
         try {
-            URL url = new URL(executionIri + "/overview");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
+            String response = httpUrlConnector.sendGetRequest(executionIri + "/overview",
+                    null, "application/json");
 
-            if (conn.getResponseCode() != 200) {
-                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
-                        + StreamHelper.getStringFromStream(conn.getErrorStream());
-                logger.error(errorMsg);
-                return errorMsg;
-            }
-
-            String response = StreamHelper.getStringFromStream(conn.getInputStream());
-            conn.disconnect();
-            return response;
-
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
             logger.error("Exception: ", e);
         }
 
-        return "Error";
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping("/execution/result")
     @ResponseBody
-    public String getResult(@RequestParam( value="executionIri") String executionIri){
+    public ResponseEntity<String> getResult(@RequestParam( value="executionIri") String executionIri){
         if(executionIri == null || executionIri.isEmpty()) {
-            return "Execution IRI not provided.";
+            return new ResponseEntity("Execution IRI not provided.", HttpStatus.BAD_REQUEST);
         }
 
         try {
-            URL url = new URL(executionIri);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
+            String response = httpUrlConnector.sendGetRequest(executionIri,
+                    null, "application/json");
 
-            if (conn.getResponseCode() != 200) {
-                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
-                        + StreamHelper.getStringFromStream(conn.getErrorStream());
-                logger.error(errorMsg);
-                return errorMsg;
-            }
-
-            String response = StreamHelper.getStringFromStream(conn.getInputStream());
-            conn.disconnect();
-            return response;
-
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
             logger.error("Exception: ", e);
         }
 
-        return "Error";
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

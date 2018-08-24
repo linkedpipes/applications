@@ -1,20 +1,33 @@
 package com.linkedpipes.lpa.backend;
 
+import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.entities.DataSourceList;
-import com.linkedpipes.lpa.backend.helpers.StreamHelper;
+import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
+import jdk.jshell.spi.ExecutionControl;
+/*import java.net.URI;
+import jdk.incubator.http.HttpClient;
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;*/
 
 @RestController
 public class DiscoveryController {
 
     private static final Logger logger =
             LoggerFactory.getLogger(DiscoveryController.class);
+
+    private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+
+    /*private static final HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();*/
 
     @RequestMapping("/pipelines/discover")
     public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
@@ -23,101 +36,88 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discoverFromInput")
-    public String startDiscovery(@RequestBody String discoveryConfig){
+    public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig){
         if(discoveryConfig == null || discoveryConfig.isEmpty()) {
-            return "Discovery config not provided";
+            return new ResponseEntity("Discovery config not provided", HttpStatus.BAD_REQUEST);
         }
 
         try {
+            String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
+                    discoveryConfig, "text/plain", "application/json");
 
-            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setRequestProperty("Content-Type", "text/plain");
-            conn.setDoOutput(true);
+            Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
 
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.writeBytes(discoveryConfig);
-            wr.flush();
-            wr.close();
-
-            conn.connect();
-
-            if (conn.getResponseCode() != 200) {
-                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
-                        + StreamHelper.getStringFromStream(conn.getErrorStream());
-                logger.error(errorMsg);
-                return errorMsg;
-            }
-
-            String response = StreamHelper.getStringFromStream(conn.getInputStream());
-            conn.disconnect();
-            return response;
-
+            return ResponseEntity.ok(newDiscovery);
         } catch (IOException e) {
             logger.error("Exception: ", e);
         }
 
-        return "Error";
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+        /*HttpResponse<String> response;
+
+        try {
+            URI requestUri = new URI(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
+            HttpRequest request = HttpRequest.newBuilder(requestUri)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "text/plain")
+                    .POST(fromString(discoveryConfig))
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandler.asString());
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            return new ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (response.statusCode() != 200) {
+            String errorMsg = response.statusCode() + ": " + response.body();
+            logger.error(errorMsg);
+            return new ResponseEntity(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok(response.body());*/
+    }
+
+    @RequestMapping("/pipelines/discoverFromInputIri")
+    public ResponseEntity<String> startDiscoveryFromInputIri(@RequestBody String discoveryConfigIri){
+        if(discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
+            return new ResponseEntity<>("Input IRI not provided", HttpStatus.BAD_REQUEST);
+        }
+
+        //TODO implement
+
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping("/discovery/{id}/status")
-    public String getDiscoveryStatus(@PathVariable("id") String discoveryId){
+    public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId){
         try {
-            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
+            String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId,
+                    null, "application/json");
 
-            conn.connect();
-
-            if (conn.getResponseCode() != 200) {
-                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
-                        + StreamHelper.getStringFromStream(conn.getErrorStream());
-                logger.error(errorMsg);
-                return errorMsg;
-            }
-
-            String response = StreamHelper.getStringFromStream(conn.getInputStream());
-
-            conn.disconnect();
-            return response;
-
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
             logger.error("Exception: ", e);
         }
-        return "Error";
+
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
-    public String getPipelineGroups(@PathVariable("id") String discoveryId){
+    public ResponseEntity<String> getPipelineGroups(@PathVariable("id") String discoveryId){
         try {
-            URL url = new URL(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
+            String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines",
+                    null, "application/json");
 
-            conn.connect();
-
-            if (conn.getResponseCode() != 200) {
-                String errorMsg = conn.getResponseCode() + " " + conn.getResponseMessage() + ": "
-                        + StreamHelper.getStringFromStream(conn.getErrorStream());
-                logger.error(errorMsg);
-                return errorMsg;
-            }
-
-            String response = StreamHelper.getStringFromStream(conn.getInputStream());
-
-            conn.disconnect();
-            return response;
+            return ResponseEntity.ok(response);
 
         } catch (IOException e) {
             logger.error("Exception: ", e);
         }
 
-        return "An error occurred.";
+        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
