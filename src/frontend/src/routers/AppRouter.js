@@ -11,7 +11,7 @@ const AppRouter = () => (
     <div>
       <NavigationBar />
       <Switch>
-        <Route path="/" component={Assistant} exact={true} />
+        <Route path="/" component={AssistantDemoPage} exact={true} />
         <Route path="/about" component={AboutPage} />
         <Route component={NotFoundPage} />
       </Switch>

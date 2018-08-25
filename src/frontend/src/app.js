@@ -1,9 +1,21 @@
 // import './utils.js'
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import "normalize.css/normalize.css";
 import "./styles/styles.scss";
-
 import AppRouter from "./routers/AppRouter";
+import configureStore from "./store/configureStore";
 
-ReactDOM.render(<AppRouter />, document.querySelector("#app"));
+const store = configureStore();
+
+const state = store.getState();
+console.log(store);
+
+const jsx = (
+  <Provider store={store}>
+    <AppRouter />
+  </Provider>
+);
+
+ReactDOM.render(jsx, document.querySelector("#app"));

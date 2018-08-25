@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -11,6 +12,8 @@ import ReactJson from "react-json-view";
 import { withStyles } from "@material-ui/core/styles";
 import withRoot from "./withRoot";
 import "whatwg-fetch";
+import PipelinesTable from "./PipelinesTable";
+import { addPipelines } from "../actions/pipelines";
 
 const styles = theme => ({
   root: {
@@ -30,8 +33,7 @@ class AssistantDemoPage extends React.Component {
     ttlFile: undefined,
     discoveryId: "",
     discoveryDialogOpen: false,
-    pipelinesDialogOpen: false,
-    pipelines: ""
+    pipelinesDialogOpen: false
   };
 
   handleClose = () => {
@@ -92,9 +94,13 @@ class AssistantDemoPage extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse);
+        console.log(jsonResponse.pipelines);
+        console.log("here we go");
+        self.props.dispatch(
+          addPipelines({ pipelinesArray: jsonResponse.pipelines })
+        );
+
         self.setState({
-          pipelines: jsonResponse,
           pipelinesDialogOpen: true
         });
       });
@@ -154,11 +160,10 @@ class AssistantDemoPage extends React.Component {
           >
             Start
           </Button>
-
           <Dialog open={pipelinesDialogOpen} onClose={this.handleClose}>
             <DialogTitle>Pipelines Response</DialogTitle>
             <DialogContent>
-              <ReactJson src={this.state.pipelines} />
+              <PipelinesTable />
             </DialogContent>
             <DialogActions>
               <Button color="primary" onClick={this.handleClose}>
@@ -190,4 +195,4 @@ AssistantDemoPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withRoot(withStyles(styles)(AssistantDemoPage));
+export default connect()(withRoot(withStyles(styles)(AssistantDemoPage)));
