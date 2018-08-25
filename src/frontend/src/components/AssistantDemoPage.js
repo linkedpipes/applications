@@ -25,7 +25,7 @@ const styles = theme => ({
   }
 });
 
-class Index extends React.Component {
+class AssistantDemoPage extends React.Component {
   state = {
     ttlFile: undefined,
     discoveryId: "",
@@ -186,8 +186,8 @@ class Index extends React.Component {
   }
 }
 
-Index.propTypes = {
+AssistantDemoPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withRoot(withStyles(styles)(Index));
+export default withRoot(withStyles(styles)(AssistantDemoPage));

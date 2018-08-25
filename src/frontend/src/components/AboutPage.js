@@ -16,7 +16,7 @@ const styles = theme => ({
   }
 });
 
-function HelpPage(props) {
+function AboutPage(props) {
   const { classes } = props;
 
   return (
@@ -31,8 +31,8 @@ function HelpPage(props) {
   );
 }
 
-HelpPage.propTypes = {
+AboutPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(HelpPage);
+export default withStyles(styles)(AboutPage);
