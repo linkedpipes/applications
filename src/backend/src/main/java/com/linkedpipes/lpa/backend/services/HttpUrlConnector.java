@@ -49,7 +49,7 @@ public class HttpUrlConnector {
 
     public String sendGetRequest(String url, String params, String acceptType) throws IOException {
 
-        URL obj = new URL(url);
+        URL obj = new URL(url + params);
 
         HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
 
