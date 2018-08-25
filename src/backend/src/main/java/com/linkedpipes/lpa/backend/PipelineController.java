@@ -30,18 +30,11 @@ public class PipelineController {
 
     @RequestMapping("/pipeline/export")
     @ResponseBody
-    public ResponseEntity<String> exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri){
-        try {
-            String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/export/" + pipelineUri,
-                    null, "application/json");
+    public ResponseEntity<String> exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri) throws IOException{
+        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/export/" + pipelineUri,
+                null, "application/json");
 
-            return ResponseEntity.ok(response);
-
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
     @RequestMapping("/pipeline/create")
@@ -51,18 +44,11 @@ public class PipelineController {
     }
 
     @RequestMapping("/pipeline/execute")
-    public ResponseEntity<String> executePipeline(@RequestParam( value="etlPipelineIri") String etlPipelineIri){
-        try {
-            String response = httpUrlConnector.sendPostRequest(Application.config.getProperty("etlServiceUrl") + "/executions?pipeline=" + etlPipelineIri,
-                    null, "application/json", "application/json");
+    public ResponseEntity<String> executePipeline(@RequestParam( value="etlPipelineIri") String etlPipelineIri) throws IOException{
+        String response = httpUrlConnector.sendPostRequest(Application.config.getProperty("etlServiceUrl") + "/executions?pipeline=" + etlPipelineIri,
+                null, "application/json", "application/json");
 
-            return ResponseEntity.ok(response);
-
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
 }

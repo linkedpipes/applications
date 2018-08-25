@@ -18,40 +18,28 @@ public class ExecutionController {
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
 
     @RequestMapping("/execution/status")
-    public ResponseEntity<String> getStatus(@RequestParam( value="executionIri") String executionIri){
+    public ResponseEntity<String> getStatus(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {
             return new ResponseEntity("Execution IRI not provided.", HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            String response = httpUrlConnector.sendGetRequest(executionIri + "/overview",
-                    null, "application/json");
+        String response = httpUrlConnector.sendGetRequest(executionIri + "/overview",
+                null, "application/json");
 
-            return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
     @RequestMapping("/execution/result")
     @ResponseBody
-    public ResponseEntity<String> getResult(@RequestParam( value="executionIri") String executionIri){
+    public ResponseEntity<String> getResult(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {
             return new ResponseEntity("Execution IRI not provided.", HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            String response = httpUrlConnector.sendGetRequest(executionIri,
-                    null, "application/json");
+        String response = httpUrlConnector.sendGetRequest(executionIri,
+                null, "application/json");
 
-            return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
 }

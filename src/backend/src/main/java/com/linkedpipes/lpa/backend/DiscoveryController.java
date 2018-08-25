@@ -36,24 +36,17 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discoverFromInput")
-    public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig){
+    public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig) throws IOException{
         if(discoveryConfig == null || discoveryConfig.isEmpty()) {
             return new ResponseEntity("Discovery config not provided", HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
-                    discoveryConfig, "text/plain", "application/json");
+        String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
+                discoveryConfig, "text/plain", "application/json");
 
-            Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
+        Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
 
-            return ResponseEntity.ok(newDiscovery);
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
-
+        return ResponseEntity.ok(newDiscovery);
 
         /*HttpResponse<String> response;
 
@@ -91,33 +84,20 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/discovery/{id}/status")
-    public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId){
-        try {
-            String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId,
-                    null, "application/json");
+    public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId) throws IOException{
+        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId,
+                null, "application/json");
 
-            return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
     @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
-    public ResponseEntity<String> getPipelineGroups(@PathVariable("id") String discoveryId){
-        try {
-            String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines",
-                    null, "application/json");
+    public ResponseEntity<String> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException{
+        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines",
+                null, "application/json");
 
-            return ResponseEntity.ok(response);
-
-        } catch (IOException e) {
-            logger.error("Exception: ", e);
-        }
-
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
 }
