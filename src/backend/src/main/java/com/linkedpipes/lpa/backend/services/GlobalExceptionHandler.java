@@ -32,6 +32,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
         }
 
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity(body, headers, status);
     }
 }

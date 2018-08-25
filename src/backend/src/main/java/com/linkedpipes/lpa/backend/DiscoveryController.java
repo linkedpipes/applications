@@ -73,14 +73,15 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discoverFromInputIri")
-    public ResponseEntity<String> startDiscoveryFromInputIri(@RequestBody String discoveryConfigIri){
+    public ResponseEntity<String> startDiscoveryFromInputIri(@RequestParam( value="discoveryConfigIri") String discoveryConfigIri) throws IOException{
         if(discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
-            return new ResponseEntity<>("Input IRI not provided", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Input IRI not provided", HttpStatus.BAD_REQUEST);
         }
 
-        //TODO implement
+        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInputIri",
+                "?iri=" + discoveryConfigIri, "application/json");
 
-        return new ResponseEntity("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.ok(response);
     }
 
     @RequestMapping("/discovery/{id}/status")
