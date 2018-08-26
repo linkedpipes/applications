@@ -177,8 +177,24 @@ class SelectSources extends React.Component {
           </Button>
 
           <Dialog open={pipelinesDialogOpen} onClose={this.handleClose}>
-            <DialogTitle>Pipelines Response</DialogTitle>
+            <DialogTitle>
+              <Typography variant="display2" gutterBottom>
+                Pipelines Browser
+              </Typography>
+            </DialogTitle>
             <DialogContent>
+              <div>
+                Each discovered pipeline presents a sequence of transformation
+                steps that have to be applied on the data so that they can be
+                visualized using this visualizer. Note that different pipelines
+                will give different outputs. You need to try them manually.
+              </div>
+              <p>
+                <strong>
+                  To create an application, first run a pipeline from the table
+                  bellow.
+                </strong>
+              </p>
               <PipelinesTable />
             </DialogContent>
             <DialogActions>
