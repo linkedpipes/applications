@@ -1,8 +1,13 @@
 package com.linkedpipes.lpa.backend;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.linkedpipes.lpa.backend.entities.DataSourceList;
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.Pipeline;
+import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +66,26 @@ public class DiscoveryController {
 
     @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
-    public ResponseEntity<String> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException{
+    public ResponseEntity<Object> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException{
         String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipeline-groups",
                 null, "application/json");
 
-        return ResponseEntity.ok(response);
+        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+        JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
+        JsonArray pipelines = pipelineGroupsJson.getAsJsonArray("pipelines");
+
+        PipelineGroups pipelineGroups = new PipelineGroups();
+
+        for (JsonElement pipeline : pipelines) {
+            JsonArray pipelineArray = pipeline.getAsJsonArray();
+            Pipeline pipelineObj = new Pipeline();
+            pipelineObj.id = pipelineArray.get(0).getAsString();
+            pipelineObj.name = pipelineArray.get(1).getAsJsonObject().get("name").getAsString();
+            pipelineObj.descriptor = pipelineArray.get(1).getAsJsonObject().get("descriptor").getAsString();
+            pipelineGroups.pipelines.add(pipelineObj);
+        }
+
+        return ResponseEntity.ok(pipelineGroups);
     }
 
 }
