@@ -2,5 +2,13 @@ package com.linkedpipes.lpa.backend.entities;
 
 public class Pipeline {
 
-    public String Uri;
+    public String id;
+
+    public String name;
+
+    public String descriptor;
+
+    public int componentCount;
+
+    public DataSourceList dataSources;
 }
