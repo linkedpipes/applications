@@ -10,12 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
-import jdk.jshell.spi.ExecutionControl;
-/*import java.net.URI;
-import jdk.incubator.http.HttpClient;
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
-import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;*/
 
 @RestController
 public class DiscoveryController {
@@ -24,10 +18,6 @@ public class DiscoveryController {
             LoggerFactory.getLogger(DiscoveryController.class);
 
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
-
-    /*private static final HttpClient client = HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.NEVER)
-            .build();*/
 
     @RequestMapping("/pipelines/discover")
     public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
@@ -47,29 +37,6 @@ public class DiscoveryController {
         Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
 
         return ResponseEntity.ok(newDiscovery);
-
-        /*HttpResponse<String> response;
-
-        try {
-            URI requestUri = new URI(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
-            HttpRequest request = HttpRequest.newBuilder(requestUri)
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "text/plain")
-                    .POST(fromString(discoveryConfig))
-                    .build();
-            response = client.send(request, HttpResponse.BodyHandler.asString());
-        } catch (Exception e) {
-            logger.error("Exception: ", e);
-            return new ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        if (response.statusCode() != 200) {
-            String errorMsg = response.statusCode() + ": " + response.body();
-            logger.error(errorMsg);
-            return new ResponseEntity(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return ResponseEntity.ok(response.body());*/
     }
 
     @RequestMapping("/pipelines/discoverFromInputIri")
@@ -95,7 +62,7 @@ public class DiscoveryController {
     @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
     public ResponseEntity<String> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException{
-        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipelines",
+        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipeline-groups",
                 null, "application/json");
 
         return ResponseEntity.ok(response);
