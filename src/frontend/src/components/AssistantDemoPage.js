@@ -5,6 +5,7 @@ import withRoot from "./withRoot";
 import SelectSources from "./SelectSources";
 import "whatwg-fetch";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 class AssistantDemoPage extends React.Component {
   render() {

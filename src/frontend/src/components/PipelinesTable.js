@@ -1,5 +1,4 @@
 import React from "react";
-import classNames from "classnames";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -144,12 +143,12 @@ class PipelinesTable extends React.Component {
     rowsPerPage: 5
   };
 
-  getPipelineGroups = () => {
+  exportPipeline = (discoveryId, pipelineUri) => {
+    return;
     const url =
-      "http://localhost:8080/discovery/" +
-      this.state.discoveryId +
-      "/pipelineGroups";
-    console.log(url);
+      `http://localhost:8080/pipeline/export?\
+      discoveryId=${discoveryId}&\
+      pipelineUri=${pipelineUri}`;
     const self = this;
     fetch(url)
       .then(
@@ -158,18 +157,12 @@ class PipelinesTable extends React.Component {
         },
         function(error) {
           console.error(error);
-          error.message; //=> String
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse.pipelines);
-        console.log("here we go");
-        self.props.dispatch(
-          addPipelines({ pipelinesArray: jsonResponse.pipelines })
-        );
-
+        console.log(jsonResponse);
         self.setState({
-          pipelinesDialogOpen: true
+          //pipelinesDialogOpen: true
         });
       });
   };
@@ -220,7 +213,10 @@ class PipelinesTable extends React.Component {
                   return (
                     <TableRow hover tabIndex={-1} key={pipeline.id}>
                       <TableCell>
-                        <Button size="small" variant="contained" color="secondary">
+                        <Button size="small"
+                                variant="contained"
+                                color="secondary"
+                                onClick={this.exportPipeline(null, null)}>
                           Run
                         </Button>
                       </TableCell>
