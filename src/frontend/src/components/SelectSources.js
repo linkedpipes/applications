@@ -15,6 +15,8 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import PipelinesTable from "./PipelinesTable";
 import { addPipelines } from "../actions/pipelines";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const styles = theme => ({
   root: {
@@ -49,12 +51,16 @@ class SelectSources extends React.Component {
   };
 
   onChange = e => {
-    console.log("got file");
+    toast.success('File uploaded', {autoClose: 1500});
     this.setState({ ttlFile: e.target.files[0] });
   };
 
   postStartFromInput = () => {
-    console.log("inside");
+    let tid = toast.info("Running the discovery...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
+    });
+    console.log(toast);
     const url = "http://localhost:8080/pipelines/discoverFromInput";
     const self = this;
     fetch(url, {
@@ -67,44 +73,52 @@ class SelectSources extends React.Component {
     })
       .then(
         function(response) {
-          console.log("json response");
           return response.json();
         },
-        function(error) {
-          console.log(error);
-          error.message; //=> String
+        function(err) {
+          toast.update(tid, { render: 'There was an error during the discovery',
+            type: toast.TYPE.ERROR,
+            autoClose: 2000 });
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse);
+        if(toast.isActive(tid)){
+          toast.update(tid, { render: `Discovery id ${jsonResponse.id}`,
+            type: toast.TYPE.SUCCESS,
+            autoClose: 2000 });
+        } else {
+          toast.success(`Discovery id ${jsonResponse.id}`, {autoClose: 2000});
+        }
 
         self.setState({
-          discoveryId: jsonResponse.id,
-          discoveryDialogOpen: true
+          discoveryId: jsonResponse.id
         });
       });
   };
 
   getPipelineGroups = () => {
     const url =
-      "http://localhost:8080/discovery/" +
-      this.state.discoveryId +
-      "/pipelineGroups";
-    console.log(url);
+      `http://localhost:8080/discovery/${this.state.discoveryId}/pipelineGroups`;
+
+    let tid = toast.info("Getting the pipeline groups...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
+    });
+
     const self = this;
     fetch(url)
       .then(
         function(response) {
           return response.json();
         },
-        function(error) {
-          console.error(error);
-          error.message; //=> String
+        function(err) {
+          toast.update(tid, { render: 'Error getting pipeline groups',
+            type: toast.TYPE.ERROR,
+            autoClose: 2000 });
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse.pipelines);
-        console.log("here we go");
+        toast.dismiss(tid);
         self.props.dispatch(
           addPipelines({ pipelinesArray: jsonResponse.pipelines })
         );
@@ -152,12 +166,13 @@ class SelectSources extends React.Component {
             className={classes.input}
             onChange={this.onChange}
             id="contained-button-file"
-            type="file"
-          />
+            type="file"/>
 
           <label htmlFor="contained-button-file">
-            <Button variant="contained" component="span"
-                    className={classes.button} size="small">
+            <Button variant="contained"
+                    component="span"
+                    className={classes.button}
+                    size="small">
               Select TTL file
             </Button>
           </label>
@@ -168,7 +183,10 @@ class SelectSources extends React.Component {
             Start
           </Button>
 
-          <Dialog fullWidth="true" maxWidth="md" open={pipelinesDialogOpen} onClose={this.handleClose}>
+          <Dialog fullWidth="true"
+                  maxWidth="md"
+                  open={pipelinesDialogOpen}
+                  onClose={this.handleClose}>
             <DialogTitle>
               <Typography variant="headline" gutterBottom>
                 Pipelines Browser
@@ -190,20 +208,19 @@ class SelectSources extends React.Component {
               <PipelinesTable/>
             </DialogContent>
             <DialogActions>
-              <Button color="primary" onClick={this.handleClose}>
+              <Button color="primary"
+                      onClick={this.handleClose}>
                 OK
               </Button>
             </DialogActions>
           </Dialog>
 
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={!this.state.discoveryId}
-            onClick={this.getPipelineGroups}
-            size="small"
-          >
+          <Button variant="contained"
+                  component="span"
+                  className={classes.button}
+                  disabled={!this.state.discoveryId}
+                  onClick={this.getPipelineGroups}
+                  size="small">
             Browse Pipelines
           </Button>
         </CardActions>
