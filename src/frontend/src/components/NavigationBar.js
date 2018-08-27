@@ -1,6 +1,7 @@
 import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import { Toolbar, Typography, withStyles } from "@material-ui/core";
+import { ToastContainer } from "react-toastify";
 
 const styles = {
   flex: {
@@ -19,6 +20,7 @@ const NavigationBar = props => {
           </Typography>
         </Toolbar>
       </AppBar>
+      <ToastContainer className="toast-container" />
     </header>
   );
 };
