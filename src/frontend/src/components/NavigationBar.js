@@ -14,11 +14,7 @@ const NavigationBar = props => {
     <header>
       <AppBar position="static">
         <Toolbar>
-          <Typography
-            variant="display1"
-            color="inherit"
-            className={classes.flex}
-          >
+          <Typography variant="title" color="inherit" className={classes.flex}>
             Discovery API Assistant Demo
           </Typography>
         </Toolbar>

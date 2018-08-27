@@ -9,11 +9,9 @@ import "react-toastify/dist/ReactToastify.css";
 class AssistantDemoPage extends React.Component {
   render() {
     return (
-      <body>
         <div style={{ padding: 50 }}>
           <SelectSources />
         </div>
-      </body>
     );
   }
 }

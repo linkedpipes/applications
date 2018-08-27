@@ -13,10 +13,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
-import ReactJson from "react-json-view";
 import PipelinesTable from "./PipelinesTable";
 import { addPipelines } from "../actions/pipelines";
-import { ToastContainer, toast } from "react-toastify";
 
 const styles = theme => ({
   root: {
@@ -69,6 +67,7 @@ class SelectSources extends React.Component {
     })
       .then(
         function(response) {
+          console.log("json response");
           return response.json();
         },
         function(error) {
@@ -99,7 +98,7 @@ class SelectSources extends React.Component {
           return response.json();
         },
         function(error) {
-          console.log(error);
+          console.error(error);
           error.message; //=> String
         }
       )
@@ -127,10 +126,10 @@ class SelectSources extends React.Component {
     return (
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBottom variant="display2" component="h1">
+          <Typography gutterBottom variant="title" component="h1">
             Select Data Sources
           </Typography>
-          <Typography variant="headline" gutterBottom>
+          <Typography variant="body1" gutterBottom>
             Select data source for your new application
           </Typography>
         </CardContent>
@@ -157,45 +156,38 @@ class SelectSources extends React.Component {
           />
 
           <label htmlFor="contained-button-file">
-            <Button
-              variant="contained"
-              component="span"
-              className={classes.button}
-            >
+            <Button variant="contained" component="span"
+                    className={classes.button} size="small">
               Select TTL file
             </Button>
           </label>
 
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={!this.state.ttlFile}
-            onClick={this.postStartFromInput}
-          >
+          <Button variant="contained" component="span"
+                  className={classes.button} disabled={!this.state.ttlFile}
+                  onClick={this.postStartFromInput} size="small">
             Start
           </Button>
 
-          <Dialog open={pipelinesDialogOpen} onClose={this.handleClose}>
+          <Dialog fullWidth="true" maxWidth="md" open={pipelinesDialogOpen} onClose={this.handleClose}>
             <DialogTitle>
-              <Typography variant="display2" gutterBottom>
+              <Typography variant="headline" gutterBottom>
                 Pipelines Browser
               </Typography>
             </DialogTitle>
             <DialogContent>
-              <div>
-                Each discovered pipeline presents a sequence of transformation
-                steps that have to be applied on the data so that they can be
-                visualized using this visualizer. Note that different pipelines
+              <Typography variant="body1">
+                Each discovered pipeline presents a sequence of transformations
+                that have to be applied to the data so that it can be
+                visualized using this visualizer. Notice that different pipelines
                 will give different outputs. You need to try them manually.
-              </div>
+              </Typography>
               <p>
-                <strong>
+                <Typography variant="body2">
                   To create an application, first run a pipeline from the table
-                  bellow.
-                </strong>
+                  below.
+                </Typography>
               </p>
-              <PipelinesTable />
+              <PipelinesTable/>
             </DialogContent>
             <DialogActions>
               <Button color="primary" onClick={this.handleClose}>
@@ -210,6 +202,7 @@ class SelectSources extends React.Component {
             className={classes.button}
             disabled={!this.state.discoveryId}
             onClick={this.getPipelineGroups}
+            size="small"
           >
             Browse Pipelines
           </Button>

@@ -14,6 +14,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
+import { addPipelines } from "../actions/pipelines";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -143,6 +144,36 @@ class PipelinesTable extends React.Component {
     rowsPerPage: 5
   };
 
+  getPipelineGroups = () => {
+    const url =
+      "http://localhost:8080/discovery/" +
+      this.state.discoveryId +
+      "/pipelineGroups";
+    console.log(url);
+    const self = this;
+    fetch(url)
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(error) {
+          console.error(error);
+          error.message; //=> String
+        }
+      )
+      .then(function(jsonResponse) {
+        console.log(jsonResponse.pipelines);
+        console.log("here we go");
+        self.props.dispatch(
+          addPipelines({ pipelinesArray: jsonResponse.pipelines })
+        );
+
+        self.setState({
+          pipelinesDialogOpen: true
+        });
+      });
+  };
+
   handleRequestSort = (event, property) => {
     const orderBy = property;
     let order = "desc";
@@ -188,9 +219,11 @@ class PipelinesTable extends React.Component {
                 .map(pipeline => {
                   return (
                     <TableRow hover tabIndex={-1} key={pipeline.id}>
-                      <Button variant="contained" color="secondary">
-                        Run Discovery
-                      </Button>
+                      <TableCell>
+                        <Button size="small" variant="contained" color="secondary">
+                          Run
+                        </Button>
+                      </TableCell>
                       <TableCell component="th" scope="row" padding="none">
                         {pipeline.name}
                       </TableCell>
@@ -236,5 +269,7 @@ const mapStateToProps = state => {
     pipelines: state.pipelines
   };
 };
+
+
 
 export default connect(mapStateToProps)(withStyles(styles)(PipelinesTable));
