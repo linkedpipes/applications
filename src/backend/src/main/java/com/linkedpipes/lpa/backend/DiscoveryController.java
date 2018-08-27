@@ -15,6 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.net.URI;
+
+
+import jdk.incubator.http.HttpClient;
+import jdk.incubator.http.HttpRequest;
+import jdk.incubator.http.HttpResponse;
+import static jdk.incubator.http.HttpRequest.BodyPublisher.fromString;
 
 @RestController
 public class DiscoveryController {
@@ -24,6 +31,10 @@ public class DiscoveryController {
 
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
 
+    private static final HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
+
     @RequestMapping("/pipelines/discover")
     public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
         Integer testDiscoveryId = 1;
@@ -31,17 +42,29 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discoverFromInput")
-    public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig) throws IOException{
-        if(discoveryConfig == null || discoveryConfig.isEmpty()) {
-            return new ResponseEntity("Discovery config not provided", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig){
+        HttpResponse<String> response;
+
+        try {
+            URI requestUri = new URI(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput");
+            HttpRequest request = HttpRequest.newBuilder(requestUri)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "text/plain")
+                    .POST(fromString(discoveryConfig))
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandler.asString());
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            return new ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
-                discoveryConfig, "text/plain", "application/json");
+        if (response.statusCode() != 200) {
+            String errorMsg = response.statusCode() + ": " + response.body();
+            logger.error(errorMsg);
+            return new ResponseEntity(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
-
-        return ResponseEntity.ok(newDiscovery);
+        return ResponseEntity.ok(response.body());
     }
 
     @RequestMapping("/pipelines/discoverFromInputIri")
