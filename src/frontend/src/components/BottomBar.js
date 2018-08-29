@@ -30,7 +30,6 @@ class SimpleBottomNavigation extends React.Component {
     if (value === "dashboard") {
       this.props.history.push(appRoutes.dashboardUrl);
     } else if (value === "about") {
-      console.log(appRoutes.aboutUrl);
       this.props.history.push(appRoutes.aboutUrl);
     }
   };

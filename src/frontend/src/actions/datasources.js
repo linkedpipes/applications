@@ -1,23 +1,17 @@
 import uuid from "uuid";
 
 // ADD_EXPENSE
-export const addSource = ({ uri } = {}) => ({
+export const addSource = ({ name, url } = {}) => ({
   type: "ADD_SOURCE",
-  expense: {
+  source: {
     id: uuid(),
-    uri
+    name: name,
+    url: url
   }
 });
 
 // REMOVE_SOURCE
-export const removeExpense = ({ id } = {}) => ({
+export const removeSource = ({ id } = {}) => ({
   type: "REMOVE_SOURCE",
   id
-});
-
-// EDIT_SOURCE
-export const editExpense = (id, updates) => ({
-  type: "EDIT_SOURCE",
-  id,
-  updates
 });

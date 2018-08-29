@@ -145,8 +145,7 @@ class PipelinesTable extends React.Component {
 
   exportPipeline = (discoveryId, pipelineUri) => {
     return;
-    const url =
-      `http://localhost:8080/pipeline/export?\
+    const url = `http://localhost:8080/pipeline/export?\
       discoveryId=${discoveryId}&\
       pipelineUri=${pipelineUri}`;
     const self = this;
@@ -188,9 +187,8 @@ class PipelinesTable extends React.Component {
 
   render() {
     const { classes, pipelines } = this.props;
-    console.log("test");
-    console.log(pipelines);
     const { order, orderBy, rowsPerPage, page } = this.state;
+
     const emptyRows =
       rowsPerPage -
       Math.min(rowsPerPage, pipelines.length - page * rowsPerPage);
@@ -213,10 +211,12 @@ class PipelinesTable extends React.Component {
                   return (
                     <TableRow hover tabIndex={-1} key={pipeline.id}>
                       <TableCell>
-                        <Button size="small"
-                                variant="contained"
-                                color="secondary"
-                                onClick={this.exportPipeline(null, null)}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="secondary"
+                          onClick={this.exportPipeline(null, null)}
+                        >
                           Run
                         </Button>
                       </TableCell>
@@ -265,7 +265,5 @@ const mapStateToProps = state => {
     pipelines: state.pipelines
   };
 };
-
-
 
 export default connect(mapStateToProps)(withStyles(styles)(PipelinesTable));
