@@ -8,8 +8,7 @@ import java.io.InputStreamReader;
 public class StreamHelper {
 
     public static String getStringFromStream(InputStream stream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(
-                stream));
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String output;
         StringBuilder sb = new StringBuilder();
         while ((output = br.readLine()) != null) {

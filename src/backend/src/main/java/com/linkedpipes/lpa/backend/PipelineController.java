@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +12,6 @@ import java.io.IOException;
 
 @RestController
 public class PipelineController {
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(DiscoveryController.class);
 
     private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
 
