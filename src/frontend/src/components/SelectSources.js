@@ -63,7 +63,7 @@ class SelectSources extends React.Component {
     this.setState({ ttlFile: e.target.files[0] });
   };
 
-  postStartFromInput = () => {
+  postStartFromFile = () => {
     let tid = toast.info("Running the discovery...", {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: false
@@ -73,7 +73,7 @@ class SelectSources extends React.Component {
     const self = this;
     fetch(url, {
       method: "POST",
-      body: this.state.ttlFile,
+      body: self.state.ttlFile,
       headers: {
         "Content-Type": "application/json"
       },
@@ -106,6 +106,66 @@ class SelectSources extends React.Component {
           discoveryId: jsonResponse.id
         });
       });
+  };
+
+  // TODO: refactor later, move to separate class responsible for api calls
+  postStartFromLinks = () => {
+    const { datasources } = this.props;
+    const datasourceURLs = datasources.map(source => {
+      return source.url;
+    });
+
+    console.log("links are below");
+    console.log(datasources);
+    console.log(datasourceURLs);
+
+    const url = "http://localhost:8080/pipelines/discover";
+    const self = this;
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        datasourceURLs: datasourceURLs
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "same-origin"
+    })
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(err) {
+          toast.update(tid, {
+            render: "There was an error during the discovery",
+            type: toast.TYPE.ERROR,
+            autoClose: 2000
+          });
+        }
+      )
+      .then(function(jsonResponse) {
+        if (toast.isActive(tid)) {
+          toast.update(tid, {
+            render: `Discovery id ${jsonResponse.id}`,
+            type: toast.TYPE.SUCCESS,
+            autoClose: 2000
+          });
+        } else {
+          toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
+        }
+
+        self.setState({
+          discoveryId: jsonResponse.id
+        });
+      });
+  };
+
+  processStartDiscovery = () => {
+    if (this.state.ttlFile) {
+      this.postStartFromFile();
+    } else {
+      this.postStartFromLinks();
+    }
   };
 
   getPipelineGroups = () => {
@@ -149,7 +209,8 @@ class SelectSources extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, datasources } = this.props;
+
     const {
       discoveryDialogOpen,
       discoveryId,
@@ -218,8 +279,8 @@ class SelectSources extends React.Component {
             variant="contained"
             component="span"
             className={classes.button}
-            disabled={!this.state.ttlFile}
-            onClick={this.postStartFromInput}
+            disabled={!this.state.ttlFile && datasources.length === 0}
+            onClick={this.processStartDiscovery}
             size="small"
           >
             Start
@@ -278,4 +339,10 @@ SelectSources.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default connect()(withStyles(styles)(SelectSources));
+const mapStateToProps = state => {
+  return {
+    datasources: state.datasources
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
