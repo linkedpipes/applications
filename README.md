@@ -19,9 +19,9 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
 
-`docker run --name lpa -p 5000:8080 linkedpipes/application`
+`$ docker run -v <path to config.properties>:/app/config.properties --name <container name> -p 5000:8080 linkedpipes/application`
 
-The application should then by available through port `5000`
+The application should then by available through port `5000`. Note that you must mount the volume with the `config.properties` file.
 
 # Building the image
 
