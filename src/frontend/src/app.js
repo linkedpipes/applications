@@ -10,7 +10,6 @@ import configureStore from "./store/configureStore";
 const store = configureStore();
 
 const state = store.getState();
-console.log(store);
 
 const jsx = (
   <Provider store={store}>

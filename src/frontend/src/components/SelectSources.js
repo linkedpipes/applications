@@ -115,10 +115,6 @@ class SelectSources extends React.Component {
       return source.url;
     });
 
-    console.log("links are below");
-    console.log(datasources);
-    console.log(datasourceURLs);
-
     const url = "http://localhost:8080/pipelines/discover";
     const self = this;
     fetch(url, {

@@ -28,7 +28,6 @@ class AddDatasourceDialog extends React.Component {
   };
 
   handleAddDatasource = () => {
-    console.log(this.state);
     const name = this.state.name;
     const url = this.state.url;
 

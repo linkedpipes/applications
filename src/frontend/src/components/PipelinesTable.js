@@ -159,7 +159,6 @@ class PipelinesTable extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse);
         self.setState({
           //pipelinesDialogOpen: true
         });
