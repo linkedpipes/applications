@@ -1,4 +1,4 @@
-package com.linkedpipes.lpa.backend;
+package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
@@ -11,7 +11,11 @@ import java.io.IOException;
 @RestController
 public class ExecutionController {
 
-    private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+    private HttpUrlConnector httpUrlConnector;
+
+    public ExecutionController(){
+        httpUrlConnector = new HttpUrlConnector();
+    }
 
     @RequestMapping("/execution/status")
     public ResponseEntity<?> getStatus(@RequestParam( value="executionIri") String executionIri) throws IOException{

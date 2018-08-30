@@ -1,25 +1,56 @@
-package com.linkedpipes.lpa.backend;
+package com.linkedpipes.lpa.backend.controllers;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
+import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
 
 @RestController
 public class DiscoveryController {
 
-    private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+    private HttpUrlConnector httpUrlConnector;
+    private DiscoveryServiceComponent discoveryService;
+
+    public DiscoveryController(){
+        httpUrlConnector = new HttpUrlConnector();
+        discoveryService = new DiscoveryServiceComponent();
+    }
 
     @RequestMapping("/pipelines/discover")
-    public Integer startDiscovery(@RequestBody DataSourceList dataSourceList){
-        Integer testDiscoveryId = 1;
-        return testDiscoveryId;
+    public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException{
+        if(dataSourceList == null || dataSourceList.size() == 0 ) {
+            return new ResponseEntity(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
+        }
+
+        //TODO move below logic to a service class
+        //TODO the ttl config being generated isn't valid, fix
+        // create an empty model
+        Model model = ModelFactory.createDefaultModel();
+
+        // create the resources
+        for (DataSource dataSource : dataSourceList) {
+            model.createResource(dataSource.Uri);
+        }
+
+        StringWriter stringWriter = new StringWriter();
+        model.write(stringWriter, "TURTLE");
+
+        String discoveryConfig = stringWriter.toString();
+
+        String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
+                discoveryConfig, "text/plain", "application/json");
+        Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
+
+        return ResponseEntity.ok(newDiscovery);
     }
 
     @RequestMapping("/pipelines/discoverFromInput")
@@ -49,8 +80,7 @@ public class DiscoveryController {
 
     @RequestMapping("/discovery/{id}/status")
     public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId) throws IOException{
-        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId,
-                null, "application/json");
+        String response = discoveryService.getDiscoveryStatus(discoveryId);
 
         return ResponseEntity.ok(response);
     }
@@ -58,23 +88,7 @@ public class DiscoveryController {
     @RequestMapping("/discovery/{id}/pipelineGroups")
     @ResponseBody
     public ResponseEntity<Object> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException{
-        String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/" + discoveryId + "/pipeline-groups",
-                null, "application/json");
-
-        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
-        JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
-        JsonArray pipelines = pipelineGroupsJson.getAsJsonArray("pipelines");
-
-        PipelineGroups pipelineGroups = new PipelineGroups();
-
-        for (JsonElement pipeline : pipelines) {
-            JsonArray pipelineArray = pipeline.getAsJsonArray();
-            Pipeline pipelineObj = new Pipeline();
-            pipelineObj.id = pipelineArray.get(0).getAsString();
-            pipelineObj.name = pipelineArray.get(1).getAsJsonObject().get("name").getAsString();
-            pipelineObj.descriptor = pipelineArray.get(1).getAsJsonObject().get("descriptor").getAsString();
-            pipelineGroups.pipelines.add(pipelineObj);
-        }
+        PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);
 
         return ResponseEntity.ok(pipelineGroups);
     }

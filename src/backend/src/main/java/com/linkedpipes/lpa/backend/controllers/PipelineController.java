@@ -1,6 +1,7 @@
-package com.linkedpipes.lpa.backend;
+package com.linkedpipes.lpa.backend.controllers;
 
 import com.google.gson.Gson;
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
@@ -13,7 +14,11 @@ import java.io.IOException;
 @RestController
 public class PipelineController {
 
-    private HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+    private HttpUrlConnector httpUrlConnector;
+
+    public PipelineController(){
+        httpUrlConnector = new HttpUrlConnector();
+    }
 
     @RequestMapping("/pipeline")
     @ResponseBody

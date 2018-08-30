@@ -45,4 +45,5 @@ dependencies {
     runtime('org.springframework.boot:spring-boot-devtools')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile 'com.google.code.gson:gson:2.8.5'
+	compile 'org.apache.jena:apache-jena-libs:3.8.0'
 }

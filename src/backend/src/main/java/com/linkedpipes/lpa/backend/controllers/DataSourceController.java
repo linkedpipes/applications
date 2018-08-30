@@ -1,16 +1,18 @@
-package com.linkedpipes.lpa.backend;
+package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.DataSource;
-import com.linkedpipes.lpa.backend.entities.DataSourceList;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class DataSourceController {
 
     @RequestMapping("/datasources")
     @ResponseBody
-    public DataSourceList getDataSources(){
-        return new DataSourceList();
+    public List<DataSource> getDataSources(){
+        return new ArrayList<>();
     }
 
     @PostMapping("/datasources")

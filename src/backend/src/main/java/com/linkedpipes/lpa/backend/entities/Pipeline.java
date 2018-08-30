@@ -1,5 +1,7 @@
 package com.linkedpipes.lpa.backend.entities;
 
+import java.util.List;
+
 public class Pipeline {
 
     public String id;
@@ -10,5 +12,5 @@ public class Pipeline {
 
     public int componentCount;
 
-    public DataSourceList dataSources;
+    public List<DataSource> dataSources;
 }
