@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.linkedpipes.lpa.backend.DiscoveryController;
+import com.linkedpipes.lpa.backend.controllers.DiscoveryController;
 import com.linkedpipes.lpa.backend.helpers.StreamHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
