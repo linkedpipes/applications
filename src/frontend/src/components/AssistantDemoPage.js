@@ -10,9 +10,9 @@ import { ToastContainer } from "react-toastify";
 class AssistantDemoPage extends React.Component {
   render() {
     return (
-        <div style={{ padding: 50 }}>
-          <SelectSources />
-        </div>
+      <div style={{ padding: 50 }}>
+        <SelectSources />
+      </div>
     );
   }
 }
