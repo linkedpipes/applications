@@ -40,7 +40,11 @@
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
+    "babel-eslint": "9",
+    "eslint": "^5.4.0",
+    "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-prettier": "^2.6.2",
+    "eslint-plugin-react": "^7.11.1",
     "prettier": "1.14.2",
     "webpack-cli": "^3.1.0"
   }
