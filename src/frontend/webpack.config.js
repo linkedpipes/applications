@@ -1,10 +1,21 @@
-const path = require("path");
+const path = require('path');
+const webpack = require('webpack');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+
+const dev = process.env.NODE_ENV !== 'production';
+
+const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
+  template: path.join(__dirname, './src/index.html'),
+  filename: 'index.html',
+  inject: 'body',
+});
 
 module.exports = {
-  entry: ["whatwg-fetch", "./src/app.js"],
+  entry: [
+    path.join(__dirname, '/src/app.js')],
   output: {
-    path: path.join(__dirname, "public"),
-    filename: "bundle.js"
+    filename: 'bundle.js',
+    path: path.join(__dirname, '/public'),
   },
   module: {
     rules: [
@@ -19,8 +30,21 @@ module.exports = {
       }
     ]
   },
-  devtool: "cheap-module-eval-source-map",
+  devtool: dev ? 'inline-source-map': 'source-map',
   devServer: {
-    contentBase: path.join(__dirname, "public")
-  }
+    contentBase: path.join(__dirname, "/public"),
+    host: '0.0.0.0',
+    port: '9000',
+    hot: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  },
+  mode: dev ? 'development' : 'production',
+  plugins: dev
+    ? [
+      HTMLWebpackPluginConfig,
+      new webpack.HotModuleReplacementPlugin(),
+    ]
+    : [HTMLWebpackPluginConfig]
 };
