@@ -112,16 +112,19 @@ class SelectSources extends React.Component {
   postStartFromLinks = () => {
     const { datasources } = this.props;
     const datasourceURLs = datasources.map(source => {
-      return source.url;
+      return { Uri: source.url };
+    });
+
+    let tid = toast.info("Getting the pipeline groups...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
     });
 
     const url = "http://localhost:8080/pipelines/discover";
     const self = this;
     fetch(url, {
       method: "POST",
-      body: JSON.stringify({
-        datasourceURLs: datasourceURLs
-      }),
+      body: JSON.stringify(datasourceURLs),
       headers: {
         "Content-Type": "application/json"
       },
