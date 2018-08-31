@@ -15,7 +15,9 @@ High level documentation markdown (updated regularly) : [HackMD](https://hackmd.
 
 ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
 
-# Running the app
+## Running backend
+
+### Using docker
 
 The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
 
@@ -23,7 +25,23 @@ The Docker image for this project is hosted in [Docker Hub](https://hub.docker.c
 
 The application should then by available through port `5000`. Note that you must mount the volume with the `config.properties` file.
 
-# Building the image
+## Running frontend
+
+### Running locally
+
+1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
+2. Navigate to frontend folder by executing following commands from root folder.
+   `$ cd src/frontend`
+3. Installing dependencies. Depending on user's preference execute the command below.
+   3.1. If you are using `npm` then : `$ npm install`
+   3.2. If you are using `yarn` then : `$ yarn install`
+4. Running the web-app on `localhost`. Depending on user's preference execute the command below.
+   4.1. If you are using `npm` then : `$ npm run dev-server`
+   4.2. If you are using `yarn` then : `$ yarn run dev-server`
+
+After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`.
+
+### Building backend docker image
 
 In case you wanna build the image locally, follow the next steps:
 
