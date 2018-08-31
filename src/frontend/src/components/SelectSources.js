@@ -286,7 +286,7 @@ class SelectSources extends React.Component {
           </Button>
 
           <Dialog
-            fullWidth="true"
+            fullWidth={true}
             maxWidth="md"
             open={pipelinesDialogOpen}
             onClose={this.handleClose}
