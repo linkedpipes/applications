@@ -5,13 +5,17 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RIOT;
+import org.apache.jena.sparql.vocabulary.FOAF;
+import org.apache.jena.vocabulary.RDF;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.io.IOException;
-import java.io.StringWriter;
+
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -33,17 +37,21 @@ public class DiscoveryController {
 
         //TODO move below logic to a service class
         //TODO the ttl config being generated isn't valid, fix
+        RIOT.init() ;
+
         // create an empty model
         Model model = ModelFactory.createDefaultModel();
 
         // create the resources
         for (DataSource dataSource : dataSourceList) {
-            model.createResource(dataSource.Uri);
+            Resource res = model.createResource(dataSource.Uri);
+
+            // TODO : Refactor below, not sure about correct implementation
+            model.add(res, RDF.type, FOAF.page);
         }
 
         StringWriter stringWriter = new StringWriter();
-        model.write(stringWriter, "TURTLE");
-
+        RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
         String discoveryConfig = stringWriter.toString();
 
         String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
