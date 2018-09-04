@@ -1,0 +1,35 @@
+sudo: required
+services:
+  - docker
+
+matrix:
+  include:
+    # Job for frontend app
+    - language: node_js
+      node_js:
+        - stable
+      before_script:
+        - cd src/frontend
+      cache:
+        directories:
+          - node_modules
+      script:
+        - yarn install
+        - yarn run build
+      after_script:
+        - docker build -t frontend .
+
+    # Job for backend app
+    - language: java
+      jdk: oraclejdk10
+      before_script:
+        - cd src/backend
+      script:
+        - ./gradlew build
+      after_script:
+        - docker build -t backend --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar
+          .
+
+branches:
+  only:
+    - master
