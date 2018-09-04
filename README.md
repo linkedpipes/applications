@@ -15,15 +15,11 @@ High level documentation markdown (updated regularly) : [HackMD](https://hackmd.
 
 ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
 
-# Running the app
+## Running backend
 
-The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
+### Using docker
 
-`$ docker run -v <path to config.properties>:/app/config.properties --name <container name> -p 5000:8080 linkedpipes/application`
-
-The application should then by available through port `5000`. Note that you must mount the volume with the `config.properties` file.
-
-# Building the image
+#### Building image locally
 
 In case you wanna build the image locally, follow the next steps:
 
@@ -38,3 +34,37 @@ In case you wanna build the image locally, follow the next steps:
 - Build the image by executing in the project's root folder the next command, replacing `<some_tag>` by the name you want the image to have
 
 `$ docker build -t <some_tag> --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar .`
+
+#### Running the image
+
+The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
+
+`$ docker run -v <path to config.properties>:/app/config.properties --name <container name> -p 5000:8080 linkedpipes/application`
+
+The application should then by available through port `5000`. Note that you must mount the volume with the `config.properties` file.
+
+## Running frontend
+
+### Running locally
+
+1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
+2. Navigate to frontend folder by executing following commands from root folder.
+   `$ cd src/frontend`
+3. Installing dependencies. Depending on user's preference execute the command below.
+   3.1. If you are using `npm` then : `$ npm install`
+   3.2. If you are using `yarn` then : `$ yarn install`
+4. Running the web-app on `localhost`. Depending on user's preference execute the command below.
+   4.1. If you are using `npm` then : `$ npm run dev-server`
+   4.2. If you are using `yarn` then : `$ yarn run dev-server`
+
+After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`.
+
+### Using Docker
+
+1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
+2. Navigate to frontend folder by executing following commands from root folder.
+   `$ cd src/frontend`
+3. Build the image by running:
+   `$ docker build -t frontend .`
+4. Running the image by running:
+   `$ docker run frontend -p 9000:9000`
