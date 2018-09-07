@@ -22,19 +22,15 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 #### Building image locally
 
-In case you wanna build the image locally, follow the next steps:
+In case you want to build the image locally, follow the next steps:
 
 - Navigate to the backend folder
 
 `$ cd src/backend`
 
-- Build the jar file. It will be located under the `src/backend/build/lib` folder.
-
-`$ gradle build`
-
 - Build the image by executing in the project's root folder the next command, replacing `<some_tag>` by the name you want the image to have
 
-`$ docker build -t <some_tag> --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar .`
+`$ docker build -t <some_tag> .`
 
 #### Running the image
 
