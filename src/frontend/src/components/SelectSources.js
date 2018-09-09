@@ -20,6 +20,7 @@ import { addPipelines } from "../actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { showDatasourcesDialog } from "../actions/dialogs";
+import { postDiscoverFromTtl, getPipelineGroups } from "../api";
 
 const styles = theme => ({
   root: {
@@ -34,7 +35,7 @@ const styles = theme => ({
     display: "none"
   },
   card: {
-    maxWidth: 1200
+    flexGrow: 1
   },
   chip: {
     margin: theme.spacing.unit / 2
@@ -69,16 +70,8 @@ class SelectSources extends React.Component {
       autoClose: false
     });
 
-    const url = "http://localhost:8080/pipelines/discoverFromInput";
     const self = this;
-    fetch(url, {
-      method: "POST",
-      body: self.state.ttlFile,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
+    postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
       .then(
         function(response) {
           return response.json();
@@ -111,7 +104,7 @@ class SelectSources extends React.Component {
   // TODO: refactor later, move to separate class responsible for api calls
   postStartFromLinks = () => {
     const { datasources } = this.props;
-    const datasourceURLs = datasources.map(source => {
+    const datasourceUris = datasources.map(source => {
       return { Uri: source.url };
     });
 
@@ -120,16 +113,8 @@ class SelectSources extends React.Component {
       autoClose: false
     });
 
-    const url = "http://localhost:8080/pipelines/discover";
     const self = this;
-    fetch(url, {
-      method: "POST",
-      body: JSON.stringify(datasourceURLs),
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
+    postStartFromLinks({ datasourceUris: datasourceUris })
       .then(
         function(response) {
           return response.json();
@@ -167,18 +152,14 @@ class SelectSources extends React.Component {
     }
   };
 
-  getPipelineGroups = () => {
-    const url = `http://localhost:8080/discovery/${
-      this.state.discoveryId
-    }/pipelineGroups`;
-
+  loadPipelineGroups = () => {
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: false
     });
 
     const self = this;
-    fetch(url)
+    getPipelineGroups({ discoveryId: self.state.discoveryId })
       .then(
         function(response) {
           return response.json();
@@ -323,7 +304,7 @@ class SelectSources extends React.Component {
             component="span"
             className={classes.button}
             disabled={!this.state.discoveryId}
-            onClick={this.getPipelineGroups}
+            onClick={this.loadPipelineGroups}
             size="small"
           >
             Browse Pipelines
