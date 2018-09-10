@@ -1,11 +1,13 @@
 version: '3'
 services:
- backend:
-   build: backend/
-   ports:
-     - "8080:5000"
+  backend:
+    # build: backend/
+    image: http://registry.hub.docker.com/linkedpipes/applications:backend
+    ports:
+      - "8080:5000"
 
- frontend:
-   build: frontend/
-   ports:
-     - "9000:9000"
+  frontend:
+    # build: frontend/
+    image: http://registry.hub.docker.com/linkedpipes/applications:frontend
+    ports:
+      - "9000:9000"
