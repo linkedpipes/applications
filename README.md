@@ -4,6 +4,7 @@
 ### Software Project (NPRG023)
 
 [![Join the chat at https://gitter.im/linkedpipes/applications](https://badges.gitter.im/linkedpipes/applications.svg)](https://gitter.im/linkedpipes/applications?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/linkedpipes/applications.svg?branch=develop)](https://travis-ci.org/linkedpipes/applications)
 
 Meeting Logs: https://docs.google.com/document/d/1tvJgEbRWb9dYM34grGARRXQ9gE0fcITw0Rayu2mEbmA/edit
 
@@ -15,33 +16,37 @@ High level documentation markdown (updated regularly) : [HackMD](https://hackmd.
 
 ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
 
+
+## Quick start
+
+The whole app can be run using docker compose
+`$ cd src/; docker-compose up`
+
+
 ## Running backend
 
 ### Using docker
 
 #### Building image locally
 
-In case you wanna build the image locally, follow the next steps:
+In case you want to build the image locally, follow the next steps:
 
 - Navigate to the backend folder
 
 `$ cd src/backend`
 
-- Build the jar file. It will be located under the `src/backend/build/lib` folder.
-
-`$ gradle build`
-
 - Build the image by executing in the project's root folder the next command, replacing `<some_tag>` by the name you want the image to have
 
-`$ docker build -t <some_tag> --build-arg JAR_FILE=src/backend/build/libs/backend-0.0.1.jar .`
+`$ docker build -t <some_tag> .`
 
 #### Running the image
 
 The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
 
-`$ docker run -v <path to config.properties>:/app/config.properties --name <container name> -p 5000:8080 linkedpipes/application`
+`$ docker run --name <container name> -p 5000:8080 <some_tag>`
 
-The application should then by available through port `5000`. Note that you must mount the volume with the `config.properties` file.
+The application should then by available through port `5000`.
+Custom configuration can be supplied via `-v <path to config.properties>:/app/config.properties` if needed.
 
 ## Running frontend
 
