@@ -21,8 +21,8 @@ import java.util.List;
 @RestController
 public class DiscoveryController {
 
-    private HttpUrlConnector httpUrlConnector;
-    private DiscoveryServiceComponent discoveryService;
+    private final HttpUrlConnector httpUrlConnector;
+    private final DiscoveryServiceComponent discoveryService;
 
     public DiscoveryController(){
         httpUrlConnector = new HttpUrlConnector();
@@ -31,7 +31,7 @@ public class DiscoveryController {
 
     @RequestMapping("/pipelines/discover")
     public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException{
-        if(dataSourceList == null || dataSourceList.size() == 0 ) {
+        if(dataSourceList == null || dataSourceList.isEmpty() ) {
             return new ResponseEntity(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
         }
 

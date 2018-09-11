@@ -11,7 +11,7 @@ import java.io.IOException;
 @RestController
 public class ExecutionController {
 
-    private HttpUrlConnector httpUrlConnector;
+    private final HttpUrlConnector httpUrlConnector;
 
     public ExecutionController(){
         httpUrlConnector = new HttpUrlConnector();

@@ -26,12 +26,8 @@ public class Application {
 	static {
 		File configFile = new File(CONFIG_FILE_NAME);
 		config = new Properties();
-
-		try {
-			FileReader reader = new FileReader(configFile);
+		try (FileReader reader = new FileReader(configFile)) {
 			config.load(reader);
-
-			reader.close();
 		} catch (IOException ex) {
 			logger.error("Exception: ", ex);
 		}
