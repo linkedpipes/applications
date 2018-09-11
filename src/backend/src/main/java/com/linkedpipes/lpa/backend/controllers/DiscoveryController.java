@@ -30,7 +30,7 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discover")
-    public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException{
+    public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException {
         if(dataSourceList == null || dataSourceList.isEmpty() ) {
             return new ResponseEntity(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
         }
