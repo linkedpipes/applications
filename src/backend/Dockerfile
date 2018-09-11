@@ -1,17 +1,15 @@
 # Using OpenJDK 10
-FROM openjdk:10-jdk
+FROM gradle:jdk10
 
 # Tomcat will eventually create directories here
 VOLUME /tmp
 
-# Argument specifying the JAR file. Needs to be specified at runtime.
-ARG JAR_FILE
-
-# Copy the JAR file in the current directory
-COPY ${JAR_FILE} /app/app.jar
-
-# Set working directory
+# copy files
+ADD --chown=gradle . /app
 WORKDIR /app
+
+# build the app
+RUN gradle build; cp /app/build/libs/backend-0.0.1.jar /app/app.jar
 
 # Expose port 8080
 EXPOSE 8080
