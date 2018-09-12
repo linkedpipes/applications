@@ -21,6 +21,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { showDatasourcesDialog } from "../actions/dialogs";
 import { postDiscoverFromTtl, getPipelineGroups } from "../api";
+import ChipInput from "material-ui-chip-input";
+import { addSource, removeSource } from "../actions/datasources";
+import { url_domain } from "../utils";
+import getDatasourcesArray from "../selectors/datasources";
 
 const styles = theme => ({
   root: {
@@ -103,10 +107,7 @@ class SelectSources extends React.Component {
 
   // TODO: refactor later, move to separate class responsible for api calls
   postStartFromLinks = () => {
-    const { datasources } = this.props;
-    const datasourceUris = datasources.map(source => {
-      return { Uri: source.url };
-    });
+    const { datasourceUris } = this.props;
 
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
@@ -184,8 +185,15 @@ class SelectSources extends React.Component {
       });
   };
 
-  displayDatasourcesPopup = () => {
-    this.props.dispatch(showDatasourcesDialog());
+  handleAddSource = chip => {
+    const name = url_domain(chip);
+    const uri = chip;
+
+    this.props.dispatch(addSource({ name: name, url: uri }));
+  };
+
+  handleDeleteSource = chip => {
+    this.props.dispatch(removeSource({ url: chip }));
   };
 
   render() {
@@ -207,7 +215,11 @@ class SelectSources extends React.Component {
           <Typography variant="body1" gutterBottom>
             Select data source for your new application
           </Typography>
-          <DatasourceChips />
+          <ChipInput
+            value={datasources}
+            onAdd={chip => this.handleAddSource(chip)}
+            onDelete={chip => his.handleDeleteSource(chip)}
+          />
         </CardContent>
 
         <CardActions>
@@ -321,7 +333,7 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: state.datasources
+    datasources: getDatasourcesArray(state.datasources)
   };
 };
 
