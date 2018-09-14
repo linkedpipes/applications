@@ -14,7 +14,7 @@ import java.io.IOException;
 @RestController
 public class PipelineController {
 
-    private HttpUrlConnector httpUrlConnector;
+    private final HttpUrlConnector httpUrlConnector;
 
     public PipelineController(){
         httpUrlConnector = new HttpUrlConnector();
