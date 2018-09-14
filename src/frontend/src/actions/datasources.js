@@ -9,5 +9,6 @@ export const addSource = ({ name, url } = {}) => ({
 
 // REMOVE_SOURCE
 export const removeSource = ({ url } = {}) => ({
-  type: "REMOVE_SOURCE"
+  type: "REMOVE_SOURCE",
+  url
 });

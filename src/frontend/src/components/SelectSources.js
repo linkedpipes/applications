@@ -216,7 +216,7 @@ class SelectSources extends React.Component {
           <ChipInput
             value={datasources}
             onAdd={chip => this.handleAddSource(chip)}
-            onDelete={chip => his.handleDeleteSource(chip)}
+            onDelete={chip => this.handleDeleteSource(chip)}
           />
         </CardContent>
 
