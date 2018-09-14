@@ -1,5 +1,3 @@
-import uuid from "uuid";
-
 // ADD_EXPENSE
 export const showDatasourcesDialog = ({} = {}) => ({
   type: "SHOW_ADD_DATASOURCES_DIALOG",
