@@ -2,7 +2,7 @@ import {
   DISCOVER_FROM_INPUT_URL,
   DISCOVER_FROM_URI_LIST_URL,
   PIPELINE_GROUPS_URL
-} from "./constants";
+} from "../constants";
 
 import "whatwg-fetch";
 

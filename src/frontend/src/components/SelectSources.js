@@ -18,7 +18,7 @@ import AddDatasourceDialog from "./AddDatasourceDialog";
 import { addPipelines } from "../actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { postDiscoverFromTtl, getPipelineGroups } from "../api";
+import { postDiscoverFromTtl, getPipelineGroups } from "../api/api";
 import ChipInput from "material-ui-chip-input";
 import { addSource, removeSource } from "../actions/datasources";
 import { url_domain } from "../utils";

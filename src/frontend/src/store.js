@@ -1,7 +1,7 @@
 import { applyMiddleware, createStore, combineReducers } from "redux";
-import datasourcesReducer from "../reducers/datasources";
-import pipelines from "../reducers/pipelines";
-import dialogs from "../reducers/dialogs";
+import datasourcesReducer from "./reducers/datasources";
+import pipelines from "./reducers/pipelines";
+import dialogs from "./reducers/dialogs";
 import logger from "redux-logger";
 
 export default () => {
