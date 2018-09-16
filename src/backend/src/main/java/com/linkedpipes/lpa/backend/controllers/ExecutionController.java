@@ -39,8 +39,7 @@ public class ExecutionController {
             return new ResponseEntity(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
 
-        String response = httpUrlConnector.sendGetRequest(executionIri,
-                null, "application/json");
+        String response = etlService.getExecutionResult(executionIri);
 
         return ResponseEntity.ok(response);
     }

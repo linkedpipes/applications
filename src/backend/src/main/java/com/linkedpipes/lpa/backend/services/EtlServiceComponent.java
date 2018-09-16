@@ -21,4 +21,10 @@ public class EtlServiceComponent {
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .create().fromJson(response, ExecutionStatus.class);
     }
+
+    public String getExecutionResult(String executionIri) throws IOException {
+        String response = get(executionIri);
+
+        return response;
+    }
 }

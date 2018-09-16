@@ -54,9 +54,7 @@ public class DiscoveryController {
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
         String discoveryConfig = stringWriter.toString();
 
-        String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
-                discoveryConfig, "text/plain", "application/json");
-        Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
+        Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
 
         return ResponseEntity.ok(newDiscovery);
     }
@@ -67,9 +65,7 @@ public class DiscoveryController {
             return new ResponseEntity(new ErrorResponse("Discovery config not provided"), HttpStatus.BAD_REQUEST);
         }
 
-        String response =  httpUrlConnector.sendPostRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInput",
-                discoveryConfig, "text/plain", "application/json");
-        Discovery newDiscovery = new Gson().fromJson(response, Discovery.class);
+        Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
 
         return ResponseEntity.ok(newDiscovery);
     }

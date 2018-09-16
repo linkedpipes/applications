@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 
@@ -18,6 +19,13 @@ public class DiscoveryServiceComponent {
     private String get(String url) throws IOException {
         return httpUrlConnector.sendGetRequest(url,
                 null, "application/json");
+    }
+
+    public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException{
+        String response =  httpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/startFromInput",
+                discoveryConfig, "text/plain", "application/json");
+
+        return new Gson().fromJson(response, Discovery.class);
     }
 
     //TODO strongly type below method params (not simply string)
