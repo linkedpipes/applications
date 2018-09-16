@@ -1,17 +1,19 @@
-import uuid from "uuid";
-
-// ADD_EXPENSE
-export const addSource = ({ name, url } = {}) => ({
+// ADD_SOURCE
+export const addSingleSource = ({ name, url } = {}) => ({
   type: "ADD_SOURCE",
   source: {
-    id: uuid(),
     name: name,
     url: url
   }
 });
 
+export const addMultipleSources = ({ sourcesList } = {}) => ({
+  type: "ADD_MULTIPLE_SOURCES",
+  source: sourcesList
+});
+
 // REMOVE_SOURCE
-export const removeSource = ({ id } = {}) => ({
+export const removeSingleSource = ({ url } = {}) => ({
   type: "REMOVE_SOURCE",
-  id
+  url
 });

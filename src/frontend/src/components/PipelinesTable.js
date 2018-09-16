@@ -13,7 +13,6 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
-import { addPipelines } from "../actions/pipelines";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {

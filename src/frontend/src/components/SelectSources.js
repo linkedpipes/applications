@@ -14,12 +14,25 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import PipelinesTable from "./PipelinesTable";
-import DatasourceChips from "./DatasourceChips";
-import AddDatasourceDialog from "./AddDatasourceDialog";
 import { addPipelines } from "../actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { showDatasourcesDialog } from "../actions/dialogs";
+import {
+  postDiscoverFromTtl,
+  postDiscoverFromUriList,
+  getPipelineGroups
+} from "../api";
+import ChipInput from "material-ui-chip-input";
+import {
+  addSingleSource,
+  removeSingleSource,
+  addMultipleSources
+} from "../actions/datasources";
+import { url_domain } from "../utils";
+import {
+  getDatasourcesArray,
+  getDatasourcesForTTLGenerator
+} from "../selectors/datasources";
 
 const styles = theme => ({
   root: {
@@ -34,7 +47,7 @@ const styles = theme => ({
     display: "none"
   },
   card: {
-    maxWidth: 1200
+    flexGrow: 1
   },
   chip: {
     margin: theme.spacing.unit / 2
@@ -45,14 +58,12 @@ class SelectSources extends React.Component {
   state = {
     ttlFile: undefined,
     discoveryId: "",
-    addDatasourceDialogOpen: false,
     discoveryDialogOpen: false,
     pipelinesDialogOpen: false
   };
 
   handleClose = () => {
     this.setState({
-      addDatasourceDialogOpen: false,
       discoveryDialogOpen: false,
       pipelinesDialogOpen: false
     });
@@ -69,16 +80,8 @@ class SelectSources extends React.Component {
       autoClose: false
     });
 
-    const url = "http://localhost:8080/pipelines/discoverFromInput";
     const self = this;
-    fetch(url, {
-      method: "POST",
-      body: self.state.ttlFile,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
+    postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
       .then(
         function(response) {
           return response.json();
@@ -109,27 +112,16 @@ class SelectSources extends React.Component {
   };
 
   // TODO: refactor later, move to separate class responsible for api calls
-  postStartFromLinks = () => {
-    const { datasources } = this.props;
-    const datasourceURLs = datasources.map(source => {
-      return { Uri: source.url };
-    });
+  postStartFromInputLinks = () => {
+    const { datasourcesForTTL } = this.props;
 
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: false
     });
 
-    const url = "http://localhost:8080/pipelines/discover";
     const self = this;
-    fetch(url, {
-      method: "POST",
-      body: JSON.stringify(datasourceURLs),
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "same-origin"
-    })
+    postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
       .then(
         function(response) {
           return response.json();
@@ -163,22 +155,18 @@ class SelectSources extends React.Component {
     if (this.state.ttlFile) {
       this.postStartFromFile();
     } else {
-      this.postStartFromLinks();
+      this.postStartFromInputLinks();
     }
   };
 
-  getPipelineGroups = () => {
-    const url = `http://localhost:8080/discovery/${
-      this.state.discoveryId
-    }/pipelineGroups`;
-
+  loadPipelineGroups = () => {
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: false
     });
 
     const self = this;
-    fetch(url)
+    getPipelineGroups({ discoveryId: self.state.discoveryId })
       .then(
         function(response) {
           return response.json();
@@ -203,8 +191,21 @@ class SelectSources extends React.Component {
       });
   };
 
-  displayDatasourcesPopup = () => {
-    this.props.dispatch(showDatasourcesDialog());
+  handleAddSource = chip => {
+    const links = chip.split(" ");
+    let sourcesList = [];
+
+    links.forEach(function(link) {
+      const name = url_domain(link);
+      const uri = link;
+      sourcesList.push({ name: name, url: uri });
+    });
+
+    this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
+  };
+
+  handleDeleteSource = chip => {
+    this.props.dispatch(removeSingleSource({ url: chip }));
   };
 
   render() {
@@ -213,8 +214,7 @@ class SelectSources extends React.Component {
     const {
       discoveryDialogOpen,
       discoveryId,
-      pipelinesDialogOpen,
-      addDatasourceDialogOpen
+      pipelinesDialogOpen
     } = this.state;
 
     return (
@@ -226,7 +226,11 @@ class SelectSources extends React.Component {
           <Typography variant="body1" gutterBottom>
             Select data source for your new application
           </Typography>
-          <DatasourceChips />
+          <ChipInput
+            value={datasources}
+            onAdd={chip => this.handleAddSource(chip)}
+            onDelete={chip => this.handleDeleteSource(chip)}
+          />
         </CardContent>
 
         <CardActions>
@@ -260,19 +264,6 @@ class SelectSources extends React.Component {
               Select TTL file
             </Button>
           </label>
-
-          <AddDatasourceDialog />
-
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={this.state.ttlFile}
-            onClick={this.displayDatasourcesPopup}
-            size="small"
-          >
-            Add URL
-          </Button>
 
           <Button
             variant="contained"
@@ -323,7 +314,7 @@ class SelectSources extends React.Component {
             component="span"
             className={classes.button}
             disabled={!this.state.discoveryId}
-            onClick={this.getPipelineGroups}
+            onClick={this.loadPipelineGroups}
             size="small"
           >
             Browse Pipelines
@@ -340,7 +331,8 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: state.datasources
+    datasources: getDatasourcesArray(state.datasources),
+    datasourcesForTTL: getDatasourcesForTTLGenerator(state.datasources)
   };
 };
 
