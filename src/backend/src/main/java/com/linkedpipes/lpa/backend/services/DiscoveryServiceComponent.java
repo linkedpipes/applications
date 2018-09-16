@@ -8,6 +8,8 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
+import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import org.apache.jena.atlas.io.IO;
 
 import java.io.IOException;
 
@@ -53,5 +55,15 @@ public class DiscoveryServiceComponent {
         }
 
         return pipelineGroups;
+    }
+
+    public String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
+        return httpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
+                null, "application/json");
+    }
+
+    public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
+        return httpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
+                new Gson().toJson(serviceDescription), "application/json", "application/json");
     }
 }

@@ -15,6 +15,12 @@ public class EtlServiceComponent {
     private String get(String url) throws IOException {
         return httpUrlConnector.sendGetRequest(url,null, "application/json");
     }
+
+    public String executePipeline(String etlPipelineIri) throws IOException{
+        return httpUrlConnector.sendPostRequest(etlServiceBaseUrl + "/executions?pipeline=" + etlPipelineIri,
+                null, "application/json", "application/json");
+    }
+
     public ExecutionStatus getExecutionStatus(String executionIri) throws IOException {
         String response = get(executionIri + "/overview");
         return new GsonBuilder()
