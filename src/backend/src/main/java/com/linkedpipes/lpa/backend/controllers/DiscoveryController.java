@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
@@ -36,18 +35,23 @@ public class DiscoveryController {
         }
 
         //TODO move below logic to a service class
-        //TODO the ttl config being generated isn't valid, fix
         RIOT.init() ;
 
         // create an empty model
         Model model = ModelFactory.createDefaultModel();
 
-        // create the resources
-        for (DataSource dataSource : dataSourceList) {
-            Resource res = model.createResource(dataSource.Uri);
+        //read base rdf from file
+        final File baseTtlFile = new File("src/data/rdf/base.ttl");
+        final InputStream fileStream = new DataInputStream(new FileInputStream(baseTtlFile));
+        model.read(fileStream, "", "TURTLE");
 
-            // TODO : Refactor below, not sure about correct implementation
-            model.add(res, RDF.type, FOAF.page);
+        //add data sources
+        Resource subject = model.createResource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config");
+        Property property = model.createProperty("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate");
+
+        for (DataSource dataSource : dataSourceList) {
+            Resource obj = model.createResource(dataSource.Uri);
+            model.add(subject, property, obj);
         }
 
         StringWriter stringWriter = new StringWriter();
