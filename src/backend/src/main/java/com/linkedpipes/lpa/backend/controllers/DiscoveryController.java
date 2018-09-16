@@ -4,12 +4,7 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.RIOT;
-import org.apache.jena.sparql.vocabulary.FOAF;
-import org.apache.jena.vocabulary.RDF;
+import com.linkedpipes.lpa.backend.services.TtlConfigGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,29 +29,7 @@ public class DiscoveryController {
             return new ResponseEntity(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
         }
 
-        //TODO move below logic to a service class
-        RIOT.init() ;
-
-        // create an empty model
-        Model model = ModelFactory.createDefaultModel();
-
-        //read base rdf from file
-        final File baseTtlFile = new File("src/data/rdf/base.ttl");
-        final InputStream fileStream = new DataInputStream(new FileInputStream(baseTtlFile));
-        model.read(fileStream, "", "TURTLE");
-
-        //add data sources
-        Resource subject = model.createResource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config");
-        Property property = model.createProperty("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate");
-
-        for (DataSource dataSource : dataSourceList) {
-            Resource obj = model.createResource(dataSource.Uri);
-            model.add(subject, property, obj);
-        }
-
-        StringWriter stringWriter = new StringWriter();
-        RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
-        String discoveryConfig = stringWriter.toString();
+        String discoveryConfig = new TtlConfigGenerator().createTtlConfig(dataSourceList);
 
         Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
 
