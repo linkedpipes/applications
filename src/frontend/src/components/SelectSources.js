@@ -14,15 +14,25 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import PipelinesTable from "./PipelinesTable";
-import AddDatasourceDialog from "./AddDatasourceDialog";
 import { addPipelines } from "../actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { postDiscoverFromTtl, getPipelineGroups } from "../api";
+import {
+  postDiscoverFromTtl,
+  postDiscoverFromUriList,
+  getPipelineGroups
+} from "../api";
 import ChipInput from "material-ui-chip-input";
-import { addSource, removeSource } from "../actions/datasources";
+import {
+  addSingleSource,
+  removeSingleSource,
+  addMultipleSources
+} from "../actions/datasources";
 import { url_domain } from "../utils";
-import getDatasourcesArray from "../selectors/datasources";
+import {
+  getDatasourcesArray,
+  getDatasourcesForTTLGenerator
+} from "../selectors/datasources";
 
 const styles = theme => ({
   root: {
@@ -48,14 +58,12 @@ class SelectSources extends React.Component {
   state = {
     ttlFile: undefined,
     discoveryId: "",
-    addDatasourceDialogOpen: false,
     discoveryDialogOpen: false,
     pipelinesDialogOpen: false
   };
 
   handleClose = () => {
     this.setState({
-      addDatasourceDialogOpen: false,
       discoveryDialogOpen: false,
       pipelinesDialogOpen: false
     });
@@ -104,8 +112,8 @@ class SelectSources extends React.Component {
   };
 
   // TODO: refactor later, move to separate class responsible for api calls
-  postStartFromLinks = () => {
-    const { datasourceUris } = this.props;
+  postStartFromInputLinks = () => {
+    const { datasourcesForTTL } = this.props;
 
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
@@ -113,7 +121,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    postStartFromLinks({ datasourceUris: datasourceUris })
+    postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
       .then(
         function(response) {
           return response.json();
@@ -147,7 +155,7 @@ class SelectSources extends React.Component {
     if (this.state.ttlFile) {
       this.postStartFromFile();
     } else {
-      this.postStartFromLinks();
+      this.postStartFromInputLinks();
     }
   };
 
@@ -184,14 +192,20 @@ class SelectSources extends React.Component {
   };
 
   handleAddSource = chip => {
-    const name = url_domain(chip);
-    const uri = chip;
+    const links = chip.split(" ");
+    let sourcesList = [];
 
-    this.props.dispatch(addSource({ name: name, url: uri }));
+    links.forEach(function(link) {
+      const name = url_domain(link);
+      const uri = link;
+      sourcesList.push({ name: name, url: uri });
+    });
+
+    this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
   };
 
   handleDeleteSource = chip => {
-    this.props.dispatch(removeSource({ url: chip }));
+    this.props.dispatch(removeSingleSource({ url: chip }));
   };
 
   render() {
@@ -200,8 +214,7 @@ class SelectSources extends React.Component {
     const {
       discoveryDialogOpen,
       discoveryId,
-      pipelinesDialogOpen,
-      addDatasourceDialogOpen
+      pipelinesDialogOpen
     } = this.state;
 
     return (
@@ -251,19 +264,6 @@ class SelectSources extends React.Component {
               Select TTL file
             </Button>
           </label>
-
-          <AddDatasourceDialog />
-
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={this.state.ttlFile}
-            onClick={this.displayDatasourcesPopup}
-            size="small"
-          >
-            Add URL
-          </Button>
 
           <Button
             variant="contained"
@@ -331,7 +331,8 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: getDatasourcesArray(state.datasources)
+    datasources: getDatasourcesArray(state.datasources),
+    datasourcesForTTL: getDatasourcesForTTLGenerator(state.datasources)
   };
 };
 
