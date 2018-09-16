@@ -282,7 +282,3 @@
 	  <https://ldcp.opendata.cz/resource/schema/transformer/schema-toLocation-to-schema-labelled-geocoordinates/template> ,
 	  <https://ldcp.opendata.cz/resource/schema/transformer/schema-workLocation-to-schema-labelled-geocoordinates/template>
 	.
-
-#Datasources
-<https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config>
-    <https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate>
