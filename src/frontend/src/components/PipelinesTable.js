@@ -13,6 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
+import { getExecutePipeline } from "../api";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -143,12 +144,9 @@ class PipelinesTable extends React.Component {
   };
 
   exportPipeline = (discoveryId, pipelineUri) => {
-    return;
-    const url = `http://localhost:8080/pipeline/export?\
-      discoveryId=${discoveryId}&\
-      pipelineUri=${pipelineUri}`;
     const self = this;
-    fetch(url)
+
+    getExecutePipeline({ discoveryId: discoveryId, pipelineUri: pipelineUri })
       .then(
         function(response) {
           return response.json();
@@ -184,7 +182,7 @@ class PipelinesTable extends React.Component {
   };
 
   render() {
-    const { classes, pipelines } = this.props;
+    const { classes, pipelines, discoveryId } = this.props;
     const { order, orderBy, rowsPerPage, page } = this.state;
 
     const emptyRows =
@@ -213,7 +211,9 @@ class PipelinesTable extends React.Component {
                           size="small"
                           variant="contained"
                           color="secondary"
-                          onClick={this.exportPipeline(null, null)}
+                          onClick={() => {
+                            this.exportPipeline(discoveryId, pipeline.id);
+                          }}
                         >
                           Run
                         </Button>

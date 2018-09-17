@@ -1,7 +1,8 @@
 import {
   DISCOVER_FROM_INPUT_URL,
   DISCOVER_FROM_URI_LIST_URL,
-  PIPELINE_GROUPS_URL
+  PIPELINE_GROUPS_URL,
+  EXECUTE_PIPELINE_URL
 } from "./constants";
 
 import "whatwg-fetch";
@@ -35,4 +36,13 @@ export async function postDiscoverFromUriList({ datasourceUris }) {
 
 export async function getPipelineGroups({ discoveryId }) {
   return rest(PIPELINE_GROUPS_URL(discoveryId), undefined, "GET", undefined);
+}
+
+export async function getExecutePipeline({ discoveryId, pipelineId }) {
+  return rest(
+    EXECUTE_PIPELINE_URL(discoveryId, pipelineId),
+    undefined,
+    "GET",
+    undefined
+  );
 }
