@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter, Route, Switch, Link, NavLink } from "react-router-dom";
-import NotFoundPage from "../components/NotFoundPage";
-import NavigationBar from "../components/NavigationBar";
-import AssistantDemoPage from "../components/AssistantDemoPage";
-import AboutPage from "../components/AboutPage";
-import BottomBar from "../components/BottomBar";
-import withRoot from "../components/withRoot";
+import NotFoundPage from "./containers/NotFoundPage";
+import NavigationBar from "./components/navbar/NavigationBar";
+import AssistantDemoPage from "./components/AssistantDemoPage";
+import AboutPage from "./containers/AboutPage";
+import BottomBar from "./components/BottomBar";
+import withRoot from "./components/withRoot";
 
 const AppRouter = () => (
   <BrowserRouter>

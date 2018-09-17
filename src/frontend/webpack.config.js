@@ -11,7 +11,7 @@ const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
 });
 
 module.exports = {
-  entry: [path.join(__dirname, "/src/app.js")],
+  entry: [path.join(__dirname, "/src/index.js")],
   output: {
     filename: "bundle.js",
     path: path.join(__dirname, "/public")
