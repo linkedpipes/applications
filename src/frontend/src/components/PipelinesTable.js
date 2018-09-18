@@ -13,7 +13,9 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
-import { getExecutePipeline } from "../api";
+import { getExecutePipeline, getExecutionStatus } from "../api/api";
+import { addSingleExecution } from "../actions/executions";
+import { toast } from "react-toastify";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -143,22 +145,82 @@ class PipelinesTable extends React.Component {
     rowsPerPage: 5
   };
 
-  exportPipeline = (discoveryId, pipelineUri) => {
+  exportPipeline = (discoveryId, pipelineId) => {
     const self = this;
 
-    getExecutePipeline({ discoveryId: discoveryId, pipelineUri: pipelineUri })
+    let tid = toast.info("Sending the execute pipeline request...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
+    });
+
+    getExecutePipeline({ discoveryId: discoveryId, pipelineId: pipelineId })
       .then(
         function(response) {
           return response.json();
         },
         function(error) {
+          toast.update(tid, {
+            render: "Error sending the execute pipeline request",
+            type: toast.TYPE.ERROR,
+            autoClose: 2000
+          });
           console.error(error);
         }
       )
-      .then(function(jsonResponse) {
-        self.setState({
-          //pipelinesDialogOpen: true
-        });
+      .then(function(json) {
+        if (toast.isActive(tid)) {
+          toast.update(tid, {
+            render: `Execute pipeline request sent!`,
+            type: toast.TYPE.SUCCESS,
+            autoClose: 2000
+          });
+        } else {
+          toast.success(`Execute pipeline request sent!`, { autoClose: 2000 });
+        }
+
+        self.props.dispatch(
+          addSingleExecution({
+            id: json.pipelineId,
+            etlPipelineIri: json.etlPipelineIri,
+            resultGraphIri: json.resultGraphIri
+          })
+        );
+      });
+  };
+
+  checkExecutionStatus = pipelineId => {
+    const { executions } = this.props;
+    const executionValues = executions.executions[pipelineId];
+
+    let tid = toast.info("Checking the execution status...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
+    });
+
+    getExecutionStatus({ executionIri: executionValues.resultGraphIri })
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(error) {
+          toast.update(tid, {
+            render: "Error while checking the execution status",
+            type: toast.TYPE.ERROR,
+            autoClose: 2000
+          });
+          console.error(error);
+        }
+      )
+      .then(function(json) {
+        if (toast.isActive(tid)) {
+          toast.update(tid, {
+            render: `Response : ${json}`,
+            type: toast.TYPE.SUCCESS,
+            autoClose: 2000
+          });
+        } else {
+          toast.success(`Response : ${json}`, { autoClose: 2000 });
+        }
       });
   };
 
@@ -182,12 +244,14 @@ class PipelinesTable extends React.Component {
   };
 
   render() {
-    const { classes, pipelines, discoveryId } = this.props;
+    const { classes, pipelines, discoveryId, executions } = this.props;
     const { order, orderBy, rowsPerPage, page } = this.state;
 
     const emptyRows =
       rowsPerPage -
       Math.min(rowsPerPage, pipelines.length - page * rowsPerPage);
+
+    const self = this;
 
     return (
       <Paper className={classes.root}>
@@ -196,7 +260,7 @@ class PipelinesTable extends React.Component {
             <PipelinesTableHead
               order={order}
               orderBy={orderBy}
-              onRequestSort={this.handleRequestSort}
+              onRequestSort={self.handleRequestSort}
               rowCount={pipelines.length}
             />
             <TableBody>
@@ -206,16 +270,27 @@ class PipelinesTable extends React.Component {
                 .map(pipeline => {
                   return (
                     <TableRow hover tabIndex={-1} key={pipeline.id}>
-                      <TableCell>
+                      <TableCell component="th" scope="row" padding="checkbox">
                         <Button
                           size="small"
                           variant="contained"
                           color="secondary"
                           onClick={() => {
-                            this.exportPipeline(discoveryId, pipeline.id);
+                            self.exportPipeline(discoveryId, pipeline.id);
                           }}
                         >
                           Run
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="primary"
+                          disabled={!(pipeline.id in executions.executions)}
+                          onClick={() => {
+                            self.checkExecutionStatus(pipeline.id);
+                          }}
+                        >
+                          Status
                         </Button>
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
@@ -246,8 +321,8 @@ class PipelinesTable extends React.Component {
           nextIconButtonProps={{
             "aria-label": "Next Page"
           }}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          onChangePage={self.handleChangePage}
+          onChangeRowsPerPage={self.handleChangeRowsPerPage}
         />
       </Paper>
     );
@@ -260,7 +335,8 @@ PipelinesTable.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    pipelines: state.pipelines
+    pipelines: state.pipelines,
+    executions: state.executions
   };
 };
 

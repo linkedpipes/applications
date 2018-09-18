@@ -21,7 +21,7 @@ import {
   postDiscoverFromTtl,
   postDiscoverFromUriList,
   getPipelineGroups
-} from "../api";
+} from "../api/api";
 import ChipInput from "material-ui-chip-input";
 import { removeSingleSource, addMultipleSources } from "../actions/datasources";
 import { url_domain } from "../utils";
