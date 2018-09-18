@@ -2,7 +2,8 @@ import {
   DISCOVER_FROM_INPUT_URL,
   DISCOVER_FROM_URI_LIST_URL,
   PIPELINE_GROUPS_URL,
-  EXECUTE_PIPELINE_URL
+  EXECUTE_PIPELINE_URL,
+  EXECUTION_STATUS_URL
 } from "../constants";
 
 import "whatwg-fetch";
@@ -45,4 +46,8 @@ export async function getExecutePipeline({ discoveryId, pipelineId }) {
     "GET",
     undefined
   );
+}
+
+export async function getExecutionStatus({ executionIri }) {
+  return rest(EXECUTION_STATUS_URL(executionIri), undefined, "GET", undefined);
 }
