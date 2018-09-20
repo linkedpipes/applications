@@ -197,7 +197,7 @@ class PipelinesTable extends React.Component {
       autoClose: false
     });
 
-    getExecutionStatus({ executionIri: executionValues.resultGraphIri })
+    getExecutionStatus({ executionIri: executionValues.etlPipelineIri })
       .then(
         function(response) {
           return response.json();
