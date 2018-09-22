@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TtlConfigGenerator {
 
-    public String createTtlConfig(List<DataSource> dataSourceList) throws FileNotFoundException{
+    public static String fromDataSourceList(List<DataSource> dataSourceList) throws FileNotFoundException {
         RIOT.init() ;
 
         // create an empty model
@@ -38,4 +38,5 @@ public class TtlConfigGenerator {
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
         return stringWriter.toString();
     }
+
 }
