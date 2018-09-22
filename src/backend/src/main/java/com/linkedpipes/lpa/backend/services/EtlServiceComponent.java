@@ -1,8 +1,6 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 

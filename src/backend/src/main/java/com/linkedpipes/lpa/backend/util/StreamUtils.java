@@ -1,11 +1,11 @@
-package com.linkedpipes.lpa.backend.helpers;
+package com.linkedpipes.lpa.backend.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class StreamHelper {
+public class StreamUtils {
 
     public static String getStringFromStream(InputStream stream) throws IOException {
         StringBuilder sb;

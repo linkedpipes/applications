@@ -18,7 +18,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Provides handling for exceptions throughout this service.
      */
-    @ExceptionHandler({IOException.class})
+    @ExceptionHandler(IOException.class)
     public final ResponseEntity<Object> handleIOException(IOException ex, WebRequest request) {
         logger.error("Exception: ", ex);
 
@@ -40,6 +40,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
         }
 
-        return new ResponseEntity(body, headers, status);
+        return new ResponseEntity<>(body, headers, status);
     }
 }

@@ -9,7 +9,6 @@ import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import org.apache.jena.atlas.io.IO;
 
 import java.io.IOException;
 

@@ -13,6 +13,7 @@ import java.io.*;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 public class DiscoveryController {
 
     private final HttpUrlConnector httpUrlConnector;
@@ -26,7 +27,7 @@ public class DiscoveryController {
     @RequestMapping("/pipelines/discover")
     public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException {
         if(dataSourceList == null || dataSourceList.isEmpty() ) {
-            return new ResponseEntity(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
         }
 
         String discoveryConfig = new TtlConfigGenerator().createTtlConfig(dataSourceList);
@@ -39,7 +40,7 @@ public class DiscoveryController {
     @RequestMapping("/pipelines/discoverFromInput")
     public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig) throws IOException{
         if(discoveryConfig == null || discoveryConfig.isEmpty()) {
-            return new ResponseEntity(new ErrorResponse("Discovery config not provided"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("Discovery config not provided"), HttpStatus.BAD_REQUEST);
         }
 
         Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
@@ -48,9 +49,9 @@ public class DiscoveryController {
     }
 
     @RequestMapping("/pipelines/discoverFromInputIri")
-    public ResponseEntity<?> startDiscoveryFromInputIri(@RequestParam( value="discoveryConfigIri") String discoveryConfigIri) throws IOException{
+    public ResponseEntity<?> startDiscoveryFromInputIri(@RequestParam(value="discoveryConfigIri") String discoveryConfigIri) throws IOException{
         if(discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
-            return new ResponseEntity(new ErrorResponse("Input IRI not provided"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("Input IRI not provided"), HttpStatus.BAD_REQUEST);
         }
 
         String response = httpUrlConnector.sendGetRequest(Application.config.getProperty("discoveryServiceUrl") + "/discovery/startFromInputIri",

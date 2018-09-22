@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
+@SuppressWarnings("unused")
 public class ExecutionController {
 
     private final HttpUrlConnector httpUrlConnector;
@@ -24,7 +25,7 @@ public class ExecutionController {
     @RequestMapping("/execution/status")
     public ResponseEntity<?> getStatus(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {
-            return new ResponseEntity(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
 
         ExecutionStatus status = etlService.getExecutionStatus(executionIri);
@@ -36,7 +37,7 @@ public class ExecutionController {
     @ResponseBody
     public ResponseEntity<?> getResult(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {
-            return new ResponseEntity(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
 
         String response = etlService.getExecutionResult(executionIri);
