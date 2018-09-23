@@ -14,7 +14,8 @@ module.exports = {
   entry: [path.join(__dirname, "/src/index.jsx")],
   output: {
     filename: "bundle.js",
-    path: path.join(__dirname, "/public")
+    path: path.join(__dirname, "/public"),
+    publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.jsx']
@@ -40,7 +41,8 @@ module.exports = {
     hot: true,
     headers: {
       "Access-Control-Allow-Origin": "*"
-    }
+    },
+    historyApiFallback: true
   },
   mode: dev ? "development" : "production",
   plugins: dev
