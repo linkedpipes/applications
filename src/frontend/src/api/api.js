@@ -3,6 +3,7 @@ import {
   DISCOVER_FROM_URI_LIST_URL,
   PIPELINE_GROUPS_URL,
   EXECUTE_PIPELINE_URL,
+  EXPORT_PIPELINE_URL,
   EXECUTION_STATUS_URL
 } from "../constants";
 
@@ -39,9 +40,18 @@ export async function getPipelineGroups({ discoveryId }) {
   return rest(PIPELINE_GROUPS_URL(discoveryId), undefined, "GET", undefined);
 }
 
-export async function getExecutePipeline({ discoveryId, pipelineId }) {
+export async function getExportPipeline({ discoveryId, pipelineId }) {
   return rest(
-    EXECUTE_PIPELINE_URL(discoveryId, pipelineId),
+    EXPORT_PIPELINE_URL(discoveryId, pipelineId),
+    undefined,
+    "GET",
+    undefined
+  );
+}
+
+export async function getExecutePipeline({ etlPipelineIri }) {
+  return rest(
+    EXECUTE_PIPELINE_URL(etlPipelineIri),
     undefined,
     "GET",
     undefined
