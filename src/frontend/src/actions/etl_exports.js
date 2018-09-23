@@ -1,19 +1,19 @@
 // ADD_PIPELINE
-export const addSingleExecution = ({
+export const addSingleExport = ({
   id,
   resultGraphIri,
   etlPipelineIri
 } = {}) => ({
-  type: "ADD_EXECUTION",
+  type: "ADD_EXPORT",
   pipelineId: id,
-  executionValues: {
+  exportValues: {
     resultGraphIri: resultGraphIri,
     etlPipelineIri: etlPipelineIri
   }
 });
 
 // REMOVE_PIPELINE
-export const removeSingleExecution = ({ id } = {}) => ({
-  type: "REMOVE_EXECUTION",
+export const removeSingleExport = ({ id } = {}) => ({
+  type: "REMOVE_EXPORT",
   id
 });
