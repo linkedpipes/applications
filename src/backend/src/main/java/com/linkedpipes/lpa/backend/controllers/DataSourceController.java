@@ -3,16 +3,17 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 public class DataSourceController {
 
     @RequestMapping("/datasources")
     @ResponseBody
     public List<DataSource> getDataSources(){
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @PostMapping("/datasources")

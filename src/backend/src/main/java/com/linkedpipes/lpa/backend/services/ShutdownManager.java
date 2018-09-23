@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ShutdownManager{
+public class ShutdownManager {
 
     @Autowired
     private ApplicationContext appContext;

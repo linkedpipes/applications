@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
+@SuppressWarnings("unused")
 public class PipelineController {
 
     private final DiscoveryServiceComponent discoveryService;
@@ -26,7 +27,7 @@ public class PipelineController {
     public ResponseEntity<Pipeline> getPipeline(@RequestParam( value="pipelineUri") String pipelineUri){
         Pipeline testPipeline = new Pipeline();
         testPipeline.id = pipelineUri;
-        return new ResponseEntity(testPipeline, HttpStatus.OK);
+        return new ResponseEntity<>(testPipeline, HttpStatus.OK);
     }
 
     @GetMapping("/pipeline/export")
