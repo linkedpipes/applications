@@ -1,7 +1,8 @@
 import { applyMiddleware, createStore, combineReducers } from "redux";
 import datasourcesReducer from "./reducers/datasources";
 import pipelines from "./reducers/pipelines";
-import executions from "./reducers/executions";
+import etl_executions from "./reducers/etl_executions";
+import etl_exports from "./reducers/etl_exports";
 import dialogs from "./reducers/dialogs";
 import logger from "redux-logger";
 
@@ -11,7 +12,8 @@ export default () => {
       datasources: datasourcesReducer,
       pipelines: pipelines,
       dialogs: dialogs,
-      executions: executions
+      etl_executions: etl_executions,
+      etl_exports: etl_exports
     }),
     window.__REDUX_DEVTOOLS_EXTENSION__ &&
       window.__REDUX_DEVTOOLS_EXTENSION__(),

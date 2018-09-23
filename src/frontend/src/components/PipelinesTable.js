@@ -13,9 +13,14 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
-import { getExecutePipeline, getExecutionStatus } from "../api/api";
-import { addSingleExecution } from "../actions/executions";
+import {
+  getExecutePipeline,
+  getExecutionStatus,
+  getExportPipeline
+} from "../api/api";
+import { addSingleExport } from "../actions/etl_exports";
 import { toast } from "react-toastify";
+import { addSingleExecution } from "../actions/etl_executions";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -153,7 +158,54 @@ class PipelinesTable extends React.Component {
       autoClose: false
     });
 
-    getExecutePipeline({ discoveryId: discoveryId, pipelineId: pipelineId })
+    getExportPipeline({ discoveryId: discoveryId, pipelineId: pipelineId })
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(error) {
+          toast.update(tid, {
+            render: "Error sending the export pipeline request",
+            type: toast.TYPE.ERROR,
+            autoClose: 2000
+          });
+          console.error(error);
+        }
+      )
+      .then(function(json) {
+        if (toast.isActive(tid)) {
+          toast.update(tid, {
+            render: `Export pipeline request sent!`,
+            type: toast.TYPE.SUCCESS,
+            autoClose: 2000
+          });
+        } else {
+          toast.success(`Export pipeline request sent!`, { autoClose: 2000 });
+        }
+
+        self.props.dispatch(
+          addSingleExport({
+            id: json.pipelineId,
+            etlPipelineIri: json.etlPipelineIri,
+            resultGraphIri: json.resultGraphIri
+          })
+        );
+
+        setTimeout(() => {
+          self.executePipeline(pipelineId, json.etlPipelineIri);
+        }, 1500);
+      });
+  };
+
+  executePipeline = (pipelineId, etlPipelineIri) => {
+    const self = this;
+
+    let tid = toast.info("Sending the execute pipeline request...", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: false
+    });
+
+    getExecutePipeline({ etlPipelineIri: etlPipelineIri })
       .then(
         function(response) {
           return response.json();
@@ -180,9 +232,8 @@ class PipelinesTable extends React.Component {
 
         self.props.dispatch(
           addSingleExecution({
-            id: json.pipelineId,
-            etlPipelineIri: json.etlPipelineIri,
-            resultGraphIri: json.resultGraphIri
+            id: pipelineId,
+            executionIri: json.iri
           })
         );
       });
@@ -197,7 +248,7 @@ class PipelinesTable extends React.Component {
       autoClose: false
     });
 
-    getExecutionStatus({ executionIri: executionValues.etlPipelineIri })
+    getExecutionStatus({ executionIri: executionValues.executionIri })
       .then(
         function(response) {
           return response.json();
@@ -212,14 +263,20 @@ class PipelinesTable extends React.Component {
         }
       )
       .then(function(json) {
+        let response = "Status: unavailable";
+
+        if ("status" in json && "id" in json.status) {
+          response = "Status: " + json.status.id.split("/").pop();
+        }
+
         if (toast.isActive(tid)) {
           toast.update(tid, {
-            render: `Response : ${json}`,
-            type: toast.TYPE.SUCCESS,
+            render: response,
+            type: toast.TYPE.INFO,
             autoClose: 2000
           });
         } else {
-          toast.success(`Response : ${json}`, { autoClose: 2000 });
+          toast.info(response, { autoClose: 2000 });
         }
       });
   };
@@ -244,7 +301,7 @@ class PipelinesTable extends React.Component {
   };
 
   render() {
-    const { classes, pipelines, discoveryId, executions } = this.props;
+    const { classes, pipelines, discoveryId, exportsDict } = this.props;
     const { order, orderBy, rowsPerPage, page } = this.state;
 
     const emptyRows =
@@ -285,7 +342,7 @@ class PipelinesTable extends React.Component {
                           size="small"
                           variant="contained"
                           color="primary"
-                          disabled={!(pipeline.id in executions.executions)}
+                          disabled={!(pipeline.id in exportsDict.exportRecords)}
                           onClick={() => {
                             self.checkExecutionStatus(pipeline.id);
                           }}
@@ -336,7 +393,8 @@ PipelinesTable.propTypes = {
 const mapStateToProps = state => {
   return {
     pipelines: state.pipelines,
-    executions: state.executions
+    exportsDict: state.etl_exports,
+    executions: state.etl_executions
   };
 };
 
