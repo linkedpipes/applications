@@ -38,4 +38,5 @@ const NavigationBar = props => {
   );
 };
 
-export default withStyles(styles)(NavigationBar);
+const styledNavBar = withStyles(styles)(NavigationBar);
+export {styledNavBar as NavigationBar};

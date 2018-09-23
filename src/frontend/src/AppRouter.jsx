@@ -1,19 +1,25 @@
 import React from "react";
-import { BrowserRouter, Route, Switch, Link, NavLink } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+
 import NotFoundPage from "./containers/NotFoundPage";
-import NavigationBar from "./components/navbar/NavigationBar";
-import AssistantDemoPage from "./components/AssistantDemoPage";
+import { NavigationBar } from "./components/Navbar";
+import { CreateApp } from "./components/CreateApp";
 import AboutPage from "./containers/AboutPage";
-import BottomBar from "./components/bottom-bar/BottomBar";
+import BottomBar from "./components/BottomBar/BottomBar";
 import withRoot from "./withRoot";
+import Redirect from "react-router-dom/es/Redirect";
 
 const AppRouter = () => (
   <BrowserRouter>
     <div>
       <NavigationBar />
       <Switch>
-        <Route path={dashboardUrl} component={AssistantDemoPage} exact={true} />
-        <Route path={aboutUrl} component={AboutPage} />
+        <Route exact path="/dashboard" component={CreateApp} />
+        {/*<Route path="/create-app" component={AboutPage} />*/}
+        <Route path="/about" component={AboutPage} />
+        {/*<Route path="/login" component={AboutPage} />*/}
+        {/*<Route path="/register" component={AboutPage} />*/}
+        <Redirect from="/" to="/dashboard"/>
         <Route component={NotFoundPage} />
       </Switch>
       <BottomBar />
@@ -22,8 +28,3 @@ const AppRouter = () => (
 );
 
 export default withRoot(AppRouter);
-
-// "Named" routes
-
-export const dashboardUrl = "/";
-export const aboutUrl = "/about";

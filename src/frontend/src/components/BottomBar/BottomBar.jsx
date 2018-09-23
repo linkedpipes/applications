@@ -7,7 +7,6 @@ import HomeIcon from "@material-ui/icons/Home";
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
 import HelpIcon from "@material-ui/icons/Help";
 import { withRouter } from "react-router-dom";
-import * as appRoutes from "../../AppRouter";
 
 const styles = {
   root: {
@@ -22,15 +21,14 @@ const styles = {
 
 class SimpleBottomNavigation extends React.Component {
   state = {
-    value: 0
+
   };
 
   handleChange = (event, value) => {
-    this.setState({ value });
     if (value === "dashboard") {
-      this.props.history.push(appRoutes.dashboardUrl);
+      this.props.history.push("/dashboard");
     } else if (value === "about") {
-      this.props.history.push(appRoutes.aboutUrl);
+      this.props.history.push("/about");
     }
   };
 

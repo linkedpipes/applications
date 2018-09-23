@@ -6,7 +6,7 @@ import Chip from "@material-ui/core/Chip";
 import Paper from "@material-ui/core/Paper";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
 import { connect } from "react-redux";
-import { removeSource } from "../_actions/datasources";
+import { removeSource } from "../../_actions/datasources";
 
 const styles = theme => ({
   chip: {

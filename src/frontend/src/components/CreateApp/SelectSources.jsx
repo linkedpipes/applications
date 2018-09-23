@@ -14,21 +14,21 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import PipelinesTable from "./PipelinesTable";
-import { addPipelines } from "../_actions/pipelines";
+import { addPipelines } from "../../_actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   postDiscoverFromTtl,
   postDiscoverFromUriList,
   getPipelineGroups
-} from "../_services/discovery.service";
+} from "../../_services/discovery.service";
 import ChipInput from "material-ui-chip-input";
-import { removeSingleSource, addMultipleSources } from "../_actions/datasources";
-import { url_domain } from "../_helpers/utils";
+import { removeSingleSource, addMultipleSources } from "../../_actions/datasources";
+import { url_domain } from "../../_helpers/utils";
 import {
   getDatasourcesArray,
   getDatasourcesForTTLGenerator
-} from "../selectors/datasources";
+} from "../../selectors/datasources";
 
 const styles = theme => ({
   root: {
