@@ -1,4 +1,4 @@
-import { getQueryString } from "../utils";
+import { getQueryString } from "../_helpers/utils";
 
 const BASE_URL = "http://localhost:8080/";
 const PIPELINES_URL = BASE_URL + "pipelines/";

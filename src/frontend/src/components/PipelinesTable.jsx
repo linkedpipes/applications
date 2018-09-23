@@ -13,8 +13,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
-import { getExecutePipeline, getExecutionStatus } from "../api/api";
-import { addSingleExecution } from "../actions/executions";
+import { getExecutePipeline, getExecutionStatus } from "../_services/discovery.service";
+import { addSingleExecution } from "../_actions/executions";
 import { toast } from "react-toastify";
 
 function desc(a, b, orderBy) {

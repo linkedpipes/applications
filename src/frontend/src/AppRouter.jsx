@@ -4,8 +4,8 @@ import NotFoundPage from "./containers/NotFoundPage";
 import NavigationBar from "./components/navbar/NavigationBar";
 import AssistantDemoPage from "./components/AssistantDemoPage";
 import AboutPage from "./containers/AboutPage";
-import BottomBar from "./components/BottomBar";
-import withRoot from "./components/withRoot";
+import BottomBar from "./components/bottom-bar/BottomBar";
+import withRoot from "./withRoot";
 
 const AppRouter = () => (
   <BrowserRouter>

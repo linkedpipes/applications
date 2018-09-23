@@ -7,7 +7,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
 import HelpIcon from "@material-ui/icons/Help";
 import { withRouter } from "react-router-dom";
-import * as appRoutes from "../AppRouter";
+import * as appRoutes from "../../AppRouter";
 
 const styles = {
   root: {
