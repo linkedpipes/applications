@@ -1,49 +1,21 @@
 package com.linkedpipes.lpa.backend.util;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class StreamUtils {
 
-    private static final int BUFFER_SIZE = 10000;
-
-    //TODO Ivan - fix null array exception in below commented code
-    /*
-     * Closes the stream
+    /**
+     * Extracts all bytes from {@code stream}, decodes them using the {@link java.nio.charset.Charset#defaultCharset()
+     * default charset}, then returns the resulting characters as a {@link String}. {@code stream} will be {@link
+     * InputStream#close() closed} when the method returns.
+     *
+     * @param stream the stream containing the bytes to be extracted
+     * @return a string containing the characters from the stream
+     * @throws IOException if an I/O error occurs
      */
     public static String getStringFromStream(InputStream stream) throws IOException {
-        StringBuilder sb;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-            String output;
-            sb = new StringBuilder();
-            while ((output = br.readLine()) != null) {
-                sb.append(output);
-                sb.append("\n");
-            }
-
-            return  sb.toString();
-
-        /*ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        copyStreamsAndClose(stream, outputStream);
-        return outputStream.toString();*/
-        }
-    }
-
-    public static void copyStreamsAndClose(InputStream inputStream, OutputStream outputStream) throws IOException {
-        try (inputStream; outputStream) {
-            copyStreams(inputStream, outputStream);
-        }
-    }
-
-    /*
-     * Does not close the streams
-     */
-    public static void copyStreams(InputStream inputStream, OutputStream outputStream) throws IOException {
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int bytesRead;
-        do {
-            bytesRead = inputStream.read(buffer);
-            outputStream.write(buffer, 0, bytesRead);
-        } while (bytesRead != -1);
+        return new String(stream.readAllBytes());
     }
 
 }
