@@ -12,7 +12,6 @@ public class EtlServiceComponent {
     private static final Gson GSON = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
             .create();
-    private final HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
     private final String etlServiceBaseUrl = Application.config.getProperty("etlServiceUrl");
 
     private String get(String url) throws IOException {

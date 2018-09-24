@@ -14,7 +14,6 @@ import java.io.IOException;
 
 public class DiscoveryServiceComponent {
 
-    private final HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
     private final String discoveryServiceBaseUrl = Application.config.getProperty("discoveryServiceUrl");
 
     private String get(String url) throws IOException {
