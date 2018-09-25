@@ -9,7 +9,7 @@ import java.net.URL;
 
 public class HttpUrlConnector {
 
-    public String sendPostRequest(String url, String postData, String contentType, String acceptType) throws IOException {
+    public static String sendPostRequest(String url, String postData, String contentType, String acceptType) throws IOException {
 
         URL obj = new URL(url);
 
@@ -38,7 +38,7 @@ public class HttpUrlConnector {
         return response;
     }
 
-    public String sendGetRequest(String url, String params, String acceptType) throws IOException {
+    public static String sendGetRequest(String url, String params, String acceptType) throws IOException {
 
         if(params != null){
             url += params;

@@ -21,13 +21,9 @@ import {
   postDiscoverFromTtl,
   postDiscoverFromUriList,
   getPipelineGroups
-} from "../api";
+} from "../api/api";
 import ChipInput from "material-ui-chip-input";
-import {
-  addSingleSource,
-  removeSingleSource,
-  addMultipleSources
-} from "../actions/datasources";
+import { removeSingleSource, addMultipleSources } from "../actions/datasources";
 import { url_domain } from "../utils";
 import {
   getDatasourcesArray,
@@ -196,9 +192,12 @@ class SelectSources extends React.Component {
     let sourcesList = [];
 
     links.forEach(function(link) {
-      const name = url_domain(link);
-      const uri = link;
-      sourcesList.push({ name: name, url: uri });
+      if (link !== "") {
+        const name = url_domain(link);
+        const uri = link.replace("<", "").replace(">", "");
+
+        sourcesList.push({ name: name, url: uri });
+      }
     });
 
     this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
@@ -300,7 +299,7 @@ class SelectSources extends React.Component {
                   below.
                 </Typography>
               </p>
-              <PipelinesTable />
+              <PipelinesTable discoveryId={discoveryId} />
             </DialogContent>
             <DialogActions>
               <Button color="primary" onClick={this.handleClose}>

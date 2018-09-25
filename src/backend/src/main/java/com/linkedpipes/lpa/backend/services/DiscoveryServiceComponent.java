@@ -18,13 +18,20 @@ public class DiscoveryServiceComponent {
     private final String discoveryServiceBaseUrl = Application.config.getProperty("discoveryServiceUrl");
 
     private String get(String url) throws IOException {
-        return httpUrlConnector.sendGetRequest(url,
+        return HttpUrlConnector.sendGetRequest(url,
                 null, "application/json");
     }
 
-    public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException{
-        String response =  httpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/startFromInput",
+    public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
+        String response = HttpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/startFromInput",
                 discoveryConfig, "text/plain", "application/json");
+
+        return new Gson().fromJson(response, Discovery.class);
+    }
+
+    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws IOException {
+        String response = HttpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/startFromInputIri",
+                "?iri=" + discoveryConfigIri, "application/json");
 
         return new Gson().fromJson(response, Discovery.class);
     }
@@ -35,7 +42,7 @@ public class DiscoveryServiceComponent {
         return get(discoveryServiceBaseUrl + "/discovery/" + discoveryId);
     }
 
-    public PipelineGroups getPipelineGroups(String discoveryId) throws IOException{
+    public PipelineGroups getPipelineGroups(String discoveryId) throws IOException {
         String response = get(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/pipeline-groups");
 
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
@@ -57,12 +64,12 @@ public class DiscoveryServiceComponent {
     }
 
     public String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-        return httpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
+        return HttpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
                 null, "application/json");
     }
 
     public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
-        return httpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
+        return HttpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
                 new Gson().toJson(serviceDescription), "application/json", "application/json");
     }
 }
