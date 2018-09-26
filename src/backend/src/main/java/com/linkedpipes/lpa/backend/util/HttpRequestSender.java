@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -25,7 +24,7 @@ public class HttpRequestSender {
     private String requestBody = null;
     private String contentType = null;
     private String acceptType = null;
-    private final Map<String, String> parameters = new HashMap<>();
+    private final UrlParameters parameters = new UrlParameters();
 
     public HttpRequestSender to(String urlString) {
         targetUrl = urlString;
@@ -86,12 +85,7 @@ public class HttpRequestSender {
     }
 
     private String getUrlWithParams() {
-        if (parameters.isEmpty()) {
-            return targetUrl;
-        }
-        return targetUrl + parameters.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.joining("&"));
+        return targetUrl + parameters.toString();
     }
 
     private void fillInHeader(HttpURLConnection connection) {
@@ -174,6 +168,7 @@ public class HttpRequestSender {
 
         private final String ETL_EXECUTE_PIPELINE = createUrl("executions");
 
+
         private EtlActionSelector(HttpRequestSender sender) {
             super(sender, Application.config.getProperty("etlServiceUrl"));
         }
@@ -188,7 +183,8 @@ public class HttpRequestSender {
         }
 
         public String getExecutionStatus(String executionIri) throws IOException {
-            return sender.to(createUrl(executionIri, "overview"))
+            String targetUrl = UrlUtils.urlFrom(executionIri, "overview");
+            return sender.to(targetUrl)
                     .acceptType("application/json")
                     .send();
         }
@@ -197,6 +193,20 @@ public class HttpRequestSender {
             return sender.to(executionIri)
                     .acceptType("application/json")
                     .send();
+        }
+
+    }
+
+    public static class UrlParameters extends HashMap<String, String> {
+
+        @Override
+        public String toString() {
+            if (isEmpty()) {
+                return "";
+            }
+            return "?" + entrySet().stream()
+                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                    .collect(Collectors.joining("&"));
         }
 
     }

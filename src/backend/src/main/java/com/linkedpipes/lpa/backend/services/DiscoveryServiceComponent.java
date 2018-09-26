@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.entities.Pipeline;
-import com.linkedpipes.lpa.backend.entities.PipelineGroups;
-import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 
 import java.io.IOException;
@@ -55,10 +52,11 @@ public class DiscoveryServiceComponent {
         return pipelineGroups;
     }
 
-    public String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-        return new HttpRequestSender()
+    public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws IOException {
+        String response = new HttpRequestSender()
                 .toDiscovery()
                 .exportPipeline(discoveryId, pipelineUri);
+        return new Gson().fromJson(response, PipelineExportResult.class);
     }
 
     public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {

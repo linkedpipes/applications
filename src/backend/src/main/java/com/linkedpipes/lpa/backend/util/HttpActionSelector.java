@@ -11,7 +11,7 @@ public abstract class HttpActionSelector {
     }
 
     protected final String createUrl(String... more) {
-        return URLUtils.urlFrom(baseUrl, more);
+        return UrlUtils.urlFrom(baseUrl, more);
     }
 
 }

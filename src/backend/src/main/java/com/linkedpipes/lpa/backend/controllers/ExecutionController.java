@@ -1,7 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
-import com.linkedpipes.lpa.backend.entities.ExecutionResult;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
 import org.springframework.http.HttpStatus;
@@ -30,7 +29,6 @@ public class ExecutionController {
         }
 
         ExecutionStatus status = etlService.getExecutionStatus(executionIri);
-
         return ResponseEntity.ok(status);
     }
 
@@ -41,8 +39,7 @@ public class ExecutionController {
             return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
 
-        ExecutionResult result = etlService.getExecutionResult(executionIri);
-
+        String result = etlService.getExecutionResult(executionIri);
         return ResponseEntity.ok(result);
     }
 

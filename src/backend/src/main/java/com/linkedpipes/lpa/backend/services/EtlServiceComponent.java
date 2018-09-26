@@ -2,7 +2,7 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.linkedpipes.lpa.backend.entities.ExecutionResult;
+import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 
@@ -14,10 +14,11 @@ public class EtlServiceComponent {
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
             .create();
 
-    public String executePipeline(String etlPipelineIri) throws IOException {
-        return new HttpRequestSender()
+    public Execution executePipeline(String etlPipelineIri) throws IOException {
+        String response = new HttpRequestSender()
                 .toEtl()
                 .executePipeline(etlPipelineIri);
+        return GSON.fromJson(response, Execution.class);
     }
 
     public ExecutionStatus getExecutionStatus(String executionIri) throws IOException {
@@ -27,11 +28,10 @@ public class EtlServiceComponent {
         return GSON.fromJson(response, ExecutionStatus.class);
     }
 
-    public ExecutionResult getExecutionResult(String executionIri) throws IOException {
-        String response = new HttpRequestSender()
+    public String getExecutionResult(String executionIri) throws IOException {
+        return new HttpRequestSender()
                 .toEtl()
                 .getExecutionResult(executionIri);
-        return GSON.fromJson(response, ExecutionResult.class);
     }
 
 }

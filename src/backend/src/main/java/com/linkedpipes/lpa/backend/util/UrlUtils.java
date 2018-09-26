@@ -5,18 +5,18 @@ import org.springframework.util.StringUtils;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class URLUtils {
+public class UrlUtils {
 
     private static final char SLASH = '/';
     private static final String SLASH_STRING = "" + SLASH;
 
     // do not let anyone instantiate this
-    private URLUtils() {
+    private UrlUtils() {
     }
 
     public static String urlFrom(String first, String... more) {
         return Stream.concat(Stream.of(first), Stream.of(more))
-                .map(URLUtils::stripSlashes)
+                .map(UrlUtils::stripSlashes)
                 .filter(s -> !StringUtils.isEmpty(s))
                 .collect(Collectors.joining(SLASH_STRING));
     }
@@ -48,10 +48,7 @@ public class URLUtils {
             i--;
         }
 
-        if (i < 0) {
-            return "";
-        }
-        return input.substring(0, i);
+        return input.substring(0, i + 1);
     }
 
 }
