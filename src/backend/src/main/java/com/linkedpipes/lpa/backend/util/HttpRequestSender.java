@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.util;
 import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import org.springframework.util.StreamUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -76,10 +77,10 @@ public class HttpRequestSender {
 
         if (connection.getResponseCode() != HTTP_OK) {
             throw new ConnectionException(connection.getResponseCode(), connection.getResponseMessage(),
-                    StreamUtils.getStringFromStream(connection.getErrorStream()));
+                    StreamUtils.copyToString(connection.getErrorStream(), Application.DEFAULT_CHARSET));
         }
 
-        String response = StreamUtils.getStringFromStream(connection.getInputStream());
+        String response = StreamUtils.copyToString(connection.getInputStream(), Application.DEFAULT_CHARSET);
         connection.disconnect();
         return response;
     }

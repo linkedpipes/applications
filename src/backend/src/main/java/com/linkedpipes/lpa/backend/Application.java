@@ -23,7 +23,6 @@ public class Application {
 	private static final String CONFIG_FILE_NAME = "config.properties";
 
 	public static final Properties config;
-	public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
 
 	static {
 		File configFile = new File(CONFIG_FILE_NAME);
@@ -34,6 +33,8 @@ public class Application {
 			logger.error("Exception: ", ex);
 		}
 	}
+
+    public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
