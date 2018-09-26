@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -22,6 +23,7 @@ public class Application {
 	private static final String CONFIG_FILE_NAME = "config.properties";
 
 	public static final Properties config;
+	public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
 
 	static {
 		File configFile = new File(CONFIG_FILE_NAME);

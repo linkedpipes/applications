@@ -4,45 +4,38 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 
 import java.io.IOException;
 
 public class DiscoveryServiceComponent {
 
-    private final String discoveryServiceBaseUrl = Application.config.getProperty("discoveryServiceUrl");
-
-    private String get(String url) throws IOException {
-        return HttpUrlConnector.sendGetRequest(url,
-                null, "application/json");
-    }
-
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
-        String response = HttpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/startFromInput",
-                discoveryConfig, "text/plain", "application/json");
-
+        String response = new HttpRequestSender().toDiscovery().startFromInput(discoveryConfig);
         return new Gson().fromJson(response, Discovery.class);
     }
 
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws IOException {
-        String response = HttpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/startFromInputIri",
-                "?iri=" + discoveryConfigIri, "application/json");
-
+        String response = new HttpRequestSender().toDiscovery().startFromInputIri(discoveryConfigIri);
         return new Gson().fromJson(response, Discovery.class);
     }
 
     //TODO strongly type below method params (not simply string)
     //TODO use better string interpolation method?
     public String getDiscoveryStatus(String discoveryId) throws IOException{
-        return get(discoveryServiceBaseUrl + "/discovery/" + discoveryId);
+        return new HttpRequestSender()
+                .toDiscovery()
+                .getStatus(discoveryId);
     }
 
     public PipelineGroups getPipelineGroups(String discoveryId) throws IOException {
-        String response = get(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/pipeline-groups");
+        String response = new HttpRequestSender()
+                .toDiscovery()
+                .getPipelineGroups(discoveryId);
 
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
         JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
@@ -63,12 +56,15 @@ public class DiscoveryServiceComponent {
     }
 
     public String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-        return HttpUrlConnector.sendGetRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
-                null, "application/json");
+        return new HttpRequestSender()
+                .toDiscovery()
+                .exportPipeline(discoveryId, pipelineUri);
     }
 
     public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
-        return HttpUrlConnector.sendPostRequest(discoveryServiceBaseUrl + "/discovery/" + discoveryId + "/export/" + pipelineUri,
-                new Gson().toJson(serviceDescription), "application/json", "application/json");
+        return new HttpRequestSender()
+                .toDiscovery()
+                .exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
     }
+
 }

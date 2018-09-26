@@ -1,10 +1,8 @@
-package com.linkedpipes.lpa.backend.services;
+package com.linkedpipes.lpa.backend.util;
 
 import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import com.linkedpipes.lpa.backend.util.StreamUtils;
-import com.linkedpipes.lpa.backend.util.URLUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -66,11 +64,6 @@ public class HttpRequestSender {
         return this;
     }
 
-    public HttpRequestSender parameters(Map<String, String> parameters) {
-        this.parameters.putAll(parameters);
-        return this;
-    }
-
     public String send() throws IOException {
         URL url = new URL(getUrlWithParams());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -119,23 +112,16 @@ public class HttpRequestSender {
         }
     }
 
-    private static class DiscoveryActionSelector {
+    public static class DiscoveryActionSelector extends HttpActionSelector {
 
-        private static final String DISCOVERY_BASE_URL = Application.config.getProperty("discoveryServiceUrl");
-        private static final String DISCOVERY_START_FROM_INPUT = createDiscoveryUrl("discovery", "startFromInput");
-        private static final String DISCOVERY_START_FROM_INPUT_IRI = createDiscoveryUrl("discovery", "startFromInputIri");
-        private static final String DISCOVERY_GET_STATUS = createDiscoveryUrl("discovery", "%s");
-        private static final String DISCOVERY_GET_PIPELINE_GROUPS = createDiscoveryUrl("discovery", "%s", "pipeline-groups");
-        private static final String DISCOVERY_EXPORT_PIPELINE = createDiscoveryUrl("discovery", "%s", "export", "%s");
-
-        private static String createDiscoveryUrl(String... more) {
-            return URLUtils.urlFrom(DISCOVERY_BASE_URL, more);
-        }
-
-        private final HttpRequestSender sender;
+        private final String DISCOVERY_START_FROM_INPUT = createUrl("discovery", "startFromInput");
+        private final String DISCOVERY_START_FROM_INPUT_IRI = createUrl("discovery", "startFromInputIri");
+        private final String DISCOVERY_GET_STATUS = createUrl("discovery", "%s");
+        private final String DISCOVERY_GET_PIPELINE_GROUPS = createUrl("discovery", "%s", "pipeline-groups");
+        private final String DISCOVERY_EXPORT_PIPELINE = createUrl("discovery", "%s", "export", "%s");
 
         private DiscoveryActionSelector(HttpRequestSender sender) {
-            this.sender = sender;
+            super(sender, Application.config.getProperty("discoveryServiceUrl"));
         }
 
         public String startFromInput(String discoveryConfig) throws IOException {
@@ -183,10 +169,34 @@ public class HttpRequestSender {
 
     }
 
-    private static class EtlActionSelector {
+    public static class EtlActionSelector extends HttpActionSelector {
+
+        private final String ETL_EXECUTE_PIPELINE = createUrl("executions");
 
         private EtlActionSelector(HttpRequestSender sender) {
-        } // TODO: 24.9.18
+            super(sender, Application.config.getProperty("etlServiceUrl"));
+        }
+
+        public String executePipeline(String pipelineIri) throws IOException {
+            return sender.to(ETL_EXECUTE_PIPELINE)
+                    .parameter("pipeline", pipelineIri)
+                    .method(HttpMethod.POST)
+                    .contentType("application/json")
+                    .acceptType("application/json")
+                    .send();
+        }
+
+        public String getExecutionStatus(String executionIri) throws IOException {
+            return sender.to(createUrl(executionIri, "overview"))
+                    .acceptType("application/json")
+                    .send();
+        }
+
+        public String getExecutionResult(String executionIri) throws IOException {
+            return sender.to(executionIri)
+                    .acceptType("application/json")
+                    .send();
+        }
 
     }
 

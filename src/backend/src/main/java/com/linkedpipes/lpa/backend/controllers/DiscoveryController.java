@@ -5,7 +5,6 @@ import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
-import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
 import com.linkedpipes.lpa.backend.services.TtlConfigGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +17,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DiscoveryController {
 
-    private final HttpUrlConnector httpUrlConnector;
     private final DiscoveryServiceComponent discoveryService;
 
     public DiscoveryController(){
-        httpUrlConnector = new HttpUrlConnector();
         discoveryService = new DiscoveryServiceComponent();
     }
 
