@@ -6,7 +6,6 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -14,21 +13,21 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import PipelinesTable from "./PipelinesTable";
-import { addPipelines } from "../actions/pipelines";
+import { addPipelines } from "../../_actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   postDiscoverFromTtl,
   postDiscoverFromUriList,
   getPipelineGroups
-} from "../api/api";
+} from "../../_services/discovery.service";
 import ChipInput from "material-ui-chip-input";
-import { removeSingleSource, addMultipleSources } from "../actions/datasources";
-import { url_domain } from "../utils";
+// import { removeSingleSource, addMultipleSources } from "../../_actions/datasources";
+import { url_domain } from "../../_helpers/utils";
 import {
   getDatasourcesArray,
   getDatasourcesForTTLGenerator
-} from "../selectors/datasources";
+} from "../../selectors/datasources";
 
 const styles = theme => ({
   root: {
@@ -107,7 +106,7 @@ class SelectSources extends React.Component {
       });
   };
 
-  // TODO: refactor later, move to separate class responsible for api calls
+  // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = () => {
     const { datasourcesForTTL } = this.props;
 

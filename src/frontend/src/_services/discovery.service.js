@@ -5,7 +5,7 @@ import {
   EXECUTE_PIPELINE_URL,
   EXPORT_PIPELINE_URL,
   EXECUTION_STATUS_URL
-} from "../constants";
+} from "../_constants";
 
 import "whatwg-fetch";
 
@@ -31,7 +31,7 @@ export async function postDiscoverFromTtl({ ttlFile }) {
   return rest(DISCOVER_FROM_INPUT_URL, ttlFile, "POST", undefined);
 }
 
-// TODO: refactor later, move to separate class responsible for api calls
+// TODO: refactor later, move to separate class responsible for _services calls
 export async function postDiscoverFromUriList({ datasourceUris }) {
   return rest(DISCOVER_FROM_URI_LIST_URL, datasourceUris, "POST", undefined);
 }
