@@ -10,7 +10,7 @@ services:
     build: frontend/
     # image: linkedpipes/applications:frontend
     environment:
-      REACT_APP_ENDPOINT: http://api.com
       env_file: .env
+      BASE_BACKEND_URL: localhost:5000
     ports:
       - "9000:9000"
