@@ -339,7 +339,7 @@ PipelinesTable.propTypes = {
 const mapStateToProps = state => {
   return {
     pipelines: state.pipelines,
-    executions: state.executions
+    executions: state.etl_executions
   };
 };
 
