@@ -1,6 +1,8 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
+import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
@@ -32,9 +34,8 @@ public class PipelineController {
 
     @GetMapping("/pipeline/export")
     @ResponseBody
-    public ResponseEntity<String> exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri) throws IOException{
-        String response = discoveryService.exportPipeline(discoveryId, pipelineUri);
-
+    public ResponseEntity<PipelineExportResult> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
+        PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
         return ResponseEntity.ok(response);
     }
 
@@ -42,9 +43,7 @@ public class PipelineController {
     @ResponseBody
     public ResponseEntity<String> exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException{
         ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
-
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
-
         return ResponseEntity.ok(response);
     }
 
@@ -55,9 +54,8 @@ public class PipelineController {
     }
 
     @RequestMapping("/pipeline/execute")
-    public ResponseEntity<String> executePipeline(@RequestParam( value="etlPipelineIri") String etlPipelineIri) throws IOException{
-        String response = etlService.executePipeline(etlPipelineIri);
-
+    public ResponseEntity<Execution> executePipeline(@RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws IOException {
+        Execution response = etlService.executePipeline(etlPipelineIri);
         return ResponseEntity.ok(response);
     }
 
