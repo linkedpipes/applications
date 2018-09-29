@@ -15,9 +15,11 @@ import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
 import {
   getExecutePipeline,
+  getExportPipeline,
   getExecutionStatus
 } from "../../_services/discovery.service";
 import { addSingleExecution } from "../../_actions/etl_executions";
+import { addSingleExport } from "../../_actions/etl_exports";
 import { toast } from "react-toastify";
 
 function desc(a, b, orderBy) {
