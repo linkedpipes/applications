@@ -153,6 +153,8 @@ class SelectSources extends React.Component {
   };
 
   processStartDiscovery = () => {
+    console.log(process.env.BASE_BACKEND_URL);
+
     this.setState({ discoveryIsLoading: true });
     if (this.state.ttlFile) {
       this.postStartFromFile();

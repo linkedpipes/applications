@@ -1,13 +1,16 @@
-version: '3'
+version: "3"
 services:
   backend:
-    # build: backend/
-    image: linkedpipes/applications:backend
+    build: backend/
+    # image: linkedpipes/applications:backend
     ports:
       - "8080:5000"
 
   frontend:
-    # build: frontend/
-    image: linkedpipes/applications:frontend
+    build: frontend/
+    # image: linkedpipes/applications:frontend
+    environment:
+      REACT_APP_ENDPOINT: http://api.com
+      env_file: .env
     ports:
       - "9000:9000"

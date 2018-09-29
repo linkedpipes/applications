@@ -4,6 +4,8 @@ const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 const dev = process.env.NODE_ENV !== "production";
 
+const Dotenv = require("dotenv-webpack");
+
 const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
   template: path.join(__dirname, "./src/index.html"),
   filename: "index.html",
@@ -46,6 +48,10 @@ module.exports = {
   },
   mode: dev ? "development" : "production",
   plugins: dev
-    ? [HTMLWebpackPluginConfig, new webpack.HotModuleReplacementPlugin()]
+    ? [
+        HTMLWebpackPluginConfig,
+        new webpack.HotModuleReplacementPlugin(),
+        new Dotenv()
+      ]
     : [HTMLWebpackPluginConfig]
 };

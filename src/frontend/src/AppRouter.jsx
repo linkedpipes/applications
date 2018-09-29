@@ -21,7 +21,7 @@ const AppRouter = () => (
         <Route path="/about" component={AboutPage} />
         {/*<Route path="/login" component={AboutPage} />*/}
         {/*<Route path="/register" component={AboutPage} />*/}
-        <Redirect from="/" to="/dashboard"/>
+        <Redirect from="/" to="/dashboard" />
         <Route component={NotFoundPage} />
       </Switch>
       <BottomBar />
