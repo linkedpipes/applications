@@ -48,3 +48,8 @@ export function getQueryString(params) {
     })
     .join("&");
 }
+
+export function replaceAll(str, search, replacement) {
+  let target = str;
+  return target.split(search).join(replacement);
+}
