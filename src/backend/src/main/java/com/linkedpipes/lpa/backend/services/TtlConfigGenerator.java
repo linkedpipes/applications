@@ -15,7 +15,7 @@ import java.util.List;
 public class TtlConfigGenerator {
 
     public static String fromDataSourceList(List<DataSource> dataSourceList) throws FileNotFoundException {
-        RIOT.init() ;
+        RIOT.init();
 
         // create an empty model
         Model model = ModelFactory.createDefaultModel();

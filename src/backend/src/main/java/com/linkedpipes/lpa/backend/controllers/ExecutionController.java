@@ -1,10 +1,8 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
-import com.linkedpipes.lpa.backend.entities.ExecutionResult;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
-import com.linkedpipes.lpa.backend.services.HttpUrlConnector;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +16,9 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 public class ExecutionController {
 
-    private final HttpUrlConnector httpUrlConnector;
     private final EtlServiceComponent etlService;
 
     public ExecutionController(){
-        httpUrlConnector = new HttpUrlConnector();
         etlService = new EtlServiceComponent();
     }
 
@@ -33,7 +29,6 @@ public class ExecutionController {
         }
 
         ExecutionStatus status = etlService.getExecutionStatus(executionIri);
-
         return ResponseEntity.ok(status);
     }
 
@@ -44,8 +39,7 @@ public class ExecutionController {
             return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
 
-        ExecutionResult result = etlService.getExecutionResult(executionIri);
-
+        String result = etlService.getExecutionResult(executionIri);
         return ResponseEntity.ok(result);
     }
 

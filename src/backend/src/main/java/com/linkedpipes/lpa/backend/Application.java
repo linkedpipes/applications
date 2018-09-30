@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -32,6 +33,8 @@ public class Application {
 			logger.error("Exception: ", ex);
 		}
 	}
+
+    public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
