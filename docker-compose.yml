@@ -9,6 +9,7 @@ services:
     image: linkedpipes/applications:frontend
     ports:
       - "9000:9000"
+
   db:
     image: tenforce/virtuoso:1.3.1-virtuoso7.2.2
     environment:
