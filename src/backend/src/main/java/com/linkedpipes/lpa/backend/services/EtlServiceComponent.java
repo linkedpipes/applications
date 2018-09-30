@@ -7,12 +7,22 @@ import com.linkedpipes.lpa.backend.entities.ExecutionResult;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class EtlServiceComponent {
     private static final Gson GSON = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
             .create();
-    private final HttpUrlConnector httpUrlConnector = new HttpUrlConnector();
+
+    private static final Map<String, String> EXECUTION_STATUS = Map.of(
+            "http://etl.linkedpipes.com/resources/status/failed", "FAILED",
+            "http://etl.linkedpipes.com/resources/status/queued", "QUEUED",
+            "http://etl.linkedpipes.com/resources/status/running", "RUNNING",
+            "http://etl.linkedpipes.com/resources/status/finished", "FINISHED",
+            "http://etl.linkedpipes.com/resources/status/cancelled", "CANCELLED",
+            "http://etl.linkedpipes.com/resources/status/cancelling", "CANCELLING"
+    );
+
     private final String etlServiceBaseUrl = Application.config.getProperty("etlServiceUrl");
 
     private String get(String url) throws IOException {
