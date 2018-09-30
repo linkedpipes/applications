@@ -12,6 +12,30 @@ export const PIPELINE_GROUPS_URL = discoveryId => {
   return DISCOVERY_URL + discoveryId + "/pipelineGroups";
 };
 
+export const ETL_STATUS_MAP = {
+  "http://etl.linkedpipes.com/resources/status/mapped": "Mapped",
+  "http://etl.linkedpipes.com/resources/status/queued": "Queued",
+  "http://etl.linkedpipes.com/resources/status/initializing": "Initializing",
+  "http://etl.linkedpipes.com/resources/status/running": "Running",
+  "http://etl.linkedpipes.com/resources/status/finished": "Finished",
+  "http://etl.linkedpipes.com/resources/status/cancelled": "Cancelled",
+  "http://etl.linkedpipes.com/resources/status/cancelling": "Cancelling",
+  "http://etl.linkedpipes.com/resources/status/failed": "Failed",
+  "http://etl.linkedpipes.com/resources/status/unknown": "Unknown"
+};
+
+export const ETL_STATUS_TYPE = {
+  Mapped: 0,
+  Queued: 1,
+  Initializing: 2,
+  Running: 3,
+  Finished: 4,
+  Cancelled: 5,
+  Cancelling: 6,
+  Failed: 7,
+  Unknown: 8
+};
+
 export const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
   return discoveryId && pipelineId
     ? PIPELINE_URL +

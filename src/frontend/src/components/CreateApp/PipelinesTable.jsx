@@ -21,6 +21,7 @@ import {
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
 import { toast } from "react-toastify";
+import { ETL_STATUS, ETL_STATUS_MAP, ETL_STATUS_TYPE } from "../../_constants";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -52,6 +53,8 @@ const rows = [
     label: "Descriptor"
   }
 ];
+
+const EXECUTION_STATUS_TIMEOUT = 10000;
 
 class PipelinesTableHead extends React.Component {
   createSortHandler = property => event => {
@@ -239,14 +242,18 @@ class PipelinesTable extends React.Component {
       });
   };
 
-  checkExecutionStatus = pipelineId => {
+  checkExecutionStatus = (pipelineId, tid) => {
     const { executions } = this.props;
     const executionValues = executions.executions[pipelineId];
+    let status = undefined;
+    const self = this;
 
-    let tid = toast.info("Checking the execution status...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
+    if (tid == undefined) {
+      tid = toast.info("Checking the execution status...", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: false
+      });
+    }
 
     getExecutionStatus({ executionIri: executionValues.executionIri })
       .then(
@@ -257,26 +264,43 @@ class PipelinesTable extends React.Component {
           toast.update(tid, {
             render: "Error while checking the execution status",
             type: toast.TYPE.ERROR,
-            autoClose: 2000
+            autoClose: EXECUTION_STATUS_TIMEOUT
           });
           console.error(error);
         }
       )
       .then(function(json) {
-        let response = "Status: unavailable";
+        let response = "Status: ";
+        let status = ETL_STATUS_MAP[json.status.id];
 
-        if ("status" in json && "id" in json.status) {
-          response = "Status: " + json.status.id.split("/").pop();
+        if (status === undefined) {
+          toast.update(tid, {
+            render: "Unkown status",
+            type: toast.TYPE.ERROR,
+            autoClose: EXECUTION_STATUS_TIMEOUT
+          });
         }
+
+        response += status;
 
         if (toast.isActive(tid)) {
           toast.update(tid, {
             render: response,
             type: toast.TYPE.INFO,
-            autoClose: 2000
+            autoClose: EXECUTION_STATUS_TIMEOUT
           });
         } else {
-          toast.info(response, { autoClose: 2000 });
+          toast.info(response, { autoClose: EXECUTION_STATUS_TIMEOUT });
+        }
+
+        if (
+          status !== ETL_STATUS_TYPE.Finished ||
+          status !== ETL_STATUS_TYPE.Cancelled ||
+          status !== ETL_STATUS_TYPE.Unknown
+        ) {
+          setTimeout(() => {
+            self.checkExecutionStatus(pipelineId, tid);
+          }, 5000);
         }
       });
   };
@@ -344,7 +368,7 @@ class PipelinesTable extends React.Component {
                           color="primary"
                           disabled={!(pipeline.id in exportsDict.exportRecords)}
                           onClick={() => {
-                            self.checkExecutionStatus(pipeline.id);
+                            self.checkExecutionStatus(pipeline.id, undefined);
                           }}
                         >
                           Status
