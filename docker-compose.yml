@@ -19,3 +19,8 @@ services:
       - ./data/virtuoso:/data
     ports:
       - "8890:8890"
+
+  discovery:
+    image: linkedpipes/discovery
+    ports:
+      - "8070:9000"
