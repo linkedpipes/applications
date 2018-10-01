@@ -2,16 +2,14 @@ version: "3"
 services:
   backend:
     image: linkedpipes/applications:backend
-    build:
-      context: src/backend/
     ports:
       - "5000:8080"
 
   frontend:
-    image: linkedpipes/applications:frontend
-    environment:
-      - REACT_APP_BASE_BACKEND_URL="http://localhost:5000/"
+    # image: linkedpipes/applications:frontend
     build:
       context: src/frontend/
+      args:
+        REACT_APP_BASE_BACKEND_URL: http://localhost:5000/
     ports:
       - "9000:9000"
