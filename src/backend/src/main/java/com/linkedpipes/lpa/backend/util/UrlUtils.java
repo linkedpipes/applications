@@ -5,6 +5,9 @@ import org.springframework.util.StringUtils;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A utility class for easier handling of strings which represent a URL.
+ */
 public class UrlUtils {
 
     private static final char SLASH = '/';
@@ -14,10 +17,18 @@ public class UrlUtils {
     private UrlUtils() {
     }
 
+    /**
+     * Concatenates the given string arguments by ignoring any leading or trailing slashes and then joining the results
+     * with a single slash. Empty components and components consisting only of slashes are ignored.
+     *
+     * @param first first component of the URL
+     * @param more  other components of the URL
+     * @return a single-slash-joined string containing the arguments
+     */
     public static String urlFrom(String first, String... more) {
         return Stream.concat(Stream.of(first), Stream.of(more))
                 .map(UrlUtils::stripSlashes)
-                .filter(s -> !StringUtils.isEmpty(s))
+                .filter(s -> !StringUtils.isEmpty(s.trim()))
                 .collect(Collectors.joining(SLASH_STRING));
     }
 
@@ -26,8 +37,8 @@ public class UrlUtils {
     }
 
     private static String stripLeadingSlashes(String input) {
-        if (StringUtils.isEmpty(input)) {
-            return input;
+        if (input == null) {
+            return null;
         }
 
         int i = 0;
@@ -39,8 +50,8 @@ public class UrlUtils {
     }
 
     private static String stripTrailingSlashes(String input) {
-        if (StringUtils.isEmpty(input)) {
-            return input;
+        if (input == null) {
+            return null;
         }
 
         int i = input.length() - 1;
