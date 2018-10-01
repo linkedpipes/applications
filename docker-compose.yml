@@ -1,0 +1,11 @@
+version: '3'
+services:
+  backend:
+    image: linkedpipes/applications:backend
+    ports:
+      - "8080:5000"
+
+  frontend:
+    image: linkedpipes/applications:frontend
+    ports:
+      - "9000:9000"
