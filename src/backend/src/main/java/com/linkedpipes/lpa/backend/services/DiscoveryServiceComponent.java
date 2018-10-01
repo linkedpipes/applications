@@ -34,19 +34,32 @@ public class DiscoveryServiceComponent {
                 .toDiscovery()
                 .getPipelineGroups(discoveryId);
 
-        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
-        JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
-        JsonArray pipelines = pipelineGroupsJson.getAsJsonArray("pipelines");
-
         PipelineGroups pipelineGroups = new PipelineGroups();
 
-        for (JsonElement pipeline : pipelines) {
-            JsonArray pipelineArray = pipeline.getAsJsonArray();
-            Pipeline pipelineObj = new Pipeline();
-            pipelineObj.id = pipelineArray.get(0).getAsString();
-            pipelineObj.name = pipelineArray.get(1).getAsJsonObject().get("name").getAsString();
-            pipelineObj.descriptor = pipelineArray.get(1).getAsJsonObject().get("descriptor").getAsString();
-            pipelineGroups.pipelines.add(pipelineObj);
+        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+        JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
+        JsonArray appGroups = pipelineGroupsJson.getAsJsonArray("applicationGroups");
+
+        for (JsonElement appGroup : appGroups) {
+            PipelineGroup pipelineGrp = new PipelineGroup();
+            JsonObject appGroupObj = appGroup.getAsJsonObject();
+            pipelineGrp.applicationInstance = new Gson().fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
+
+            JsonArray dataSourceGroups = appGroupObj.getAsJsonArray("dataSourceGroups");
+
+            for (JsonElement dataSourceGroup : dataSourceGroups) {
+                JsonArray extractorGroups = dataSourceGroup.getAsJsonObject().getAsJsonArray("extractorGroups");
+
+                for (JsonElement extractorGroup : extractorGroups) {
+                    JsonArray dataSampleGroups = extractorGroup.getAsJsonObject().getAsJsonArray("dataSampleGroups");
+
+                    for (JsonElement dataSampleGroup : dataSampleGroups) {
+                        Pipeline pipeline = new Gson().fromJson(dataSampleGroup.getAsJsonObject().getAsJsonObject("pipeline"), Pipeline.class);
+                        pipelineGrp.pipelines.add(pipeline);
+                    }
+                }
+            }
+            pipelineGroups.pipelineGroups.add(pipelineGrp);
         }
 
         return pipelineGroups;

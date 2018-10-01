@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PipelineGroups {
-    @SerializedName("pipelines")
-    public List<Pipeline> pipelines;
+    public List<PipelineGroup> pipelineGroups;
 
     public PipelineGroups(){
-        pipelines = new ArrayList<>();
+        pipelineGroups = new ArrayList<>();
     }
 }
