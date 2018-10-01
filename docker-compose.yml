@@ -3,7 +3,7 @@ services:
   backend:
     image: linkedpipes/applications:backend
     ports:
-      - "8080:5000"
+      - "5000:8080"
 
   frontend:
     # image: linkedpipes/applications:frontend
