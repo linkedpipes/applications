@@ -1,6 +1,6 @@
 import { getQueryString } from "../_helpers/utils";
 
-const BASE_URL = process.env.BASE_BACKEND_URL;
+const BASE_URL = process.env.REACT_APP_BASE_BACKEND_URL;
 const PIPELINES_URL = BASE_URL + "pipelines/";
 const PIPELINE_URL = BASE_URL + "pipeline/";
 const DISCOVERY_URL = BASE_URL + "discovery/";
