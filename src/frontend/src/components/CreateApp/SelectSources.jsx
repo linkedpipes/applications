@@ -11,6 +11,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
+import TextField from "@material-ui/core/TextField";
 import PipelinesTable from "./PipelinesTable";
 import { addPipelines } from "../../_actions/pipelines";
 import { toast } from "react-toastify";
@@ -20,7 +21,6 @@ import {
   postDiscoverFromUriList,
   getPipelineGroups
 } from "../../_services/discovery.service";
-import ChipInput from "material-ui-chip-input";
 import {
   removeSingleSource,
   addMultipleSources
@@ -57,7 +57,9 @@ class SelectSources extends React.Component {
     ttlFile: undefined,
     discoveryId: "",
     discoveryIsLoading: false,
-    pipelinesDialogOpen: false
+    pipelinesDialogOpen: false,
+    textFieldValue: "",
+    textFieldIsValid: false
   };
 
   handleClose = () => {
@@ -159,7 +161,10 @@ class SelectSources extends React.Component {
     if (this.state.ttlFile) {
       this.postStartFromFile();
     } else {
-      this.postStartFromInputLinks();
+      this.handleAddSources();
+      setTimeout(() => {
+        this.postStartFromInputLinks();
+      }, 500);
     }
   };
 
@@ -195,57 +200,75 @@ class SelectSources extends React.Component {
       });
   };
 
-  handleAddSource = chip => {
-    if (!(typeof chip === "string" || chip instanceof String)) {
+  handleAddSources = () => {
+    let input = this.state.textFieldValue;
+
+    if (!(typeof input === "string" || input instanceof String)) {
       return;
     }
 
-    let links = replaceAll(chip, ",", " ");
-    links = links.split(" ");
+    let links = input.split(",\n");
     let sourcesList = [];
 
     links.forEach(function(link) {
       if (link !== "") {
-        const name = url_domain(link);
-        const uri = link.replace("<", "").replace(">", "");
-
-        sourcesList.push({ name: name, url: uri });
+        const domainName = url_domain(link);
+        sourcesList.push({ name: domainName, url: link });
       }
     });
 
     this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
   };
 
-  handleDeleteSource = chip => {
-    this.props.dispatch(removeSingleSource({ url: chip }));
+  // TODO: refactor
+  // handleDeleteSource = chip => {
+  //   this.props.dispatch(removeSingleSource({ url: chip }));
+  // };
+
+  validateField = e => {
+    let rawText = e.target.value;
+    const regex = /(?:http|https):\/\/((?:[\w-]+)(?:\.[\w-]+)+)(?:[\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gm;
+    let matches = rawText.match(regex);
+    let valid = false;
+
+    if (matches instanceof Array) {
+      rawText = matches.join(",\n");
+      valid = true;
+    }
+
+    this.setState({
+      textFieldValue: rawText,
+      textFieldIsValid: valid
+    });
   };
 
   render() {
     const { classes, datasources } = this.props;
 
-    const { discoveryId, pipelinesDialogOpen, discoveryIsLoading } = this.state;
+    const {
+      discoveryId,
+      pipelinesDialogOpen,
+      discoveryIsLoading,
+      textFieldValue,
+      textFieldIsValid
+    } = this.state;
 
     return (
       <Card className={classes.card}>
         <CardContent>
           <Typography gutterBottom variant="title" component="h1">
-            Select Data Sources
+            Add Data Sources
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            Select data source for your new application
-          </Typography>
-          <ChipInput
-            value={datasources}
-            disabled={discoveryIsLoading}
-            onAdd={chip => this.handleAddSource(chip)}
+          <TextField
+            id="outlined-textarea"
+            label="Sources validator"
+            multiline
+            value={textFieldValue}
+            onChange={this.validateField}
+            placeholder="Input your sources..."
             fullWidth
-            onDelete={chip => this.handleDeleteSource(chip)}
-            style={{ margin: 8 }}
-            helperText="Enter your sources and press 'Enter' :)"
             margin="normal"
-            InputLabelProps={{
-              shrink: true
-            }}
+            variant="outlined"
           />
         </CardContent>
 
@@ -278,7 +301,7 @@ class SelectSources extends React.Component {
                 variant="contained"
                 component="span"
                 className={classes.button}
-                disabled={!this.state.ttlFile && datasources.length === 0}
+                disabled={!this.state.ttlFile && !textFieldIsValid}
                 onClick={this.processStartDiscovery}
                 size="small"
               >
