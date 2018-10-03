@@ -19,7 +19,8 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 ## Quick start
 
-The whole app can be run using docker compose
+The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
+
 `$ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose.yml -o docker-compose.yml; docker-compose up`
 
 
