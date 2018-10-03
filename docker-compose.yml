@@ -3,7 +3,7 @@ services:
   backend:
     image: linkedpipes/applications:backend
     ports:
-      - "8080:5000"
+      - "5000:8080"
 
   frontend:
     image: linkedpipes/applications:frontend
@@ -23,4 +23,4 @@ services:
   discovery:
     image: linkedpipes/discovery
     ports:
-      - "8070:9000"
+      - "9000:8070"
