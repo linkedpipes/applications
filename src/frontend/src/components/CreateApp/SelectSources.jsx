@@ -25,11 +25,8 @@ import {
   removeSingleSource,
   addMultipleSources
 } from "../../_actions/datasources";
-import { url_domain, replaceAll } from "../../_helpers/utils";
-import {
-  getDatasourcesArray,
-  getDatasourcesForTTLGenerator
-} from "../../selectors/datasources";
+import { extractUrlGroups } from "../../_helpers/utils";
+import { getDatasourcesArray } from "../../selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 
 const styles = theme => ({
@@ -114,7 +111,10 @@ class SelectSources extends React.Component {
 
   // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = () => {
-    const { datasourcesForTTL } = this.props;
+    const splitFieldValue = this.state.textFieldValue.split(",\n");
+    const datasourcesForTTL = splitFieldValue.map(source => {
+      return { Uri: source };
+    });
 
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
@@ -161,10 +161,7 @@ class SelectSources extends React.Component {
     if (this.state.ttlFile) {
       this.postStartFromFile();
     } else {
-      this.handleAddSources();
-      setTimeout(() => {
-        this.postStartFromInputLinks();
-      }, 500);
+      this.postStartFromInputLinks();
     }
   };
 
@@ -200,35 +197,9 @@ class SelectSources extends React.Component {
       });
   };
 
-  handleAddSources = () => {
-    let input = this.state.textFieldValue;
-
-    if (!(typeof input === "string" || input instanceof String)) {
-      return;
-    }
-
-    let links = input.split(",\n");
-    let sourcesList = [];
-
-    links.forEach(function(link) {
-      if (link !== "") {
-        const domainName = url_domain(link);
-        sourcesList.push({ name: domainName, url: link });
-      }
-    });
-
-    this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
-  };
-
-  // TODO: refactor
-  // handleDeleteSource = chip => {
-  //   this.props.dispatch(removeSingleSource({ url: chip }));
-  // };
-
   validateField = e => {
     let rawText = e.target.value;
-    const regex = /(?:http|https):\/\/((?:[\w-]+)(?:\.[\w-]+)+)(?:[\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gm;
-    let matches = rawText.match(regex);
+    let matches = extractUrlGroups(rawText);
     let valid = false;
 
     if (matches instanceof Array) {
@@ -243,7 +214,7 @@ class SelectSources extends React.Component {
   };
 
   render() {
-    const { classes, datasources } = this.props;
+    const { classes } = this.props;
 
     const {
       discoveryId,
@@ -262,6 +233,7 @@ class SelectSources extends React.Component {
           <TextField
             id="outlined-textarea"
             label="Sources validator"
+            disabled={discoveryIsLoading}
             multiline
             value={textFieldValue}
             onChange={this.validateField}
@@ -364,8 +336,7 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: getDatasourcesArray(state.datasources),
-    datasourcesForTTL: getDatasourcesForTTLGenerator(state.datasources)
+    datasources: getDatasourcesArray(state.datasources)
   };
 };
 

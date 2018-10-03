@@ -53,3 +53,8 @@ export function replaceAll(str, search, replacement) {
   let target = str;
   return target.split(search).join(replacement);
 }
+
+export function extractUrlGroups(url) {
+  const regex = /(?:http|https):\/\/((?:[\w-]+)(?:\.[\w-]+)+)(?:[\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gm;
+  return url.match(regex);
+}
