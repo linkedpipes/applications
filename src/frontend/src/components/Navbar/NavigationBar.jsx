@@ -2,6 +2,7 @@ import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import { Toolbar, Typography, withStyles } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
+import { UserButton } from "./UserDropdown";
 
 const styles = {
   flex: {
@@ -29,6 +30,7 @@ const NavigationBar = props => {
         <Typography variant="title" color="inherit" className={classes.flex}>
           Discovery API Assistant Demo
         </Typography>
+        <UserButton/>
       </Toolbar>
       <ToastContainer className="toast-container" />
       {process.env.NODE_ENV !== "production" && (
@@ -38,4 +40,5 @@ const NavigationBar = props => {
   );
 };
 
-export default withStyles(styles)(NavigationBar);
+const styledNavBar = withStyles(styles)(NavigationBar);
+export {styledNavBar as NavigationBar};

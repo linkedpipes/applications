@@ -1,4 +1,4 @@
-package com.linkedpipes.lpa.backend.services;
+package com.linkedpipes.lpa.backend.util;
 
 import java.io.IOException;
 

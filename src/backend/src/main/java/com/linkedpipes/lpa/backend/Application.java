@@ -11,7 +11,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class Application {
@@ -33,12 +35,20 @@ public class Application {
 		}
 	}
 
+    public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
+
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins(config.getProperty("allowedOrigins"));
+				registry.addMapping("/**") //
+						.allowedOrigins("*") //
+						.allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE", "PATCH") //
+						.allowedHeaders("*") //
+						.exposedHeaders("WWW-Authenticate") //
+						.allowCredentials(true)
+						.maxAge(TimeUnit.DAYS.toSeconds(1));
 			}
 		};
 	}

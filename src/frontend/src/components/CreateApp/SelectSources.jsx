@@ -6,29 +6,28 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-
 import { connect } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
+import TextField from "@material-ui/core/TextField";
 import PipelinesTable from "./PipelinesTable";
-import { addPipelines } from "../actions/pipelines";
+import { addPipelines } from "../../_actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   postDiscoverFromTtl,
   postDiscoverFromUriList,
   getPipelineGroups
-} from "../api/api";
-import ChipInput from "material-ui-chip-input";
-import { removeSingleSource, addMultipleSources } from "../actions/datasources";
-import { url_domain } from "../utils";
+} from "../../_services/discovery.service";
 import {
-  getDatasourcesArray,
-  getDatasourcesForTTLGenerator
-} from "../selectors/datasources";
+  removeSingleSource,
+  addMultipleSources
+} from "../../_actions/datasources";
+import { extractUrlGroups } from "../../_helpers/utils";
+import { getDatasourcesArray } from "../../selectors/datasources";
+import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 
 const styles = theme => ({
   root: {
@@ -54,13 +53,14 @@ class SelectSources extends React.Component {
   state = {
     ttlFile: undefined,
     discoveryId: "",
-    discoveryDialogOpen: false,
-    pipelinesDialogOpen: false
+    discoveryIsLoading: false,
+    pipelinesDialogOpen: false,
+    textFieldValue: "",
+    textFieldIsValid: false
   };
 
   handleClose = () => {
     this.setState({
-      discoveryDialogOpen: false,
       pipelinesDialogOpen: false
     });
   };
@@ -88,6 +88,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
+          self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -102,14 +103,18 @@ class SelectSources extends React.Component {
         }
 
         self.setState({
-          discoveryId: jsonResponse.id
+          discoveryId: jsonResponse.id,
+          discoveryIsLoading: false
         });
       });
   };
 
-  // TODO: refactor later, move to separate class responsible for api calls
+  // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = () => {
-    const { datasourcesForTTL } = this.props;
+    const splitFieldValue = this.state.textFieldValue.split(",\n");
+    const datasourcesForTTL = splitFieldValue.map(source => {
+      return { Uri: source };
+    });
 
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
@@ -128,6 +133,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
+          self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -142,12 +148,16 @@ class SelectSources extends React.Component {
         }
 
         self.setState({
-          discoveryId: jsonResponse.id
+          discoveryId: jsonResponse.id,
+          discoveryIsLoading: false
         });
       });
   };
 
   processStartDiscovery = () => {
+    console.log(process.env.BASE_BACKEND_URL);
+
+    this.setState({ discoveryIsLoading: true });
     if (this.state.ttlFile) {
       this.postStartFromFile();
     } else {
@@ -187,137 +197,133 @@ class SelectSources extends React.Component {
       });
   };
 
-  handleAddSource = chip => {
-    const links = chip.split(" ");
-    let sourcesList = [];
+  validateField = e => {
+    let rawText = e.target.value;
+    let matches = extractUrlGroups(rawText);
+    let valid = false;
 
-    links.forEach(function(link) {
-      if (link !== "") {
-        const name = url_domain(link);
-        const uri = link.replace("<", "").replace(">", "");
+    if (matches instanceof Array) {
+      rawText = matches.join(",\n");
+      valid = true;
+    }
 
-        sourcesList.push({ name: name, url: uri });
-      }
+    this.setState({
+      textFieldValue: rawText,
+      textFieldIsValid: valid
     });
-
-    this.props.dispatch(addMultipleSources({ sourcesList: sourcesList }));
-  };
-
-  handleDeleteSource = chip => {
-    this.props.dispatch(removeSingleSource({ url: chip }));
   };
 
   render() {
-    const { classes, datasources } = this.props;
+    const { classes } = this.props;
 
     const {
-      discoveryDialogOpen,
       discoveryId,
-      pipelinesDialogOpen
+      pipelinesDialogOpen,
+      discoveryIsLoading,
+      textFieldValue,
+      textFieldIsValid
     } = this.state;
 
     return (
       <Card className={classes.card}>
         <CardContent>
           <Typography gutterBottom variant="title" component="h1">
-            Select Data Sources
+            Add Data Sources
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            Select data source for your new application
-          </Typography>
-          <ChipInput
-            value={datasources}
-            onAdd={chip => this.handleAddSource(chip)}
-            onDelete={chip => this.handleDeleteSource(chip)}
+          <TextField
+            id="outlined-textarea"
+            label="Sources validator"
+            disabled={discoveryIsLoading}
+            multiline
+            value={textFieldValue}
+            onChange={this.validateField}
+            placeholder="Input your sources..."
+            fullWidth
+            margin="normal"
+            variant="outlined"
           />
         </CardContent>
 
         <CardActions>
-          <Dialog open={discoveryDialogOpen} onClose={this.handleClose}>
-            <DialogTitle>Discovery Response</DialogTitle>
-            <DialogContent>
-              <DialogContentText>Your id is : {discoveryId}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button color="primary" onClick={this.handleClose}>
-                OK
+          {discoveryIsLoading ? (
+            <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
+          ) : (
+            <div>
+              {/*
+              <input
+                accept=".ttl"
+                className={classes.input}
+                onChange={this.onChange}
+                id="contained-button-file"
+                type="file"
+              />
+              <label htmlFor="contained-button-file">
+                <Button
+                  variant="contained"
+                  component="span"
+                  className={classes.button}
+                  size="small"
+                >
+                  Select TTL file
+                </Button>
+
+              </label>
+             */}
+              <Button
+                variant="contained"
+                component="span"
+                className={classes.button}
+                disabled={!this.state.ttlFile && !textFieldIsValid}
+                onClick={this.processStartDiscovery}
+                size="small"
+              >
+                Start
               </Button>
-            </DialogActions>
-          </Dialog>
-
-          <input
-            accept=".ttl"
-            className={classes.input}
-            onChange={this.onChange}
-            id="contained-button-file"
-            type="file"
-          />
-
-          <label htmlFor="contained-button-file">
-            <Button
-              variant="contained"
-              component="span"
-              className={classes.button}
-              size="small"
-            >
-              Select TTL file
-            </Button>
-          </label>
-
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={!this.state.ttlFile && datasources.length === 0}
-            onClick={this.processStartDiscovery}
-            size="small"
-          >
-            Start
-          </Button>
-
-          <Dialog
-            fullWidth={true}
-            maxWidth="md"
-            open={pipelinesDialogOpen}
-            onClose={this.handleClose}
-          >
-            <DialogTitle>
-              <Typography variant="headline" gutterBottom>
-                Pipelines Browser
-              </Typography>
-            </DialogTitle>
-            <DialogContent>
-              <Typography variant="body1">
-                Each discovered pipeline presents a sequence of transformations
-                that have to be applied to the data so that it can be visualized
-                using this visualizer. Notice that different pipelines will give
-                different outputs. You need to try them manually.
-              </Typography>
-              <p>
-                <Typography variant="body2">
-                  To create an application, first run a pipeline from the table
-                  below.
-                </Typography>
-              </p>
-              <PipelinesTable discoveryId={discoveryId} />
-            </DialogContent>
-            <DialogActions>
-              <Button color="primary" onClick={this.handleClose}>
-                OK
+              <Dialog
+                fullWidth={true}
+                maxWidth="md"
+                open={pipelinesDialogOpen}
+                onClose={this.handleClose}
+              >
+                <DialogTitle>
+                  <Typography variant="headline" gutterBottom>
+                    Pipelines Browser
+                  </Typography>
+                </DialogTitle>
+                <DialogContent>
+                  <Typography variant="body1">
+                    Each discovered pipeline presents a sequence of
+                    transformations that have to be applied to the data so that
+                    it can be visualized using this visualizer. Notice that
+                    different pipelines will give different outputs. You need to
+                    try them manually.
+                  </Typography>
+                  <p>
+                    <Typography variant="body2">
+                      To create an application, first run a pipeline from the
+                      table below.
+                    </Typography>
+                  </p>
+                  <PipelinesTable discoveryId={discoveryId} />
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary" onClick={this.handleClose}>
+                    OK
+                  </Button>
+                </DialogActions>
+              </Dialog>
+              <Button
+                variant="contained"
+                component="span"
+                className={classes.button}
+                disabled={!this.state.discoveryId}
+                onClick={this.loadPipelineGroups}
+                size="small"
+              >
+                Browse Pipelines
               </Button>
-            </DialogActions>
-          </Dialog>
-
-          <Button
-            variant="contained"
-            component="span"
-            className={classes.button}
-            disabled={!this.state.discoveryId}
-            onClick={this.loadPipelineGroups}
-            size="small"
-          >
-            Browse Pipelines
-          </Button>
+            </div>
+          )}
         </CardActions>
       </Card>
     );
@@ -330,8 +336,7 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: getDatasourcesArray(state.datasources),
-    datasourcesForTTL: getDatasourcesForTTLGenerator(state.datasources)
+    datasources: getDatasourcesArray(state.datasources)
   };
 };
 

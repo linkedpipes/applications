@@ -4,6 +4,8 @@ const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 const dev = process.env.NODE_ENV !== "production";
 
+const Dotenv = require("dotenv-webpack");
+
 const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
   template: path.join(__dirname, "./src/index.html"),
   filename: "index.html",
@@ -11,17 +13,20 @@ const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
 });
 
 module.exports = {
-  entry: [path.join(__dirname, "/src/index.js")],
+  entry: [path.join(__dirname, "/src/index.jsx")],
   output: {
     filename: "bundle.js",
     path: path.join(__dirname, "/public"),
     publicPath: "/"
   },
+  resolve: {
+    extensions: [".js", ".jsx"]
+  },
   module: {
     rules: [
       {
         loader: "babel-loader",
-        test: /\.js$/,
+        test: /\.jsx$/,
         exclude: /node_modules/
       },
       {
@@ -43,6 +48,10 @@ module.exports = {
   },
   mode: dev ? "development" : "production",
   plugins: dev
-    ? [HTMLWebpackPluginConfig, new webpack.HotModuleReplacementPlugin()]
+    ? [
+        HTMLWebpackPluginConfig,
+        new webpack.HotModuleReplacementPlugin(),
+        new Dotenv()
+      ]
     : [HTMLWebpackPluginConfig]
 };

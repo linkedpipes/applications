@@ -13,7 +13,7 @@ const theme = createMuiTheme({
       main: "#ab003c"
     }
   }
-});
+})
 
 function withRoot(Component) {
   function WithRoot(props) {
