@@ -4,6 +4,8 @@ services:
     image: linkedpipes/applications:backend
     ports:
       - "5000:8080"
+    volumes:
+      - "./src/backend/config.properties:/app/config.properties"
 
   frontend:
     # image: linkedpipes/applications:frontend
