@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * A utility class for easier handling of strings which represent a URL.
  */
-public class UrlUtils {
+public final class UrlUtils {
 
     private static final char SLASH = '/';
     private static final String SLASH_STRING = "" + SLASH;

@@ -75,7 +75,7 @@ public class DiscoveryServiceComponent {
     public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
         return new HttpRequestSender()
                 .toDiscovery()
-                .exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
+                .exportPipelineUsingSD(discoveryId, pipelineUri, new Gson().toJson(serviceDescription));
     }
 
 }
