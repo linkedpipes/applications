@@ -22,7 +22,6 @@ public class DiscoveryServiceComponent {
     }
 
     //TODO strongly type below method params (not simply string)
-    //TODO use better string interpolation method?
     public String getDiscoveryStatus(String discoveryId) throws IOException{
         return new HttpRequestSender()
                 .toDiscovery()

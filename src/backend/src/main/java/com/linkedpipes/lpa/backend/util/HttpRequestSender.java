@@ -149,14 +149,14 @@ public class HttpRequestSender {
 
     /**
      * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the {@link
-     * HttpURLConnectionFactory#getDefault() default factory}.
+     * HttpURLConnectionFactory#getDefaultFactory() default factory}.
      *
      * @return the body of the response obtained by the request
      * @throws IOException           if an I/O error occurs
      * @throws IllegalStateException if a mandatory setting has not been set for this builder
      */
     public String send() throws IOException {
-        return send(HttpURLConnectionFactory.getDefault());
+        return send(HttpURLConnectionFactory.getDefaultFactory());
     }
 
     private void checkMandatorySettings() {

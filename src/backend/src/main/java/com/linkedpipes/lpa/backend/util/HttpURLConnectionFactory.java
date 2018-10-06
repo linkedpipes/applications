@@ -6,7 +6,7 @@ import java.net.URL;
 
 public interface HttpURLConnectionFactory {
 
-    static HttpURLConnectionFactory getDefault() {
+    static HttpURLConnectionFactory getDefaultFactory() {
         return urlString -> (HttpURLConnection) new URL(urlString).openConnection();
     }
 
