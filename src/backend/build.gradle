@@ -24,16 +24,24 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+	main {
+		resources {
+			srcDir "src/main/config"
+		}
+	}
+}
+
 compileJava {
-	options.compilerArgs += ["--add-modules", "jdk.incubator.httpclient"]
+	options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 compileTestJava {
-	options.compilerArgs += ["--add-modules", "jdk.incubator.httpclient"]
+	options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 test {
-	jvmArgs += ["--add-modules", "jdk.incubator.httpclient"]
+	jvmArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 bootRun {

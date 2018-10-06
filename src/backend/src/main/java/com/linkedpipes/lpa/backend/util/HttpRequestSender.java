@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
+import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
@@ -53,7 +54,7 @@ public class HttpRequestSender {
      * Delegates the builder to an {@link EtlActionSelector} which is an {@link HttpActionSelector} for selecting
      * actions specific to the ETL tool.
      *
-     * @return a {@link EtlActionSelector} operating on this builder
+     * @return an {@link EtlActionSelector} operating on this builder
      */
     public EtlActionSelector toEtl() {
         return new EtlActionSelector(this);
@@ -190,14 +191,15 @@ public class HttpRequestSender {
 
     public static class DiscoveryActionSelector extends HttpActionSelector {
 
-        private final String DISCOVERY_START_FROM_INPUT = createUrl("discovery", "startFromInput");
-        private final String DISCOVERY_START_FROM_INPUT_IRI = createUrl("discovery", "startFromInputIri");
-        private final String DISCOVERY_GET_STATUS = createUrl("discovery", "%s");
-        private final String DISCOVERY_GET_PIPELINE_GROUPS = createUrl("discovery", "%s", "pipeline-groups");
-        private final String DISCOVERY_EXPORT_PIPELINE = createUrl("discovery", "%s", "export", "%s");
+        private static final String DISCOVERY_BASE = Application.getConfig().getProperty("discoveryServiceUrl");
+        private static final String DISCOVERY_START_FROM_INPUT = urlFrom(DISCOVERY_BASE, "discovery", "startFromInput");
+        private static final String DISCOVERY_START_FROM_INPUT_IRI = urlFrom(DISCOVERY_BASE, "discovery", "startFromInputIri");
+        private static final String DISCOVERY_GET_STATUS = urlFrom(DISCOVERY_BASE, "discovery", "%s");
+        private static final String DISCOVERY_GET_PIPELINE_GROUPS = urlFrom(DISCOVERY_BASE, "discovery", "%s", "pipeline-groups");
+        private static final String DISCOVERY_EXPORT_PIPELINE = urlFrom(DISCOVERY_BASE, "discovery", "%s", "export", "%s");
 
         private DiscoveryActionSelector(HttpRequestSender sender) {
-            super(sender, Application.config.getProperty("discoveryServiceUrl"));
+            super(sender);
         }
 
         public String startFromInput(String discoveryConfig) throws IOException {
@@ -247,11 +249,11 @@ public class HttpRequestSender {
 
     public static class EtlActionSelector extends HttpActionSelector {
 
-        private final String ETL_EXECUTE_PIPELINE = createUrl("executions");
-
+        private final String ETL_BASE = Application.getConfig().getProperty("etlServiceUrl");
+        private final String ETL_EXECUTE_PIPELINE = urlFrom(ETL_BASE, "executions");
 
         private EtlActionSelector(HttpRequestSender sender) {
-            super(sender, Application.config.getProperty("etlServiceUrl"));
+            super(sender);
         }
 
         public String executePipeline(String pipelineIri) throws IOException {
@@ -264,7 +266,7 @@ public class HttpRequestSender {
         }
 
         public String getExecutionStatus(String executionIri) throws IOException {
-            String targetUrl = UrlUtils.urlFrom(executionIri, "overview");
+            String targetUrl = urlFrom(executionIri, "overview");
             return sender.to(targetUrl)
                     .acceptType("application/json")
                     .send();

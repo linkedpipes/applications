@@ -17,12 +17,12 @@ public class DataSourceController {
     }
 
     @PostMapping("/datasources")
-    public String createDataSources(@RequestParam( value="fileUri") String fileUri){
+    public String createDataSources(@RequestParam(value = "fileUri") String fileUri) {
         return "called POST /datasources";
     }
 
     @RequestMapping("/datasource")
-    public DataSource getDataSource(@RequestParam( value="dataSourceUri") String dataSourceUri){
+    public DataSource getDataSource(@RequestParam(value = "dataSourceUri") String dataSourceUri) {
         DataSource dataSource = new DataSource();
         return dataSource;
     }
