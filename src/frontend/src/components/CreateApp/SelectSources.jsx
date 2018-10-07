@@ -7,12 +7,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
-import PipelinesTable from "./PipelinesTable";
 import { addPipelines } from "../../_actions/pipelines";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -122,7 +117,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
+    return postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
       .then(
         function(response) {
           return response.json();
@@ -147,21 +142,29 @@ class SelectSources extends React.Component {
           toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
         }
 
-        self.setState({
-          discoveryId: jsonResponse.id,
-          discoveryIsLoading: false
-        });
+        return jsonResponse;
       });
   };
 
   processStartDiscovery = () => {
     console.log(process.env.BASE_BACKEND_URL);
 
-    this.setState({ discoveryIsLoading: true });
-    if (this.state.ttlFile) {
-      this.postStartFromFile();
+    const self = this;
+
+    self.setState({ discoveryIsLoading: true });
+
+    if (self.state.ttlFile) {
+      self.postStartFromFile();
     } else {
-      this.postStartFromInputLinks();
+      self.postStartFromInputLinks().then(function(discoveryResponse) {
+        self.setState({ discoveryId: discoveryResponse.id });
+        self.loadPipelineGroups().then(function(pipelinesResponse) {
+          console.log(pipelinesResponse);
+          self.setState({
+            discoveryIsLoading: false
+          });
+        });
+      });
     }
   };
 
@@ -172,7 +175,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    getPipelineGroups({ discoveryId: self.state.discoveryId })
+    return getPipelineGroups({ discoveryId: self.state.discoveryId })
       .then(
         function(response) {
           return response.json();
@@ -190,10 +193,7 @@ class SelectSources extends React.Component {
         self.props.dispatch(
           addPipelines({ pipelinesArray: jsonResponse.pipelines })
         );
-
-        self.setState({
-          pipelinesDialogOpen: true
-        });
+        return jsonResponse;
       });
   };
 
@@ -227,9 +227,6 @@ class SelectSources extends React.Component {
     return (
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBottom variant="title" component="h1">
-            Add Data Sources
-          </Typography>
           <TextField
             id="outlined-textarea"
             label="Sources validator"
@@ -277,50 +274,18 @@ class SelectSources extends React.Component {
                 onClick={this.processStartDiscovery}
                 size="small"
               >
-                Start
+                Start Discovery
               </Button>
-              <Dialog
-                fullWidth={true}
-                maxWidth="md"
-                open={pipelinesDialogOpen}
-                onClose={this.handleClose}
-              >
-                <DialogTitle>
-                  <Typography variant="headline" gutterBottom>
-                    Pipelines Browser
-                  </Typography>
-                </DialogTitle>
-                <DialogContent>
-                  <Typography variant="body1">
-                    Each discovered pipeline presents a sequence of
-                    transformations that have to be applied to the data so that
-                    it can be visualized using this visualizer. Notice that
-                    different pipelines will give different outputs. You need to
-                    try them manually.
-                  </Typography>
-                  <p>
-                    <Typography variant="body2">
-                      To create an application, first run a pipeline from the
-                      table below.
-                    </Typography>
-                  </p>
-                  <PipelinesTable discoveryId={discoveryId} />
-                </DialogContent>
-                <DialogActions>
-                  <Button color="primary" onClick={this.handleClose}>
-                    OK
-                  </Button>
-                </DialogActions>
-              </Dialog>
+
               <Button
                 variant="contained"
                 component="span"
                 className={classes.button}
                 disabled={!this.state.discoveryId}
-                onClick={this.loadPipelineGroups}
+                onClick={this.props.handleNextStep}
                 size="small"
               >
-                Browse Pipelines
+                Next
               </Button>
             </div>
           )}
@@ -341,3 +306,37 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
+
+// <Dialog
+//                 fullWidth={true}
+//                 maxWidth="md"
+//                 open={pipelinesDialogOpen}
+//                 onClose={this.handleClose}
+//               >
+//                 <DialogTitle>
+//                   <Typography variant="headline" gutterBottom>
+//                     Pipelines Browser
+//                   </Typography>
+//                 </DialogTitle>
+//                 <DialogContent>
+//                   <Typography variant="body1">
+//                     Each discovered pipeline presents a sequence of
+//                     transformations that have to be applied to the data so that
+//                     it can be visualized using this visualizer. Notice that
+//                     different pipelines will give different outputs. You need to
+//                     try them manually.
+//                   </Typography>
+//                   <p>
+//                     <Typography variant="body2">
+//                       To create an application, first run a pipeline from the
+//                       table below.
+//                     </Typography>
+//                   </p>
+//                   <PipelinesTable discoveryId={discoveryId} />
+//                 </DialogContent>
+//                 <DialogActions>
+//                   <Button color="primary" onClick={this.handleClose}>
+//                     OK
+//                   </Button>
+//                 </DialogActions>
+//               </Dialog>
