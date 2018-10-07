@@ -78,6 +78,13 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
+"@babel/runtime@^7.0.0":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.1.2.tgz#81c89935f4647706fc54541145e6b4ecfef4b8e3"
+  integrity sha512-Y3SCjmhSupzFB6wcv1KmmFucH6gDVnI30WjOcicV10ju0cZjak3Jcs67YLIXBrmZYw1xCrVeJPbycFwrqNyxpg==
+  dependencies:
+    regenerator-runtime "^0.12.0"
+
 "@babel/template@^7.1.0":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.1.2.tgz#090484a574fef5a2d2d7726a674eceda5c5b5644"
@@ -111,13 +118,13 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@material-ui/core@^1.5.0":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-1.5.1.tgz#cb00cb934447ae688e08129f1dab55f54d29d87a"
-  integrity sha512-hGT0JelWZGZqgWZzRbON/uqFCgWa4XhmEFG/IEd9SBwCU4sWC99Kv1KpywLhYYWecobqT4Dh7ijO1ZaIAk8HyA==
+"@material-ui/core@^3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-3.1.2.tgz#0ba7c510320c41be672792e3f3ab73ab79ff100f"
+  integrity sha512-tTRjlTVJY78GDKRHKSuxpoghrFyDAu9GrYCnaARHaZ2pZWiBHuviqUgAC8n8jWUXG3e6vfAXn9zZWzFedb4LwQ==
   dependencies:
-    "@babel/runtime" "7.0.0-rc.1"
-    "@types/jss" "^9.5.3"
+    "@babel/runtime" "7.0.0"
+    "@types/jss" "^9.5.6"
     "@types/react-transition-group" "^2.0.8"
     brcast "^3.0.1"
     classnames "^2.2.5"
@@ -141,7 +148,7 @@
     react-event-listener "^0.6.2"
     react-jss "^8.1.0"
     react-transition-group "^2.2.1"
-    recompose "^0.28.0"
+    recompose "0.28.0 - 0.30.0"
     warning "^4.0.1"
 
 "@material-ui/icons@^2.0.2":
@@ -200,7 +207,7 @@
   dependencies:
     "@sentry/types" "4.0.6"
 
-"@types/jss@^9.5.3":
+"@types/jss@^9.5.6":
   version "9.5.6"
   resolved "https://registry.yarnpkg.com/@types/jss/-/jss-9.5.6.tgz#96e1d246ddfbccc4867494077c714773cf29acde"
   integrity sha512-7TWmR5y1jYG4ka4wTZt65RR0kw4WgALFUWktQIWbLnDd6/z/0SQZ/4+UeH0rhdp+HEdIfmzPBH0VwE/4Z9Evzw==
@@ -6119,6 +6126,18 @@ readdirp@^2.0.0:
     micromatch "^3.1.10"
     readable-stream "^2.0.2"
 
+"recompose@0.28.0 - 0.30.0":
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.30.0.tgz#82773641b3927e8c7d24a0d87d65aeeba18aabd0"
+  integrity sha512-ZTrzzUDa9AqUIhRk4KmVFihH0rapdCSMFXjhHbNrjAWxBuUD/guYlyysMnuHjlZC/KRiOKRtB4jf96yYSkKE8w==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    change-emitter "^0.1.2"
+    fbjs "^0.8.1"
+    hoist-non-react-statics "^2.3.1"
+    react-lifecycles-compat "^3.0.2"
+    symbol-observable "^1.0.4"
+
 recompose@^0.28.0:
   version "0.28.2"
   resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.28.2.tgz#19e679227bdf979e0d31b73ffe7ae38c9194f4a7"
@@ -7410,6 +7429,11 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+validator@10.6.0:
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-10.6.0.tgz#a9bdce685b3c3e8480e7ebbb9eb95c54cd9733b0"
+  integrity sha512-/yVPLo/GYprbhK9m9Qi9T7XSJ/lZ9rnqerlN68yH4c1/raGHoxlE7TtirN2VcP4w27Qvyv8UHJ/SUIjntPhPCw==
 
 value-equal@^0.4.0:
   version "0.4.0"
