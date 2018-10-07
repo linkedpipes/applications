@@ -10,6 +10,12 @@ import AppRouter from "./AppRouter";
 
 const myStore = store();
 
+const checkDebugMode = () => {
+  if (process.env.NODE_ENV === "production") {
+    console.log = function() {};
+  }
+};
+
 const jsx = (
   <Provider store={myStore}>
     <AppRouter />
