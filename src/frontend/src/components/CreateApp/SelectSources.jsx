@@ -8,7 +8,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import TextField from "@material-ui/core/TextField";
-import { addPipelines } from "../../_actions/pipelines";
+import { addVisualizer } from "../../_actions/visualizers";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -191,7 +191,7 @@ class SelectSources extends React.Component {
       .then(function(jsonResponse) {
         toast.dismiss(tid);
         self.props.dispatch(
-          addPipelines({ pipelinesArray: jsonResponse.pipelines })
+          addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
         );
         return jsonResponse;
       });
@@ -216,13 +216,7 @@ class SelectSources extends React.Component {
   render() {
     const { classes } = this.props;
 
-    const {
-      discoveryId,
-      pipelinesDialogOpen,
-      discoveryIsLoading,
-      textFieldValue,
-      textFieldIsValid
-    } = this.state;
+    const { discoveryIsLoading, textFieldValue, textFieldIsValid } = this.state;
 
     return (
       <Card className={classes.card}>

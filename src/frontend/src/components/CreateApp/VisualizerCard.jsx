@@ -28,7 +28,7 @@ const styles = {
 
 class VisualizerCard extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, visualizerData } = this.props;
     return (
       <Card className={classes.card}>
         <CardActionArea>
@@ -41,9 +41,11 @@ class VisualizerCard extends React.Component {
           />
           <CardContent>
             <Typography gutterBottom variant="headline" component="h2">
-              Google Maps
+              Test
             </Typography>
-            <Typography component="p">Google Maps Visualizer</Typography>
+            <Typography component="p">
+              {visualizerData.applicationInstance.label}
+            </Typography>
           </CardContent>
         </CardActionArea>
         <CardActions classes={{ root: classes.root }}>

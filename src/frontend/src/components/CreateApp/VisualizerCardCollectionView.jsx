@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import connect from "react-redux/lib/connect/connect";
 import VisualizerCard from "./VisualizerCard";
 
 const styles = theme => ({
@@ -25,7 +26,7 @@ class VisualizerCardCollectionView extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, visualizers } = this.props;
     const { spacing } = this.state;
 
     return (
@@ -37,9 +38,9 @@ class VisualizerCardCollectionView extends React.Component {
           xs={12}
           spacing={Number(spacing)}
         >
-          {[0, 1, 2].map(value => (
-            <Grid key={value} item xs={4}>
-              <VisualizerCard />
+          {visualizers.map((value, index) => (
+            <Grid key={index} item xs={4}>
+              <VisualizerCard visualizerData={value} />
             </Grid>
           ))}
         </Grid>
@@ -52,4 +53,12 @@ VisualizerCardCollectionView.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(VisualizerCardCollectionView);
+const mapStateToProps = state => {
+  return {
+    visualizers: state.visualizers
+  };
+};
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(VisualizerCardCollectionView)
+);
