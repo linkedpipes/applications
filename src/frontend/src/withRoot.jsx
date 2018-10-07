@@ -7,13 +7,15 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#2196f3"
+      // main: "#2196f3"
+      main: "#154168"
     },
     secondary: {
-      main: "#ab003c"
+      // main: "#ab003c"
+      main: "#fecf8a"
     }
   }
-})
+});
 
 function withRoot(Component) {
   function WithRoot(props) {
