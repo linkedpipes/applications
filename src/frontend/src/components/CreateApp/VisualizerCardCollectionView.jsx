@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
+import Card from "@material-ui/core/Card";
 import connect from "react-redux/lib/connect/connect";
 import VisualizerCard from "./VisualizerCard";
 
@@ -11,6 +13,20 @@ const styles = theme => ({
   },
   control: {
     padding: theme.spacing.unit * 2
+  },
+  card: {
+    minHeight: 40,
+    marginLeft: 8,
+    marginTop: 8,
+    marginBottom: 10,
+    marginRight: 8
+  },
+  label: {
+    marginTop: 5,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    margin: "auto"
   }
 });
 
