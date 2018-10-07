@@ -1,18 +1,27 @@
-version: "3"
+version: "2"
 services:
+  nginx: 
+      image: nginx:stable
+      container_name: lpa_reverse_proxy
+      volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      ports:
+        - 80:80
   backend:
     image: linkedpipes/applications:backend
+    container_name: lpa_backend
+    build:
+      context: src/backend/
     ports:
       - "5000:8080"
     volumes:
       - "./src/backend/config.properties:/app/config.properties"
 
   frontend:
-    # image: linkedpipes/applications:frontend
+    image: linkedpipes/applications:frontend
+    container_name: lpa_frontend
     build:
       context: src/frontend/
-      args:
-        REACT_APP_BASE_BACKEND_URL: http://localhost:5000/
     ports:
       - "9000:9000"
 

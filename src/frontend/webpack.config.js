@@ -4,8 +4,6 @@ const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 const dev = process.env.NODE_ENV !== "production";
 
-const Dotenv = require("dotenv-webpack");
-
 const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
   template: path.join(__dirname, "./src/index.html"),
   filename: "index.html",
@@ -40,6 +38,7 @@ module.exports = {
     contentBase: path.join(__dirname, "/public"),
     host: "0.0.0.0",
     port: "9000",
+    disableHostCheck: true, // solved Invalid-Host-header
     hot: true,
     headers: {
       "Access-Control-Allow-Origin": "*"
@@ -50,8 +49,7 @@ module.exports = {
   plugins: dev
     ? [
         HTMLWebpackPluginConfig,
-        new webpack.HotModuleReplacementPlugin(),
-        new Dotenv()
+        new webpack.HotModuleReplacementPlugin()
       ]
     : [HTMLWebpackPluginConfig]
 };
