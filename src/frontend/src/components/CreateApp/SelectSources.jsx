@@ -190,9 +190,9 @@ class SelectSources extends React.Component {
       )
       .then(function(jsonResponse) {
         toast.dismiss(tid);
-        self.props.dispatch(
-          addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
-        );
+        // self.props.dispatch(
+        //   addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
+        // );
         return jsonResponse;
       });
   };

@@ -37,7 +37,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, "/public"),
     host: "0.0.0.0",
-    port: "9000",
+    port: "9001",
     disableHostCheck: true, // solved Invalid-Host-header
     hot: true,
     headers: {
