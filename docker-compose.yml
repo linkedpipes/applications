@@ -4,6 +4,8 @@ services:
     image: linkedpipes/applications:backend
     ports:
       - "5000:8080"
+    volumes:
+      - "./src/backend/config.properties:/app/config.properties"
 
   frontend:
     # image: linkedpipes/applications:frontend
@@ -13,3 +15,18 @@ services:
         REACT_APP_BASE_BACKEND_URL: http://localhost:5000/
     ports:
       - "9000:9000"
+
+  db:
+    image: tenforce/virtuoso:1.3.1-virtuoso7.2.2
+    environment:
+      SPARQL_UPDATE: "true"
+      DEFAULT_GRAPH: "http://www.example.com/my-graph"
+    volumes:
+      - ./data/virtuoso:/data
+    ports:
+      - "8890:8890"
+
+  discovery:
+    image: linkedpipes/discovery
+    ports:
+      - "8070:9000"
