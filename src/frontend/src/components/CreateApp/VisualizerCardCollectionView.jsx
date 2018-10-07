@@ -38,11 +38,26 @@ class VisualizerCardCollectionView extends React.Component {
           xs={12}
           spacing={Number(spacing)}
         >
-          {visualizers.map((value, index) => (
-            <Grid key={index} item xs={4}>
-              <VisualizerCard visualizerData={value} />
+          {visualizers.length === 0 ? (
+            <Grid item xs={12}>
+              <Card className={classes.card}>
+                <Typography
+                  className={classes.label}
+                  variant="body1"
+                  align="center"
+                  gutterBottom
+                >
+                  No visualizers available, try providing different sources ☹️
+                </Typography>
+              </Card>
             </Grid>
-          ))}
+          ) : (
+            visualizers.map((value, index) => (
+              <Grid key={index} item xs={4}>
+                <VisualizerCard visualizerData={value} />
+              </Grid>
+            ))
+          )}
         </Grid>
       </Grid>
     );
