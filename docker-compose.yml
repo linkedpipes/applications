@@ -1,4 +1,4 @@
-version: "3"
+version: "2"
 services:
   nginx: 
       image: nginx:stable
@@ -10,13 +10,12 @@ services:
       depends_on:
         - backend
         - frontend
+
   backend:
     image: linkedpipes/applications:backend
     container_name: lpa_backend
     build:
       context: src/backend/
-    # ports:
-    #   - "5000:8080"
     volumes:
       - "./src/backend/config.properties:/app/config.properties"
 
