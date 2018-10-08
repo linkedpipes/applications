@@ -3,9 +3,9 @@ package com.linkedpipes.lpa.backend.util;
 import com.linkedpipes.lpa.backend.Application;
 import org.springframework.util.StreamUtils;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
@@ -184,8 +184,8 @@ public class HttpRequestSender {
             return;
         }
         connection.setDoOutput(true);
-        try (DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
-            dos.writeBytes(requestBody);
+        try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Application.DEFAULT_CHARSET)) {
+            writer.append(requestBody);
         }
     }
 

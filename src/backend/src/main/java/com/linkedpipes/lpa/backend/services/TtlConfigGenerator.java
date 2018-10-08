@@ -31,7 +31,7 @@ public class TtlConfigGenerator {
         Property property = model.createProperty("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate");
 
         for (DataSource dataSource : dataSourceList) {
-            Resource obj = model.createResource(dataSource.Uri);
+            Resource obj = model.createResource(dataSource.uri);
             model.add(subject, property, obj);
         }
 
