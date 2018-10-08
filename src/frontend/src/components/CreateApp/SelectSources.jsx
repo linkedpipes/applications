@@ -116,6 +116,8 @@ class SelectSources extends React.Component {
       autoClose: false
     });
 
+    console.log(datasourcesForTTL);
+
     const self = this;
     return postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
       .then(
@@ -158,26 +160,29 @@ class SelectSources extends React.Component {
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
         self.setState({ discoveryId: discoveryResponse.id });
-        self.loadPipelineGroups().then(function(pipelinesResponse) {
-          console.log(pipelinesResponse);
-          self.setState({
-            discoveryIsLoading: false
+        self
+          .loadPipelineGroups(discoveryResponse.id)
+          .then(function(pipelinesResponse) {
+            console.log(pipelinesResponse);
+            self.setState({
+              discoveryIsLoading: false
+            });
           });
-        });
       });
     }
   };
 
-  loadPipelineGroups = () => {
+  loadPipelineGroups = discoveryId => {
     let tid = toast.info("Getting the pipeline groups...", {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: false
     });
 
     const self = this;
-    return getPipelineGroups({ discoveryId: self.state.discoveryId })
+    return getPipelineGroups({ discoveryId: discoveryId })
       .then(
         function(response) {
+          console.log(response);
           return response.json();
         },
         function(err) {

@@ -15,6 +15,11 @@ const rest = (
   method = "POST",
   contentType = "application/json"
 ) => {
+  console.log("Sending request:\n");
+  console.log("URL: " + url + "\n");
+  console.log("Body: " + body + "\n");
+  console.log("Method: " + method + "\n");
+
   return method === "POST"
     ? fetch(url, {
         method: method,
