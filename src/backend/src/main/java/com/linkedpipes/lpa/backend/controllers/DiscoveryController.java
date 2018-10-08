@@ -54,14 +54,14 @@ public class DiscoveryController {
         return ResponseEntity.ok(newDiscovery);
     }
 
-    @RequestMapping("/discovery/{id}/status")
+    @RequestMapping("/api/discovery/{id}/status")
     public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId) throws IOException {
         String response = discoveryService.getDiscoveryStatus(discoveryId);
 
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping("/discovery/{id}/pipelineGroups")
+    @RequestMapping("/api/discovery/{id}/pipelineGroups")
     @ResponseBody
     public ResponseEntity<PipelineGroups> getPipelineGroups(@PathVariable("id") String discoveryId) throws IOException {
         PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);
