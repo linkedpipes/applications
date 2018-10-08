@@ -1,7 +1,6 @@
 package com.linkedpipes.lpa.backend.util;
 
-import org.springframework.util.StringUtils;
-
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,17 +17,19 @@ public final class UrlUtils {
     }
 
     /**
-     * Concatenates the given string arguments by ignoring any leading or trailing slashes and then joining the results
-     * with a single slash. Empty components and components consisting only of slashes are ignored.
+     * Concatenates the given string arguments into a URL string. {@code null} components and components consisting only
+     * of slashes are ignored. Leading and trailing slashes are then stripped. The stripped strings are then joined with
+     * a single slash.
      *
-     * @param first first component of the URL
-     * @param more  other components of the URL
+     * @param components the strings to be joined into a URL
      * @return a single-slash-joined string containing the arguments
+     * @throws NullPointerException if {@code components} is {@code null}
      */
-    public static String urlFrom(String first, String... more) {
-        return Stream.concat(Stream.of(first), Stream.of(more))
+    public static String urlFrom(String... components) {
+        return Stream.of(components)
+                .filter(Objects::nonNull)
                 .map(UrlUtils::stripSlashes)
-                .filter(s -> !StringUtils.isEmpty(s.trim()))
+                .filter(s -> !s.isEmpty())
                 .collect(Collectors.joining(SLASH_STRING));
     }
 

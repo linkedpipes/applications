@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrows;
 import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class HttpRequestSenderTests {
 
@@ -16,6 +17,8 @@ public class HttpRequestSenderTests {
 
     private static final String GOOGLE_URL = "http://www.google.com/";
     private static final String FAKE_URL = "http://this.url.does.not.exist/";
+    private static final String REQUEST_PROPERTY_CONTENT_TYPE = "Content-Type";
+    private static final String REQUEST_PROPERTY_ACCEPT = "Accept";
 
     @Test
     public void testSend() {
@@ -196,6 +199,96 @@ public class HttpRequestSenderTests {
 
         String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
         assertEquals(expectedBody, actualBody);
+    }
+
+    @Test
+    public void testNoContentType() throws IOException {
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .send(FAKE_FACTORY);
+
+        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        assertNull(actualContentType);
+    }
+
+    @Test
+    public void testNullContentType() throws IOException {
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .contentType(null)
+                .send(FAKE_FACTORY);
+
+        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        assertNull(actualContentType);
+    }
+
+    @Test
+    public void testEmptyContentType() throws IOException {
+        String expectedContentType = "";
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .contentType(expectedContentType)
+                .send(FAKE_FACTORY);
+
+        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        assertEquals(expectedContentType, actualContentType);
+    }
+
+    @Test
+    public void testContentType() throws IOException {
+        String expectedContentType = "text/plain";
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .contentType(expectedContentType)
+                .send(FAKE_FACTORY);
+
+        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        assertEquals(expectedContentType, actualContentType);
+    }
+
+    @Test
+    public void testNoAcceptType() throws IOException {
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .send(FAKE_FACTORY);
+
+        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        assertNull(actualAcceptType);
+    }
+
+    @Test
+    public void testNullAcceptType() throws IOException {
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .acceptType(null)
+                .send(FAKE_FACTORY);
+
+        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        assertNull(actualAcceptType);
+    }
+
+    @Test
+    public void testEmptyAcceptType() throws IOException {
+        String expectedAcceptType = "";
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .acceptType(expectedAcceptType)
+                .send(FAKE_FACTORY);
+
+        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        assertEquals(expectedAcceptType, actualAcceptType);
+    }
+
+    @Test
+    public void testAcceptType() throws IOException {
+        String expectedAcceptType = "text/plain";
+        new HttpRequestSender()
+                .to(FAKE_URL)
+                .acceptType(expectedAcceptType)
+                .send(FAKE_FACTORY);
+
+        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        assertEquals(expectedAcceptType, actualAcceptType);
     }
 
 }
