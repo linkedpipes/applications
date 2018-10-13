@@ -32,8 +32,22 @@ const styles = {
 };
 
 class VisualizerCard extends React.Component {
+  state = {
+    pipelinesDialogOpen: false
+  };
+
+  handleOpen = () => {
+    this.setState({ pipelinesDialogOpen: true });
+  };
+
+  handleClose = () => {
+    this.setState({ pipelinesDialogOpen: false });
+  };
+
   render() {
-    const { classes, visualizerData } = this.props;
+    const { classes, visualizerData, discoveryId } = this.props;
+    const { pipelinesDialogOpen } = this.state;
+
     return (
       <Card className={classes.card}>
         <CardActionArea>
@@ -42,7 +56,6 @@ class VisualizerCard extends React.Component {
             alt="Visualizer Logo"
             className={classes.media}
             height="100"
-            image="/static/images/cards/contemplative-reptile.jpg"
           />
           <CardContent>
             <Typography gutterBottom variant="headline" component="h2">
@@ -54,6 +67,9 @@ class VisualizerCard extends React.Component {
           </CardContent>
         </CardActionArea>
         <CardActions classes={{ root: classes.root }}>
+          <Button size="small" color="primary" onClick={this.handleOpen}>
+            Browse Pipelines
+          </Button>
           <Dialog
             fullWidth={true}
             maxWidth="md"
@@ -78,7 +94,10 @@ class VisualizerCard extends React.Component {
                   below.
                 </Typography>
               </p>
-              <PipelinesTable discoveryId={discoveryId} />
+              <PipelinesTable
+                discoveryId={discoveryId}
+                pipelines={visualizerData.pipelines}
+              />
             </DialogContent>
             <DialogActions>
               <Button color="primary" onClick={this.handleClose}>
@@ -86,9 +105,6 @@ class VisualizerCard extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
-          <Button size="small" color="primary">
-            Browse Pipelines
-          </Button>
         </CardActions>
       </Card>
     );

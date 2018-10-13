@@ -42,7 +42,7 @@ class VisualizerCardCollectionView extends React.Component {
   };
 
   render() {
-    const { classes, visualizers } = this.props;
+    const { classes, visualizers, discoveryId } = this.props;
     const { spacing } = this.state;
 
     return (
@@ -70,7 +70,10 @@ class VisualizerCardCollectionView extends React.Component {
           ) : (
             visualizers.map((value, index) => (
               <Grid key={index} item xs={4}>
-                <VisualizerCard visualizerData={value} />
+                <VisualizerCard
+                  visualizerData={value}
+                  discoveryId={discoveryId}
+                />
               </Grid>
             ))
           )}
@@ -86,7 +89,8 @@ VisualizerCardCollectionView.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    visualizers: state.visualizers
+    visualizers: state.visualizers,
+    discoveryId: state.globals.discoveryId
   };
 };
 

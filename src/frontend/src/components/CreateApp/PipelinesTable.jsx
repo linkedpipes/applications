@@ -416,7 +416,6 @@ PipelinesTable.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    pipelines: state.pipelines,
     exportsDict: state.etl_exports,
     executions: state.etl_executions
   };
