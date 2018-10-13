@@ -1,4 +1,4 @@
-package com.linkedpipes.backend;
+package com.linkedpipes.lpa.backend;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
