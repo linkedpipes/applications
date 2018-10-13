@@ -23,8 +23,6 @@ services:
     container_name: lpa_frontend
     build:
       context: src/frontend/
-    # ports:
-    #   - "9001:9001"
 
 
   db:
@@ -34,12 +32,9 @@ services:
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
     volumes:
       - ./data/virtuoso:/data
-    # ports:
-    #   - "8890:8890"
 
+  # Discovery service runs locally in port 9000
   discovery:
     image: linkedpipes/discovery
     container_name: lpa_discovery
     stdin_open: true
-    # ports:
-    #   - "8070:9000"

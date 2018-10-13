@@ -19,7 +19,7 @@ WORKDIR /app
 
 ADD . /app
 
-EXPOSE 9000
+EXPOSE 9001
 
 CMD ["yarn", "start"]
 
