@@ -5,7 +5,8 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack-dev-server",
+    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:8080/api/ webpack-dev-server",
+    "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ webpack-dev-server",
     "build": "cross-env NODE_ENV=production webpack"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
     "css-loader": "^1.0.0",
+    "dotenv-webpack": "^1.5.7",
     "material-ui-chip-input": "^1.0.0-beta.6",
     "node-sass": "^4.9.3",
     "normalize.css": "^8.0.0",
