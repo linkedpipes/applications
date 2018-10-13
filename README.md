@@ -1,4 +1,4 @@
-<p align="center"><img width=30% src="https://pli.io/k9Aaw.png"></p>
+<p align="center"><img width=30% src="https://pli.io/22gHl3.png"></p>
 <p align="center"><img width=25% src="https://media.giphy.com/media/8PpFGKr5vgNY1s8QiY/giphy.gif"></p>
 
 ### Software Project (NPRG023)
