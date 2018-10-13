@@ -10,12 +10,21 @@ import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
-import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * A builder for HTTP requests. Some settings of the builder are mandatory. If any mandatory setting is not provided,
  * the {@link #send()} method throws {@link IllegalStateException}.
+ *
+ * Example use case:
+ * <pre>
+ * String responseBody = new HttpRequestSender()
+ *         .{@link #to(String) to}("http://www.example.com/")
+ *         .{@link #method(HttpMethod) method}({@link HttpMethod#GET GET})
+ *         .{@link #requestBody(String) requestBody}("A payload to send to the website.")
+ *         .{@link #contentType(String) contentType}("text/plain")
+ *         .{@link #send() send}();
+ * </pre>
  */
 public class HttpRequestSender {
 
@@ -38,26 +47,6 @@ public class HttpRequestSender {
     public HttpRequestSender to(String urlString) {
         targetUrl = urlString;
         return this;
-    }
-
-    /**
-     * Delegates the builder to a {@link DiscoveryActionSelector} which is an {@link HttpActionSelector} for selecting
-     * actions specific to the Discovery tool.
-     *
-     * @return a {@link DiscoveryActionSelector} operating on this builder
-     */
-    public DiscoveryActionSelector toDiscovery() {
-        return new DiscoveryActionSelector(this);
-    }
-
-    /**
-     * Delegates the builder to an {@link EtlActionSelector} which is an {@link HttpActionSelector} for selecting
-     * actions specific to the ETL tool.
-     *
-     * @return an {@link EtlActionSelector} operating on this builder
-     */
-    public EtlActionSelector toEtl() {
-        return new EtlActionSelector(this);
     }
 
     /**
@@ -187,97 +176,6 @@ public class HttpRequestSender {
         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Application.DEFAULT_CHARSET)) {
             writer.append(requestBody);
         }
-    }
-
-    public static class DiscoveryActionSelector extends HttpActionSelector {
-
-        private static final String DISCOVERY_BASE = Application.getConfig().getProperty("discoveryServiceUrl");
-        private static final String DISCOVERY_START_FROM_INPUT = urlFrom(DISCOVERY_BASE, "discovery", "startFromInput");
-        private static final String DISCOVERY_START_FROM_INPUT_IRI = urlFrom(DISCOVERY_BASE, "discovery", "startFromInputIri");
-        private static final String DISCOVERY_GET_STATUS = urlFrom(DISCOVERY_BASE, "discovery", "%s");
-        private static final String DISCOVERY_GET_PIPELINE_GROUPS = urlFrom(DISCOVERY_BASE, "discovery", "%s", "pipeline-groups");
-        private static final String DISCOVERY_EXPORT_PIPELINE = urlFrom(DISCOVERY_BASE, "discovery", "%s", "export", "%s");
-
-        private DiscoveryActionSelector(HttpRequestSender sender) {
-            super(sender);
-        }
-
-        public String startFromInput(String discoveryConfig) throws IOException {
-            return sender.to(DISCOVERY_START_FROM_INPUT)
-                    .method(HttpMethod.POST)
-                    .requestBody(discoveryConfig)
-                    .contentType("text/plain")
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String startFromInputIri(String discoveryConfigIri) throws IOException {
-            return sender.to(DISCOVERY_START_FROM_INPUT_IRI)
-                    .parameter("iri", discoveryConfigIri)
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String getStatus(String discoveryId) throws IOException {
-            return sender.to(String.format(DISCOVERY_GET_STATUS, discoveryId))
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String getPipelineGroups(String discoveryId) throws IOException {
-            return sender.to(String.format(DISCOVERY_GET_PIPELINE_GROUPS, discoveryId))
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-            return sender.to(String.format(DISCOVERY_EXPORT_PIPELINE, discoveryId, pipelineUri))
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws IOException {
-            return sender.to(String.format(DISCOVERY_EXPORT_PIPELINE, discoveryId, pipelineUri))
-                    .method(HttpMethod.POST)
-                    .requestBody(serviceDescription)
-                    .contentType("application/json")
-                    .acceptType("application/json")
-                    .send();
-        }
-
-    }
-
-    public static class EtlActionSelector extends HttpActionSelector {
-
-        private final String ETL_BASE = Application.getConfig().getProperty("etlServiceUrl");
-        private final String ETL_EXECUTE_PIPELINE = urlFrom(ETL_BASE, "executions");
-
-        private EtlActionSelector(HttpRequestSender sender) {
-            super(sender);
-        }
-
-        public String executePipeline(String pipelineIri) throws IOException {
-            return sender.to(ETL_EXECUTE_PIPELINE)
-                    .parameter("pipeline", pipelineIri)
-                    .method(HttpMethod.POST)
-                    .contentType("application/json")
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String getExecutionStatus(String executionIri) throws IOException {
-            String targetUrl = urlFrom(executionIri, "overview");
-            return sender.to(targetUrl)
-                    .acceptType("application/json")
-                    .send();
-        }
-
-        public String getExecutionResult(String executionIri) throws IOException {
-            return sender.to(executionIri)
-                    .acceptType("application/json")
-                    .send();
-        }
-
     }
 
     public static class UrlParameters extends LinkedHashMap<String, String> {

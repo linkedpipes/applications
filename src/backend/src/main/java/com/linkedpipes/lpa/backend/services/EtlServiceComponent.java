@@ -2,12 +2,15 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
 public class EtlServiceComponent {
 
@@ -25,23 +28,45 @@ public class EtlServiceComponent {
     );
 
     public Execution executePipeline(String etlPipelineIri) throws IOException {
-        String response = new HttpRequestSender()
-                .toEtl()
-                .executePipeline(etlPipelineIri);
+        String response = HttpActions.executePipeline(etlPipelineIri);
         return GSON.fromJson(response, Execution.class);
     }
 
     public ExecutionStatus getExecutionStatus(String executionIri) throws IOException {
-        String response = new HttpRequestSender()
-                .toEtl()
-                .getExecutionStatus(executionIri);
+        String response = HttpActions.getExecutionStatus(executionIri);
         return GSON.fromJson(response, ExecutionStatus.class);
     }
 
     public String getExecutionResult(String executionIri) throws IOException {
-        return new HttpRequestSender()
-                .toEtl()
-                .getExecutionResult(executionIri);
+        return HttpActions.getExecutionResult(executionIri);
     }
 
+    private static class HttpActions {
+
+        private static final String URL_BASE = Application.getConfig().getProperty("etlServiceUrl");
+        private static final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
+
+        private static String executePipeline(String pipelineIri) throws IOException {
+            return new HttpRequestSender().to(URL_EXECUTE_PIPELINE)
+                    .parameter("pipeline", pipelineIri)
+                    .method(HttpRequestSender.HttpMethod.POST)
+                    .contentType("application/json")
+                    .acceptType("application/json")
+                    .send();
+        }
+
+        private static String getExecutionStatus(String executionIri) throws IOException {
+            String targetUrl = urlFrom(executionIri, "overview");
+            return new HttpRequestSender().to(targetUrl)
+                    .acceptType("application/json")
+                    .send();
+        }
+
+        private static String getExecutionResult(String executionIri) throws IOException {
+            return new HttpRequestSender().to(executionIri)
+                    .acceptType("application/json")
+                    .send();
+        }
+
+    }
 }
