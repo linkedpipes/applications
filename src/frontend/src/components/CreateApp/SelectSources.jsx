@@ -18,6 +18,7 @@ import {
 import { extractUrlGroups } from "../../_helpers/utils";
 import { getDatasourcesArray } from "../../selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
+import { addDiscoveryIdAction } from "../../_actions/globals";
 
 const styles = theme => ({
   root: {
@@ -42,17 +43,9 @@ const styles = theme => ({
 class SelectSources extends React.Component {
   state = {
     ttlFile: undefined,
-    discoveryId: "",
     discoveryIsLoading: false,
-    pipelinesDialogOpen: false,
     textFieldValue: "",
     textFieldIsValid: false
-  };
-
-  handleClose = () => {
-    this.setState({
-      pipelinesDialogOpen: false
-    });
   };
 
   onChange = e => {
@@ -93,7 +86,6 @@ class SelectSources extends React.Component {
         }
 
         self.setState({
-          discoveryId: jsonResponse.id,
           discoveryIsLoading: false
         });
       });
@@ -143,6 +135,19 @@ class SelectSources extends React.Component {
       });
   };
 
+  addDiscoveryId = id => {
+    const self = this;
+
+    return new Promise((resolve, reject) => {
+      self.props.dispatch(
+        addDiscoveryIdAction({
+          id: id
+        })
+      );
+      resolve();
+    });
+  };
+
   processStartDiscovery = () => {
     console.log(process.env.BASE_BACKEND_URL);
 
@@ -154,20 +159,21 @@ class SelectSources extends React.Component {
       self.postStartFromFile();
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
-        self.setState({ discoveryId: discoveryResponse.id });
-        self
-          .loadPipelineGroups(discoveryResponse.id)
-          .then(function(pipelinesResponse) {
-            console.log(pipelinesResponse);
+        self.addDiscoveryId(discoveryResponse.id).then(function() {
+          self
+            .loadPipelineGroups(discoveryResponse.id)
+            .then(function(pipelinesResponse) {
+              console.log(pipelinesResponse);
 
-            self.setState({
-              discoveryIsLoading: false
+              self.setState({
+                discoveryIsLoading: false
+              });
+
+              setTimeout(function() {
+                self.props.handleNextStep();
+              }, 500);
             });
-
-            setTimeout(function() {
-              self.props.handleNextStep();
-            }, 500);
-          });
+        });
       });
     }
   };
@@ -276,12 +282,12 @@ class SelectSources extends React.Component {
                 Start Discovery
               </Button>
 
-              {this.state.discoveryId && (
+              {this.props.discoveryId && (
                 <Button
                   variant="contained"
                   component="span"
                   className={classes.button}
-                  disabled={!this.state.discoveryId}
+                  disabled={!this.props.discoveryId}
                   onClick={this.props.handleNextStep}
                   size="small"
                 >
@@ -302,7 +308,8 @@ SelectSources.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: getDatasourcesArray(state.datasources)
+    datasources: getDatasourcesArray(state.datasources),
+    discoveryId: state.globals.discoveryId
   };
 };
 
