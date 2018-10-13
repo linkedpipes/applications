@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography/Typography";
 import Button from "@material-ui/core/Button/Button";
 import Link from "react-router-dom/es/Link";
@@ -11,42 +11,38 @@ import Link from "react-router-dom/es/Link";
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    marginTop: '2rem',
-    marginLeft: '10%',
-    marginRight: '10%'
+    marginTop: "2rem",
+    marginLeft: "10%",
+    marginRight: "10%"
   },
   paper: {
     padding: theme.spacing.unit * 2,
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
+    textAlign: "center",
+    color: theme.palette.text.secondary
   },
   button: {
     margin: theme.spacing.unit,
-    width: '90%'
+    width: "90%"
   },
   createBtn: {
     margin: theme.spacing.unit,
-    width: '90%',
-    backgroundColor: '#46a80a',
-    color: 'black',
-    textDecoration: 'none'
+    width: "90%",
+    backgroundColor: "#00695C",
+    color: "white",
+    textDecoration: "none"
   },
   templatesBtn: {
     margin: theme.spacing.unit,
-    width: '90%',
-    backgroundColor: '#f4d742',
-    color: 'black'
+    width: "90%",
+    backgroundColor: "#154168",
+    color: "white"
   }
 });
 
-
 class Dashboard extends Component {
-
-
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
@@ -60,14 +56,22 @@ class Dashboard extends Component {
                 Start by creating a new application
               </Typography>
               <Link to={"/create-app"}>
-              <Button variant="contained" size="large" className={classes.createBtn}>
-                Create
-              </Button>
+                <Button
+                  variant="contained"
+                  size="large"
+                  className={classes.createBtn}
+                >
+                  Create
+                </Button>
               </Link>
-              <br/>
-              <Button variant="contained" size="large" className={classes.templatesBtn}>
-              Templates
-            </Button>
+              <br />
+              <Button
+                variant="contained"
+                size="large"
+                className={classes.templatesBtn}
+              >
+                Templates
+              </Button>
             </Paper>
           </Grid>
           <Grid item xs={8}>
@@ -93,7 +97,6 @@ class Dashboard extends Component {
 const styledDashboard = withStyles(styles)(Dashboard);
 export { styledDashboard as Dashboard };
 
-
 Dashboard.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };

@@ -30,7 +30,7 @@ const NavigationBar = props => {
         <Typography variant="title" color="inherit" className={classes.flex}>
           Discovery API Assistant Demo
         </Typography>
-        <UserButton/>
+        <UserButton />
       </Toolbar>
       <ToastContainer className="toast-container" />
       {process.env.NODE_ENV !== "production" && (
@@ -41,4 +41,4 @@ const NavigationBar = props => {
 };
 
 const styledNavBar = withStyles(styles)(NavigationBar);
-export {styledNavBar as NavigationBar};
+export { styledNavBar as NavigationBar };
