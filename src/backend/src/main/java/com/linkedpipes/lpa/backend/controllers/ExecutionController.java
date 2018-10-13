@@ -22,7 +22,7 @@ public class ExecutionController {
         etlService = new EtlServiceComponent();
     }
 
-    @RequestMapping("/execution/status")
+    @RequestMapping("/api/execution/status")
     public ResponseEntity<?> getStatus(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
@@ -32,7 +32,7 @@ public class ExecutionController {
         return ResponseEntity.ok(status);
     }
 
-    @RequestMapping("/execution/result")
+    @RequestMapping("/api/execution/result")
     @ResponseBody
     public ResponseEntity<?> getResult(@RequestParam( value="executionIri") String executionIri) throws IOException{
         if(executionIri == null || executionIri.isEmpty()) {

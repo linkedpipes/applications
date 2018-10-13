@@ -10,18 +10,18 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DataSourceController {
 
-    @RequestMapping("/datasources")
+    @RequestMapping("/api/datasources")
     @ResponseBody
     public List<DataSource> getDataSources(){
         return Collections.emptyList();
     }
 
-    @PostMapping("/datasources")
+    @PostMapping("/api/datasources")
     public String createDataSources(@RequestParam( value="fileUri") String fileUri){
         return "called POST /datasources";
     }
 
-    @RequestMapping("/datasource")
+    @RequestMapping("/api/datasource")
     public DataSource getDataSource(@RequestParam( value="dataSourceUri") String dataSourceUri){
         DataSource dataSource = new DataSource();
         return dataSource;

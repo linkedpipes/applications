@@ -18,9 +18,9 @@ EXPOSE 8080
 
 COPY --from=builder /app/build/libs/backend-0.0.1.jar /app/app.jar
 
-WORKDIR /app
-
 COPY src/data/rdf/base.ttl /app/src/data/rdf/base.ttl
+
+WORKDIR /app
 
 # Start the container running the JAR file
 # using dev/urandom
