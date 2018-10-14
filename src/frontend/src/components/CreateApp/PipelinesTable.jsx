@@ -21,7 +21,8 @@ import {
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
 import { toast } from "react-toastify";
-import { ETL_STATUS, ETL_STATUS_MAP, ETL_STATUS_TYPE } from "../../_constants";
+import { ETL_STATUS_MAP, ETL_STATUS_TYPE } from "../../_constants";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -150,7 +151,23 @@ class PipelinesTable extends React.Component {
     order: "asc",
     orderBy: "id",
     page: 0,
-    rowsPerPage: 5
+    rowsPerPage: 5,
+    loadingButtons: {}
+  };
+
+  exportAndStartPolling = (discoveryId, pipelineId) => {
+    const self = this;
+
+    self.exportPipeline(discoveryId, pipelineId).then(function(json) {
+      self
+        .executePipeline(json.pipelineId, json.etlPipelineIri)
+        .then(function(pipelineId) {
+          let loadingButtons = self.state.loadingButtons;
+          loadingButtons["button_" + json.pipelineId] = true;
+          self.setState({ loadingButtons: loadingButtons });
+          self.checkExecutionStatus(pipelineId);
+        });
+    });
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -161,7 +178,10 @@ class PipelinesTable extends React.Component {
       autoClose: false
     });
 
-    getExportPipeline({ discoveryId: discoveryId, pipelineId: pipelineId })
+    return getExportPipeline({
+      discoveryId: discoveryId,
+      pipelineId: pipelineId
+    })
       .then(
         function(response) {
           return response.json();
@@ -194,9 +214,7 @@ class PipelinesTable extends React.Component {
           })
         );
 
-        setTimeout(() => {
-          self.executePipeline(pipelineId, json.etlPipelineIri);
-        }, 1500);
+        return json;
       });
   };
 
@@ -208,7 +226,7 @@ class PipelinesTable extends React.Component {
       autoClose: false
     });
 
-    getExecutePipeline({ etlPipelineIri: etlPipelineIri })
+    return getExecutePipeline({ etlPipelineIri: etlPipelineIri })
       .then(
         function(response) {
           return response.json();
@@ -239,6 +257,8 @@ class PipelinesTable extends React.Component {
             executionIri: json.iri
           })
         );
+
+        return pipelineId;
       });
   };
 
@@ -248,14 +268,14 @@ class PipelinesTable extends React.Component {
     let status = undefined;
     const self = this;
 
-    if (tid == undefined) {
-      tid = toast.info("Checking the execution status...", {
+    if (tid === undefined) {
+      tid = toast.info("Checking the pipeline execution status...", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: false
       });
     }
 
-    getExecutionStatus({ executionIri: executionValues.executionIri })
+    return getExecutionStatus({ executionIri: executionValues.executionIri })
       .then(
         function(response) {
           return response.json();
@@ -286,7 +306,7 @@ class PipelinesTable extends React.Component {
         if (toast.isActive(tid)) {
           toast.update(tid, {
             render: response,
-            type: toast.TYPE.INFO,
+            type: toast.TYPE.SUCCESS,
             autoClose: EXECUTION_STATUS_TIMEOUT
           });
         } else {
@@ -294,10 +314,15 @@ class PipelinesTable extends React.Component {
         }
 
         if (
-          status !== ETL_STATUS_TYPE.Finished ||
-          status !== ETL_STATUS_TYPE.Cancelled ||
-          status !== ETL_STATUS_TYPE.Unknown
+          status === ETL_STATUS_TYPE.Finished ||
+          status === ETL_STATUS_TYPE.Cancelled ||
+          status === ETL_STATUS_TYPE.Unknown ||
+          status === ETL_STATUS_TYPE.Failed
         ) {
+          let loadingButtons = self.state.loadingButtons;
+          loadingButtons["button_" + pipelineId] = false;
+          self.setState({ loadingButtons: loadingButtons });
+        } else {
           setTimeout(() => {
             self.checkExecutionStatus(pipelineId, tid);
           }, 5000);
@@ -326,7 +351,7 @@ class PipelinesTable extends React.Component {
 
   render() {
     const { classes, pipelines, discoveryId, exportsDict } = this.props;
-    const { order, orderBy, rowsPerPage, page } = this.state;
+    const { order, orderBy, rowsPerPage, page, loadingButtons } = this.state;
 
     const emptyRows =
       rowsPerPage -
@@ -352,27 +377,24 @@ class PipelinesTable extends React.Component {
                   return (
                     <TableRow hover tabIndex={-1} key={pipeline.id}>
                       <TableCell component="th" scope="row" padding="checkbox">
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => {
-                            self.exportPipeline(discoveryId, pipeline.id);
-                          }}
-                        >
-                          Run
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="primary"
-                          disabled={!(pipeline.id in exportsDict.exportRecords)}
-                          onClick={() => {
-                            self.checkExecutionStatus(pipeline.id, undefined);
-                          }}
-                        >
-                          Status
-                        </Button>
+                        {loadingButtons["button_" + pipeline.id] ? (
+                          <CircularProgress size={25} />
+                        ) : (
+                          <Button
+                            id={"button_" + pipeline.id}
+                            size="small"
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              self.exportAndStartPolling(
+                                discoveryId,
+                                pipeline.id
+                              );
+                            }}
+                          >
+                            Execute
+                          </Button>
+                        )}
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
                         {pipeline.name}
