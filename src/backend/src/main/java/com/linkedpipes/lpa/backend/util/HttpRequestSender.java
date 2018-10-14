@@ -1,19 +1,22 @@
 package com.linkedpipes.lpa.backend.util;
 
-import com.google.gson.Gson;
 import com.linkedpipes.lpa.backend.Application;
-import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import org.springframework.util.StreamUtils;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
+import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 import static java.net.HttpURLConnection.HTTP_OK;
 
+/**
+ * A builder for HTTP requests. Some settings of the builder are mandatory. If any mandatory setting is not provided,
+ * the {@link #send()} method throws {@link IllegalStateException}.
+ */
 public class HttpRequestSender {
 
     private static final String HTTP_PROPERTY_KEY_CONTENT_TYPE = "Content-Type";
@@ -26,65 +29,144 @@ public class HttpRequestSender {
     private String acceptType = null;
     private final UrlParameters parameters = new UrlParameters();
 
+    /**
+     * Sets the target URL to connect to. This setting is mandatory.
+     *
+     * @param urlString the target URL
+     * @return this
+     */
     public HttpRequestSender to(String urlString) {
         targetUrl = urlString;
         return this;
     }
 
+    /**
+     * Delegates the builder to a {@link DiscoveryActionSelector} which is an {@link HttpActionSelector} for selecting
+     * actions specific to the Discovery tool.
+     *
+     * @return a {@link DiscoveryActionSelector} operating on this builder
+     */
     public DiscoveryActionSelector toDiscovery() {
         return new DiscoveryActionSelector(this);
     }
 
+    /**
+     * Delegates the builder to an {@link EtlActionSelector} which is an {@link HttpActionSelector} for selecting
+     * actions specific to the ETL tool.
+     *
+     * @return an {@link EtlActionSelector} operating on this builder
+     */
     public EtlActionSelector toEtl() {
         return new EtlActionSelector(this);
     }
 
+    /**
+     * Sets the HTTP method to use for this request. This setting is optional. The default is {@link HttpMethod#GET}.
+     *
+     * @param method the desired HTTP method
+     * @return this
+     */
     public HttpRequestSender method(HttpMethod method) {
         this.method = method;
         return this;
     }
 
+    /**
+     * Sets the body to use for this request. This setting is optional.
+     *
+     * @param requestBody the desired request body
+     * @return this
+     */
     public HttpRequestSender requestBody(String requestBody) {
         this.requestBody = requestBody;
         return this;
     }
 
+    /**
+     * Sets the {@code Content-Type} request property. This setting is optional.
+     *
+     * @param contentType the desired value of the {@code Content-Type} request property
+     * @return this
+     */
     public HttpRequestSender contentType(String contentType) {
         this.contentType = contentType;
         return this;
     }
 
+    /**
+     * Sets the {@code Accept} request property. This setting is optional.
+     *
+     * @param acceptType the desired value of the {@code Accept} request property
+     * @return this
+     */
     public HttpRequestSender acceptType(String acceptType) {
         this.acceptType = acceptType;
         return this;
     }
 
+    /**
+     * Adds a key-value pair to the list of the GET parameters for this request. If the key has already been mapped to a
+     * value before, the previous value is overridden. The list of parameters is appended to the target URL regardless
+     * of the request method.
+     *
+     * @param key   the key to map to a value
+     * @param value the mapped value
+     * @return this
+     */
     public HttpRequestSender parameter(String key, String value) {
         parameters.put(key, value);
         return this;
     }
 
-    public String send() throws IOException {
-        URL url = new URL(getUrlWithParams());
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    /**
+     * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the given factory.
+     *
+     * @param factory factory for the connection object
+     * @return the body of the response obtained by the request
+     * @throws IOException           if an I/O error occurs
+     * @throws IllegalStateException if a mandatory setting has not been set for this builder
+     */
+    public String send(HttpURLConnectionFactory factory) throws IOException {
+        checkMandatorySettings();
+        HttpURLConnection connection = factory.getConnectionForUrl(getUrlWithParameters());
 
         connection.setRequestMethod(method.name());
         fillInHeader(connection);
         fillInBody(connection);
 
-        connection.connect();
-
         if (connection.getResponseCode() != HTTP_OK) {
-            throw new ConnectionException(connection.getResponseCode(), connection.getResponseMessage(),
-                    StreamUtils.copyToString(connection.getErrorStream(), Application.DEFAULT_CHARSET));
+            try (InputStream errorStream = connection.getErrorStream()) {
+                int responseCode = connection.getResponseCode();
+                String responseMessage = connection.getResponseMessage();
+                String responseBody = StreamUtils.copyToString(errorStream, Application.DEFAULT_CHARSET);
+                throw new ConnectionException(responseCode, responseMessage, responseBody);
+            }
         }
 
-        String response = StreamUtils.copyToString(connection.getInputStream(), Application.DEFAULT_CHARSET);
-        connection.disconnect();
-        return response;
+        try (InputStream inputStream = connection.getInputStream()) {
+            return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
+        }
     }
 
-    private String getUrlWithParams() {
+    /**
+     * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the {@link
+     * HttpURLConnectionFactory#getDefaultFactory() default factory}.
+     *
+     * @return the body of the response obtained by the request
+     * @throws IOException           if an I/O error occurs
+     * @throws IllegalStateException if a mandatory setting has not been set for this builder
+     */
+    public String send() throws IOException {
+        return send(HttpURLConnectionFactory.getDefaultFactory());
+    }
+
+    private void checkMandatorySettings() {
+        if (targetUrl == null) {
+            throw new IllegalStateException("Target URL was not set");
+        }
+    }
+
+    private String getUrlWithParameters() {
         return targetUrl + parameters.toString();
     }
 
@@ -102,28 +184,29 @@ public class HttpRequestSender {
             return;
         }
         connection.setDoOutput(true);
-        try (DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
-            dos.writeBytes(requestBody);
+        try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Application.DEFAULT_CHARSET)) {
+            writer.append(requestBody);
         }
     }
 
     public static class DiscoveryActionSelector extends HttpActionSelector {
 
-        private final String DISCOVERY_START_FROM_INPUT = createUrl("discovery", "startFromInput");
-        private final String DISCOVERY_START_FROM_INPUT_IRI = createUrl("discovery", "startFromInputIri");
-        private final String DISCOVERY_GET_STATUS = createUrl("discovery", "%s");
-        private final String DISCOVERY_GET_PIPELINE_GROUPS = createUrl("discovery", "%s", "pipeline-groups");
-        private final String DISCOVERY_EXPORT_PIPELINE = createUrl("discovery", "%s", "export", "%s");
+        private static final String DISCOVERY_BASE = Application.getConfig().getProperty("discoveryServiceUrl");
+        private static final String DISCOVERY_START_FROM_INPUT = urlFrom(DISCOVERY_BASE, "discovery", "startFromInput");
+        private static final String DISCOVERY_START_FROM_INPUT_IRI = urlFrom(DISCOVERY_BASE, "discovery", "startFromInputIri");
+        private static final String DISCOVERY_GET_STATUS = urlFrom(DISCOVERY_BASE, "discovery", "%s");
+        private static final String DISCOVERY_GET_PIPELINE_GROUPS = urlFrom(DISCOVERY_BASE, "discovery", "%s", "pipeline-groups");
+        private static final String DISCOVERY_EXPORT_PIPELINE = urlFrom(DISCOVERY_BASE, "discovery", "%s", "export", "%s");
 
         private DiscoveryActionSelector(HttpRequestSender sender) {
-            super(sender, Application.config.getProperty("discoveryServiceUrl"));
+            super(sender);
         }
 
         public String startFromInput(String discoveryConfig) throws IOException {
             return sender.to(DISCOVERY_START_FROM_INPUT)
                     .method(HttpMethod.POST)
                     .requestBody(discoveryConfig)
-                    .contentType("text/plain")
+                    .contentType("text/html")
                     .acceptType("application/json")
                     .send();
         }
@@ -153,10 +236,10 @@ public class HttpRequestSender {
                     .send();
         }
 
-        public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
+        public String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws IOException {
             return sender.to(String.format(DISCOVERY_EXPORT_PIPELINE, discoveryId, pipelineUri))
                     .method(HttpMethod.POST)
-                    .requestBody(new Gson().toJson(serviceDescription))
+                    .requestBody(serviceDescription)
                     .contentType("application/json")
                     .acceptType("application/json")
                     .send();
@@ -166,11 +249,11 @@ public class HttpRequestSender {
 
     public static class EtlActionSelector extends HttpActionSelector {
 
-        private final String ETL_EXECUTE_PIPELINE = createUrl("executions");
-
+        private final String ETL_BASE = Application.getConfig().getProperty("etlServiceUrl");
+        private final String ETL_EXECUTE_PIPELINE = urlFrom(ETL_BASE, "executions");
 
         private EtlActionSelector(HttpRequestSender sender) {
-            super(sender, Application.config.getProperty("etlServiceUrl"));
+            super(sender);
         }
 
         public String executePipeline(String pipelineIri) throws IOException {
@@ -183,7 +266,7 @@ public class HttpRequestSender {
         }
 
         public String getExecutionStatus(String executionIri) throws IOException {
-            String targetUrl = UrlUtils.urlFrom(executionIri, "overview");
+            String targetUrl = urlFrom(executionIri, "overview");
             return sender.to(targetUrl)
                     .acceptType("application/json")
                     .send();
@@ -197,7 +280,18 @@ public class HttpRequestSender {
 
     }
 
-    public static class UrlParameters extends HashMap<String, String> {
+    public static class UrlParameters extends LinkedHashMap<String, String> {
+
+        @Override
+        public String put(String key, String value) {
+            if (key == null) {
+                throw new NullPointerException("URL parameter key cannot be null");
+            }
+            if (value == null) {
+                throw new NullPointerException("URL parameter value cannot be null");
+            }
+            return super.put(key, value);
+        }
 
         @Override
         public String toString() {
