@@ -206,7 +206,7 @@ public class HttpRequestSender {
             return sender.to(DISCOVERY_START_FROM_INPUT)
                     .method(HttpMethod.POST)
                     .requestBody(discoveryConfig)
-                    .contentType("text/plain")
+                    .contentType("text/html")
                     .acceptType("application/json")
                     .send();
         }
