@@ -22,7 +22,11 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
 
-`$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose-master.yml -o docker-compose.yml; docker-compose up`
+```
+$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose-master.yml -o docker-compose-master.yml &&
+curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx.conf -o  nginx.conf &&
+sudo docker-compose -f docker-compose-master.yml up
+```
 
 ## Manual start
 
