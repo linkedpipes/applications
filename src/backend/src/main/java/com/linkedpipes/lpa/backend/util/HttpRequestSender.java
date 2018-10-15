@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.util;
 import com.linkedpipes.lpa.backend.Application;
 import org.springframework.util.StreamUtils;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -184,8 +185,11 @@ public class HttpRequestSender {
             return;
         }
         connection.setDoOutput(true);
-        try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), Application.DEFAULT_CHARSET)) {
-            writer.append(requestBody);
+
+        //IMP - fill in body as bytes, otherwise passing rdf will fail
+        try (DataOutputStream writer = new DataOutputStream(connection.getOutputStream())) {
+            writer.writeBytes(requestBody);
+            writer.flush();
         }
     }
 
@@ -206,7 +210,7 @@ public class HttpRequestSender {
             return sender.to(DISCOVERY_START_FROM_INPUT)
                     .method(HttpMethod.POST)
                     .requestBody(discoveryConfig)
-                    .contentType("text/html")
+                    .contentType("text/plain")
                     .acceptType("application/json")
                     .send();
         }
