@@ -23,7 +23,7 @@ public class PipelineController {
         etlService = new EtlServiceComponent();
     }
 
-    @RequestMapping("/pipeline")
+    @RequestMapping("/api/pipeline")
     @ResponseBody
     public ResponseEntity<Pipeline> getPipeline(@RequestParam(value = "pipelineUri") String pipelineUri) {
         Pipeline testPipeline = new Pipeline();
@@ -31,14 +31,14 @@ public class PipelineController {
         return ResponseEntity.ok(testPipeline);
     }
 
-    @GetMapping("/pipeline/export")
+    @GetMapping("/api/pipeline/export")
     @ResponseBody
     public ResponseEntity<PipelineExportResult> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
         PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/pipeline/export")
+    @PostMapping("/api/pipeline/export")
     @ResponseBody
     public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException {
         ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
@@ -46,13 +46,13 @@ public class PipelineController {
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping("/pipeline/create")
+    @RequestMapping("/api/pipeline/create")
     @ResponseBody
     public void createPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) {
 
     }
 
-    @RequestMapping("/pipeline/execute")
+    @RequestMapping("/api/pipeline/execute")
     public ResponseEntity<Execution> executePipeline(@RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws IOException {
         Execution response = etlService.executePipeline(etlPipelineIri);
         return ResponseEntity.ok(response);
