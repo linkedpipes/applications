@@ -25,8 +25,10 @@ The whole app can be run using [docker compose](https://docs.docker.com/compose/
 ```
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose-master.yml -o docker-compose-master.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx.conf -o  nginx.conf &&
-sudo docker-compose -f docker-compose-master.yml up
+docker-compose -f docker-compose-master.yml up
 ```
+
+The application then runs on http://localhost:9001
 
 ## Manual start
 
