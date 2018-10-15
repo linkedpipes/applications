@@ -1,0 +1,8 @@
+[
+  {
+    "iri": "https://ldcp.opendata.cz/resource/dbpedia/datasource-templates/Earthquake"
+  },
+  {
+    "iri": "https://discovery.linkedpipes.com/resource/lod/templates/http---commons.dbpedia.org-sparql"
+  }
+]

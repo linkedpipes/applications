@@ -14,6 +14,9 @@ import java.util.ArrayList;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
+/**
+ * Provides the functionality of Discovery-related backend operations of the application.
+ */
 public class DiscoveryServiceComponent {
 
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
@@ -135,4 +138,5 @@ public class DiscoveryServiceComponent {
         }
 
     }
+
 }

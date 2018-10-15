@@ -6,7 +6,6 @@ import org.springframework.util.StreamUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
@@ -175,7 +174,7 @@ public class HttpRequestSender {
         }
         connection.setDoOutput(true);
 
-        //IMP - fill in body as bytes, otherwise passing rdf will fail
+        // impl note - fill in body as bytes, otherwise passing RDF will fail
         try (DataOutputStream writer = new DataOutputStream(connection.getOutputStream())) {
             writer.writeBytes(requestBody);
             writer.flush();

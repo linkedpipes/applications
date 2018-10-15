@@ -12,6 +12,9 @@ import java.util.Map;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
+/**
+ * Provides the functionality of ETL-related backend operations of the application.
+ */
 public class EtlServiceComponent {
 
     private static final Gson GSON = new GsonBuilder()
@@ -69,4 +72,5 @@ public class EtlServiceComponent {
         }
 
     }
+
 }
