@@ -45,13 +45,14 @@ public class DiscoveryServiceComponent {
         for (JsonElement appGroup : appGroups) {
             PipelineGroup pipelineGrp = new PipelineGroup();
             JsonObject appGroupObj = appGroup.getAsJsonObject();
-            pipelineGrp.applicationInstance = gson.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
+            pipelineGrp.visualizers = gson.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
 
             JsonArray dataSourceGroups = appGroupObj.getAsJsonArray("dataSourceGroups");
 
             for (JsonElement dataSourceGroup : dataSourceGroups) {
+                DataSourceGroup dataSrcGroup = new DataSourceGroup();
                 JsonArray datasourceInstances = dataSourceGroup.getAsJsonObject().getAsJsonArray("dataSourceInstances");
-                pipelineGrp.dataSources = gson.fromJson(datasourceInstances, new TypeToken<ArrayList<DataSource>>(){}.getType());
+                dataSrcGroup.dataSources = gson.fromJson(datasourceInstances, new TypeToken<ArrayList<DataSource>>(){}.getType());
 
                 JsonArray extractorGroups = dataSourceGroup.getAsJsonObject().getAsJsonArray("extractorGroups");
 
@@ -60,9 +61,11 @@ public class DiscoveryServiceComponent {
 
                     for (JsonElement dataSampleGroup : dataSampleGroups) {
                         Pipeline pipeline = gson.fromJson(dataSampleGroup.getAsJsonObject().getAsJsonObject("pipeline"), Pipeline.class);
-                        pipelineGrp.pipelines.add(pipeline);
+                        dataSrcGroup.pipelines.add(pipeline);
                     }
                 }
+
+                pipelineGrp.dataSourceGroups.add(dataSrcGroup);
             }
             pipelineGroups.pipelineGroups.add(pipelineGrp);
         }
