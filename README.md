@@ -1,5 +1,5 @@
-<p align="center"><img width=30% src="https://pli.io/k9Aaw.png"></p>
-<p align="center"><img width=60% src="https://pli.io/9qaU7.png"></p>
+<p align="center"><img width=30% src="https://pli.io/22gHl3.png"></p>
+<p align="center"><img width=25% src="https://media.giphy.com/media/8PpFGKr5vgNY1s8QiY/giphy.gif"></p>
 
 ### Software Project (NPRG023)
 
@@ -8,7 +8,9 @@
 
 Meeting Logs: https://docs.google.com/document/d/1tvJgEbRWb9dYM34grGARRXQ9gE0fcITw0Rayu2mEbmA/edit
 
-Wireframe Designs: https://app.moqups.com/ponsietta/LMyuSmiQKD/view
+Wireframe Designs (Legacy via Moqups): https://app.moqups.com/ponsietta/LMyuSmiQKD/view
+
+Wireframe Designs (Latest) https://docs.google.com/document/d/166u_INZn6jAsKVsmVX88N2dQdX1wb9Mk2ZH1q2gRZV4/edit?usp=sharing
 
 Current App that we will be extracting, modifying and adding to: https://github.com/ld-viz-swp/LDVMi
 
@@ -16,18 +18,19 @@ High level documentation markdown (updated regularly) : [HackMD](https://hackmd.
 
 ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
 
-
 ## Quick start
 
-The whole app can be run using docker compose
-`$ cd src/; docker-compose up`
+The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
 
+`$ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose.yml -o docker-compose.yml; docker-compose up`
 
-## Running backend
+## Manual start
 
-### Using docker
+### Running backend
 
-#### Building image locally
+#### Using docker
+
+##### Building image locally
 
 In case you want to build the image locally, follow the next steps:
 
@@ -39,7 +42,7 @@ In case you want to build the image locally, follow the next steps:
 
 `$ docker build -t <some_tag> .`
 
-#### Running the image
+##### Running the image
 
 The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
 
@@ -48,9 +51,9 @@ The Docker image for this project is hosted in [Docker Hub](https://hub.docker.c
 The application should then by available through port `5000`.
 Custom configuration can be supplied via `-v <path to config.properties>:/app/config.properties` if needed.
 
-## Running frontend
+### Running frontend
 
-### Running locally
+#### Running locally
 
 1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
 2. Navigate to frontend folder by executing following commands from root folder.
@@ -64,7 +67,7 @@ Custom configuration can be supplied via `-v <path to config.properties>:/app/co
 
 After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`.
 
-### Using Docker
+#### Using Docker
 
 1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
 2. Navigate to frontend folder by executing following commands from root folder.

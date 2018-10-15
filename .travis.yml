@@ -14,22 +14,29 @@ matrix:
       script:
         - yarn install
         - yarn run build
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker build -t frontend .
-        - docker images
-        - docker tag frontend linkedpipes/applications:frontend
-        - docker push linkedpipes/applications
+
     - language: java
       jdk: oraclejdk10
       before_script:
         - cd src/backend
       script:
         - "./gradlew assemble"
+        - "./gradlew test"
+
+    - # require the branch name to be master
+      if: branch = master
+      script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - cd src/frontend
+        - docker build -t frontend .
+        - docker tag frontend linkedpipes/applications:frontend
+        - docker push linkedpipes/applications
+        - cd ../backend
         - docker build -t backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
         - docker images
         - docker tag backend linkedpipes/applications:backend
         - docker push linkedpipes/applications
+
 branches:
   only:
     - master
