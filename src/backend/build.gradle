@@ -1,13 +1,13 @@
 buildscript {
-	ext {
-		springBootVersion = '2.0.4.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+    ext {
+        springBootVersion = '2.0.4.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 apply plugin: 'java'
@@ -21,37 +21,38 @@ sourceCompatibility = 10
 targetCompatibility = 10
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 sourceSets {
-	main {
-		resources {
-			srcDir "src/main/config"
-		}
-	}
+    main {
+        resources {
+            srcDir "src/main/config"
+        }
+    }
 }
 
 compileJava {
-	options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
+    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 compileTestJava {
-	options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
+    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 test {
-	jvmArgs << "--add-modules" << "jdk.incubator.httpclient"
+    include "**/UnitTests.class"
+    jvmArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
 
 bootRun {
-	args = ["--add-modules jdk.incubator.httpclient"]
+    args = ["--add-modules jdk.incubator.httpclient"]
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-web')
     runtime('org.springframework.boot:spring-boot-devtools')
     testCompile('org.springframework.boot:spring-boot-starter-test')
-	compile 'com.google.code.gson:gson:2.8.5'
-	compile 'org.apache.jena:apache-jena-libs:3.8.0'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.apache.jena:apache-jena-libs:3.8.0'
 }

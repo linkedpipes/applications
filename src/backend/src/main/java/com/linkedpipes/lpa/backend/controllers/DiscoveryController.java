@@ -25,7 +25,7 @@ public class DiscoveryController {
 
     @RequestMapping("/api/pipelines/discover")
     public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException {
-        if(dataSourceList == null || dataSourceList.isEmpty() ) {
+        if (dataSourceList == null || dataSourceList.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
         }
 
@@ -36,7 +36,7 @@ public class DiscoveryController {
 
     @RequestMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<?> startDiscoveryFromInput(@RequestBody String discoveryConfig) throws IOException {
-        if(discoveryConfig == null || discoveryConfig.isEmpty()) {
+        if (discoveryConfig == null || discoveryConfig.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("Discovery config not provided"), HttpStatus.BAD_REQUEST);
         }
 
@@ -46,7 +46,7 @@ public class DiscoveryController {
 
     @RequestMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<?> startDiscoveryFromInputIri(@RequestParam(value="discoveryConfigIri") String discoveryConfigIri) throws IOException{
-        if(discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
+        if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("Input IRI not provided"), HttpStatus.BAD_REQUEST);
         }
 

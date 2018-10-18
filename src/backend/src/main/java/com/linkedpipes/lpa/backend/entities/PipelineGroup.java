@@ -10,4 +10,5 @@ public class PipelineGroup {
     public PipelineGroup(){
         dataSourceGroups = new ArrayList<>();
     }
+
 }
