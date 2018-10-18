@@ -95,7 +95,7 @@ class SelectSources extends React.Component {
   postStartFromInputLinks = () => {
     const splitFieldValue = this.state.textFieldValue.split(",\n");
     const datasourcesForTTL = splitFieldValue.map(source => {
-      return { Uri: source };
+      return { uri: source };
     });
 
     let tid = toast.info("Getting the pipeline groups...", {
