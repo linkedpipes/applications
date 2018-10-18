@@ -6,7 +6,6 @@ import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,17 +18,17 @@ public class PipelineController {
     private final DiscoveryServiceComponent discoveryService;
     private final EtlServiceComponent etlService;
 
-    public PipelineController(){
+    public PipelineController() {
         discoveryService = new DiscoveryServiceComponent();
         etlService = new EtlServiceComponent();
     }
 
     @RequestMapping("/api/pipeline")
     @ResponseBody
-    public ResponseEntity<Pipeline> getPipeline(@RequestParam( value="pipelineUri") String pipelineUri){
+    public ResponseEntity<Pipeline> getPipeline(@RequestParam(value = "pipelineUri") String pipelineUri) {
         Pipeline testPipeline = new Pipeline();
         testPipeline.id = pipelineUri;
-        return new ResponseEntity<>(testPipeline, HttpStatus.OK);
+        return ResponseEntity.ok(testPipeline);
     }
 
     @GetMapping("/api/pipeline/export")
@@ -41,7 +40,7 @@ public class PipelineController {
 
     @PostMapping("/api/pipeline/export")
     @ResponseBody
-    public ResponseEntity<String> exportPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException{
+    public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException {
         ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
@@ -49,7 +48,7 @@ public class PipelineController {
 
     @RequestMapping("/api/pipeline/create")
     @ResponseBody
-    public void createPipeline(@RequestParam( value="discoveryId") String discoveryId, @RequestParam( value="pipelineUri") String pipelineUri){
+    public void createPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) {
 
     }
 

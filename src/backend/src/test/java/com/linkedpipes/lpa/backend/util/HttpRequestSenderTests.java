@@ -189,19 +189,6 @@ public class HttpRequestSenderTests {
     }
 
     @Test
-    public void testNonASCIIRequestBody() throws IOException {
-        String expectedBody = "This is a request body with fůňńý čhäřáćťěřš";
-
-        new HttpRequestSender()
-                .to(FAKE_URL)
-                .requestBody(expectedBody)
-                .send(FAKE_FACTORY);
-
-        String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
-        assertEquals(expectedBody, actualBody);
-    }
-
-    @Test
     public void testNoContentType() throws IOException {
         new HttpRequestSender()
                 .to(FAKE_URL)
