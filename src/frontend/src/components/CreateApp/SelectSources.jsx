@@ -95,7 +95,7 @@ class SelectSources extends React.Component {
   postStartFromInputLinks = () => {
     const splitFieldValue = this.state.textFieldValue.split(",\n");
     const datasourcesForTTL = splitFieldValue.map(source => {
-      return { Uri: source };
+      return { uri: source };
     });
 
     let tid = toast.info("Getting the pipeline groups...", {
@@ -188,7 +188,6 @@ class SelectSources extends React.Component {
     return getPipelineGroups({ discoveryId: discoveryId })
       .then(
         function(response) {
-          console.log(response);
           return response.json();
         },
         function(err) {
@@ -200,6 +199,8 @@ class SelectSources extends React.Component {
         }
       )
       .then(function(jsonResponse) {
+        console.log(jsonResponse);
+
         toast.dismiss(tid);
         self.props.dispatch(
           addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })

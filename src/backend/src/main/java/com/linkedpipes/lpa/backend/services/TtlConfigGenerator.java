@@ -9,20 +9,21 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.List;
 
 public class TtlConfigGenerator {
 
-    public static String fromDataSourceList(List<DataSource> dataSourceList) throws FileNotFoundException {
+    public static String fromDataSourceList(List<DataSource> dataSourceList) {
         RIOT.init();
 
         // create an empty model
         Model model = ModelFactory.createDefaultModel();
 
-        //read base rdf from file
-        final File baseTtlFile = new File("src/data/rdf/base.ttl");
-        final InputStream fileStream = new DataInputStream(new FileInputStream(baseTtlFile));
+        //read base rdf from resource
+        InputStream fileStream = new DataInputStream(TtlConfigGenerator.class.getResourceAsStream("base.ttl"));
         model.read(fileStream, "", "TURTLE");
 
         //add data sources
@@ -30,7 +31,7 @@ public class TtlConfigGenerator {
         Property property = model.createProperty("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate");
 
         for (DataSource dataSource : dataSourceList) {
-            Resource obj = model.createResource(dataSource.Uri);
+            Resource obj = model.createResource(dataSource.uri);
             model.add(subject, property, obj);
         }
 
