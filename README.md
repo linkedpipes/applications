@@ -62,10 +62,10 @@ Custom configuration can be supplied via `-v <path to config.properties>:/app/co
    3.1. If you are using `npm` then : `$ npm install`
    3.2. If you are using `yarn` then : `$ yarn install`
 4. Running the web-app on `localhost`. Depending on user's preference execute the command below.
-   4.1. If you are using `npm` then : `$ npm run dev-server`
-   4.2. If you are using `yarn` then : `$ yarn run dev-server`
+   4.1. If you are using `npm` then : `$ npm run startLocalDev`
+   4.2. If you are using `yarn` then : `$ yarn run startLocalDev`
 
-After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`.
+After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`. To run backend, execute ./gradlew bootRun inside backend folder
 
 #### Using Docker
 
