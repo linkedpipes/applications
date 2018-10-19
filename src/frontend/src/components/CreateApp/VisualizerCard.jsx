@@ -12,7 +12,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
-import PipelinesTable from "./PipelinesTable";
+import DataSourcesTable from "./DataSourcesTable";
 
 const styles = {
   root: {
@@ -62,7 +62,7 @@ class VisualizerCard extends React.Component {
               Test
             </Typography>
             <Typography component="p">
-              {visualizerData.applicationInstance.label}
+              {visualizerData.visualizers.label}
             </Typography>
           </CardContent>
         </CardActionArea>
@@ -78,25 +78,26 @@ class VisualizerCard extends React.Component {
           >
             <DialogTitle>
               <Typography variant="headline" gutterBottom>
-                Pipelines Browser
+                Data sources Browser
               </Typography>
             </DialogTitle>
             <DialogContent>
               <Typography variant="body1">
-                Each discovered pipeline presents a sequence of transformations
-                that have to be applied to the data so that it can be visualized
-                using this visualizer. Notice that different pipelines will give
-                different outputs. You need to try them manually.
+                Each discovered data source contain a set of pipelines that
+                present a sequence of transformations that have to be applied to
+                the data so that it can be visualized using this visualizer.
+                Notice that different data sources will trigger different
+                pipelines and give different outputs.
               </Typography>
               <p>
                 <Typography variant="body2">
-                  To create an application, first run a pipeline from the table
-                  below.
+                  To create an application, first run a pipeline by selecting
+                  the required data source from the table below.
                 </Typography>
               </p>
-              <PipelinesTable
+              <DataSourcesTable
                 discoveryId={discoveryId}
-                pipelines={visualizerData.pipelines}
+                dataSourceGroups={visualizerData.dataSourceGroups}
               />
             </DialogContent>
             <DialogActions>
