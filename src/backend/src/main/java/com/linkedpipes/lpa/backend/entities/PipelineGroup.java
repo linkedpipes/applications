@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PipelineGroup {
-
-    public ApplicationInstance visualizers;
+    public ApplicationInstance visualizer;
     public List<DataSourceGroup> dataSourceGroups;
 
     public PipelineGroup(){

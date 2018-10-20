@@ -19,6 +19,7 @@ public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
+    private static final String CONFIG_FILE_NAME = "config.properties";
 
     @Bean
     @SuppressWarnings("unused")
@@ -46,7 +47,7 @@ public class Application {
 
         private static Properties loadConfig() {
             Properties config = new Properties();
-            try (InputStream stream = Application.class.getResourceAsStream("config.properties")) {
+            try (InputStream stream = Application.class.getResourceAsStream(CONFIG_FILE_NAME)) {
                 config.load(new InputStreamReader(stream, Application.DEFAULT_CHARSET));
             } catch (IOException ex) {
                 logger.error("Failed to load application configuration", ex);
