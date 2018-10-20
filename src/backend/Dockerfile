@@ -9,7 +9,7 @@ ADD --chown=gradle . /app
 WORKDIR /app
 
 # build the app
-RUN gradle build
+RUN gradle build -x test
 
 FROM openjdk:10-jre-slim
 
