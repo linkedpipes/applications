@@ -26,7 +26,7 @@ The whole app can be run using [docker compose](https://docs.docker.com/compose/
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/config.properties -o config.properties &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose-master.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx.conf -o  nginx.conf &&
-docker-compose pull backend && docker-compose pull frontend && docker ps -a -q -f name=lpa_* &&
+docker-compose pull backend && docker-compose pull frontend && docker rm $(docker ps -a -q -f name=lpa_*) &&
 docker-compose up
 ``` 
 
