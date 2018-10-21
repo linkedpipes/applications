@@ -10,6 +10,7 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
+import Layout from "../GoogleMapsVisualizer/Layout";
 
 const styles = theme => ({
   root: {
@@ -117,6 +118,7 @@ class CreateAppStepper extends React.Component {
             </Button>
           </Paper>
         )}
+        <Layout></Layout>
       </div>
     );
   }
