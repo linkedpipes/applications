@@ -26,9 +26,15 @@ The whole app can be run using [docker compose](https://docs.docker.com/compose/
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/config.properties -o config.properties &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx.conf -o  nginx.conf &&
-docker-compose pull backend && docker-compose pull frontend && docker rm $(docker ps -a -q -f name=lpa_*) &&
-docker-compose up
+docker-compose pull backend && docker-compose pull frontend && docker-compose up
 ``` 
+
+If it fails it can be because you already have some container with the same names running. You can delete these containers with the
+following command:s
+
+```bash
+ $ docker rm $(docker ps -a -q -f name=lpa_*)
+```
 
 
 ## Manual start
