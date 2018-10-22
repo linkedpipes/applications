@@ -9,7 +9,7 @@ ADD --chown=gradle . /app
 WORKDIR /app
 
 # build the app
-RUN gradle build
+RUN gradle build -x test
 
 FROM openjdk:10-jre-slim
 
@@ -18,7 +18,7 @@ EXPOSE 8080
 
 COPY --from=builder /app/build/libs/backend-0.0.1.jar /app/app.jar
 
-COPY src/data/rdf/base.ttl /app/src/data/rdf/base.ttl
+COPY src/main/resources/com/linkedpipes/lpa/backend/services/base.ttl /app/src/data/rdf/base.ttl
 
 WORKDIR /app
 

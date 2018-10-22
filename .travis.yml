@@ -16,7 +16,7 @@ matrix:
         - yarn run build
 
     - language: java
-      jdk: oraclejdk10
+      jdk: openjdk10
       before_script:
         - cd src/backend
       script:

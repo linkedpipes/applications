@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 public class ExecutionStatus {
+
     @SerializedName("status")
     public EtlStatus status;
 
@@ -13,4 +14,5 @@ public class ExecutionStatus {
 
     @SerializedName("executionFinished")
     public Date finished;
+
 }

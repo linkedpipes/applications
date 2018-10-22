@@ -15,7 +15,7 @@ services:
     image: linkedpipes/applications:backend
     container_name: lpa_backend
     volumes:
-      - "./src/backend/config.properties:/app/config.properties"
+      - "./config.properties:/app/config.properties"
 
   frontend:
     image: linkedpipes/applications:frontend

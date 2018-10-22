@@ -5,3 +5,9 @@ export const addDiscoveryIdAction = ({ id } = {}) => ({
     id: id
   }
 });
+
+// ADD_SELECTED_VIZUALIZER
+export const addSelectedVisualizerAction = ({ data } = {}) => ({
+  type: "SET_SELECTED_VISUALIZER",
+  selectedVisualizer: data
+});
