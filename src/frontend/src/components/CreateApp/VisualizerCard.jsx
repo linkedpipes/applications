@@ -81,7 +81,7 @@ class VisualizerCard extends React.Component {
               Test
             </Typography>
             <Typography component="p">
-              {visualizerData.visualizers.label}
+              {visualizerData.visualizer.label}
             </Typography>
           </CardContent>
         </CardActionArea>
