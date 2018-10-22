@@ -1,23 +1,23 @@
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import IconButton from '@material-ui/core/IconButton';
-import Slide from '@material-ui/core/Slide';
-import { withStyles } from '@material-ui/core/styles';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import PropTypes from 'prop-types';
-import React from 'react';
-import MyMapComponent from './GoogleMapsVisualizer';
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import IconButton from "@material-ui/core/IconButton";
+import Slide from "@material-ui/core/Slide";
+import { withStyles } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import CloseIcon from "@material-ui/icons/Close";
+import PropTypes from "prop-types";
+import React from "react";
+import MyMapComponent from "./GoogleMapsVisualizer";
 
 const styles = {
   appBar: {
-    position: 'relative',
+    position: "relative"
   },
   flex: {
-    flex: 1,
-  },
+    flex: 1
+  }
 };
 
 function Transition(props) {
@@ -39,9 +39,23 @@ class FullScreenDialog extends React.Component {
 
   render() {
     const { classes } = this.props;
-    this.markers = [{uri: "uri1", coordinates: { lat: -34.300, lng: 149.644 }, title: "marker title1" },
-        {uri: "uri2", coordinates: { lat: -34.300, lng: 152.644 }, title: "marker title2" },
-        {uri: "uri3", coordinates: { lat: -35.300, lng: 149.644 }, title: "marker title3" }];
+    this.markers = [
+      {
+        uri: "uri1",
+        coordinates: { lat: -34.3, lng: 149.644 },
+        title: "marker title1"
+      },
+      {
+        uri: "uri2",
+        coordinates: { lat: -34.3, lng: 152.644 },
+        title: "marker title2"
+      },
+      {
+        uri: "uri3",
+        coordinates: { lat: -35.3, lng: 149.644 },
+        title: "marker title3"
+      }
+    ];
     return (
       <div>
         <Button onClick={this.handleClickOpen}>Show map</Button>
@@ -53,10 +67,18 @@ class FullScreenDialog extends React.Component {
         >
           <AppBar className={classes.appBar}>
             <Toolbar>
-              <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+              <IconButton
+                color="inherit"
+                onClick={this.handleClose}
+                aria-label="Close"
+              >
                 <CloseIcon />
               </IconButton>
-              <Typography variant="title" color="inherit" className={classes.flex}>
+              <Typography
+                variant="title"
+                color="inherit"
+                className={classes.flex}
+              >
                 Output preview
               </Typography>
               <Button color="inherit" onClick={this.handleClose}>
