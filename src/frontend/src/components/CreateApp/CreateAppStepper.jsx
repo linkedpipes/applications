@@ -11,6 +11,10 @@ import Typography from "@material-ui/core/Typography";
 import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
 import Layout from "../GoogleMapsVisualizer/Layout";
+import connect from "react-redux/lib/connect/connect";
+import DataSourcesTable from "./DataSourcesTable";
+
+import Grid from "@material-ui/core/Grid";
 
 const styles = theme => ({
   root: {
@@ -25,11 +29,19 @@ const styles = theme => ({
   },
   resetContainer: {
     padding: theme.spacing.unit * 3
+  },
+  createAppButtons: {
+    justifyContent: "center"
   }
 });
 
 function getSteps() {
-  return ["Add Data Sources", "Select visualizer"];
+  return [
+    "Add Data Source IRIs",
+    "Pick a visualizer",
+    "Pick a source for execution",
+    "Preview & create app"
+  ];
 }
 
 class CreateAppStepper extends React.Component {
@@ -38,11 +50,45 @@ class CreateAppStepper extends React.Component {
   };
 
   getStepContent(step) {
+    const { discoveryId, selectedVisualizer, classes } = this.props;
+
     switch (step) {
       case 0:
         return <SelectSources handleNextStep={this.handleNext} />;
       case 1:
-        return <VisualizerCardCollectionView />;
+        return (
+          <VisualizerCardCollectionView handleNextStep={this.handleNext} />
+        );
+      case 2:
+        return (
+          <DataSourcesTable
+            handleNextStep={this.handleNext}
+            discoveryId={discoveryId}
+            dataSourceGroups={
+              selectedVisualizer !== undefined
+                ? selectedVisualizer.dataSourceGroups
+                : selectedVisualizer
+            }
+          />
+        );
+      case 3:
+        return (
+          <Grid container justify="center">
+            <Paper>
+              <Button onClick={this.handleBack} className={classes.button}>
+                Preview Data
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.handleNext}
+                className={classes.button}
+              >
+                Create App
+              </Button>
+            </Paper>
+          </Grid>
+        );
       default:
         return "Unknown step";
     }
@@ -94,14 +140,16 @@ class CreateAppStepper extends React.Component {
                         >
                           Back
                         </Button>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={this.handleNext}
-                          className={classes.button}
-                        >
-                          {activeStep === steps.length - 1 ? "Finish" : "Next"}
-                        </Button>
+                        {activeStep === steps.length && (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={this.handleNext}
+                            className={classes.button}
+                          >
+                            "Finish"
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -118,7 +166,7 @@ class CreateAppStepper extends React.Component {
             </Button>
           </Paper>
         )}
-        <Layout></Layout>
+        <Layout />
       </div>
     );
   }
@@ -128,4 +176,11 @@ CreateAppStepper.propTypes = {
   classes: PropTypes.object
 };
 
-export default withStyles(styles)(CreateAppStepper);
+const mapStateToProps = state => {
+  return {
+    discoveryId: state.globals.discoveryId,
+    selectedVisualizer: state.globals.selectedVisualizer
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(CreateAppStepper));
