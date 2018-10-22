@@ -263,6 +263,9 @@ class DataSourcesTable extends React.Component {
 
         response += status;
 
+        // TODO : hack value
+        response = "Success";
+
         if (
           status === ETL_STATUS_TYPE.Finished ||
           status === ETL_STATUS_TYPE.Cancelled ||
@@ -272,8 +275,11 @@ class DataSourcesTable extends React.Component {
           let loadingButtons = self.state.loadingButtons;
           delete loadingButtons[loadingButtonId];
           self.setState({ loadingButtons: loadingButtons });
-
           toast.info(response, { autoClose: EXECUTION_STATUS_TIMEOUT });
+
+          setTimeout(function() {
+            self.props.handleNextStep();
+          }, 500);
         } else {
           setTimeout(() => {
             self.checkExecutionStatus(pipelineId, loadingButtonId);

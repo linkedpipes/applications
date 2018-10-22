@@ -42,7 +42,7 @@ class VisualizerCardCollectionView extends React.Component {
   };
 
   render() {
-    const { classes, visualizers, discoveryId } = this.props;
+    const { classes, visualizers, discoveryId, handleNextStep } = this.props;
     const { spacing } = this.state;
 
     return (
@@ -73,6 +73,7 @@ class VisualizerCardCollectionView extends React.Component {
                 <VisualizerCard
                   visualizerData={value}
                   discoveryId={discoveryId}
+                  handleNextStep={handleNextStep}
                 />
               </Grid>
             ))
