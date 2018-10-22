@@ -1,4 +1,5 @@
 import {
+  BASE_URL,
   DISCOVER_FROM_INPUT_URL,
   DISCOVER_FROM_URI_LIST_URL,
   PIPELINE_GROUPS_URL,
@@ -65,4 +66,8 @@ export async function getExecutePipeline({ etlPipelineIri }) {
 
 export async function getExecutionStatus({ executionIri }) {
   return rest(EXECUTION_STATUS_URL(executionIri), undefined, "GET", undefined);
+}
+
+export async function getMarkers (applicationId, pipelineIri){
+  return rest(`${BASE_URL}map/markers`, null, "GET", null);
 }

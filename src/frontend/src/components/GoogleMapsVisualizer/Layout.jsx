@@ -10,6 +10,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import PropTypes from "prop-types";
 import React from "react";
 import MyMapComponent from "./GoogleMapsVisualizer";
+import { getMarkers } from "../../_services/discovery.service";
+
 
 const styles = {
   appBar: {
@@ -28,7 +30,7 @@ class FullScreenDialog extends React.Component {
   state = {
     open: false
   };
-
+  
   handleClickOpen = () => {
     this.setState({ open: true });
   };
@@ -37,27 +39,33 @@ class FullScreenDialog extends React.Component {
     this.setState({ open: false });
   };
 
+  componentDidMount(){
+    getMarkers(null, null)
+      .then(response => {console.log(response);this.markers=response}, error => {console.error(error)})
+  }
+
   render() {
     const { classes } = this.props;
-    this.markers = [
-      {
-        uri: "uri1",
-        coordinates: { lat: -34.3, lng: 149.644 },
-        title: "marker title1"
-      },
-      {
-        uri: "uri2",
-        coordinates: { lat: -34.3, lng: 152.644 },
-        title: "marker title2"
-      },
-      {
-        uri: "uri3",
-        coordinates: { lat: -35.3, lng: 149.644 },
-        title: "marker title3"
-      }
-    ];
+    // this.markers = [
+    //   {
+    //     uri: "uri1",
+    //     coordinates: { lat: -34.3, lng: 149.644 },
+    //     title: "marker title1"
+    //   },
+    //   {
+    //     uri: "uri2",
+    //     coordinates: { lat: -34.3, lng: 152.644 },
+    //     title: "marker title2"
+    //   },
+    //   {
+    //     uri: "uri3",
+    //     coordinates: { lat: -35.3, lng: 149.644 },
+    //     title: "marker title3"
+    //   }
+    // ];
     return (
       <div>
+        <Button onClick={this.handleClickOpen}>Preview</Button>
         <Dialog
           fullScreen
           open={this.state.open}
@@ -87,7 +95,7 @@ class FullScreenDialog extends React.Component {
           </AppBar>
 
           <MyMapComponent
-            markers={this.markers}
+            markers={null}
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
             loadingElement={<div style={{ height: `100%` }} />}
             containerElement={<div style={{ height: `100%` }} />}

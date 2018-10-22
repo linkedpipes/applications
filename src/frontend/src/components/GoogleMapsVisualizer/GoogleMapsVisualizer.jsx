@@ -10,15 +10,22 @@ import React from "react";
 const MyMapComponent = withScriptjs(
   withGoogleMap(props => {
     return (
-      <GoogleMap defaultZoom={8} defaultCenter={{ lat: -34.397, lng: 150.644 }}>
-        <MarkerClusterer averageCenter enableRetinaIcons gridSize={60}>
-          {props.markers.map((marker, index) => (
+      <GoogleMap 
+        defaultZoom={8}
+        defaultCenter={{ lat: -34.397, lng: 150.644 }}>
+        
+        <MarkerClusterer 
+          averageCenter 
+          enableRetinaIcons 
+          gridSize={60}>
+
+          {props.markers && props.markers.map((marker, index) => (
             <Marker
               key={marker.uri}
               position={marker.coordinates}
               onClick={() => console.log("clicked")}
-              defaultAnimation={null}
-            />
+              defaultAnimation={null}>
+          </Marker>
           ))}
         </MarkerClusterer>
       </GoogleMap>

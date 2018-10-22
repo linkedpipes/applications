@@ -75,7 +75,7 @@ class CreateAppStepper extends React.Component {
         return (
           <Grid container justify="center">
             <Paper>
-              <Button className={classes.button}>Preview Data</Button>
+              <Layout></Layout>
               <Button
                 variant="contained"
                 color="primary"
