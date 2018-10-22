@@ -146,7 +146,7 @@ class CreateAppStepper extends React.Component {
                             onClick={this.handleNext}
                             className={classes.button}
                           >
-                            "Finish"
+                            Finish
                           </Button>
                         )}
                       </div>
