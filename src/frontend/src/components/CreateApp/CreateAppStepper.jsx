@@ -75,7 +75,8 @@ class CreateAppStepper extends React.Component {
         return (
           <Grid container justify="center">
             <Paper>
-              <Layout></Layout>
+              <Layout />
+
               <Button
                 variant="contained"
                 color="primary"
@@ -164,7 +165,6 @@ class CreateAppStepper extends React.Component {
             </Button>
           </Paper>
         )}
-        <Layout />
       </div>
     );
   }

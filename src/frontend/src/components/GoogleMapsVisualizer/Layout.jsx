@@ -12,15 +12,18 @@ import React from "react";
 import MyMapComponent from "./GoogleMapsVisualizer";
 import { getMarkers } from "../../_services/discovery.service";
 
-
-const styles = {
+const styles = theme => ({
   appBar: {
     position: "relative"
   },
   flex: {
     flex: 1
+  },
+  button: {
+    marginTop: theme.spacing.unit,
+    marginRight: theme.spacing.unit
   }
-};
+});
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -28,9 +31,10 @@ function Transition(props) {
 
 class FullScreenDialog extends React.Component {
   state = {
-    open: false
+    open: false,
+    markers: []
   };
-  
+
   handleClickOpen = () => {
     this.setState({ open: true });
   };
@@ -39,33 +43,31 @@ class FullScreenDialog extends React.Component {
     this.setState({ open: false });
   };
 
-  componentDidMount(){
+  componentDidMount() {
+    const self = this;
+
     getMarkers(null, null)
-      .then(response => {console.log(response);this.markers=response}, error => {console.error(error)})
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(err) {
+          console.log(err);
+        }
+      )
+      .then(function(jsonResponse) {
+        self.setState({ markers: jsonResponse });
+      });
   }
 
   render() {
     const { classes } = this.props;
-    // this.markers = [
-    //   {
-    //     uri: "uri1",
-    //     coordinates: { lat: -34.3, lng: 149.644 },
-    //     title: "marker title1"
-    //   },
-    //   {
-    //     uri: "uri2",
-    //     coordinates: { lat: -34.3, lng: 152.644 },
-    //     title: "marker title2"
-    //   },
-    //   {
-    //     uri: "uri3",
-    //     coordinates: { lat: -35.3, lng: 149.644 },
-    //     title: "marker title3"
-    //   }
-    // ];
+    const { markers } = this.state;
     return (
-      <div>
-        <Button onClick={this.handleClickOpen}>Preview</Button>
+      <span>
+        <Button className={classes.button} onClick={this.handleClickOpen}>
+          Preview
+        </Button>
         <Dialog
           fullScreen
           open={this.state.open}
@@ -89,20 +91,20 @@ class FullScreenDialog extends React.Component {
                 Output preview
               </Typography>
               <Button color="inherit" onClick={this.handleClose}>
-                Continue
+                Create App
               </Button>
             </Toolbar>
           </AppBar>
 
           <MyMapComponent
-            markers={null}
+            markers={markers}
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
             loadingElement={<div style={{ height: `100%` }} />}
             containerElement={<div style={{ height: `100%` }} />}
             mapElement={<div style={{ height: `100%` }} />}
           />
         </Dialog>
-      </div>
+      </span>
     );
   }
 }
