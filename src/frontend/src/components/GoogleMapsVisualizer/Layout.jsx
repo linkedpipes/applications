@@ -64,14 +64,14 @@ class FullScreenDialog extends React.Component {
               </Button>
             </Toolbar>
           </AppBar>
-            
-            <MyMapComponent
-                markers={this.markers}
-                googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places"
-                loadingElement={<div style={{ height: `100%` }} />}
-                containerElement={<div style={{ height: `100%` }} />}
-                mapElement={<div style={{ height: `100%` }} />}
-            />
+
+          <MyMapComponent
+            markers={this.markers}
+            googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
+            loadingElement={<div style={{ height: `100%` }} />}
+            containerElement={<div style={{ height: `100%` }} />}
+            mapElement={<div style={{ height: `100%` }} />}
+          />
         </Dialog>
       </div>
     );
