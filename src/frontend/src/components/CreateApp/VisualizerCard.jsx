@@ -8,11 +8,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import DataSourcesTable from "./DataSourcesTable";
+import connect from "react-redux/lib/connect/connect";
+import { addSelectedVisualizerAction } from "../../_actions/globals";
 
 const styles = {
   root: {
@@ -44,6 +41,28 @@ class VisualizerCard extends React.Component {
     this.setState({ pipelinesDialogOpen: false });
   };
 
+  addSelectedVisualizer = visualizerData => {
+    const self = this;
+
+    return new Promise((resolve, reject) => {
+      self.props.dispatch(
+        addSelectedVisualizerAction({
+          data: visualizerData
+        })
+      );
+      resolve();
+    });
+  };
+
+  handleSelectVisualizer = () => {
+    const self = this;
+    const visualizerData = self.props.visualizerData;
+
+    self.addSelectedVisualizer(visualizerData).then(function() {
+      self.props.handleNextStep();
+    });
+  };
+
   render() {
     const { classes, visualizerData, discoveryId } = this.props;
     const { pipelinesDialogOpen } = this.state;
@@ -67,45 +86,13 @@ class VisualizerCard extends React.Component {
           </CardContent>
         </CardActionArea>
         <CardActions classes={{ root: classes.root }}>
-          <Button size="small" color="primary" onClick={this.handleOpen}>
-            Browse Pipelines
-          </Button>
-          <Dialog
-            fullWidth={true}
-            maxWidth="md"
-            open={pipelinesDialogOpen}
-            onClose={this.handleClose}
+          <Button
+            size="small"
+            color="primary"
+            onClick={this.handleSelectVisualizer}
           >
-            <DialogTitle>
-              <Typography variant="headline" gutterBottom>
-                Data sources Browser
-              </Typography>
-            </DialogTitle>
-            <DialogContent>
-              <Typography variant="body1">
-                Each discovered data source contain a set of pipelines that
-                present a sequence of transformations that have to be applied to
-                the data so that it can be visualized using this visualizer.
-                Notice that different data sources will trigger different
-                pipelines and give different outputs.
-              </Typography>
-              <p>
-                <Typography variant="body2">
-                  To create an application, first run a pipeline by selecting
-                  the required data source from the table below.
-                </Typography>
-              </p>
-              <DataSourcesTable
-                discoveryId={discoveryId}
-                dataSourceGroups={visualizerData.dataSourceGroups}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button color="primary" onClick={this.handleClose}>
-                OK
-              </Button>
-            </DialogActions>
-          </Dialog>
+            Select Vizualizer
+          </Button>
         </CardActions>
       </Card>
     );
@@ -116,4 +103,4 @@ VisualizerCard.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(VisualizerCard);
+export default connect()(withStyles(styles)(VisualizerCard));
