@@ -7,12 +7,12 @@ const PIPELINE_URL = BASE_URL + "pipeline/";
 const DISCOVERY_URL = BASE_URL + "discovery/";
 const EXECUTION_URL = BASE_URL + "execution/";
 
-
 export const DISCOVER_FROM_INPUT_URL = PIPELINES_URL + "discoverFromInput";
 export const DISCOVER_FROM_URI_LIST_URL = PIPELINES_URL + "discover";
 export const PIPELINE_GROUPS_URL = discoveryId => {
   return DISCOVERY_URL + discoveryId + "/pipelineGroups";
 };
+export const GET_MARKERS_URL = BASE_URL + "map/markers";
 
 export const ETL_STATUS_MAP = {
   "http://etl.linkedpipes.com/resources/status/queued": "Queued",
