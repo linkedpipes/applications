@@ -58,7 +58,6 @@ class FullScreenDialog extends React.Component {
     ];
     return (
       <div>
-        <Button onClick={this.handleClickOpen}>Show map</Button>
         <Dialog
           fullScreen
           open={this.state.open}
