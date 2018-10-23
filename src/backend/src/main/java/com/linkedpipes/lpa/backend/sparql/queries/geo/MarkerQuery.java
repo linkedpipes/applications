@@ -61,7 +61,13 @@ public class MarkerQuery implements SparqlQuery {
                 .addOptional(S, NAME, ST)
                 .addOptional(S, DESCRIPTION, SD)
 
+                //TODO also add filter restrictions once filter data is passed to method
+
                 .buildString();
+    }
+
+    private void getFilterConditions(){
+        //TODO
     }
 
     public static void main(String[] args) {

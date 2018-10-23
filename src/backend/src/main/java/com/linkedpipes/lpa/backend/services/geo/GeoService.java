@@ -10,6 +10,7 @@ import java.util.List;
 public class GeoService {
 
     public List<Marker> getMarkers(){
+        //TODO run sparql query to get markers here using SparqlService class
         return new ArrayList<>();
     }
 

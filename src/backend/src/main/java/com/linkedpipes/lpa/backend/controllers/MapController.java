@@ -22,7 +22,7 @@ public class MapController {
 
     @RequestMapping("/api/map/markers")
     public ResponseEntity<?> markers() {
-        //TODO implement
+        //TODO call geoService to get actual markers
         List<Marker> dummyMarkers = new ArrayList<>();
         dummyMarkers.add(new Marker("testUri1", new Coordinate(7.84624, -59.40816)));
         dummyMarkers.add(new Marker("testUri2", new Coordinate(65.33371, 111.46105)));
