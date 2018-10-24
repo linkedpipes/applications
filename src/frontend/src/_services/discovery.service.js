@@ -1,10 +1,12 @@
 import {
+  BASE_URL,
   DISCOVER_FROM_INPUT_URL,
   DISCOVER_FROM_URI_LIST_URL,
   PIPELINE_GROUPS_URL,
   EXECUTE_PIPELINE_URL,
   EXPORT_PIPELINE_URL,
-  EXECUTION_STATUS_URL
+  EXECUTION_STATUS_URL,
+  GET_MARKERS_URL
 } from "../_constants";
 
 import "whatwg-fetch";
@@ -65,4 +67,8 @@ export async function getExecutePipeline({ etlPipelineIri }) {
 
 export async function getExecutionStatus({ executionIri }) {
   return rest(EXECUTION_STATUS_URL(executionIri), undefined, "GET", undefined);
+}
+
+export async function getMarkers(applicationId, pipelineIri) {
+  return rest(GET_MARKERS_URL, null, "GET", null);
 }

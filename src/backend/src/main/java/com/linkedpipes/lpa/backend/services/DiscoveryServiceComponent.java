@@ -48,7 +48,7 @@ public class DiscoveryServiceComponent {
         for (JsonElement appGroup : appGroups) {
             PipelineGroup pipelineGrp = new PipelineGroup();
             JsonObject appGroupObj = appGroup.getAsJsonObject();
-            pipelineGrp.visualizers = gson.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
+            pipelineGrp.visualizer = gson.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
 
             JsonArray dataSourceGroups = appGroupObj.getAsJsonArray("dataSourceGroups");
 

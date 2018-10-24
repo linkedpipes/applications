@@ -384,6 +384,7 @@ class PipelinesTable extends React.Component {
                             id={"button_" + pipeline.id}
                             size="small"
                             variant="contained"
+                            disabled={loadingButtons.length > 1}
                             color="secondary"
                             onClick={() => {
                               self.exportAndStartPolling(
