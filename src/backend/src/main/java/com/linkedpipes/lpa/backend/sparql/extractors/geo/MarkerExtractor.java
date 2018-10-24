@@ -23,8 +23,11 @@ public class MarkerExtractor {
                     new Marker(qs.getResource("s").getURI(),
                     new Coordinate(NumberParserUtils.tryParseDouble(qs.getLiteral("lat").getString()), NumberParserUtils.tryParseDouble(qs.getLiteral("lng").getString())),
                             "", ""
+                            //TODO extract label and description from queryExec
                     ));
         }
+
+        markers.removeIf(m -> (m.coordinates.lat == null || m.coordinates.lng == null));
 
         return markers;
     }
