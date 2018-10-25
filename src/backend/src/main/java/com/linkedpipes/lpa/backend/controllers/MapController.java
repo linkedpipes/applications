@@ -24,9 +24,9 @@ public class MapController {
     public ResponseEntity<?> markers() {
         //TODO call geoService to get actual markers
         List<Marker> dummyMarkers = new ArrayList<>();
-        dummyMarkers.add(new Marker("testUri1", new Coordinate(7.84624, -59.40816)));
-        dummyMarkers.add(new Marker("testUri2", new Coordinate(65.33371, 111.46105)));
-        dummyMarkers.add(new Marker("testUri3", new Coordinate(31.23245, -80.42539)));
+        dummyMarkers.add(new Marker("testUri1", new Coordinate(7.84624, -59.40816), "", ""));
+        dummyMarkers.add(new Marker("testUri2", new Coordinate(65.33371, 111.46105), "", ""));
+        dummyMarkers.add(new Marker("testUri3", new Coordinate(31.23245, -80.42539), "", ""));
 
         return ResponseEntity.ok(dummyMarkers);
     }

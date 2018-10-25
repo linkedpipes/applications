@@ -55,9 +55,9 @@ public class MarkerQuery implements SparqlQuery {
     public String get() {
         SelectBuilder builder = new SelectBuilder()
 
-                .addPrefix(SKOS_PREFIX, SparqlUtils.formatUri(SKOS_PREFIX_URL))
-                .addPrefix(SCHEMA_PREFIX, SparqlUtils.formatUri(SCHEMA_PREFIX_URL))
-                .addPrefix(RDFS_PREFIX, SparqlUtils.formatUri(RDFS_PREFIX_URL))
+                .addPrefix(SKOS_PREFIX, SKOS_PREFIX_URL)
+                .addPrefix(SCHEMA_PREFIX, SCHEMA_PREFIX_URL)
+                .addPrefix(RDFS_PREFIX, RDFS_PREFIX_URL)
 
                 .addVar(S)
                 .addVar(LAT)
