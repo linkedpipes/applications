@@ -22,57 +22,48 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
 
-`$ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose.yml -o docker-compose.yml; docker-compose up`
+```bash
+$ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties -o config.properties &&
+curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
+curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx.conf -o  nginx.conf &&
+docker-compose pull backend && docker-compose pull frontend && docker-compose up
+``` 
+
+If it fails it can be because you already have some container with the same names running. You can delete these containers with the
+following command:s
+
+```bash
+ $ docker rm $(docker ps -a -q -f name=lpa_*)
+```
+
 
 ## Manual start
 
-### Running backend
+You can also run the whole application by directly from the code in the repository. 
 
-#### Using docker
+First download the whole repository into your computer by running
 
-##### Building image locally
+```bash
+$ git clone https://github.com/linkedpipes/applications.git lpa
+```
 
-In case you want to build the image locally, follow the next steps:
+Then set your working directory to the one that you just downloaded:
 
-- Navigate to the backend folder
+```bash
+$ cd lpa
+```
 
-`$ cd src/backend`
+Finally, execute
 
-- Build the image by executing in the project's root folder the next command, replacing `<some_tag>` by the name you want the image to have
+```bash
+(lpa)$ docker-compose up --build
+```
 
-`$ docker build -t <some_tag> .`
+You should be able to access the application at `localhost:9001`
 
-##### Running the image
 
-The Docker image for this project is hosted in [Docker Hub](https://hub.docker.com/r/linkedpipes/application/) so to run the application you just need to execute (given that you have Docker installed):
+You can also customize some settings in the following files:
 
-`$ docker run --name <container name> -p 5000:8080 <some_tag>`
-
-The application should then by available through port `5000`.
-Custom configuration can be supplied via `-v <path to config.properties>:/app/config.properties` if needed.
-
-### Running frontend
-
-#### Running locally
-
-1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
-2. Navigate to frontend folder by executing following commands from root folder.
-   `$ cd src/frontend`
-3. Installing dependencies. Depending on user's preference execute the command below.
-   3.1. If you are using `npm` then : `$ npm install`
-   3.2. If you are using `yarn` then : `$ yarn install`
-4. Running the web-app on `localhost`. Depending on user's preference execute the command below.
-   4.1. If you are using `npm` then : `$ npm run startLocalDev`
-   4.2. If you are using `yarn` then : `$ yarn run startLocalDev`
-
-After step `4` navigate to `localhost:9000` in browser. Please note that the frontend app currently expects to have local instance of backend running at port `8080`. To run backend, execute ./gradlew bootRun inside backend folder
-
-#### Using Docker
-
-1. Make sure that you are currently switched to `frontend` branch since `develop` does not contain frontend code yet.
-2. Navigate to frontend folder by executing following commands from root folder.
-   `$ cd src/frontend`
-3. Build the image by running:
-   `$ docker build -t frontend .`
-4. Running the image by running:
-   `$ docker run frontend -p 9000:9000`
+- `docker-compose.yml`
+- `nginx.conf`
+- `src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties`
