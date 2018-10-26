@@ -1,5 +1,4 @@
 // Expenses Reducer
-
 const datasourceReducerDefaultState = [];
 
 export default (state = datasourceReducerDefaultState, action) => {
