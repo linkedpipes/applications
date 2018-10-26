@@ -10,10 +10,10 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
-import GoogleMapsPopup from "../Visualizers";
 import connect from "react-redux/lib/connect/connect";
 import DataSourcesTable from "./DataSourcesTable";
 import Grid from "@material-ui/core/Grid";
+import { GoogleMapsPopup } from "../Visualizers";
 
 const styles = theme => ({
   root: {

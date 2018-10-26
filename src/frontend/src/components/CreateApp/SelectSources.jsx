@@ -11,7 +11,7 @@ import { addVisualizer } from "../../_actions/visualizers";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DiscoveryService } from "../../_services";
-import { extractUrlGroups } from "../../_helpers/utils";
+import { extractUrlGroups } from "../../_helpers";
 import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";

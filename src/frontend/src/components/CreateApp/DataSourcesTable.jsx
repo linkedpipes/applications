@@ -13,11 +13,14 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
-import { DiscoveryService } from "../../_services";
+import {
+  DiscoveryService,
+  ETL_STATUS_MAP,
+  ETL_STATUS_TYPE
+} from "../../_services";
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
 import { toast } from "react-toastify";
-import { API } from "../../_constants";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 function desc(a, b, orderBy) {
@@ -255,7 +258,7 @@ class DataSourcesTable extends React.Component {
       )
       .then(function(json) {
         let response = "Status: ";
-        let status = API.ETL_STATUS_MAP[json.status.id];
+        let status = ETL_STATUS_MAP[json.status.id];
 
         if (status === undefined) {
           console.log("Unkown status for checking pipeline execution");
@@ -267,10 +270,11 @@ class DataSourcesTable extends React.Component {
         response = "Success";
 
         if (
-          status === API.ETL_STATUS_TYPE.Finished ||
-          status === API.ETL_STATUS_TYPE.Cancelled ||
-          status === API.ETL_STATUS_TYPE.Unknown ||
-          status === API.ETL_STATUS_TYPE.Failed
+          status === ETL_STATUS_TYPE.Finished ||
+          status === ETL_STATUS_TYPE.Cancelled ||
+          status === ETL_STATUS_TYPE.Unknown ||
+          status === ETL_STATUS_TYPE.Failed ||
+          response === "Success"
         ) {
           let loadingButtons = self.state.loadingButtons;
           delete loadingButtons[loadingButtonId];

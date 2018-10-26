@@ -1,4 +1,5 @@
 import "whatwg-fetch";
+import { getQueryString } from "../_helpers";
 
 const rest = (
   url,
@@ -37,7 +38,7 @@ const PIPELINE_GROUPS_URL = discoveryId => {
 };
 const GET_MARKERS_URL = BASE_URL + "map/markers";
 
-const ETL_STATUS_MAP = {
+export const ETL_STATUS_MAP = {
   "http://etl.linkedpipes.com/resources/status/queued": "Queued",
   "http://etl.linkedpipes.com/resources/status/mapped": "Mapped",
   "http://etl.linkedpipes.com/resources/status/initializing": "Initializing",
@@ -49,7 +50,7 @@ const ETL_STATUS_MAP = {
   "http://etl.linkedpipes.com/resources/status/unknown": "Unknown"
 };
 
-const ETL_STATUS_TYPE = {
+export const ETL_STATUS_TYPE = {
   Mapped: "Mapped",
   Queued: "Queued",
   Initializing: "Initializing",
@@ -86,7 +87,7 @@ const EXECUTION_STATUS_URL = executionIri => {
   );
 };
 
-const DiscoveryService = {
+export const DiscoveryService = {
   postDiscoverFromTtl: async function({ ttlFile }) {
     return rest(DISCOVER_FROM_INPUT_URL, ttlFile, "POST", undefined);
   },
@@ -131,5 +132,3 @@ const DiscoveryService = {
     return rest(GET_MARKERS_URL, null, "GET", null);
   }
 };
-
-export default DiscoveryService;
