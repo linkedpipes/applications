@@ -10,13 +10,9 @@ import TextField from "@material-ui/core/TextField";
 import { addVisualizer } from "../../_actions/visualizers";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  postDiscoverFromTtl,
-  postDiscoverFromUriList,
-  getPipelineGroups
-} from "../../_services/discovery.service";
+import { DiscoveryService } from "../../_services";
 import { extractUrlGroups } from "../../_helpers/utils";
-import { getDatasourcesArray } from "../../selectors/datasources";
+import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
 
@@ -60,7 +56,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
+    DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
       .then(
         function(response) {
           return response.json();
@@ -106,7 +102,9 @@ class SelectSources extends React.Component {
     console.log(datasourcesForTTL);
 
     const self = this;
-    return postDiscoverFromUriList({ datasourceUris: datasourcesForTTL })
+    return DiscoveryService.postDiscoverFromUriList({
+      datasourceUris: datasourcesForTTL
+    })
       .then(
         function(response) {
           return response.json();
@@ -185,7 +183,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    return getPipelineGroups({ discoveryId: discoveryId })
+    return DiscoveryService.getPipelineGroups({ discoveryId: discoveryId })
       .then(
         function(response) {
           return response.json();

@@ -9,8 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import CloseIcon from "@material-ui/icons/Close";
 import PropTypes from "prop-types";
 import React from "react";
-import MyMapComponent from "./GoogleMapsVisualizer";
-import { getMarkers } from "../../_services/discovery.service";
+import GoogleMapsVisualizer from "./GoogleMapsVisualizer";
+import { DiscoveryService } from "../../../_services";
 
 const styles = theme => ({
   appBar: {
@@ -29,7 +29,7 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
-class FullScreenDialog extends React.Component {
+class GoogleMapsPopup extends React.Component {
   state = {
     open: false,
     markers: []
@@ -46,7 +46,7 @@ class FullScreenDialog extends React.Component {
   componentDidMount() {
     const self = this;
 
-    getMarkers(null, null)
+    DiscoveryService.getMarkers(null, null)
       .then(
         function(response) {
           return response.json();
@@ -96,7 +96,7 @@ class FullScreenDialog extends React.Component {
             </Toolbar>
           </AppBar>
 
-          <MyMapComponent
+          <GoogleMapsVisualizer
             markers={markers}
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
             loadingElement={<div style={{ height: `100%` }} />}
@@ -109,8 +109,8 @@ class FullScreenDialog extends React.Component {
   }
 }
 
-FullScreenDialog.propTypes = {
+GoogleMapsPopup.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(FullScreenDialog);
+export default withStyles(styles)(GoogleMapsPopup);
