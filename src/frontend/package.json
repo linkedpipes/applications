@@ -7,7 +7,7 @@
   "scripts": {
     "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:8080/api/ webpack-dev-server",
     "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ webpack-dev-server",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=development webpack"
   },
   "dependencies": {
     "@material-ui/core": "^3.1.2",
