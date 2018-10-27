@@ -78,7 +78,10 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
                 .addOptional(VAR_SUBJECT, PRED_LABEL, VAR_LABEL)
                 .addOptional(VAR_SUBJECT, PRED_NOTATION, VAR_NOTATION)
                 .addOptional(VAR_SUBJECT, PRED_NAME, VAR_NAME)
-                .addOptional(VAR_SUBJECT, PRED_DESCRIPTION, VAR_DESCRIPTION);
+                .addOptional(VAR_SUBJECT, PRED_DESCRIPTION, VAR_DESCRIPTION)
+
+                //TODO remove this limit once using our virtuoso endpoint
+                .setLimit(500);
 
         appendFilterConditions(builder);
 

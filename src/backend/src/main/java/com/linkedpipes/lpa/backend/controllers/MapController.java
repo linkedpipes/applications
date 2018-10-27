@@ -16,7 +16,7 @@ import java.util.Map;
 public class MapController {
 
     @RequestMapping("/api/map/markers")
-    public ResponseEntity<List<Marker>> markers(@RequestBody Map<String, List<ValueFilter>> filters) {
+    public ResponseEntity<List<Marker>> markers(@RequestBody(required=false) Map<String, List<ValueFilter>> filters) {
         return ResponseEntity.ok(GeoService.getMarkers(filters));
     }
 
