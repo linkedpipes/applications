@@ -7,7 +7,7 @@
   "scripts": {
     "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:8080/api/ webpack-dev-server",
     "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ webpack-dev-server",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=development webpack"
   },
   "dependencies": {
     "@material-ui/core": "^3.1.2",
@@ -23,11 +23,13 @@
     "babel-preset-react": "6.24.1",
     "css-loader": "^1.0.0",
     "dotenv-webpack": "^1.5.7",
+    "immutable": "3.8.x",
     "material-ui-chip-input": "^1.0.0-beta.6",
     "node-sass": "^4.9.3",
     "normalize.css": "^8.0.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-google-maps": "9.4.x",
     "react-json-view": "^1.19.1",
     "react-modal": "^3.5.1",
     "react-redux": "^5.0.7",
@@ -35,16 +37,13 @@
     "react-toastify": "^4.2.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
+    "reselect": "4.0.x",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.22.1",
     "validator": "10.6.0",
     "webpack": "4.16.5",
     "webpack-dev-server": "3.1.5",
-    "whatwg-fetch": "^2.0.4",
-	  "d3": "5.7.0",
-    "react-google-maps": "9.4.x",
-    "immutable": "3.8.x",
-    "reselect": "4.0.x"
+    "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
     "babel-eslint": "9",

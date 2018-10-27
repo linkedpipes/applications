@@ -10,11 +10,10 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
-import Layout from "../GoogleMapsVisualizer/Layout";
 import connect from "react-redux/lib/connect/connect";
 import DataSourcesTable from "./DataSourcesTable";
-
 import Grid from "@material-ui/core/Grid";
+import { GoogleMapsPopup } from "../Visualizers";
 
 const styles = theme => ({
   root: {
@@ -75,7 +74,7 @@ class CreateAppStepper extends React.Component {
         return (
           <Grid container justify="center">
             <Paper>
-              <Layout />
+              <GoogleMapsPopup />
 
               <Button
                 variant="contained"

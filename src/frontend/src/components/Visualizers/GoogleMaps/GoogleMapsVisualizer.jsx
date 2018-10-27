@@ -7,7 +7,7 @@ import {
 import MarkerClusterer from "react-google-maps/lib/components/addons/MarkerClusterer";
 import React from "react";
 
-const MyMapComponent = withScriptjs(
+const GoogleMapsVisualizer = withScriptjs(
   withGoogleMap(props => {
     return (
       <GoogleMap
@@ -30,4 +30,4 @@ const MyMapComponent = withScriptjs(
   })
 );
 
-export default MyMapComponent;
+export default GoogleMapsVisualizer;

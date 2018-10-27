@@ -14,14 +14,13 @@ import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
 import {
-  getExecutePipeline,
-  getExportPipeline,
-  getExecutionStatus
-} from "../../_services/discovery.service";
+  DiscoveryService,
+  ETL_STATUS_MAP,
+  ETL_STATUS_TYPE
+} from "../../_services";
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
 import { toast } from "react-toastify";
-import { ETL_STATUS_MAP, ETL_STATUS_TYPE } from "../../_constants";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 function desc(a, b, orderBy) {
@@ -181,7 +180,7 @@ class DataSourcesTable extends React.Component {
 
     console.log("Sending the execute pipeline request...");
 
-    return getExportPipeline({
+    return DiscoveryService.getExportPipeline({
       discoveryId: discoveryId,
       pipelineId: pipelineId
     })
@@ -214,7 +213,9 @@ class DataSourcesTable extends React.Component {
 
     console.log("Sending the execute pipeline request...");
 
-    return getExecutePipeline({ etlPipelineIri: etlPipelineIri })
+    return DiscoveryService.getExecutePipeline({
+      etlPipelineIri: etlPipelineIri
+    })
       .then(
         function(response) {
           return response.json();
@@ -243,7 +244,9 @@ class DataSourcesTable extends React.Component {
     let status = undefined;
     const self = this;
 
-    return getExecutionStatus({ executionIri: executionValues.executionIri })
+    return DiscoveryService.getExecutionStatus({
+      executionIri: executionValues.executionIri
+    })
       .then(
         function(response) {
           return response.json();
@@ -270,7 +273,8 @@ class DataSourcesTable extends React.Component {
           status === ETL_STATUS_TYPE.Finished ||
           status === ETL_STATUS_TYPE.Cancelled ||
           status === ETL_STATUS_TYPE.Unknown ||
-          status === ETL_STATUS_TYPE.Failed
+          status === ETL_STATUS_TYPE.Failed ||
+          response === "Success"
         ) {
           let loadingButtons = self.state.loadingButtons;
           delete loadingButtons[loadingButtonId];
