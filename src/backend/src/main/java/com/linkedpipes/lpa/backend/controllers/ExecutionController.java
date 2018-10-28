@@ -5,10 +5,7 @@ import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -22,8 +19,8 @@ public class ExecutionController {
         etlService = new EtlServiceComponent();
     }
 
-    @RequestMapping("/api/execution/status")
-    public ResponseEntity<?> getStatus(@RequestParam( value="executionIri") String executionIri) throws IOException{
+    @GetMapping("/api/execution/status")
+    public ResponseEntity<?> getStatus(@RequestParam(value = "executionIri") String executionIri) throws IOException {
         if(executionIri == null || executionIri.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }
@@ -32,9 +29,9 @@ public class ExecutionController {
         return ResponseEntity.ok(status);
     }
 
-    @RequestMapping("/api/execution/result")
+    @GetMapping("/api/execution/result")
     @ResponseBody
-    public ResponseEntity<?> getResult(@RequestParam( value="executionIri") String executionIri) throws IOException{
+    public ResponseEntity<?> getResult(@RequestParam(value = "executionIri") String executionIri) throws IOException {
         if(executionIri == null || executionIri.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
         }

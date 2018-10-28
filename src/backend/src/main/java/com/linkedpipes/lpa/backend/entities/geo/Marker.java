@@ -34,11 +34,14 @@ public class Marker {
                         row.getLiteral(VAR_LATITUDE).getDouble(),
                         row.getLiteral(VAR_LONGITUDE).getDouble()),
                 //for label, pick any one of the values for LABEL_VARIABLES (if any of them is set, otherwise null)
-                Optional.ofNullable(Arrays.stream(LABEL_VARIABLES).filter(v -> row.contains(v)).findFirst().orElse(null))
-                        .map(v -> row.getLiteral(v))
+                Arrays.stream(LABEL_VARIABLES)
+                        .filter(row::contains)
+                        .findFirst()
+                        .map(row::getLiteral)
                         .map(Literal::getString)
                         .orElse(null),
-                Optional.ofNullable(row.getLiteral(VAR_DESCRIPTION))
+                Optional.of(VAR_DESCRIPTION)
+                        .map(row::getLiteral)
                         .map(Literal::getString)
                         .orElse(null));
     }
