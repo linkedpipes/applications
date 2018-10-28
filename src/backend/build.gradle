@@ -32,21 +32,8 @@ sourceSets {
     }
 }
 
-compileJava {
-    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
-}
-
-compileTestJava {
-    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
-}
-
 test {
     include "**/UnitTests.class"
-    jvmArgs << "--add-modules" << "jdk.incubator.httpclient"
-}
-
-bootRun {
-    args = ["--add-modules jdk.incubator.httpclient"]
 }
 
 dependencies {
