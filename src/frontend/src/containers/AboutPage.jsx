@@ -21,10 +21,10 @@ function AboutPage(props) {
 
   return (
     <div className={classes.root}>
-      <Typography variant="display4" gutterBottom>
+      <Typography variant="h1" gutterBottom>
         FAQ
       </Typography>
-      <Typography variant="display3" gutterBottom>
+      <Typography variant="h2" gutterBottom>
         To be implemented...
       </Typography>
     </div>

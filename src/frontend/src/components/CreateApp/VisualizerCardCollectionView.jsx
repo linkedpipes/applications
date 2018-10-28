@@ -59,7 +59,7 @@ class VisualizerCardCollectionView extends React.Component {
               <Card className={classes.card}>
                 <Typography
                   className={classes.label}
-                  variant="body1"
+                  variant="body2"
                   align="center"
                   gutterBottom
                 >
