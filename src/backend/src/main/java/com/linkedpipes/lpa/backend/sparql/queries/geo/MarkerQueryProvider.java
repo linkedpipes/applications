@@ -40,6 +40,8 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
     public static final String VAR_NAME = var("st");
     public static final String VAR_DESCRIPTION = var("sd");
 
+    public static final String[] LABEL_VARIABLES = {VAR_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION};
+
     // PREDICATES
     private static final String PRED_GEO = pred(SCHEMA_PREFIX, "geo");
     private static final String PRED_LATITUDE = pred(SCHEMA_PREFIX, "latitude");

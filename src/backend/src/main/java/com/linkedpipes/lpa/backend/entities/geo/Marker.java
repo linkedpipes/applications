@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.entities.geo;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static com.linkedpipes.lpa.backend.sparql.queries.geo.MarkerQueryProvider.*;
@@ -32,7 +33,9 @@ public class Marker {
                 new Coordinates(
                         row.getLiteral(VAR_LATITUDE).getDouble(),
                         row.getLiteral(VAR_LONGITUDE).getDouble()),
-                Optional.ofNullable(row.getLiteral(VAR_LABEL))
+                //for label, pick any one of the values for LABEL_VARIABLES (if any of them is set, otherwise null)
+                Optional.ofNullable(Arrays.stream(LABEL_VARIABLES).filter(v -> row.contains(v)).findFirst().orElse(null))
+                        .map(v -> row.getLiteral(v))
                         .map(Literal::getString)
                         .orElse(null),
                 Optional.ofNullable(row.getLiteral(VAR_DESCRIPTION))
