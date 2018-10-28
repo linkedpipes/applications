@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Map;
 @RestController
 public class MapController {
 
-    @RequestMapping("/api/map/markers")
+    @RequestMapping(value = "/api/map/markers", method = RequestMethod.POST)
     public ResponseEntity<List<Marker>> markers(@RequestBody(required=false) Map<String, List<ValueFilter>> filters) {
         return ResponseEntity.ok(GeoService.getMarkers(filters));
     }
