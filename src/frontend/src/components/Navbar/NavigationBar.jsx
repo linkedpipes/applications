@@ -27,7 +27,7 @@ const NavigationBar = props => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="title" color="inherit" className={classes.flex}>
+        <Typography variant="h6" color="inherit" className={classes.flex}>
           Discovery API Assistant Demo
         </Typography>
         <UserButton />

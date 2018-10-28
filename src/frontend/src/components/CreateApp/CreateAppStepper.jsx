@@ -12,8 +12,7 @@ import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
 import connect from "react-redux/lib/connect/connect";
 import DataSourcesTable from "./DataSourcesTable";
-import Grid from "@material-ui/core/Grid";
-import { GoogleMapsPopup } from "../Visualizers";
+import CreateAppCard from "./CreateAppCard";
 
 const styles = theme => ({
   root: {
@@ -71,22 +70,7 @@ class CreateAppStepper extends React.Component {
           />
         );
       case 3:
-        return (
-          <Grid container justify="center">
-            <Paper>
-              <GoogleMapsPopup />
-
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.handleNext}
-                className={classes.button}
-              >
-                Create App
-              </Button>
-            </Paper>
-          </Grid>
-        );
+        return <CreateAppCard />;
       default:
         return "Unknown step";
     }

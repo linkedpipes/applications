@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -52,7 +51,7 @@ class Dashboard extends Component {
         <Grid container spacing={24}>
           <Grid item xs={4}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 Start by creating a new application
               </Typography>
               <Link to={"/create-app"}>
@@ -76,14 +75,14 @@ class Dashboard extends Component {
           </Grid>
           <Grid item xs={8}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 Recent applications
               </Typography>
             </Paper>
           </Grid>
           <Grid item xs={4}>
             <Paper className={classes.paper}>
-              <Typography variant="subheading" gutterBottom>
+              <Typography variant="subtitle1" gutterBottom>
                 Running discoveries
               </Typography>
             </Paper>

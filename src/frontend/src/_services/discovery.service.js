@@ -128,7 +128,7 @@ export const DiscoveryService = {
     );
   },
 
-  getMarkers: async function getMarkers(applicationId, pipelineIri) {
-    return rest(GET_MARKERS_URL, null, "GET", null);
+  getMarkers: async function(applicationId, pipelineIri, filters = {}) {
+    return rest(GET_MARKERS_URL, filters, "POST");
   }
 };
