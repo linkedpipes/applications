@@ -5,7 +5,6 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Paper from "@material-ui/core/Paper";
@@ -307,10 +306,6 @@ class DataSourcesTable extends React.Component {
     this.setState({ page });
   };
 
-  handleChangeRowsPerPage = event => {
-    this.setState({ rowsPerPage: event.target.value });
-  };
-
   render() {
     const { classes, dataSourceGroups, discoveryId, exportsDict } = this.props;
     const { order, orderBy, rowsPerPage, page, loadingButtons } = this.state;
@@ -384,20 +379,6 @@ class DataSourcesTable extends React.Component {
             </TableBody>
           </Table>
         </div>
-        <TablePagination
-          component="div"
-          count={dataSourceGroups.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          backIconButtonProps={{
-            "aria-label": "Previous Page"
-          }}
-          nextIconButtonProps={{
-            "aria-label": "Next Page"
-          }}
-          onChangePage={self.handleChangePage}
-          onChangeRowsPerPage={self.handleChangeRowsPerPage}
-        />
       </Paper>
     );
   }
