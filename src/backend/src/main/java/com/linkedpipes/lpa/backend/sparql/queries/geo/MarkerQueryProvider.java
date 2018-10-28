@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
-import com.linkedpipes.lpa.backend.rdf.vocabulary.SKOS;
+import com.linkedpipes.lpa.backend.rdf.Vocabularies;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider;
@@ -23,11 +23,11 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
 
     // PREFIXES
     private static final String SKOS_PREFIX = "skos";
-    private static final String SKOS_PREFIX_URL = new SKOS().getPrefixURL();
+    private static final String SKOS_PREFIX_URL = Vocabularies.SKOS;
     private static final String SCHEMA_PREFIX = "s";
-    private static final String SCHEMA_PREFIX_URL = "http://schema.org/";
+    private static final String SCHEMA_PREFIX_URL = Vocabularies.SCHEMA;
     private static final String RDFS_PREFIX = "rdfs";
-    private static final String RDFS_PREFIX_URL = "http://www.w3.org/2000/01/rdf-schema#";
+    private static final String RDFS_PREFIX_URL = Vocabularies.RDFS;
 
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
