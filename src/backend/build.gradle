@@ -35,7 +35,11 @@ sourceSets {
 test {
     include "**/UnitTests.class"
 }
-
+task unpack(type: Copy) {
+    dependsOn bootJar
+    from(zipTree(tasks.bootJar.outputs.files.singleFile))
+    into("build/dependency")
+}
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     runtime 'org.springframework.boot:spring-boot-devtools'
