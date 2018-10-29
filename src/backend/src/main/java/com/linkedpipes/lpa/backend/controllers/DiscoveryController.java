@@ -11,12 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 @RestController
 @SuppressWarnings("unused")
-public class DiscoveryController implements Serializable {
+public class DiscoveryController {
 
     private final DiscoveryServiceComponent discoveryService;
 
