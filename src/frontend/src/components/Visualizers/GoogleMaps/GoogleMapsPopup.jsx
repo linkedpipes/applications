@@ -83,12 +83,8 @@ class GoogleMapsPopup extends React.Component {
               >
                 <CloseIcon />
               </IconButton>
-              <Typography
-                variant="title"
-                color="inherit"
-                className={classes.flex}
-              >
-                Output preview
+              <Typography variant="h6" color="inherit" className={classes.flex}>
+                Google Maps Visualizer Preview
               </Typography>
               <Button color="inherit" onClick={this.handleClose}>
                 Create App
