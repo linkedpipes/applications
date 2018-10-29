@@ -22,4 +22,4 @@ COPY --from=builder /app/build/dependency/BOOT-INF/classes /app
 
 COPY src/main/resources/com/linkedpipes/lpa/backend/services/base.ttl /app/src/data/rdf/base.ttl
 
-ENTRYPOINT ["java","-cp","app:app/*","com.linkedpipes.lpa.backend.Application"]
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.linkedpipes.lpa.backend.Application"]
