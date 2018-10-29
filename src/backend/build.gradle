@@ -32,27 +32,19 @@ sourceSets {
     }
 }
 
-compileJava {
-    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
-}
-
-compileTestJava {
-    options.compilerArgs << "--add-modules" << "jdk.incubator.httpclient"
-}
-
 test {
     include "**/UnitTests.class"
-    jvmArgs << "--add-modules" << "jdk.incubator.httpclient"
 }
-
-bootRun {
-    args = ["--add-modules jdk.incubator.httpclient"]
+task unpack(type: Copy) {
+    dependsOn bootJar
+    from(zipTree(tasks.bootJar.outputs.files.singleFile))
+    into("build/dependency")
 }
-
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
-    runtime('org.springframework.boot:spring-boot-devtools')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    runtime 'org.springframework.boot:spring-boot-devtools'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'org.apache.jena:apache-jena-libs:3.8.0'
+    compile 'org.apache.jena:jena-querybuilder:3.9.0'
 }

@@ -23,8 +23,7 @@ public class PipelineController {
         etlService = new EtlServiceComponent();
     }
 
-    @RequestMapping("/api/pipeline")
-    @ResponseBody
+    @GetMapping("/api/pipeline")
     public ResponseEntity<Pipeline> getPipeline(@RequestParam(value = "pipelineUri") String pipelineUri) {
         Pipeline testPipeline = new Pipeline();
         testPipeline.id = pipelineUri;
@@ -32,27 +31,24 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline/export")
-    @ResponseBody
     public ResponseEntity<PipelineExportResult> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
         PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/pipeline/export")
-    @ResponseBody
     public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException {
         ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping("/api/pipeline/create")
-    @ResponseBody
+    @GetMapping("/api/pipeline/create")
     public void createPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) {
 
     }
 
-    @RequestMapping("/api/pipeline/execute")
+    @GetMapping("/api/pipeline/execute")
     public ResponseEntity<Execution> executePipeline(@RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws IOException {
         Execution response = etlService.executePipeline(etlPipelineIri);
         return ResponseEntity.ok(response);

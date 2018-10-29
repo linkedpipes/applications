@@ -63,7 +63,9 @@ public class DiscoveryServiceComponent {
                     JsonArray dataSampleGroups = extractorGroup.getAsJsonObject().getAsJsonArray("dataSampleGroups");
 
                     for (JsonElement dataSampleGroup : dataSampleGroups) {
-                        Pipeline pipeline = gson.fromJson(dataSampleGroup.getAsJsonObject().getAsJsonObject("pipeline"), Pipeline.class);
+                        JsonObject dataSampleGrpObj = dataSampleGroup.getAsJsonObject();
+                        Pipeline pipeline = gson.fromJson(dataSampleGrpObj.getAsJsonObject("pipeline"), Pipeline.class);
+                        pipeline.minimalIteration = Integer.parseInt(dataSampleGrpObj.getAsJsonPrimitive("minimalIteration").toString());
                         dataSrcGroup.pipelines.add(pipeline);
                     }
                 }

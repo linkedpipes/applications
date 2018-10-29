@@ -5,11 +5,11 @@ import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import connect from "react-redux/lib/connect/connect";
 import { addSelectedVisualizerAction } from "../../_actions/globals";
+import MapIcon from "@material-ui/icons/Map";
 
 const styles = {
   root: {
@@ -29,18 +29,6 @@ const styles = {
 };
 
 class VisualizerCard extends React.Component {
-  state = {
-    pipelinesDialogOpen: false
-  };
-
-  handleOpen = () => {
-    this.setState({ pipelinesDialogOpen: true });
-  };
-
-  handleClose = () => {
-    this.setState({ pipelinesDialogOpen: false });
-  };
-
   addSelectedVisualizer = visualizerData => {
     const self = this;
 
@@ -64,20 +52,14 @@ class VisualizerCard extends React.Component {
   };
 
   render() {
-    const { classes, visualizerData, discoveryId } = this.props;
-    const { pipelinesDialogOpen } = this.state;
+    const { classes, visualizerData } = this.props;
 
     return (
       <Card className={classes.card}>
-        <CardActionArea>
-          <CardMedia
-            component="img"
-            alt="Visualizer Logo"
-            className={classes.media}
-            height="100"
-          />
+        <CardActionArea style={{ textAlign: "center" }}>
+          <MapIcon style={{ fontSize: "80px" }} />
           <CardContent>
-            <Typography gutterBottom variant="headline" component="h2">
+            <Typography gutterBottom variant="h5" component="h2">
               Test
             </Typography>
             <Typography component="p">

@@ -3,25 +3,28 @@ services:
   - docker
 matrix:
   include:
-    - language: node_js
+    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+      language: node_js
       node_js:
         - stable
       before_script:
         - cd src/frontend
       cache:
+        yarn: true
         directories:
-          - node_modules
+          - src/frontend/node_modules
       script:
-        - yarn install
+        - yarn install --frozen-lockfile --check-files
         - yarn run build
 
-    - language: java
+    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+      language: java
       jdk: openjdk10
       before_script:
         - cd src/backend
       script:
-        - "./gradlew assemble"
-        - "./gradlew test"
+        - ./gradlew assemble
+        - ./gradlew test
 
     - # require the branch name to be master
       if: branch = master
@@ -37,10 +40,6 @@ matrix:
         - docker tag backend linkedpipes/applications:backend
         - docker push linkedpipes/applications
 
-branches:
-  only:
-    - master
-    - develop
 notifications:
   slack:
     secure: k85vRAQg57BTbCXOVoNy9Z/ASmXSDTdQgySr/Pb8sGd0WiM5Cw6HJrvKabRyXgS1RI/e0DTHsQEciM6+tIiEVPaGxv21p2OxyEl3OSzClbD012blgFV4yYhj0MJJbO9oDil2TRfIsOPLcN5S3Yyeq5BMHi6cRAWjOqqFGJn0PJQ1ecLaGMOp93bRyjFsERh76xxljFD3FcT33s8uhvpPHPFCLcf/uJgjMbeOlUmpz6lSuGQmtmav3RjSLk+40sZWKDnV9zrk4cmz8DYWYl9X0jYjHBbp3aFDGIv9KkUdDrP+A5/wVk6Vxq/KhaE+x/JnV6WjsoAklGmSujkQB9kcpvz7eEhCYLHEJtFf4Ak17HzYFw+PmWKOQJgOSOHfWLoXsRY2I5qp/MnWVAvdCiGewrQ7/4ly34F4TUHhtMgCFihqQL+NabVybWaqp9UI5mG1pVGz3M9tO61GPtYTIiIClIeQ52zrpEnfWJxZ5fh03Ov/FL+nqrmR6KwKvdB2nq5p3hzHgqBriW0yI/x54dUc2CDJXDpwplRQ08GGvtYd4qKTz0z5vsOMBZY3UH/19A2YMU2P3Jp0Qk0GgRb9aJtN1JzmAL2gK47h+AR5laFLWKFt+atRF/GXr/SEqjdKCDwEGfuqs7YrMtSMYuY/qMIlZbuCIDu88ge6NTMuSgSVABI=

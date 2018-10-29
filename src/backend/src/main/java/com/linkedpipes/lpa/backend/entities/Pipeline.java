@@ -6,5 +6,6 @@ public class Pipeline {
     public String name;
     public String descriptor;
     public int componentCount;
+    public int minimalIteration;
 
 }
