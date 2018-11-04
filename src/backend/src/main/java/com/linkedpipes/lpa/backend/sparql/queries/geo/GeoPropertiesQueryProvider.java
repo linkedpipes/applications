@@ -44,7 +44,7 @@ public class GeoPropertiesQueryProvider implements SparqlQueryProvider {
     private static final String PRED_PREF_LABEL = pred(SKOS_PREFIX, "prefLabel");
     private static final String PRED_NOTATION = pred(SKOS_PREFIX, "notation");
     private static final String PRED_SCHEMA_TITLE = pred(SCHEMA_PREFIX, "title");
-    private static final String PRED_DCTERMS_TITLE = pred(SCHEMA_PREFIX, "title");
+    private static final String PRED_DCTERMS_TITLE = pred(DCTERMS_PREFIX, "title");
     private static final String PRED_DESCRIPTION = pred(SCHEMA_PREFIX, "description");
     private static final String PRED_TYPE = pred(RDF_PREFIX, "type");
     private static final String PRED_RDFS_LABEL = pred(RDFS_PREFIX, "label");
