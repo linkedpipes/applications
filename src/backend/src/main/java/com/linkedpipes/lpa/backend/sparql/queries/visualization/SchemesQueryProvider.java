@@ -25,7 +25,7 @@ public class SchemesQueryProvider implements SparqlQueryProvider {
     public static final String VAR_PREF_LABEL = var("spl");
     public static final String VAR_RDFS_LABEL = var("lab");
     public static final String VAR_DCTERMS_TITLE = var("dctt");
-    public static final String VAR_C = var("c");
+    public static final String VAR_CONCEPT = var("c");
 
     // PREDICATES
     private static final String PRED_SKOS_CONCEPT_SCHEME = pred(SKOS_PREFIX, "ConceptScheme");
@@ -50,8 +50,8 @@ public class SchemesQueryProvider implements SparqlQueryProvider {
                 .addConstruct(VAR_SCHEME, PRED_DCTERMS_TITLE, VAR_DCTERMS_TITLE)
                 .addConstruct(VAR_SCHEME, PRED_RDFS_LABEL, VAR_RDFS_LABEL)
 
-                .addWhere(VAR_C, PRED_RDF_TYPE, PRED_SKOS_CONCEPT)
-                .addWhere(VAR_C, PRED_INSCHEME, VAR_SCHEME)
+                .addWhere(VAR_CONCEPT, PRED_RDF_TYPE, PRED_SKOS_CONCEPT)
+                .addWhere(VAR_CONCEPT, PRED_INSCHEME, VAR_SCHEME)
                 .addWhere(VAR_SCHEME, PRED_RDF_TYPE, PRED_SKOS_CONCEPT_SCHEME)
 
                 .addOptional(VAR_SCHEME, PRED_PREF_LABEL, VAR_PREF_LABEL)
