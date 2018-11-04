@@ -1,15 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import { GoogleMapsVisualizer } from "../../Visualizers";
 import { VISUALIZER_TYPE } from "../../../_constants";
+import Filters from "../Filters/Filters";
 
 const styles = theme => ({
   root: {
-    height: "100vh"
+    height: "70vh"
+  },
+  filterSideBar: {
+    overflowY: "auto"
   },
   card: {},
   input: {}
@@ -35,14 +37,14 @@ class VisualizerControllerContainer extends React.Component {
   };
 
   render() {
-    const { classes, visualizerType, visualizerParams } = this.props;
+    const { classes, visualizerType, visualizerParams, filters } = this.props;
 
     return (
       <Grid container className={classes.root} direction="row" spacing={0}>
-        <Grid item xs={4}>
-          <Paper />
+        <Grid item lg={3} md={4} xs={12} className={classes.filterSideBar}>
+          <Filters filters={filters} />
         </Grid>
-        <Grid item xs={8}>
+        <Grid item lg={9} md={8} xs={12}>
           {this.getVisualizer(visualizerType, visualizerParams)}
         </Grid>
       </Grid>

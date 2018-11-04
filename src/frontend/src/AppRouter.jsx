@@ -15,10 +15,7 @@ import Grid from "@material-ui/core/Grid";
 const AppRouter = () => (
   <BrowserRouter>
     <Grid container direction="column">
-      <Grid item>
-        <NavigationBar />
-      </Grid>
-
+      <NavigationBar />
       <Grid item>
         <Switch>
           <Route exact path="/dashboard" component={Dashboard} />
@@ -31,10 +28,7 @@ const AppRouter = () => (
           <Route component={NotFoundPage} />
         </Switch>
       </Grid>
-
-      <Grid item>
-        <BottomBar />
-      </Grid>
+      <BottomBar />
     </Grid>
   </BrowserRouter>
 );

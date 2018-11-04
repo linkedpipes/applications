@@ -20,13 +20,15 @@ class VisualizerController extends React.Component {
       classes,
       visualizerType,
       visualizerParams,
+      filters,
       headerParams
     } = this.props;
 
     return (
-      <div>
+      <div className={classes.root}>
         <VisualizerControllerHeader headerParams={headerParams} />
         <VisualizerContainer
+          filters={filters}
           visualizerType={visualizerType}
           visualizerParams={visualizerParams}
         />

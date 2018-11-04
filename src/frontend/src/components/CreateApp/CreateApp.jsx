@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 import GoogleMapsVisualizer from "../Visualizers";
 import { VisualizerController } from "../VisualizerController";
-import { VISUALIZER_TYPE } from "../../_constants";
+import { VISUALIZER_TYPE, optionModes, filterTypes } from "../../_constants";
 
 const styles = theme => ({
   root: {
@@ -42,9 +42,46 @@ class CreateApp extends React.Component {
       }
     ];
 
+    const skoConcept1 = {
+      label: "skoConcept1label",
+      uri: "skoConcept1URI",
+      schemeUri: "skoConcept1URI",
+      linkUris: []
+    };
+
+    const skoConcept2 = {
+      label: "skoConcept2 label",
+      uri: "skoConcept2URI",
+      schemeUri: "skoConcept2URI",
+      linkUris: []
+    };
+    const option1 = {
+      skosConcept: skoConcept1,
+      count: null,
+      mode: optionModes.USER_DEFINED,
+      selected: false
+    };
+
+    const option2 = {
+      skosConcept: skoConcept2,
+      count: null,
+      mode: optionModes.USER_DEFINED,
+      selected: false
+    };
+
+    const myFilter = {
+      property: { uri: "property URI", label: "filter label" },
+      type: filterTypes.CHECKBOX,
+      enabled: true,
+      expanded: true,
+      options: [option1, option2],
+      optionsUris: ["option1 URI", "option2 URI"]
+    };
+
     return (
       <VisualizerController
         visualizerType={VISUALIZER_TYPE.GoogleMaps}
+        filters={[myFilter]}
         visualizerParams={{ markers: dummyMarkers }}
         headerParams={{
           title: "Dataset overview",
