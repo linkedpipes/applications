@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
-import com.linkedpipes.lpa.backend.rdf.Vocabularies;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.SCHEMA;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider;
@@ -9,11 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.SKOS;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider.pred;
 import static com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider.var;
 
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/query/MarkerQuery.scala
@@ -23,11 +26,8 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
 
     // PREFIXES
     private static final String SKOS_PREFIX = "skos";
-    private static final String SKOS_PREFIX_URL = Vocabularies.SKOS;
     private static final String SCHEMA_PREFIX = "s";
-    private static final String SCHEMA_PREFIX_URL = Vocabularies.SCHEMA;
     private static final String RDFS_PREFIX = "rdfs";
-    private static final String RDFS_PREFIX_URL = Vocabularies.RDFS;
 
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
@@ -42,16 +42,6 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
 
     public static final String[] LABEL_VARIABLES = {VAR_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION};
 
-    // PREDICATES
-    private static final String PRED_GEO = pred(SCHEMA_PREFIX, "geo");
-    private static final String PRED_LATITUDE = pred(SCHEMA_PREFIX, "latitude");
-    private static final String PRED_LONGITUDE = pred(SCHEMA_PREFIX, "longitude");
-    private static final String PRED_PREF_LABEL = pred(SKOS_PREFIX, "prefLabel");
-    private static final String PRED_LABEL = pred(RDFS_PREFIX, "label");
-    private static final String PRED_NOTATION = pred(SKOS_PREFIX, "notation");
-    private static final String PRED_NAME = pred(SCHEMA_PREFIX, "name");
-    private static final String PRED_DESCRIPTION = pred(SCHEMA_PREFIX, "description");
-
     public MarkerQueryProvider(Map<String, List<ValueFilter>> filters){
         this.filters = filters;
     }
@@ -59,9 +49,9 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
     public Query get() {
         SelectBuilder builder = new SelectBuilder()
 
-                .addPrefix(SKOS_PREFIX, SKOS_PREFIX_URL)
-                .addPrefix(SCHEMA_PREFIX, SCHEMA_PREFIX_URL)
-                .addPrefix(RDFS_PREFIX, RDFS_PREFIX_URL)
+                .addPrefix(SKOS_PREFIX, SKOS.getURI())
+                .addPrefix(SCHEMA_PREFIX, SCHEMA.uri)
+                .addPrefix(RDFS_PREFIX, RDFS.getURI())
 
                 .addVar(VAR_SUBJECT)
                 .addVar(VAR_LATITUDE)
@@ -72,15 +62,15 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
                 .addVar(VAR_NAME)
                 .addVar(VAR_DESCRIPTION)
 
-                .addWhere(VAR_SUBJECT, PRED_GEO, VAR_GEO)
-                .addWhere(VAR_GEO, PRED_LATITUDE, VAR_LATITUDE)
-                .addWhere(VAR_GEO, PRED_LONGITUDE, VAR_LONGITUDE)
+                .addWhere(VAR_SUBJECT, SCHEMA.geo, VAR_GEO)
+                .addWhere(VAR_GEO, SCHEMA.latitude, VAR_LATITUDE)
+                .addWhere(VAR_GEO, SCHEMA.longitude, VAR_LONGITUDE)
 
-                .addOptional(VAR_SUBJECT, PRED_PREF_LABEL, VAR_PREF_LABEL)
-                .addOptional(VAR_SUBJECT, PRED_LABEL, VAR_LABEL)
-                .addOptional(VAR_SUBJECT, PRED_NOTATION, VAR_NOTATION)
-                .addOptional(VAR_SUBJECT, PRED_NAME, VAR_NAME)
-                .addOptional(VAR_SUBJECT, PRED_DESCRIPTION, VAR_DESCRIPTION)
+                .addOptional(VAR_SUBJECT, SKOS.prefLabel, VAR_PREF_LABEL)
+                .addOptional(VAR_SUBJECT, RDFS.label, VAR_LABEL)
+                .addOptional(VAR_SUBJECT, SKOS.notation, VAR_NOTATION)
+                .addOptional(VAR_SUBJECT, SCHEMA.name, VAR_NAME)
+                .addOptional(VAR_SUBJECT, SCHEMA.description, VAR_DESCRIPTION)
 
                 //TODO remove this limit once using our virtuoso endpoint
                 .setLimit(500);
@@ -119,6 +109,11 @@ public class MarkerQueryProvider implements SparqlQueryProvider {
         }
 
         return null;
+    }
+
+    public static void main(String[] args) {
+        MarkerQueryProvider prov = new MarkerQueryProvider(new HashMap<>());
+        System.out.print(prov.get().toString());
     }
 
 }
