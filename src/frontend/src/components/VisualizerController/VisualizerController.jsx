@@ -2,10 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 
-import Paper from "@material-ui/core/Paper";
-import Labels from "./Header/VisualizerControllerLabels";
 import { VisualizerControllerHeader } from "./Header";
-import Grid from "@material-ui/core/Grid";
 import { VisualizerContainer } from "./Container";
 
 const styles = theme => ({
@@ -19,12 +16,20 @@ const styles = theme => ({
 
 class VisualizerController extends React.Component {
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      visualizerType,
+      visualizerParams,
+      headerParams
+    } = this.props;
 
     return (
       <div>
-        <VisualizerControllerHeader />
-        <VisualizerContainer />
+        <VisualizerControllerHeader headerParams={headerParams} />
+        <VisualizerContainer
+          visualizerType={visualizerType}
+          visualizerParams={visualizerParams}
+        />
       </div>
     );
   }

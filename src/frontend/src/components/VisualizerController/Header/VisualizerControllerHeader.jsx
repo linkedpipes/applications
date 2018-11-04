@@ -9,8 +9,8 @@ import Grid from "@material-ui/core/Grid";
 
 const styles = theme => ({
   root: {
-    justifyContent: "center",
-    flex: 1
+    flex: 1,
+    flexGrow: 1
   },
   card: {},
   input: {}
@@ -18,7 +18,7 @@ const styles = theme => ({
 
 class VisualizerControllerHeader extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, headerParams } = this.props;
 
     return (
       <Paper className={classes.root}>
@@ -26,10 +26,10 @@ class VisualizerControllerHeader extends React.Component {
           container
           direction="row"
           className={classes.root}
-          alignContent={"center"}
-          spacing={0}
+          justify="center"
+          alignItems="center"
         >
-          <Labels />
+          <Labels title={headerParams.title} subtitle={headerParams.subtitle} />
           <Toolbox />
         </Grid>
       </Paper>
