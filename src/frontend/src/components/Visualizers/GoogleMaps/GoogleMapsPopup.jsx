@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import GoogleMapsVisualizer from "./GoogleMapsVisualizer";
 import { DiscoveryService } from "../../../_services";
+import { withRouter } from "react-router-dom";
 
 const styles = theme => ({
   appBar: {
@@ -40,7 +41,20 @@ class GoogleMapsPopup extends React.Component {
   };
 
   handleClose = () => {
-    this.setState({ open: false });
+    const self = this;
+
+    self.setState(
+      {
+        open: true
+      },
+      () => {
+        self.handleCreateAppPressed();
+      }
+    );
+  };
+
+  handleCreateAppPressed = () => {
+    this.props.history.replace("/create-app");
   };
 
   componentDidMount() {
@@ -106,7 +120,8 @@ class GoogleMapsPopup extends React.Component {
 }
 
 GoogleMapsPopup.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  popupAction: PropTypes.object
 };
 
-export default withStyles(styles)(GoogleMapsPopup);
+export default withRouter(withStyles(styles)(GoogleMapsPopup));
