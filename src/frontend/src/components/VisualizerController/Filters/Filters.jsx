@@ -5,19 +5,25 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Checkbox from "@material-ui/core/Checkbox";
+import Collapse from "@material-ui/core/Collapse";
+import Option from "./Options/Options";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
 import { withStyles } from "@material-ui/core/styles";
+
+const styles = theme => ({
+  nested: {
+    paddingLeft: theme.spacing.unit * 4
+  }
+});
 
 const Filters = function(props) {
   const { filters } = props;
-  const styles = theme => ({
-    nested: {
-      paddingLeft: theme.spacing.unit * 4
-    }
-  });
 
   return (
     <div>
       <List
+        component="nav"
         subheader={
           <ListSubheader disableSticky={true}>
             {filters.length == 0 ? "No filters available" : "Available filters"}
@@ -27,12 +33,29 @@ const Filters = function(props) {
         {filters.length > 0 &&
           filters.map(filter => {
             return (
-              <ListItem button key={filter.property.uri}>
-                <ListItemText primary={filter.property.label} />
-                <ListItemSecondaryAction>
-                  <Checkbox />
-                </ListItemSecondaryAction>
-              </ListItem>
+              <div key={filter.property.uri}>
+                <ListItem button>
+                  <ListItemSecondaryAction>
+                    <Checkbox indeterminate />
+                  </ListItemSecondaryAction>
+                  <ListItemText inset primary={filter.property.label} />
+                </ListItem>
+                <Collapse in={true}>
+                  {filter.options.length > 0 && (
+                    <List component="div" disablePadding>
+                      {filter.options.map(option => {
+                        return (
+                          <Option
+                            type={filter.type}
+                            key={option.skosConcept.uri}
+                            option={option}
+                          />
+                        );
+                      })}
+                    </List>
+                  )}
+                </Collapse>
+              </div>
             );
           })}
       </List>
@@ -40,17 +63,4 @@ const Filters = function(props) {
   );
 };
 
-// If options.size > 0 then add:
-// <Collapse in={this.state.open} timeout="auto" unmountOnExit>
-//   <List component="div" disablePadding>
-//     <ListItem button className={classes.nested}>
-//       <ListItemIcon>
-//         <StarBorder />
-//       </ListItemIcon>
-//       <ListItemText inset primary="Starred" />
-//     </ListItem>
-//   </List>
-// </Collapse>;
-// how to track state of each dropdown?
-
-export default Filters;
+export default withStyles(styles)(Filters);

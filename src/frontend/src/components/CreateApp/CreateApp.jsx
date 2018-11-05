@@ -59,7 +59,7 @@ class CreateApp extends React.Component {
       skosConcept: skoConcept1,
       count: null,
       mode: optionModes.USER_DEFINED,
-      selected: false
+      selected: true
     };
 
     const option2 = {
