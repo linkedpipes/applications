@@ -8,7 +8,7 @@ import Filters from "../Filters/Filters";
 
 const styles = theme => ({
   root: {
-    height: "70vh"
+    height: "100vh"
   },
   filterSideBar: {
     overflowY: "auto"
