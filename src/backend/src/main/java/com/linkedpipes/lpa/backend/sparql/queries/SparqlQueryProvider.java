@@ -6,34 +6,20 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-public interface SparqlQueryProvider extends Supplier<Query> {
+public abstract class SparqlQueryProvider implements Supplier<Query> {
 
-    Query get();
+    protected static final String VAR_GRAPH = var("graph");
 
-    static String var(String variableName) {
+    protected static String var(String variableName) {
         if (requireNonNull(variableName).isEmpty()) {
             throw new IllegalArgumentException("variableName");
         }
         return variableName.startsWith("?") ? variableName : "?" + variableName;
     }
 
-    static String pred(String prefix, String name) {
-        requireNonNull(prefix);
-        requireNonNull(name);
-        if (prefix.endsWith(":")) {
-            prefix = prefix.substring(0, prefix.length() - 1);
-        }
-        if (name.startsWith(":")) {
-            name = name.substring(1);
-        }
-        if (prefix.isEmpty()) {
-            throw new IllegalArgumentException("prefix");
-        }
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name");
-        }
+    @Override
+    public abstract Query get();
 
-        return prefix + ":" + name;
-    }
+    public abstract Query getForNamed(String name);
 
 }
