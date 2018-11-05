@@ -23,7 +23,7 @@
     "babel-preset-react": "6.24.1",
     "css-loader": "^1.0.0",
     "dotenv-webpack": "^1.5.7",
-    "immutable": "3.8.x",
+    "immutable": "^4.0.0-rc.12",
     "material-ui-chip-input": "^1.0.0-beta.6",
     "node-sass": "^4.9.3",
     "normalize.css": "^8.0.0",
