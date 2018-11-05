@@ -26,7 +26,7 @@ class VisualizerControllerHeader extends React.Component {
           container
           direction="row"
           className={classes.root}
-          justify="center"
+          justify="space-between"
           alignItems="center"
         >
           <Labels title={headerParams.title} subtitle={headerParams.subtitle} />
