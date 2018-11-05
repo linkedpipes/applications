@@ -37,8 +37,8 @@ class VisualizerControllerToolbox extends React.Component {
         item
         direction="row"
         spacing={0}
-        alignContent="center"
-        xs={5}
+        alignContent="flex-end"
+        xs={3}
       >
         <Grid item>
           <FormControlLabel
