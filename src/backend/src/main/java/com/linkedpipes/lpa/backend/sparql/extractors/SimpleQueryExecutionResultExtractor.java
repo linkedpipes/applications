@@ -17,13 +17,13 @@ import java.util.stream.StreamSupport;
 import static java.util.Spliterator.*;
 import static java.util.Spliterators.spliteratorUnknownSize;
 
-public abstract class SimpleQueryExecutionResultExtractor {
+public abstract class SimpleQueryExecutionResultExtractor<T> {
 
     protected abstract String getPropertyVariableName();
-    public abstract Object withResourceSolution(Resource res, QuerySolution qs);
-    public abstract Object withLiteralSolution(Literal literal);
+    public abstract T withResourceSolution(Resource res, QuerySolution qs);
+    public abstract T withLiteralSolution(Literal literal);
 
-    public List<Object> extract(QueryExecution queryExecution){
+    public List<T> extract(QueryExecution queryExecution){
         ResultSet result = queryExecution.execSelect();
 
         Spliterator<QuerySolution> spliterator =
@@ -34,7 +34,7 @@ public abstract class SimpleQueryExecutionResultExtractor {
                 .collect(Collectors.toList());
     }
 
-    private Object extractObject(QuerySolution qs){
+    private T extractObject(QuerySolution qs){
         String propertyVarName = getPropertyVariableName();
 
         if(qs.contains(propertyVarName)){

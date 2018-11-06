@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import com.linkedpipes.lpa.backend.entities.geo.Polygon;
 import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
+import com.linkedpipes.lpa.backend.sparql.extractors.geo.GeoPropertiesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.MarkerExtractor;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.GeoPropertiesQueryProvider;
@@ -32,8 +33,8 @@ public class GeoService {
 
     public static List<Property> getProperties() {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
-        //TODO implement
-        return new ArrayList<>();
+
+        return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
     }
 
     public List<Polygon> getPolygons(){
