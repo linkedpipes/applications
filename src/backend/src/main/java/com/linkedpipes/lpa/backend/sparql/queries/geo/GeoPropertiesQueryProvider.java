@@ -33,6 +33,7 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     public static final String VAR_P = var("p");
     public static final String VAR_O = var("o");
 
+    public static final String[] NODE_VARIABLES = {VAR_P, VAR_SCHEME};
     public static final String[] LABEL_VARIABLES = {VAR_RDFS_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION, VAR_DCTERMS_TITLE};
 
     @Override
