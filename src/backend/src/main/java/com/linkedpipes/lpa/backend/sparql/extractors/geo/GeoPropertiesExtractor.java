@@ -8,7 +8,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 
-public class GeoPropertiesExtractor extends SimpleQueryExecutionResultExtractor {
+public class GeoPropertiesExtractor extends SimpleQueryExecutionResultExtractor<Property> {
 
     protected String getPropertyVariableName(){
         return GeoPropertiesQueryProvider.VAR_P;

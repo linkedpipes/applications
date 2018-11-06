@@ -89,4 +89,9 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
         return builder.setLimit(1000);
     }
 
+    public static void main(String[] args) {
+        GeoPropertiesQueryProvider prov = new GeoPropertiesQueryProvider();
+        System.out.println(prov.get().toString());
+    }
+
 }

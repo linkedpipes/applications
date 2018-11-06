@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.services.geo.GeoService;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class MapController {
         return ResponseEntity.ok(GeoService.getMarkers(filters));
     }
 
-    @PostMapping("/api/map/properties")
+    @GetMapping("/api/map/properties")
     public ResponseEntity<List<Property>> getProperties() {
         return ResponseEntity.ok(GeoService.getProperties());
     }
