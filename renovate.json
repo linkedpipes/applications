@@ -1,7 +1,5 @@
 {
   "extends": ["config:base"],
-  "separateMajorReleases": true,
-  "separatePatchReleases": false,
   "schedule": "every weekend",
   "assignees": ["aorumbayev", "Ponsietta"],
   "baseBranches": ["dependency_updates"]
