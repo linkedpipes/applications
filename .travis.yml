@@ -25,6 +25,8 @@ matrix:
       script:
         - ./gradlew assemble
         - ./gradlew test
+        - ./gradlew jacocoTestReport
+        - ./gradlew sendCoverageToCodacy
 
     - # require the branch name to be master
       if: branch = master
