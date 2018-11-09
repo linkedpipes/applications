@@ -1,32 +1,33 @@
 const path = require("path");
 const webpack = require("webpack");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
-const Dotenv = require("dotenv-webpack");
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
+const dev = process.env.NODE_ENV !== "production";
 
 module.exports = () => {
-  const isProduction = process.env.NODE_ENV === "production";
+  const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
+    template: path.join(__dirname, "./src/index.html"),
+    filename: "index.html",
+    inject: "body"
+  });
 
-  let pluginsArray = [
+  const plugins = [
+    HTMLWebpackPluginConfig,
     new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       "process.env.BASE_BACKEND_URL": JSON.stringify(
         process.env.BASE_BACKEND_URL
       )
-    }),
-    new Dotenv()
+    })
   ];
 
-  if (!isProduction) {
-    pluginsArray.push(new webpack.HotModuleReplacementPlugin());
-  }
+  if (dev) plugins.push(new webpack.HotModuleReplacementPlugin());
 
   return {
     entry: [path.join(__dirname, "/src/index.jsx")],
     output: {
-      filename: "bundle.js",
-      path: path.join(__dirname, "/public", "dist"),
-      publicPath: "/"
+      path: path.join(__dirname, "/public"),
+      filename: "bundle.js"
     },
     resolve: {
       extensions: [".js", ".jsx"]
@@ -44,9 +45,9 @@ module.exports = () => {
         }
       ]
     },
-    devtool: isProduction ? "source-map" : "inline-source-map",
+    devtool: dev ? "inline-source-map" : "source-map",
     devServer: {
-      contentBase: path.join(__dirname, "/public"),
+      index: "index.html",
       host: "0.0.0.0",
       port: "9001",
       disableHostCheck: true, // solved Invalid-Host-header
@@ -54,10 +55,10 @@ module.exports = () => {
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      historyApiFallback: true,
-      publicPath: "/dist/"
+      historyApiFallback: true
     },
-    mode: isProduction ? "production" : "development",
-    plugins: pluginsArray
+    mode: dev ? "development" : "production",
+    plugins: plugins,
+    externals: {}
   };
 };
