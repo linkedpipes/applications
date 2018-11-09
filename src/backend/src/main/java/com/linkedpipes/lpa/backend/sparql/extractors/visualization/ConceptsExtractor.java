@@ -1,16 +1,13 @@
 package com.linkedpipes.lpa.backend.sparql.extractors.visualization;
 
 import com.linkedpipes.lpa.backend.entities.visualization.Concept;
+import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 //https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/visualization/extractor/ConceptsExtractor.scala
 public class ConceptsExtractor {
@@ -20,10 +17,10 @@ public class ConceptsExtractor {
 
         List<Concept> concepts = new ArrayList<>();
         Model model = queryExec.execConstruct();
-        ResIterator resIter = model.listResourcesWithProperty(RDF.type, SKOS.Concept);
+        ResIterator conceptStmtsIterator = model.listResourcesWithProperty(RDF.type, SKOS.Concept);
 
-        while(resIter.hasNext()){
-            Resource conceptResource = resIter.next().asResource();
+        while(conceptStmtsIterator.hasNext()){
+            Resource conceptResource = conceptStmtsIterator.next().asResource();
 
             String label = Optional.of(conceptResource.getProperty(SKOS.prefLabel))
                     .map(lr -> lr.getLiteral())
@@ -34,14 +31,14 @@ public class ConceptsExtractor {
                     .map(sr -> sr.getResource().getURI())
                     .orElse(null);
 
-            //TODO fix below linkUris extration logic.. should return map?
-            List<String> linkUris = Arrays.stream(possibleLinkUris).flatMap(l -> {
-                return Optional.of(conceptResource.getProperty(l))
-                    .map(s-> s.getResource().getURI()).stream();
-                    //.orElse(null);
-            }).collect(Collectors.toList());
+            Map<String, String> linkUris = new HashMap<>();
 
-            concepts.add(new Concept(conceptResource.getURI(), label, null, schemeUri, null));
+            Arrays.stream(possibleLinkUris).forEach(l -> {
+                    Statement linkResource = Optional.of(conceptResource.getProperty(l)).orElse(null);
+                    linkUris.put(l.getURI(), linkResource.getResource().getURI());
+            });
+
+            concepts.add(new Concept(conceptResource.getURI(), new LocalizedValue(label), null, schemeUri, linkUris));
         }
 
         return new ArrayList<>();

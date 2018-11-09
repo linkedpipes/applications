@@ -23,7 +23,6 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
     public static final String VAR_SCHEME = var("scheme");
-    public static final String VAR_GEO = var("g");
     public static final String VAR_PREF_LABEL = var("spl");
     public static final String VAR_RDFS_LABEL = var("lab");
     public static final String VAR_NOTATION = var("sn");
@@ -33,6 +32,7 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     public static final String VAR_P = var("p");
     public static final String VAR_O = var("o");
 
+    public static final String[] NODE_VARIABLES = {VAR_P, VAR_SCHEME};
     public static final String[] LABEL_VARIABLES = {VAR_RDFS_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION, VAR_DCTERMS_TITLE};
 
     @Override
@@ -87,6 +87,11 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     @Override
     public SelectBuilder addAdditional(SelectBuilder builder) {
         return builder.setLimit(1000);
+    }
+
+    public static void main(String[] args) {
+        GeoPropertiesQueryProvider prov = new GeoPropertiesQueryProvider();
+        System.out.println(prov.get().toString());
     }
 
 }
