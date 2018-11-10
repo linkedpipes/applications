@@ -15,6 +15,7 @@ import { extractUrlGroups } from "../../_helpers";
 import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
+import { QuickStartDialog } from "./QuickStart";
 
 const styles = theme => ({
   root: {
@@ -41,7 +42,30 @@ class SelectSources extends React.Component {
     ttlFile: undefined,
     discoveryIsLoading: false,
     textFieldValue: "",
-    textFieldIsValid: false
+    textFieldIsValid: false,
+    open: false
+  };
+
+  handleClickOpen = () => {
+    this.setState({
+      open: true
+    });
+  };
+
+  handleClose = value => {
+    let matches = extractUrlGroups(value);
+    let valid = false;
+
+    if (matches instanceof Array) {
+      value = matches.join(",\n");
+      valid = true;
+    }
+
+    this.setState({
+      textFieldValue: value,
+      textFieldIsValid: valid,
+      open: false
+    });
   };
 
   onChange = e => {
@@ -99,8 +123,6 @@ class SelectSources extends React.Component {
       autoClose: false
     });
 
-    console.log(datasourcesForTTL);
-
     const self = this;
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL
@@ -147,8 +169,6 @@ class SelectSources extends React.Component {
   };
 
   processStartDiscovery = () => {
-    console.log(process.env.BASE_BACKEND_URL);
-
     const self = this;
 
     self.setState({ discoveryIsLoading: true });
@@ -197,8 +217,6 @@ class SelectSources extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        console.log(jsonResponse);
-
         toast.dismiss(tid);
         self.props.dispatch(
           addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
@@ -270,6 +288,19 @@ class SelectSources extends React.Component {
 
               </label>
              */}
+              <Button
+                variant="contained"
+                component="span"
+                className={classes.button}
+                size="small"
+                onClick={this.handleClickOpen}
+              >
+                Quick start
+              </Button>
+              <QuickStartDialog
+                open={this.state.open}
+                onClose={this.handleClose}
+              />
               <Button
                 variant="contained"
                 component="span"
