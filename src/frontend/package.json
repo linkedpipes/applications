@@ -30,7 +30,7 @@
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "reselect": "4.0.x",
-    "whatwg-fetch": "^2.0.4"
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
