@@ -1,5 +1,5 @@
 # Base image
-FROM node:8.11.4-alpine
+FROM node:8.12.0-alpine
 
 # Install packages using Yarn
 # References:
