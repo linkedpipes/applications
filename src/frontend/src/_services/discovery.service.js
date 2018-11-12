@@ -37,6 +37,7 @@ const PIPELINE_GROUPS_URL = discoveryId => {
   return DISCOVERY_URL + discoveryId + "/pipelineGroups";
 };
 const GET_MARKERS_URL = BASE_URL + "map/markers";
+const GET_PROPERTIES_URL = BASE_URL + "map/properties";
 
 export const ETL_STATUS_MAP = {
   "http://etl.linkedpipes.com/resources/status/queued": "Queued",
@@ -126,6 +127,10 @@ export const DiscoveryService = {
       "GET",
       undefined
     );
+  },
+
+  getFilters: async function() {
+    return rest(GET_PROPERTIES_URL, undefined, "GET", undefined);
   },
 
   getMarkers: async function(applicationId, pipelineIri, filters = {}) {

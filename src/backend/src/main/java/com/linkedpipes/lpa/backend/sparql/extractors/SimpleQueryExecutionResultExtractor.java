@@ -30,7 +30,7 @@ public abstract class SimpleQueryExecutionResultExtractor<T> {
                 spliteratorUnknownSize(result, ORDERED | DISTINCT | NONNULL | IMMUTABLE);
 
         return StreamSupport.stream(spliterator, false)
-                .map(s -> extractObject(s))
+                .map(this::extractObject)
                 .collect(Collectors.toList());
     }
 
@@ -52,7 +52,7 @@ public abstract class SimpleQueryExecutionResultExtractor<T> {
 
     protected LocalizedValue getLabel(QuerySolution solution, String[] labelVariables){
         return Arrays.stream(labelVariables)
-                .filter(l -> solution.contains(l))
+                .filter(solution::contains)
                 .map(l -> localizedLabel(solution.get(l).asLiteral()))
                 .findAny().orElse(null);
     }

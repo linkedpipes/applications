@@ -12,7 +12,7 @@ public class LocalizedValue {
     public int size = languageMap.size();
 
     public LocalizedValue(Map<String, String> variants){
-        variants.forEach((language, value) -> put(language, value));
+        variants.forEach(this::put);
     }
 
     public LocalizedValue(String language, String localizedValue){
