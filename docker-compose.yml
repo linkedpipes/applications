@@ -36,7 +36,7 @@ services:
   discovery:
     image: linkedpipes/discovery
     container_name: lpa_discovery
-    command: sbt run -D ldcp.etl.hostname="http://etl:1234"
+    command: sbt -Dldcp.etl.hostname="http://etl:1234" run
     stdin_open: true
 
   etl:
