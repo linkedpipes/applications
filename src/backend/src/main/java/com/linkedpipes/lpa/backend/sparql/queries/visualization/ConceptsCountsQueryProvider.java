@@ -6,21 +6,27 @@ import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.SKOS;
 
+import java.util.List;
+
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/visualization/query/ConceptCountQuery.scala
 public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
 
-    private String propertyUri;
-    private String conceptUri;
+    private final String propertyUri;
+    private final String[] conceptUris;
 
     // PREFIXES
     private static final String SKOS_PREFIX = "skos";
 
     // VARIABLES
-    public static final String VAR_X = var("x");
+    public static final String VAR_CONCEPT = var("concept");
+    public static final String VAR_CONCEPT_URI = var("conceptUri");
+    public static final String VAR_COUNT = var("count");
 
-    public ConceptsCountsQueryProvider(String propertyUri, String conceptUri){
-        this.propertyUri = propertyUri;
-        this.conceptUri = conceptUri;
+    public ConceptsCountsQueryProvider(String propertyUri, List<String> conceptUris){
+        this.propertyUri = SparqlUtils.formatUri(propertyUri);
+        this.conceptUris = conceptUris.stream()
+                .map(SparqlUtils::formatUri)
+                .toArray(String[]::new);
     }
 
     @Override
@@ -32,13 +38,21 @@ public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
     @Override
     protected SelectBuilder addVars(SelectBuilder builder) throws ParseException {
         return builder
-                .addVar("count(" + VAR_X + ")", "?count");
+                .addVar(VAR_CONCEPT_URI)
+                .addVar("count(" + VAR_CONCEPT + ")", VAR_COUNT);
     }
 
     @Override
     protected SelectBuilder addWheres(SelectBuilder builder) {
         return builder
-                .addWhere(VAR_X, SparqlUtils.formatUri(propertyUri), SparqlUtils.formatUri(conceptUri));
+                .addWhereValueVar(VAR_CONCEPT_URI, (Object[]) conceptUris)
+                .addWhere(VAR_CONCEPT, propertyUri, VAR_CONCEPT_URI);
+    }
+
+    @Override
+    protected SelectBuilder addAdditional(SelectBuilder builder) {
+        return builder
+                .addGroupBy(VAR_CONCEPT_URI);
     }
 
 }
