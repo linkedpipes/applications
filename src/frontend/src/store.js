@@ -3,6 +3,7 @@ import datasourcesReducer from "./_reducers/datasources";
 import visualizers from "./_reducers/visualizers";
 import etl_executions from "./_reducers/etl_executions";
 import etl_exports from "./_reducers/etl_exports";
+import filters from "./_reducers/filters";
 import logger from "redux-logger";
 import globals from "./_reducers/globals";
 
@@ -22,7 +23,8 @@ export default () => {
       datasources: datasourcesReducer,
       visualizers: visualizers,
       etl_executions: etl_executions,
-      etl_exports: etl_exports
+      etl_exports: etl_exports,
+      filters: filters
     }),
     enhancer
   );
