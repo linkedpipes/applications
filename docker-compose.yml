@@ -34,6 +34,13 @@ services:
 
   # Discovery service runs locally in port 9000
   discovery:
-    image: linkedpipes/discovery
+    image: lp-discovery #linkedpipes/discovery
     container_name: lpa_discovery
+    command: sbt run -D ldcp.etl.hostname="http://etl:1234"
     stdin_open: true
+
+  etl:
+    image: linkedpipes/etl
+    container_name: lpa_etl
+    ports:
+      - 1234:8080
