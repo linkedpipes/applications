@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-
 import { VisualizerControllerHeader } from "./Header";
 import { VisualizerContainer } from "./Container";
+import connect from "react-redux/lib/connect/connect";
 
 const styles = theme => ({
   root: {
@@ -41,4 +41,12 @@ VisualizerController.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(VisualizerController);
+const mapStateToProps = state => {
+  return {
+    filters: state.filters
+  };
+};
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(VisualizerController)
+);
