@@ -25,7 +25,7 @@ matrix:
         - sed '1d' config.properties > config.properties.1
         - echo -e "discoveryServiceUrl=http://localhost:9000\n$(cat config.properties.1)" > config.properties
         - rm -rf config.properties.1
-        - cd src/backend
+        - cd ../../../../../../../
 
       script:
         - ./gradlew dockerRun
