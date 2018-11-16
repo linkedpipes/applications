@@ -29,7 +29,7 @@ matrix:
 
       script:
         - ./gradlew dockerRun
-        - sleep 5
+        - sleep 15
         - ./gradlew assemble
         - ./gradlew test
         - ./gradlew jacocoTestReport
