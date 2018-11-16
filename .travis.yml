@@ -22,6 +22,8 @@ matrix:
       jdk: openjdk10
       before_script:
         - cd src/backend
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker run -i -p 9000:9000 discovery -Dplay.crypto.secret=yourRandomSecret
       script:
         - ./gradlew assemble
         - ./gradlew test
