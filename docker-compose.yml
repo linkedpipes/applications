@@ -38,8 +38,6 @@ services:
     image: linkedpipes/applications:discovery
     container_name: lpa_discovery
     command: -Dldcp.etl.hostname="http://etl:1234" -Dplay.crypto.secret=yourRandomSecret
-    ports:
-      - 9002:9000
     stdin_open: true
     depends_on:
       - db
