@@ -21,10 +21,15 @@ matrix:
       language: java
       jdk: openjdk10
       before_script:
+        - cd src/backend/src/main/config/com/linkedpipes/lpa/backend
+        - sed '1d' config.properties > config.properties.1
+        - echo -e "discoveryServiceUrl=http://localhost:9000\n$(cat config.properties.1)" > config.properties
+        - rm -rf config.properties.1
         - cd src/backend
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker run -i -p 9000:9000 linkedpipes/applications:discovery -Dplay.crypto.secret=yourRandomSecret
+
       script:
+        - ./gradlew dockerRun
+        - sleep 5
         - ./gradlew assemble
         - ./gradlew test
         - ./gradlew jacocoTestReport
