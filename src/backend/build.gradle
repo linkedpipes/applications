@@ -68,7 +68,7 @@ dockerRun {
     image 'linkedpipes/applications:discovery'
     ports '9000:9000'
     daemonize true
-    command "-Dldcp.etl.hostname=http://etl:1234", "-Dplay.crypto.secret=yourRandomSecret"
+    command "-Dplay.crypto.secret=yourRandomSecret"
 }
 
 // Jacoco setup

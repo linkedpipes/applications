@@ -37,7 +37,7 @@ services:
   discovery:
     image: linkedpipes/applications:discovery
     container_name: lpa_discovery
-    command: -Dldcp.etl.hostname="http://etl:8080" -Dplay.crypto.secret=yourRandomSecret
+    command: -Dldcp.etl.hostname="http://lpa_etl:8080" -Dplay.crypto.secret=yourRandomSecret
     stdin_open: true
     depends_on:
       - db
