@@ -89,7 +89,7 @@ public class DiscoveryServiceComponent {
 
     private static class HttpActions {
 
-        private static final String URL_BASE = Application.getConfig().getProperty("discoveryServiceUrl");
+        private static final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
         private static final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
         private static final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
         private static final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");
