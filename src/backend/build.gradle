@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.palantir.docker-run' version '0.20.1'
+}
+
 configurations { codacy }
 
 apply plugin: 'java'
@@ -57,6 +61,14 @@ task unpack(type: Copy) {
     dependsOn bootJar
     from(zipTree(tasks.bootJar.outputs.files.singleFile))
     into("build/dependency")
+}
+
+dockerRun {
+    name 'my-container'
+    image 'linkedpipes/applications:discovery'
+    ports '9000:9000'
+    daemonize true
+    command "-Dplay.crypto.secret=yourRandomSecret"
 }
 
 // Jacoco setup
