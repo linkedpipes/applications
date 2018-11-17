@@ -14,7 +14,7 @@ matrix:
         directories:
           - src/frontend/node_modules
       script:
-        - yarn install --frozen-lockfile --check-files
+        - yarn install --check-files
         - yarn run build
 
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
