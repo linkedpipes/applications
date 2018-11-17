@@ -20,14 +20,15 @@ matrix:
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: java
       jdk: openjdk10
-      before_script:
+
+      script:
         - cd src/backend/src/main/config/com/linkedpipes/lpa/backend
         - sed '1d' config.properties > config.properties.1
         - echo -e "discoveryServiceUrl=http://localhost:9000\n$(cat config.properties.1)" > config.properties
+        - cat config.properties
         - rm -rf config.properties.1
         - cd ../../../../../../../
-
-      script:
+        - ls
         - ./gradlew dockerRun
         - sleep 15
         - ./gradlew assemble
