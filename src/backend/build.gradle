@@ -96,3 +96,17 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
             "87ac72b5a8d347b5a10a519323d71b6f"
     ]
 }
+
+static def lpaRelatedProperties() {
+    System.properties.findAll { key, _ ->
+        key.startsWith "lpa."
+    }
+}
+
+tasks.withType(Test) {
+    systemProperties lpaRelatedProperties()
+}
+
+tasks.withType(JavaExec) {
+    systemProperties lpaRelatedProperties()
+}
