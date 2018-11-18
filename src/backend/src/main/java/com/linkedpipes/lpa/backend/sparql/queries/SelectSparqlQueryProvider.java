@@ -20,20 +20,18 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
     public final Query get() {
         SelectBuilder builder = new SelectBuilder();
 
-        addPrefixes(builder);
-        addVars(builder);
-        addWheres(builder);
-        addOptionals(builder);
-
         try {
+            addPrefixes(builder);
+            addVars(builder);
+            addWheres(builder);
+            addOptionals(builder);
             addFilters(builder);
+            addAdditional(builder);
         }
         catch (ParseException e) {
-            logger.error("Exception while parsing query filters", e);
+            logger.error("Exception while parsing query", e);
             throw new RuntimeException(e);
         }
-
-        addAdditional(builder);
 
         return builder.build();
     }
@@ -42,22 +40,20 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
     public final Query getForNamed(String name) {
         SelectBuilder builder = new SelectBuilder();
 
-        addPrefixes(builder);
-        addVars(builder);
-        builder.fromNamed(name);
-
-        SelectBuilder subQuery = addOptionals(addWheres(new SelectBuilder()));
-
         try {
+            addPrefixes(builder);
+            addVars(builder);
+            builder.fromNamed(name);
+
+            SelectBuilder subQuery = addOptionals(addWheres(new SelectBuilder()));
             addFilters(subQuery);
+            builder.addGraph(VAR_GRAPH, subQuery);
+            addAdditional(builder);
+
         } catch (ParseException e) {
-            logger.error("Exception while parsing query filters", e);
+            logger.error("Exception while parsing query", e);
             throw new RuntimeException(e);
         }
-
-        builder.addGraph(VAR_GRAPH, subQuery);
-
-        addAdditional(builder);
 
         return builder.build();
     }
@@ -66,7 +62,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
         return builder;
     }
 
-    protected abstract SelectBuilder addVars(SelectBuilder builder);
+    protected abstract SelectBuilder addVars(SelectBuilder builder) throws ParseException;
 
     protected abstract SelectBuilder addWheres(SelectBuilder builder);
 

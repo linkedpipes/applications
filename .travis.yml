@@ -9,24 +9,42 @@ matrix:
         - stable
       before_script:
         - cd src/frontend
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
+        - export PATH="$HOME/.yarn/bin:$PATH"
       cache:
         yarn: true
         directories:
           - src/frontend/node_modules
       script:
-        - yarn install --frozen-lockfile --check-files
+        - yarn install --no-lockfile
         - yarn run build
 
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: java
       jdk: openjdk10
+
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+
       before_script:
-        - cd src/backend
+        - cd src/backend/src/main/config/com/linkedpipes/lpa/backend
+        - sed '1d' config.properties > config.properties.1
+        - echo -e "discoveryServiceUrl=http://localhost:9000\n$(cat config.properties.1)" > config.properties
+        - cat config.properties
+        - rm -rf config.properties.1
+        - cd ../../../../../../../
+
       script:
+        - ./gradlew dockerRun
         - ./gradlew assemble
         - ./gradlew test
         - ./gradlew jacocoTestReport
-        - ./gradlew sendCoverageToCodacy
+        # - ./gradlew sendCoverageToCodacy
 
     - # require the branch name to be master
       if: branch = master
