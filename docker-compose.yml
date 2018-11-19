@@ -27,6 +27,7 @@ services:
     container_name: lpa_frontend
     build:
       context: src/frontend/
+      dockerfile: Dockerfile
     depends_on:
       - backend
 
@@ -42,7 +43,7 @@ services:
   discovery:
     image: linkedpipes/applications:discovery
     container_name: lpa_discovery
-    command: ['-Dldcp.etl.hostname="http://lpa_etl:8080"', "-Dplay.http.secret=yourRandomSecret"]
+    command: ["-Dldcp.etl.hostname=http://lpa_etl:8080", "-Dplay.http.secret.key=yourRandomSecret", "-Dpidfile.path=/dev/null"]
     depends_on:
       - db
       - etl
