@@ -30,20 +30,20 @@ services:
     build:
       context: src/frontend/
       dockerfile: Dockerfile-prod
-    depends_on:
-      - backend
+    # depends_on:
+    #   - backend
 
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
+    container_name: lpa_virtuoso
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
     ports:
-      - 8890:8890
+      - 8899:8890
     volumes:
       - ./data/virtuoso:/data
 
-  # Discovery service runs locally in port 9000
   discovery:
     image: linkedpipes/applications:discovery
     container_name: lpa_discovery
@@ -54,9 +54,9 @@ services:
       ]
     ports:
       - 9000:9000
-    depends_on:
-      - db
-      - etl
+    # depends_on:
+    #   - db
+    #   - etl
 
   etl:
     image: linkedpipes/etl

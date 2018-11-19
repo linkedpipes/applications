@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 @RestController
 @SuppressWarnings("unused")
@@ -37,8 +40,10 @@ public class PipelineController {
     }
 
     @PostMapping("/api/pipeline/export")
-    public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException {
-        ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
+    public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException, URISyntaxException {
+        URL url = new URL(serviceDescriptionIri);
+        URI uri = url.toURI();
+        ServiceDescription serviceDescription = new ServiceDescription(uri.toString());
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
     }

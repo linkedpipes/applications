@@ -10,7 +10,7 @@ FROM node:8.12.0-alpine
 ADD package.json yarn.* /tmp/
 
 # Install packages
-RUN cd /tmp && yarn install --frozen-lockfile --check-files
+RUN cd /tmp && yarn install --no-lockfile
 
 # Create a symlink to node_modules
 RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules
