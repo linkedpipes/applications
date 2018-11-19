@@ -13,26 +13,24 @@ import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import {
   TOGGLE_FILTER,
-  TOGGLE_EXPAND_FILTER
+  TOGGLE_EXPAND_FILTER,
+  TOGGLE_CHECKBOX
 } from "../../../_constants/filters.constants";
 
 const styles = theme => ({});
 
 const mapStateToProps = state => ({});
 
-// const mapDispatchToProps = dispatch => ({
-//   toggleFilter: filter => dispatch({ type: TOGGLE_FILTER, payload: filter }),
-//   toggleExpandFilter: filter =>
-//     dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter })
-// });
-
 class Filters extends React.Component {
   handleClick = filter => () => {
     this.props.dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
   };
 
-  handleChance = option => () => {
-    this.props.dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
+  handleOptionChange = (filterUri, optionUri) => () => {
+    this.props.dispatch({
+      type: TOGGLE_CHECKBOX,
+      payload: { filterUri: filterUri, optionUri: optionUri }
+    });
   };
 
   render() {
@@ -66,7 +64,10 @@ class Filters extends React.Component {
                               type={filter.type}
                               key={option.skosConcept.uri}
                               option={option}
-                              onChange={null}
+                              onChange={this.handleOptionChange(
+                                filter.property.uri,
+                                option.skosConcept.uri
+                              )}
                             />
                           );
                         })}

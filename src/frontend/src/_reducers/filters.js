@@ -2,7 +2,8 @@ import {
   TOGGLE_FILTER,
   TOGGLE_EXPAND_FILTER,
   ADD_FILTERS,
-  ADD_FILTER
+  ADD_FILTER,
+  TOGGLE_CHECKBOX
 } from "../_constants/filters.constants";
 
 export default (state = [], action) => {
@@ -31,10 +32,23 @@ export default (state = [], action) => {
         }
         return filter;
       });
-    case TOGGLE_RADIO:
-      return state.concat(action.payload);
+    // case TOGGLE_RADIO:
+    //   return state.concat(action.payload);
     case TOGGLE_CHECKBOX:
-      return [...state, action.payload];
+      return state.map(filter => {
+        if (filter.property.uri === action.payload.filterUri) {
+          return {
+            ...filter,
+            options: filter.options.map(opt => {
+              if (opt.skosConcept.uri === action.payload.optionUri) {
+                return { ...opt, selected: !opt.selected };
+              }
+              return opt;
+            })
+          };
+        }
+        return filter;
+      });
     default:
       return state;
   }
