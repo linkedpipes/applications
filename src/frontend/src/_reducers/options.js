@@ -7,9 +7,9 @@ import {
 
 export default (state = [], action) => {
   switch (action.type) {
-    case ADD_FILTERS:
+    case TOGGLE_RADIO:
       return state.concat(action.payload);
-    case ADD_FILTER:
+    case TOGGLE_CHECKBOX:
       return [...state, action.payload];
     case TOGGLE_FILTER:
       return state.filters.map(filter => {
@@ -21,20 +21,6 @@ export default (state = [], action) => {
         }
         return filter;
       });
-    case TOGGLE_EXPAND_FILTER:
-      return state.map(filter => {
-        if (filter.property.uri === action.payload.property.uri) {
-          return {
-            ...filter,
-            expanded: !action.payload.expanded
-          };
-        }
-        return filter;
-      });
-    case TOGGLE_RADIO:
-      return state.concat(action.payload);
-    case TOGGLE_CHECKBOX:
-      return [...state, action.payload];
     default:
       return state;
   }

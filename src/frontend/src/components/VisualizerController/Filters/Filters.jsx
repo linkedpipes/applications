@@ -10,16 +10,29 @@ import Option from "./Options/Options";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import { withStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import {
+  TOGGLE_FILTER,
+  TOGGLE_EXPAND_FILTER
+} from "../../../_constants/filters.constants";
 
 const styles = theme => ({});
 
+const mapStateToProps = state => ({});
+
+// const mapDispatchToProps = dispatch => ({
+//   toggleFilter: filter => dispatch({ type: TOGGLE_FILTER, payload: filter }),
+//   toggleExpandFilter: filter =>
+//     dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter })
+// });
+
 class Filters extends React.Component {
-  state = {
-    open: true
+  handleClick = filter => () => {
+    this.props.dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
   };
 
-  handleClick = () => {
-    this.setState(state => ({ open: !state.open }));
+  handleChance = option => () => {
+    this.props.dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
   };
 
   render() {
@@ -40,11 +53,11 @@ class Filters extends React.Component {
             filters.map(filter => {
               return (
                 <div key={filter.property.uri}>
-                  <ListItem button onClick={this.handleClick}>
+                  <ListItem button onClick={this.handleClick(filter)}>
                     <ListItemText inset primary={filter.property.label} />
-                    {this.state.open ? <ExpandLess /> : <ExpandMore />}
+                    {filter.expanded ? <ExpandMore /> : <ExpandLess />}
                   </ListItem>
-                  <Collapse in={this.state.open} timeout="auto" unmountOnExit>
+                  <Collapse in={filter.expanded} timeout="auto" unmountOnExit>
                     {filter.options.length > 0 && (
                       <List component="div" disablePadding>
                         {filter.options.map(option => {
@@ -53,6 +66,7 @@ class Filters extends React.Component {
                               type={filter.type}
                               key={option.skosConcept.uri}
                               option={option}
+                              onChange={null}
                             />
                           );
                         })}
@@ -68,4 +82,4 @@ class Filters extends React.Component {
   }
 }
 
-export default withStyles(styles)(Filters);
+export default connect(mapStateToProps)(withStyles(styles)(Filters));
