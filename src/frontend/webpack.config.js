@@ -49,7 +49,7 @@ module.exports = () => {
     devServer: {
       index: "index.html",
       host: "0.0.0.0",
-      port: "9001",
+      port: "80",
       disableHostCheck: true, // solved Invalid-Host-header
       hot: true,
       headers: {
