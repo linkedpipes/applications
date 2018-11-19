@@ -24,7 +24,7 @@ services:
     container_name: lpa_frontend
     build:
       context: src/frontend/
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile-prod
 
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
