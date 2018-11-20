@@ -29,6 +29,9 @@ const BASE_URL = process.env.BASE_BACKEND_URL;
 const PIPELINES_URL = BASE_URL + "pipelines/";
 const PIPELINE_URL = BASE_URL + "pipeline/";
 const DISCOVERY_URL = BASE_URL + "discovery/";
+const DISCOVERY_STATUS_URL = discoveryId => {
+  return DISCOVERY_URL + discoveryId + "/status";
+};
 const EXECUTION_URL = BASE_URL + "execution/";
 
 const DISCOVER_FROM_INPUT_URL = PIPELINES_URL + "discoverFromInput";
@@ -96,6 +99,10 @@ export const DiscoveryService = {
   // TODO: refactor later, move to separate class responsible for _services calls
   postDiscoverFromUriList: async function({ datasourceUris }) {
     return rest(DISCOVER_FROM_URI_LIST_URL, datasourceUris, "POST", undefined);
+  },
+
+  getDiscoveryStatus: async function({ discoveryId }) {
+    return rest(DISCOVERY_STATUS_URL(discoveryId), undefined, "GET", undefined);
   },
 
   getPipelineGroups: async function({ discoveryId }) {
