@@ -51,14 +51,11 @@ matrix:
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - cd src/frontend
-        - docker build -t frontend .
-        - docker tag frontend linkedpipes/applications:frontend
-        - docker push linkedpipes/applications
+        - docker build -t linkedpipes/applications:frontend .
+        - docker push linkedpipes/applications:frontend
         - cd ../backend
-        - docker build -t backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
-        - docker images
-        - docker tag backend linkedpipes/applications:backend
-        - docker push linkedpipes/applications
+        - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
+        - docker push linkedpipes/applications:backend
 
 notifications:
   slack:
