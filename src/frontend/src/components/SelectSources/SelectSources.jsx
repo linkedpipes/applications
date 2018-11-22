@@ -83,7 +83,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
+    return DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
       .then(
         function(response) {
           return response.json();
@@ -111,6 +111,7 @@ class SelectSources extends React.Component {
         // self.setState({
         //   discoveryIsLoading: false
         // });
+        return jsonResponse;
       });
   };
 
@@ -177,7 +178,12 @@ class SelectSources extends React.Component {
     self.setState({ discoveryIsLoading: true });
 
     if (self.state.ttlFile) {
-      self.postStartFromFile();
+      self.postStartFromFile().then(function(discoveryResponse) {
+        self.addDiscoveryId(discoveryResponse.id).then(function() {
+          self.setState({ discoveryStatusPollingFinished: false });
+          self.checkDiscovery(discoveryResponse.id);
+        });
+      });
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
         self.addDiscoveryId(discoveryResponse.id).then(function() {
@@ -321,7 +327,6 @@ class SelectSources extends React.Component {
             <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
           ) : (
             <div>
-              {/*
               <input
                 accept=".ttl"
                 className={classes.input}
@@ -338,9 +343,8 @@ class SelectSources extends React.Component {
                 >
                   Select TTL file
                 </Button>
-
               </label>
-             */}
+
               <Button
                 variant="contained"
                 component="span"
