@@ -6,7 +6,7 @@ services:
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 80:80
+      - 9001:80
     depends_on:
       - backend
       - frontend
@@ -21,7 +21,7 @@ services:
       - discovery
 
   frontend:
-    image: linkedpipes/applications:frontend-prod
+    image: linkedpipes/applications:frontend
     container_name: lpa_frontend
     depends_on:
       - backend

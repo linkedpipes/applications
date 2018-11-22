@@ -43,10 +43,7 @@ class SelectSources extends React.Component {
     discoveryIsLoading: false,
     textFieldValue: "",
     textFieldIsValid: false,
-    open: false,
-    discoveryStatusPolling: undefined,
-    discoveryStatusPollingFinished: false,
-    discoveryStatusPollingInterval: 2000
+    open: false
   };
 
   handleClickOpen = () => {
@@ -94,7 +91,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          // self.setState({ discoveryIsLoading: false });
+          self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -108,9 +105,9 @@ class SelectSources extends React.Component {
           toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
         }
 
-        // self.setState({
-        //   discoveryIsLoading: false
-        // });
+        self.setState({
+          discoveryIsLoading: false
+        });
       });
   };
 
@@ -140,7 +137,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          // self.setState({ discoveryIsLoading: false });
+          self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -181,72 +178,22 @@ class SelectSources extends React.Component {
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
         self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id);
+          self
+            .loadPipelineGroups(discoveryResponse.id)
+            .then(function(pipelinesResponse) {
+              console.log(pipelinesResponse);
+
+              self.setState({
+                discoveryIsLoading: false
+              });
+
+              setTimeout(function() {
+                self.props.handleNextStep();
+              }, 500);
+            });
         });
       });
     }
-  };
-
-  checkDiscovery = discoveryId => {
-    // you should keep track of the timeout scheduled and
-    // provide a cleanup if needed
-
-    const self = this;
-
-    this.state.discoveryStatusPolling &&
-      clearTimeout(this.state.discoveryStatusPolling);
-
-    if (this.state.discoveryStatusPollingFinished) {
-      this.setState({ polling: undefined });
-
-      self.loadPipelineGroups(discoveryId).then(function(pipelinesResponse) {
-        console.log(pipelinesResponse);
-
-        self.setState({
-          discoveryIsLoading: false
-        });
-
-        setTimeout(function() {
-          self.props.handleNextStep();
-        }, 500);
-      });
-
-      return;
-    }
-
-    let tid = toast.info("Running discovery...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
-
-    DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "Error during discovery run",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
-      .then(function(jsonResponse) {
-        toast.dismiss(tid);
-        self.setState({
-          discoveryStatusPollingFinished: jsonResponse.isFinished
-        });
-      });
-
-    const discoveryStatusPolling = setTimeout(() => {
-      this.checkDiscovery(discoveryId);
-    }, this.state.discoveryStatusPollingInterval);
-
-    this.setState({
-      discoveryStatusPolling
-    });
   };
 
   loadPipelineGroups = discoveryId => {

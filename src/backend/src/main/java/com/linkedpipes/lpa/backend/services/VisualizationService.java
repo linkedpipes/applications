@@ -19,7 +19,7 @@ import java.util.List;
 
 public class VisualizationService {
 
-    private static final String ENDPOINT = Application.getConfig().getProperty("sparqlEndpoint");
+    private static final String ENDPOINT = Application.getConfig().getString("lpa.sparqlEndpoint");
 
     public List<Scheme> getSkosSchemes() {
         ConstructSparqlQueryProvider provider = new SchemesQueryProvider();

@@ -266,7 +266,7 @@ class DataSourcesTable extends React.Component {
         response += status;
 
         // TODO : hack value
-        // response = "Success";
+        response = "Success";
 
         if (
           status === ETL_STATUS_TYPE.Finished ||
