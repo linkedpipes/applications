@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
@@ -38,8 +39,8 @@ public class PipelineController {
 
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<String> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
-        //TODO remove hardcoding of localhost and port in below sd iri
-        ServiceDescription serviceDescription = new ServiceDescription("http://localhost:9001/api/virtuosoServiceDescription");
+        String serverUrl = Application.getConfig().getProperty("hostUrl");
+        ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription");
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
     }
