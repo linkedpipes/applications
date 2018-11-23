@@ -5,6 +5,9 @@
 
 [![Join the chat at https://gitter.im/linkedpipes/applications](https://badges.gitter.im/linkedpipes/applications.svg)](https://gitter.im/linkedpipes/applications?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/linkedpipes/applications.svg?branch=develop)](https://travis-ci.org/linkedpipes/applications)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/87ac72b5a8d347b5a10a519323d71b6f)](https://app.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Grade_Settings)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9589669eb7534112a3f65f0e4b9f69d8)](https://www.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Coverage)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 
 Meeting Logs: https://docs.google.com/document/d/1tvJgEbRWb9dYM34grGARRXQ9gE0fcITw0Rayu2mEbmA/edit
 
@@ -27,7 +30,7 @@ $ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/ba
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx.conf -o  nginx.conf &&
 docker-compose pull backend && docker-compose pull frontend && docker-compose up
-``` 
+```
 
 If it fails it can be because you already have some container with the same names running. You can delete these containers with the
 following command:s
@@ -36,10 +39,9 @@ following command:s
  $ docker rm $(docker ps -a -q -f name=lpa_*)
 ```
 
-
 ## Manual start
 
-You can also run the whole application by directly from the code in the repository. 
+You can also run the whole application by directly from the code in the repository.
 
 First download the whole repository into your computer by running
 
@@ -60,7 +62,6 @@ Finally, execute
 ```
 
 You should be able to access the application at `localhost:9001`
-
 
 You can also customize some settings in the following files:
 
