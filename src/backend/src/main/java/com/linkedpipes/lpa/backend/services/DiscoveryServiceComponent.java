@@ -8,8 +8,16 @@ import com.google.gson.reflect.TypeToken;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RIOT;
 
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
@@ -85,6 +93,25 @@ public class DiscoveryServiceComponent {
 
     public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
         return HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, new Gson().toJson(serviceDescription));
+    }
+
+    public String getVirtuosoServiceDescription(){
+        RIOT.init();
+
+        // create an empty model
+        Model model = ModelFactory.createDefaultModel();
+
+        //read base rdf from resource
+        InputStream fileStream = new DataInputStream(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl"));
+        model.read(fileStream, "", "TURTLE");
+        String virtuosoEndpoint = Application.getConfig().getString("lpa.sparqlEndpoint");
+        model.setNsPrefix("ns1", virtuosoEndpoint);
+
+        //TODO also set unique named graph
+        StringWriter stringWriter = new StringWriter();
+        RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
+
+        return stringWriter.toString();
     }
 
     private static class HttpActions {

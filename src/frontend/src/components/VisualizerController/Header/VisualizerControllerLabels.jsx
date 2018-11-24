@@ -8,7 +8,6 @@ import MapIcon from "@material-ui/icons/Map";
 
 const styles = {
   root: {
-    width: "100%",
     flexGrow: 1
   },
   textField: {
@@ -38,31 +37,18 @@ class VisualizerControllerLabels extends React.Component {
     const { classes } = this.props;
 
     return (
-      <Grid
-        container
-        item
-        direction="row"
-        alignItems="center"
-        spacing={0}
-        xs={7}
-      >
-        <Grid item>
-          <MapIcon style={{ fontSize: "70px" }} />
-        </Grid>
-        <Grid container item direction="column" xs={4} spacing={0}>
-          <Grid item>
-            <TextField
-              classes={classes.textField}
-              label="App title"
-              className={classes.textField}
-              value={this.state.title}
-              placeholder="Enter your app Title"
-              onChange={this.handleChange("title")}
-              margin="normal"
-            />
-          </Grid>
-        </Grid>
-      </Grid>
+      <div className={classes.root}>
+        <MapIcon style={{ fontSize: "70px" }} />
+        <TextField
+          classes={classes.textField}
+          label="App title"
+          className={classes.textField}
+          value={this.state.title}
+          placeholder="Enter your app Title"
+          onChange={this.handleChange("title")}
+          margin="normal"
+        />
+      </div>
     );
   }
 }

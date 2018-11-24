@@ -43,7 +43,10 @@ class SelectSources extends React.Component {
     discoveryIsLoading: false,
     textFieldValue: "",
     textFieldIsValid: false,
-    open: false
+    open: false,
+    discoveryStatusPolling: undefined,
+    discoveryStatusPollingFinished: false,
+    discoveryStatusPollingInterval: 2000
   };
 
   handleClickOpen = () => {
@@ -80,7 +83,7 @@ class SelectSources extends React.Component {
     });
 
     const self = this;
-    DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
+    return DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
       .then(
         function(response) {
           return response.json();
@@ -91,7 +94,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          self.setState({ discoveryIsLoading: false });
+          // self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -105,9 +108,10 @@ class SelectSources extends React.Component {
           toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
         }
 
-        self.setState({
-          discoveryIsLoading: false
-        });
+        // self.setState({
+        //   discoveryIsLoading: false
+        // });
+        return jsonResponse;
       });
   };
 
@@ -137,7 +141,7 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          self.setState({ discoveryIsLoading: false });
+          // self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -174,26 +178,83 @@ class SelectSources extends React.Component {
     self.setState({ discoveryIsLoading: true });
 
     if (self.state.ttlFile) {
-      self.postStartFromFile();
+      self.postStartFromFile().then(function(discoveryResponse) {
+        self.addDiscoveryId(discoveryResponse.id).then(function() {
+          self.setState({ discoveryStatusPollingFinished: false });
+          self.checkDiscovery(discoveryResponse.id, undefined);
+        });
+      });
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
         self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self
-            .loadPipelineGroups(discoveryResponse.id)
-            .then(function(pipelinesResponse) {
-              console.log(pipelinesResponse);
-
-              self.setState({
-                discoveryIsLoading: false
-              });
-
-              setTimeout(function() {
-                self.props.handleNextStep();
-              }, 500);
-            });
+          self.setState({ discoveryStatusPollingFinished: false });
+          self.checkDiscovery(discoveryResponse.id, undefined);
         });
       });
     }
+  };
+
+  checkDiscovery = (discoveryId, tid) => {
+    const self = this;
+
+    this.state.discoveryStatusPolling &&
+      clearTimeout(this.state.discoveryStatusPolling);
+
+    if (this.state.discoveryStatusPollingFinished) {
+      this.setState({ polling: undefined });
+
+      self.loadPipelineGroups(discoveryId).then(function(pipelinesResponse) {
+        console.log(pipelinesResponse);
+
+        self.setState({
+          discoveryIsLoading: false
+        });
+
+        setTimeout(function() {
+          self.props.handleNextStep();
+        }, 500);
+      });
+
+      return;
+    }
+
+    tid =
+      tid === undefined
+        ? toast.info("Please, hold on Discovery is casting spells 🧙‍...", {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: false
+          })
+        : tid;
+
+    DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(err) {
+          toast.update(tid, {
+            render: "Error during discovery run",
+            type: toast.TYPE.ERROR,
+            autoClose: 2000
+          });
+        }
+      )
+      .then(function(jsonResponse) {
+        self.setState({
+          discoveryStatusPollingFinished: jsonResponse.isFinished
+        });
+        if (jsonResponse.isFinished) {
+          toast.dismiss(tid);
+        }
+      });
+
+    const discoveryStatusPolling = setTimeout(() => {
+      this.checkDiscovery(discoveryId, tid);
+    }, this.state.discoveryStatusPollingInterval);
+
+    this.setState({
+      discoveryStatusPolling
+    });
   };
 
   loadPipelineGroups = discoveryId => {
@@ -268,7 +329,6 @@ class SelectSources extends React.Component {
             <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
           ) : (
             <div>
-              {/*
               <input
                 accept=".ttl"
                 className={classes.input}
@@ -285,9 +345,8 @@ class SelectSources extends React.Component {
                 >
                   Select TTL file
                 </Button>
-
               </label>
-             */}
+
               <Button
                 variant="contained"
                 component="span"

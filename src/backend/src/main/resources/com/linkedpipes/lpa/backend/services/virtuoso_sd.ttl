@@ -1,0 +1,19 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ns1:	<http://localhost:8890/sparql-graph-crud/> .
+@prefix sd:	<http://www.w3.org/ns/sparql-service-description#> .
+ns1:service	rdf:type	sd:Service ;
+	sd:endpoint	ns1: ;
+	sd:namedGraph	[ sd:name <https://named.com/someGraph> ];
+	sd:feature	sd:DereferencesURIs ,
+		sd:UnionDefaultGraph ,
+		sd:BasicFederatedQuery .
+@prefix ns3:	<http://www.w3.org/ns/formats/> .
+ns1:service	sd:resultFormat	ns3:SPARQL_Results_XML ,
+		ns3:Turtle ,
+		ns3:SPARQL_Results_CSV ,
+		ns3:SPARQL_Results_JSON ,
+		ns3:N3 ,
+		ns3:RDF_XML ,
+		ns3:N-Triples ,
+		ns3:RDFa ;
+	sd:supportedLanguage	sd:SPARQL11Query .
