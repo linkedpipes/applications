@@ -6,7 +6,7 @@ services:
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 9001:80
+      - 80:80
     depends_on:
       - backend
       - frontend
@@ -21,7 +21,7 @@ services:
       - discovery
 
   frontend:
-    image: linkedpipes/applications:frontend
+    image: linkedpipes/applications:frontend-prod
     container_name: lpa_frontend
     depends_on:
       - backend
@@ -34,11 +34,16 @@ services:
     volumes:
       - ./data/virtuoso:/data
 
-  # Discovery service runs locally in port 9000
   discovery:
     image: linkedpipes/applications:discovery
     container_name: lpa_discovery
-    command: ["-Dldcp.etl.hostname=http://lpa_etl:8080", "-Dplay.http.secret.key=yourRandomSecret", "-Dpidfile.path=/dev/null"]
+    command:
+      [
+        "40",
+        "-Dldcp.etl.hostname=http://lpa_etl:8080",
+        "-Dplay.http.secret.key=yourRandomSecret",
+        "-Dpidfile.path=/dev/null",
+      ]
     depends_on:
       - db
       - etl

@@ -31,7 +31,7 @@ The production version can be run with:
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties -o config.properties &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx-prod.conf -o  nginx-prod.conf &&
-docker-compose pull backend && docker-compose pull frontend && docker-compose up
+docker-compose pull && docker-compose up
 ```
 
 The development version can be run with:
