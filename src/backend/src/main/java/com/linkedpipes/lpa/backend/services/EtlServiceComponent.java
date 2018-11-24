@@ -46,7 +46,7 @@ public class EtlServiceComponent {
 
     private static class HttpActions {
 
-        private static final String URL_BASE = Application.getConfig().getProperty("etlServiceUrl");
+        private static final String URL_BASE = Application.getConfig().getString("lpa.etlServiceUrl");
         private static final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
 
         private static String executePipeline(String pipelineIri) throws IOException {

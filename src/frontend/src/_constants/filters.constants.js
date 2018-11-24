@@ -10,6 +10,12 @@ export const Filter = Record({
   type: filterTypes.CHECKBOX,
   enabled: true,
   expanded: false,
-  options: new Map(),
-  optionsUris: new List()
+  options: {},
+  optionsUris: []
 });
+
+export const ADD_FILTERS = "ADD_FILTERS";
+export const ADD_FILTER = "ADD_FILTER";
+export const TOGGLE_FILTER = "TOGGLE_FILTER";
+export const TOGGLE_EXPAND_FILTER = "TOGGLE_EXPAND_FILTER";
+export const TOGGLE_CHECKBOX = "TOGGLE_CHECKBOX";

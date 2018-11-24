@@ -19,3 +19,5 @@ export const Option = Record({
   mode: optionModes.USER_DEFINED,
   selected: false
 });
+
+export const TOGGLE_OPTION = "TOGGLE_OPTION";
