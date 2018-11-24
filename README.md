@@ -69,10 +69,15 @@ $ cd lpa
 Finally, execute
 
 ```bash
-(lpa)$ docker-compose up --build
+(lpa)$ docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up --build
 ```
 
-You should be able to access the application at `localhost:9001`
+You should be able to access:
+• Frontend of LPA at `localhost:9001`
+• Backend of LPA at `localhost:9005`
+• Local Discover at `localhost:9000`
+• Local ETL at `localhost:8080`
+• Local Virtuoso at `localhost:8890`
 
 You can also customize some settings in the following files:
 
