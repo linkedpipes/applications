@@ -104,7 +104,7 @@ public class DiscoveryServiceComponent {
         //read base rdf from resource
         InputStream fileStream = new DataInputStream(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl"));
         model.read(fileStream, "", "TURTLE");
-        String virtuosoEndpoint = Application.getConfig().getProperty("sparqlEndpoint");
+        String virtuosoEndpoint = Application.getConfig().getString("lpa.sparqlEndpoint");
         model.setNsPrefix("ns1", virtuosoEndpoint);
 
         //TODO also set unique named graph
@@ -116,7 +116,7 @@ public class DiscoveryServiceComponent {
 
     private static class HttpActions {
 
-        private static final String URL_BASE = Application.getConfig().getProperty("discoveryServiceUrl");
+        private static final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
         private static final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
         private static final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
         private static final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");

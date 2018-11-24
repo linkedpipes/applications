@@ -39,7 +39,7 @@ public class PipelineController {
 
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<String> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
-        String serverUrl = Application.getConfig().getProperty("hostUrl");
+        String serverUrl = Application.getConfig().getString("lpa.hostUrl");
         ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription");
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
