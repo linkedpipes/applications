@@ -25,9 +25,20 @@ ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPip
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
 
+The production version can be run with:
+
 ```bash
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties -o config.properties &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
+curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx-prod.conf -o  nginx-prod.conf &&
+docker-compose pull backend && docker-compose pull frontend && docker-compose up
+```
+
+The development version can be run with:
+
+```bash
+$ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties -o config.properties &&
+curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx.conf -o  nginx.conf &&
 docker-compose pull backend && docker-compose pull frontend && docker-compose up
 ```

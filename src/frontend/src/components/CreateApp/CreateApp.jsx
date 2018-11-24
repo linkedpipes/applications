@@ -16,29 +16,6 @@ const styles = theme => ({
   input: {}
 });
 
-const dummyMarkers = [
-  {
-    uri:
-      "http://linked.opendata.cz/resource/domain/cenia.cz/provozovny/CZ0065863E",
-    coordinates: {
-      lat: 49.243547222222226,
-      lng: 13.516010555555555
-    },
-    label: "Transformovna Sušice",
-    description: null
-  },
-  {
-    uri:
-      "http://linked.opendata.cz/resource/domain/coi.cz/check-action/101202279553001/postal-address",
-    coordinates: {
-      lat: 49.65865489999999,
-      lng: 17.0811406
-    },
-    label: null,
-    description: null
-  }
-];
-
 const skoConcept1 = {
   label: "skoConcept1label",
   uri: "skoConcept1URI",
@@ -93,11 +70,7 @@ class CreateApp extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        self.props.dispatch(
-          addFilters({
-            filters: self.assembleFilters(jsonResponse)
-          })
-        );
+        self.props.dispatch(addFilters(self.assembleFilters(jsonResponse)));
       });
   }
 
@@ -107,7 +80,7 @@ class CreateApp extends React.Component {
     return (
       <VisualizerController
         visualizerType={VISUALIZER_TYPE.GoogleMaps}
-        visualizerParams={{ markers: dummyMarkers }}
+        visualizerParams={{ markers: [] }}
         headerParams={{
           title: "Dataset overview",
           subtitle: "Google Maps Visualizer"

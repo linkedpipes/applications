@@ -14,7 +14,7 @@ const styles = theme => ({
   }
 });
 
-const Option = ({ option, type, onSelect, classes }) => {
+const Option = ({ option, type, onChange, classes }) => {
   const { count, mode, skosConcept, selected } = option;
 
   switch (type) {
@@ -25,7 +25,7 @@ const Option = ({ option, type, onSelect, classes }) => {
           <ListItemSecondaryAction>
             <Checkbox
               disabled={mode == modes.ALWAYS_SELECT}
-              onChange={() => console.log("value changed")}
+              onChange={onChange}
               checked={selected}
             />
           </ListItemSecondaryAction>
@@ -39,9 +39,7 @@ const Option = ({ option, type, onSelect, classes }) => {
             <Radio
               disabled={mode == modes.ALWAYS_SELECT}
               checked={selected}
-              onChange={() => console.log("value changed")}
-              value="a"
-              name="radio-button-demo"
+              onChange={onChange}
             />
           </ListItemSecondaryAction>
         </ListItem>
