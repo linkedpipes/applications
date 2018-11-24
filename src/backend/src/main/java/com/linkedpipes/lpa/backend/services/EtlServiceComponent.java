@@ -72,10 +72,11 @@ public class EtlServiceComponent {
                     .send();
         }
 
-        //the below method is used as a hack to change localhost reference to the name of the etl container in docker
-        private static String formatExecutionIri(String executionIri){
-            String exeuctionId = StringUtils.substringAfterLast(executionIri, "/");
-            return URL_BASE + "/executions/" + exeuctionId;
+        // the below method is used as a hack to change localhost reference to the name
+        // of the etl container in docker
+        private static String formatExecutionIri(String executionIri) {
+            String executionId = StringUtils.substringAfterLast(executionIri, "/");
+            return URL_BASE + "/executions/" + executionId;
         }
     }
 
