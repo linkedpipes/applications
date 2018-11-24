@@ -29,6 +29,9 @@ const BASE_URL = process.env.BASE_BACKEND_URL;
 const PIPELINES_URL = BASE_URL + "pipelines/";
 const PIPELINE_URL = BASE_URL + "pipeline/";
 const DISCOVERY_URL = BASE_URL + "discovery/";
+const DISCOVERY_STATUS_URL = discoveryId => {
+  return DISCOVERY_URL + discoveryId + "/status";
+};
 const EXECUTION_URL = BASE_URL + "execution/";
 
 const DISCOVER_FROM_INPUT_URL = PIPELINES_URL + "discoverFromInput";
@@ -98,6 +101,10 @@ export const DiscoveryService = {
     return rest(DISCOVER_FROM_URI_LIST_URL, datasourceUris, "POST", undefined);
   },
 
+  getDiscoveryStatus: async function({ discoveryId }) {
+    return rest(DISCOVERY_STATUS_URL(discoveryId), undefined, "GET", undefined);
+  },
+
   getPipelineGroups: async function({ discoveryId }) {
     return rest(PIPELINE_GROUPS_URL(discoveryId), undefined, "GET", undefined);
   },
@@ -109,6 +116,15 @@ export const DiscoveryService = {
       "GET",
       undefined
     );
+    // return fetch(EXPORT_PIPELINE_URL(discoveryId, pipelineId), {
+    //   method: "POST",
+    //   body:
+    //     "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
+    //   headers: {
+    //     "Content-Type": "text/plain"
+    //   },
+    //   credentials: "same-origin"
+    // });
   },
 
   getExecutePipeline: async function({ etlPipelineIri }) {
