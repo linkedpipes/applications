@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
@@ -36,11 +37,17 @@ public class PipelineController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/api/pipeline/export")
-    public ResponseEntity<String> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri, @RequestBody String serviceDescriptionIri) throws IOException {
-        ServiceDescription serviceDescription = new ServiceDescription(serviceDescriptionIri);
+    @GetMapping("/api/pipeline/exportWithSD")
+    public ResponseEntity<String> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
+        String serverUrl = Application.getConfig().getString("lpa.hostUrl");
+        ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription");
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/virtuosoServiceDescription")
+    public ResponseEntity<String> serviceDescription() {
+        return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription());
     }
 
     @GetMapping("/api/pipeline/create")

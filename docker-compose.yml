@@ -49,6 +49,7 @@ services:
     container_name: lpa_discovery
     command:
       [
+        "40",
         "-Dldcp.etl.hostname=http://lpa_etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",

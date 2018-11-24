@@ -110,21 +110,21 @@ export const DiscoveryService = {
   },
 
   getExportPipeline: async function({ discoveryId, pipelineId }) {
-    // return rest(
-    //   EXPORT_PIPELINE_URL(discoveryId, pipelineId),
-    //   "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
-    //   "POST",
-    //   undefined
-    // );
-    return fetch(EXPORT_PIPELINE_URL(discoveryId, pipelineId), {
-      method: "POST",
-      body:
-        "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      credentials: "same-origin"
-    });
+    return rest(
+      EXPORT_PIPELINE_URL(discoveryId, pipelineId),
+      undefined,
+      "GET",
+      undefined
+    );
+    // return fetch(EXPORT_PIPELINE_URL(discoveryId, pipelineId), {
+    //   method: "POST",
+    //   body:
+    //     "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
+    //   headers: {
+    //     "Content-Type": "text/plain"
+    //   },
+    //   credentials: "same-origin"
+    // });
   },
 
   getExecutePipeline: async function({ etlPipelineIri }) {

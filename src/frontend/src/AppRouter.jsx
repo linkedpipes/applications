@@ -15,10 +15,10 @@ import Grid from "@material-ui/core/Grid";
 const AppRouter = () => (
   <BrowserRouter>
     <Grid container direction="column">
-      <Grid item>
+      <Grid item md={12} lg={12}>
         <NavigationBar />
       </Grid>
-      <Grid item>
+      <Grid item md={12} lg={12}>
         <Switch>
           <Route exact path="/dashboard" component={Dashboard} />
           <Route exact path="/create-app" component={CreateApp} />

@@ -21,8 +21,6 @@ High level documentation markdown (updated regularly) : [HackMD](https://hackmd.
 
 ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
 
-Backend API Design: https://linkedpipes.docs.apiary.io/#
-
 ## Quick start
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):

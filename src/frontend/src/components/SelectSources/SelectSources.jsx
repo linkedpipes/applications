@@ -181,23 +181,20 @@ class SelectSources extends React.Component {
       self.postStartFromFile().then(function(discoveryResponse) {
         self.addDiscoveryId(discoveryResponse.id).then(function() {
           self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id);
+          self.checkDiscovery(discoveryResponse.id, undefined);
         });
       });
     } else {
       self.postStartFromInputLinks().then(function(discoveryResponse) {
         self.addDiscoveryId(discoveryResponse.id).then(function() {
           self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id);
+          self.checkDiscovery(discoveryResponse.id, undefined);
         });
       });
     }
   };
 
-  checkDiscovery = discoveryId => {
-    // you should keep track of the timeout scheduled and
-    // provide a cleanup if needed
-
+  checkDiscovery = (discoveryId, tid) => {
     const self = this;
 
     this.state.discoveryStatusPolling &&
@@ -221,10 +218,13 @@ class SelectSources extends React.Component {
       return;
     }
 
-    let tid = toast.info("Running discovery...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
+    tid =
+      tid === undefined
+        ? toast.info("Please, hold on Discovery is casting spells 🧙‍...", {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: false
+          })
+        : tid;
 
     DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
       .then(
@@ -240,14 +240,16 @@ class SelectSources extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        toast.dismiss(tid);
         self.setState({
           discoveryStatusPollingFinished: jsonResponse.isFinished
         });
+        if (jsonResponse.isFinished) {
+          toast.dismiss(tid);
+        }
       });
 
     const discoveryStatusPolling = setTimeout(() => {
-      this.checkDiscovery(discoveryId);
+      this.checkDiscovery(discoveryId, tid);
     }, this.state.discoveryStatusPollingInterval);
 
     this.setState({
