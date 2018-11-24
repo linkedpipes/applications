@@ -49,7 +49,7 @@ public class PipelineController {
 
     @GetMapping("/api/virtuosoServiceDescription")
     public ResponseEntity<String> serviceDescription(@RequestParam(value = "graphId") String graphId) {
-        String prefix = "https://named.com/graph/";
+        String prefix = "https://lpapps.com/";
         return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription(prefix + graphId));
     }
 
