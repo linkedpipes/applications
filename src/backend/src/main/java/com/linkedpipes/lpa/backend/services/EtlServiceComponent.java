@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -59,18 +60,24 @@ public class EtlServiceComponent {
         }
 
         private static String getExecutionStatus(String executionIri) throws IOException {
-            String targetUrl = urlFrom(executionIri, "overview");
+            String targetUrl = urlFrom(formatExecutionIri(executionIri), "overview");
             return new HttpRequestSender().to(targetUrl)
                     .acceptType("application/json")
                     .send();
         }
 
         private static String getExecutionResult(String executionIri) throws IOException {
-            return new HttpRequestSender().to(executionIri)
+            return new HttpRequestSender().to(formatExecutionIri(executionIri))
                     .acceptType("application/json")
                     .send();
         }
 
+        // the below method is used as a hack to change localhost reference to the name
+        // of the etl container in docker
+        private static String formatExecutionIri(String executionIri) {
+            String executionId = StringUtils.substringAfterLast(executionIri, "/");
+            return URL_BASE + "/executions/" + executionId;
+        }
     }
 
 }
