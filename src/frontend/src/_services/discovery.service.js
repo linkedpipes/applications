@@ -69,7 +69,7 @@ export const ETL_STATUS_TYPE = {
 const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
   return discoveryId && pipelineId
     ? PIPELINE_URL +
-        "export?" +
+        "exportWithSD?" +
         getQueryString({ discoveryId: discoveryId, pipelineUri: pipelineId })
     : "";
 };

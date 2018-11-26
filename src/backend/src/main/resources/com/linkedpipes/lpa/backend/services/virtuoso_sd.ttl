@@ -1,5 +1,5 @@
 @prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ns1:	<http://lpa_virtuoso:8890/sparql-graph-crud/> .
+@prefix ns1:	<http://lpa-virtuoso:8890/sparql-graph-crud/> .
 @prefix sd:	<http://www.w3.org/ns/sparql-service-description#> .
 ns1:service	rdf:type	sd:Service ;
 	sd:endpoint	ns1: ;

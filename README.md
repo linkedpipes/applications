@@ -1,4 +1,4 @@
-<p align="center"><img width=30% src="https://pli.io/22gHl3.png"></p>
+<p align="center"><img width=30% src="http://i63.tinypic.com/3013lg4.png"></a>
 <p align="center"><img width=25% src="https://media.giphy.com/media/8PpFGKr5vgNY1s8QiY/giphy.gif"></p>
 
 ### Software Project (NPRG023)
@@ -31,7 +31,7 @@ The production version can be run with:
 $ curl https://raw.githubusercontent.com/linkedpipes/applications/develop/src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties -o config.properties &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/docker-compose-master.yml -o docker-compose.yml &&
 curl https://raw.githubusercontent.com/linkedpipes/applications/develop/nginx-prod.conf -o  nginx-prod.conf &&
-docker-compose pull backend && docker-compose pull frontend && docker-compose up
+docker-compose pull && docker-compose up
 ```
 
 The development version can be run with:
@@ -47,7 +47,7 @@ If it fails it can be because you already have some container with the same name
 following command:s
 
 ```bash
- $ docker rm $(docker ps -a -q -f name=lpa_*)
+ $ docker rm $(docker ps -a -q -f name=lpa-*)
 ```
 
 ## Manual start

@@ -2,18 +2,18 @@ version: "3"
 services:
   nginx:
     image: nginx:stable
-    container_name: lpa_reverse_proxy
+    container_name: lpa-reverse-proxy
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 9001:80
+      - 80:80
     depends_on:
       - backend
       - frontend
 
   backend:
     image: linkedpipes/applications:backend
-    container_name: lpa_backend
+    container_name: lpa-backend
     volumes:
       - "./config.properties:/app/config.properties"
     depends_on:
@@ -21,8 +21,8 @@ services:
       - discovery
 
   frontend:
-    image: linkedpipes/applications:frontend
-    container_name: lpa_frontend
+    image: linkedpipes/applications:frontend-prod
+    container_name: lpa-frontend
     depends_on:
       - backend
 
@@ -34,17 +34,22 @@ services:
     volumes:
       - ./data/virtuoso:/data
 
-  # Discovery service runs locally in port 9000
   discovery:
     image: linkedpipes/applications:discovery
-    container_name: lpa_discovery
-    command: ["-Dldcp.etl.hostname=http://lpa_etl:8080", "-Dplay.http.secret.key=yourRandomSecret", "-Dpidfile.path=/dev/null"]
+    container_name: lpa-discovery
+    command:
+      [
+        "40",
+        "-Dldcp.etl.hostname=http://lpa-etl:8080",
+        "-Dplay.http.secret.key=yourRandomSecret",
+        "-Dpidfile.path=/dev/null",
+      ]
     depends_on:
       - db
       - etl
-  
+
   etl:
     image: linkedpipes/etl
-    container_name: lpa_etl
+    container_name: lpa-etl
     ports:
       - 8080:8080
