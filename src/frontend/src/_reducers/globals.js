@@ -7,7 +7,7 @@ export default (state = {}, action) => {
     case "SET_SELECTED_RESULT_GRAPH_IRI":
       return {
         ...state,
-        selectedResultGraphIRI: action.selectedResultGraphIRI
+        selectedResultGraphIri: action.selectedResultGraphIri
       };
     default:
       return { ...state };
