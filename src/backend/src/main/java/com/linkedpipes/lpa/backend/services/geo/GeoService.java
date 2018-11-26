@@ -31,6 +31,15 @@ public class GeoService {
         return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
     }
 
+    public static List<Marker> getMarkersFromNamed(String graphIri, Map<String, List<ValueFilter>> filters) {
+        if (filters == null) {
+            filters = Collections.emptyMap();
+        }
+
+        SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
+        return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
     public static List<Property> getProperties() {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
 

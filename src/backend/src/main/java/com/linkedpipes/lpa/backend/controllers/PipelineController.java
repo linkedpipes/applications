@@ -8,7 +8,9 @@ import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -39,11 +41,11 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline/exportWithSD")
-    public ResponseEntity<String> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
+    public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
         String serverUrl = Application.getConfig().getString("lpa.hostUrl");
         String graphId = UUID.randomUUID().toString() + "-" + discoveryId;
         ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription?graphId=" + graphId);
-        String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
+        PipelineExportResult response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
     }
 
