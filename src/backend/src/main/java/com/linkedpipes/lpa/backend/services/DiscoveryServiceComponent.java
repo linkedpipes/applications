@@ -10,17 +10,16 @@ import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
-import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
@@ -29,6 +28,8 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
  * Provides the functionality of Discovery-related backend operations of the application.
  */
 public class DiscoveryServiceComponent {
+
+    private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
 
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
         String response = HttpActions.startFromInput(discoveryConfig);
@@ -98,7 +99,7 @@ public class DiscoveryServiceComponent {
         return HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, new Gson().toJson(serviceDescription));
     }
 
-    public String getVirtuosoServiceDescription(String graphName){
+    public String getVirtuosoServiceDescription(String graphName) {
         RIOT.init();
 
         // create an empty model
@@ -107,24 +108,25 @@ public class DiscoveryServiceComponent {
         //read base rdf from resource
         InputStream fileStream = new DataInputStream(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl"));
         model.read(fileStream, "", "TURTLE");
-        String virtuosoEndpoint = Application.getConfig().getString("lpa.sparqlEndpoint");
-        model.setNsPrefix("ns1", virtuosoEndpoint);
 
+        String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint");
         String sd = "http://www.w3.org/ns/sparql-service-description#";
 
         //create triple ns1:service sd:namedGraph [sd:name <graphName>];
         //resource, property, RDFNode
-        Resource bnode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
-        Resource endpoint = model.createResource(virtuosoEndpoint + "service");
+        Resource endpoint = model.createResource(virtuosoEndpoint + "/service");
+        Resource blankNode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
         Statement name = model.createStatement(endpoint,
-                                               new PropertyImpl(sd+"namedGraph"),
-                                               bnode);
+                                               new PropertyImpl(sd + "namedGraph"),
+                                               blankNode);
         model.add(name);
 
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
 
-        return stringWriter.toString();
+        String serviceDescription = stringWriter.toString();
+        logger.info("serviceDescription = " + serviceDescription);
+        return serviceDescription;
     }
 
     private static class HttpActions {
