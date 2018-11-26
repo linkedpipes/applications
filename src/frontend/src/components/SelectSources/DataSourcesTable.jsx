@@ -19,6 +19,7 @@ import {
 } from "../../_services";
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
+import { addSelectedResultGraphIriAction } from "../../_actions/globals";
 import { toast } from "react-toastify";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -201,6 +202,12 @@ class DataSourcesTable extends React.Component {
             id: json.pipelineId,
             etlPipelineIri: json.etlPipelineIri,
             resultGraphIri: json.resultGraphIri
+          })
+        );
+
+        self.props.dispatch(
+          addSelectedResultGraphIriAction({
+            data: json.resultGraphIri
           })
         );
 
