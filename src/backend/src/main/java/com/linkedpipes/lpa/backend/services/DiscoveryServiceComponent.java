@@ -33,7 +33,7 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 public class DiscoveryServiceComponent {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
-    public static final Gson DEFAULT_GSON = new Gson();
+    private static final Gson DEFAULT_GSON = new Gson();
 
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
         String response = HttpActions.startFromInput(discoveryConfig);
