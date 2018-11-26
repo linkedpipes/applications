@@ -197,17 +197,19 @@ class DataSourcesTable extends React.Component {
       .then(function(json) {
         console.log(`Export pipeline request sent!`);
 
+        const response = json;
+
         self.props.dispatch(
           addSingleExport({
-            id: json.pipelineId,
-            etlPipelineIri: json.etlPipelineIri,
-            resultGraphIri: json.resultGraphIri
+            id: response.pipelineId,
+            etlPipelineIri: response.etlPipelineIri,
+            resultGraphIri: response.resultGraphIri
           })
         );
 
         self.props.dispatch(
           addSelectedResultGraphIriAction({
-            data: json.resultGraphIri
+            data: response.resultGraphIri
           })
         );
 
