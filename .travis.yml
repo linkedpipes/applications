@@ -48,6 +48,8 @@ matrix:
         - cd src/frontend
         - docker build -t linkedpipes/applications:frontend .
         - docker push linkedpipes/applications:frontend
+        - docker build -t linkedpipes/applications:frontend-prod -f Dockerfile-prod .
+        - docker push linkedpipes/applications:frontend-prod
         - cd ../backend
         - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
         - docker push linkedpipes/applications:backend

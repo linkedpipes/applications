@@ -149,7 +149,13 @@ export const DiscoveryService = {
     return rest(GET_PROPERTIES_URL, undefined, "GET", undefined);
   },
 
-  getMarkers: async function(applicationId, pipelineIri, filters = {}) {
-    return rest(GET_MARKERS_URL, filters, "POST");
+  getMarkers: async function({ resultGraphIri, filters = {} }) {
+    return rest(
+      GET_MARKERS_URL +
+        "?" +
+        getQueryString({ resultGraphIri: resultGraphIri }),
+      filters,
+      "POST"
+    );
   }
 };
