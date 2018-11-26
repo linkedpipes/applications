@@ -13,7 +13,7 @@ export const addSelectedVisualizerAction = ({ data } = {}) => ({
 });
 
 // ADD_SELECTED_VIZUALIZER
-export const addSelectedGraphIriAction = ({ data } = {}) => ({
-  type: "SET_SELECTED_GRAPH_IRI",
-  selectedGraphIri: data
+export const addSelectedResultGraphIriAction = ({ data } = {}) => ({
+  type: "SET_SELECTED_RESULT_GRAPH_IRI",
+  selectedResultGraphIri: data
 });
