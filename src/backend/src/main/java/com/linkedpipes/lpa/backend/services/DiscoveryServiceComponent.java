@@ -13,6 +13,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.rdf.model.Statement;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -95,7 +98,7 @@ public class DiscoveryServiceComponent {
         return HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, new Gson().toJson(serviceDescription));
     }
 
-    public String getVirtuosoServiceDescription(){
+    public String getVirtuosoServiceDescription(String graphName){
         RIOT.init();
 
         // create an empty model
@@ -107,7 +110,17 @@ public class DiscoveryServiceComponent {
         String virtuosoEndpoint = Application.getConfig().getString("lpa.sparqlEndpoint");
         model.setNsPrefix("ns1", virtuosoEndpoint);
 
-        //TODO also set unique named graph
+        String sd = "http://www.w3.org/ns/sparql-service-description#";
+
+        //create triple ns1:service sd:namedGraph [sd:name <graphName>];
+        //resource, property, RDFNode
+        Resource bnode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
+        Resource endpoint = model.createResource(virtuosoEndpoint + "service");
+        Statement name = model.createStatement(endpoint,
+                                               new PropertyImpl(sd+"namedGraph"),
+                                               bnode);
+        model.add(name);
+
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
 

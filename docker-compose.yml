@@ -2,7 +2,7 @@ version: "3"
 services:
   nginx:
     image: nginx:stable
-    container_name: lpa_reverse_proxy
+    container_name: lpa-reverse-proxy
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -13,7 +13,7 @@ services:
 
   backend:
     image: linkedpipes/applications:backend
-    container_name: lpa_backend
+    container_name: lpa-backend
     build:
       context: src/backend/
     volumes:
@@ -26,7 +26,7 @@ services:
 
   frontend:
     image: linkedpipes/applications:frontend
-    container_name: lpa_frontend
+    container_name: lpa-frontend
     build:
       context: src/frontend/
       dockerfile: Dockerfile
@@ -35,7 +35,7 @@ services:
 
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
-    container_name: lpa_virtuoso
+    container_name: lpa-virtuoso
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
@@ -46,11 +46,11 @@ services:
 
   discovery:
     image: linkedpipes/applications:discovery
-    container_name: lpa_discovery
+    container_name: lpa-discovery
     command:
       [
         "40",
-        "-Dldcp.etl.hostname=http://lpa_etl:8080",
+        "-Dldcp.etl.hostname=http://lpa-etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",
       ]
@@ -62,6 +62,6 @@ services:
 
   etl:
     image: linkedpipes/etl
-    container_name: lpa_etl
+    container_name: lpa-etl
     ports:
       - 8080:8080

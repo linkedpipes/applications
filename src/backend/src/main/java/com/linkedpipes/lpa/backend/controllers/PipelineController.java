@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @SuppressWarnings("unused")
@@ -40,14 +41,16 @@ public class PipelineController {
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<String> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws IOException {
         String serverUrl = Application.getConfig().getString("lpa.hostUrl");
-        ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription");
+        String graphId = UUID.randomUUID().toString() + "-" + discoveryId;
+        ServiceDescription serviceDescription = new ServiceDescription(serverUrl + "/api/virtuosoServiceDescription?graphId=" + graphId);
         String response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/virtuosoServiceDescription")
-    public ResponseEntity<String> serviceDescription() {
-        return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription());
+    public ResponseEntity<String> serviceDescription(@RequestParam(value = "graphId") String graphId) {
+        String prefix = "https://lpapps.com/";
+        return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription(prefix + graphId));
     }
 
     @GetMapping("/api/pipeline/create")
