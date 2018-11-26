@@ -3,7 +3,6 @@
 @prefix sd:	<http://www.w3.org/ns/sparql-service-description#> .
 ns1:service	rdf:type	sd:Service ;
 	sd:endpoint	ns1: ;
-	sd:namedGraph	[ sd:name <https://named.com/someGraph> ];
 	sd:feature	sd:DereferencesURIs ,
 		sd:UnionDefaultGraph ,
 		sd:BasicFederatedQuery .
