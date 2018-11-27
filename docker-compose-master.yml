@@ -6,7 +6,7 @@ services:
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 80:80
+      - 9001:80 # port configure in lpapps server
     depends_on:
       - backend
       - frontend
@@ -14,8 +14,6 @@ services:
   backend:
     image: linkedpipes/applications:backend
     container_name: lpa-backend
-    volumes:
-      - "./config.properties:/app/config.properties"
     depends_on:
       - etl
       - discovery
@@ -28,6 +26,7 @@ services:
 
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
+    container_name: lpa-virtuoso
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
