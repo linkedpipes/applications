@@ -2,10 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 
-import Paper from "@material-ui/core/Paper";
 import Labels from "./VisualizerControllerLabels";
 import Toolbox from "./VIsualizerControllerToolbox";
-import Grid from "@material-ui/core/Grid";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 
 const styles = theme => ({
   root: {
@@ -21,18 +21,17 @@ class VisualizerControllerHeader extends React.Component {
     const { classes, headerParams } = this.props;
 
     return (
-      <Paper className={classes.root}>
-        <Grid
-          container
-          direction="row"
-          className={classes.root}
-          justify="space-between"
-          alignItems="center"
-        >
-          <Labels title={headerParams.title} subtitle={headerParams.subtitle} />
-          <Toolbox />
-        </Grid>
-      </Paper>
+      <div className={classes.root}>
+        <AppBar position="static" color="default">
+          <Toolbar>
+            <Labels
+              title={headerParams.title}
+              subtitle={headerParams.subtitle}
+            />
+            <Toolbox />
+          </Toolbar>
+        </AppBar>
+      </div>
     );
   }
 }

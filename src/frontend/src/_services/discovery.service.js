@@ -29,6 +29,9 @@ const BASE_URL = process.env.BASE_BACKEND_URL;
 const PIPELINES_URL = BASE_URL + "pipelines/";
 const PIPELINE_URL = BASE_URL + "pipeline/";
 const DISCOVERY_URL = BASE_URL + "discovery/";
+const DISCOVERY_STATUS_URL = discoveryId => {
+  return DISCOVERY_URL + discoveryId + "/status";
+};
 const EXECUTION_URL = BASE_URL + "execution/";
 
 const DISCOVER_FROM_INPUT_URL = PIPELINES_URL + "discoverFromInput";
@@ -37,6 +40,7 @@ const PIPELINE_GROUPS_URL = discoveryId => {
   return DISCOVERY_URL + discoveryId + "/pipelineGroups";
 };
 const GET_MARKERS_URL = BASE_URL + "map/markers";
+const GET_PROPERTIES_URL = BASE_URL + "map/properties";
 
 export const ETL_STATUS_MAP = {
   "http://etl.linkedpipes.com/resources/status/queued": "Queued",
@@ -65,7 +69,7 @@ export const ETL_STATUS_TYPE = {
 const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
   return discoveryId && pipelineId
     ? PIPELINE_URL +
-        "export?" +
+        "exportWithSD?" +
         getQueryString({ discoveryId: discoveryId, pipelineUri: pipelineId })
     : "";
 };
@@ -97,6 +101,10 @@ export const DiscoveryService = {
     return rest(DISCOVER_FROM_URI_LIST_URL, datasourceUris, "POST", undefined);
   },
 
+  getDiscoveryStatus: async function({ discoveryId }) {
+    return rest(DISCOVERY_STATUS_URL(discoveryId), undefined, "GET", undefined);
+  },
+
   getPipelineGroups: async function({ discoveryId }) {
     return rest(PIPELINE_GROUPS_URL(discoveryId), undefined, "GET", undefined);
   },
@@ -108,6 +116,15 @@ export const DiscoveryService = {
       "GET",
       undefined
     );
+    // return fetch(EXPORT_PIPELINE_URL(discoveryId, pipelineId), {
+    //   method: "POST",
+    //   body:
+    //     "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
+    //   headers: {
+    //     "Content-Type": "text/plain"
+    //   },
+    //   credentials: "same-origin"
+    // });
   },
 
   getExecutePipeline: async function({ etlPipelineIri }) {
@@ -128,7 +145,17 @@ export const DiscoveryService = {
     );
   },
 
-  getMarkers: async function(applicationId, pipelineIri, filters = {}) {
-    return rest(GET_MARKERS_URL, filters, "POST");
+  getFilters: async function() {
+    return rest(GET_PROPERTIES_URL, undefined, "GET", undefined);
+  },
+
+  getMarkers: async function({ resultGraphIri, filters = {} }) {
+    return rest(
+      GET_MARKERS_URL +
+        "?" +
+        getQueryString({ resultGraphIri: resultGraphIri }),
+      filters,
+      "POST"
+    );
   }
 };

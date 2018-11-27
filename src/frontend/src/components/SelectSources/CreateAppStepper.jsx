@@ -61,6 +61,7 @@ class CreateAppStepper extends React.Component {
         return (
           <DataSourcesTable
             handleNextStep={this.handleNext}
+            handlePrevStep={this.handleBack}
             discoveryId={discoveryId}
             dataSourceGroups={
               selectedVisualizer !== undefined

@@ -1,5 +1,5 @@
 # Base image
-FROM node:8.11.4-alpine
+FROM node:8.12.0-alpine
 
 # Install packages using Yarn
 # References:
@@ -10,7 +10,7 @@ FROM node:8.11.4-alpine
 ADD package.json yarn.* /tmp/
 
 # Install packages
-RUN cd /tmp && yarn
+RUN cd /tmp && yarn install --frozen-lockfile --check-files
 
 # Create a symlink to node_modules
 RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules

@@ -20,7 +20,7 @@ import java.util.Map;
 //synonymous to https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/GeoServiceImpl.scala
 public class GeoService {
 
-    private static final String ENDPOINT = Application.getConfig().getProperty("sparqlEndpoint");
+    private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
 
     public static List<Marker> getMarkers(Map<String, List<ValueFilter>> filters) {
         if (filters == null) {
@@ -29,6 +29,15 @@ public class GeoService {
 
         SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
         return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+    }
+
+    public static List<Marker> getMarkersFromNamed(String graphIri, Map<String, List<ValueFilter>> filters) {
+        if (filters == null) {
+            filters = Collections.emptyMap();
+        }
+
+        SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
+        return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
     public static List<Property> getProperties() {
