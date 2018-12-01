@@ -5,7 +5,7 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
-    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:8080/api/ webpack-dev-server",
+    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ webpack-dev-server",
     "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ webpack-dev-server",
     "build": "cross-env BASE_BACKEND_URL=./api/ NODE_ENV=production webpack"
   },

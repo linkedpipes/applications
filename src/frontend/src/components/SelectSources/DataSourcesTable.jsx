@@ -22,6 +22,7 @@ import { addSingleExport } from "../../_actions/etl_exports";
 import { addSelectedResultGraphIriAction } from "../../_actions/globals";
 import { toast } from "react-toastify";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import uuid from "uuid";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -367,11 +368,7 @@ class DataSourcesTable extends React.Component {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(datasourceAndPipelines => {
                   return (
-                    <TableRow
-                      hover
-                      tabIndex={-1}
-                      key={datasourceAndPipelines.dataSources[0].uri}
-                    >
+                    <TableRow hover tabIndex={-1} key={uuid()}>
                       <TableCell component="th" scope="row" padding="checkbox">
                         {loadingButtons[
                           "button_" +
