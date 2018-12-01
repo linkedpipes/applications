@@ -12,11 +12,16 @@ import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
 import connect from "react-redux/lib/connect/connect";
 import DataSourcesTable from "./DataSourcesTable";
-import CreateAppCard from "./CreateAppCard";
+import { CreateAppCard } from "../CreateApp";
+import Grid from "@material-ui/core/Grid";
+import { QuickStartWidget } from "./QuickStart";
 
 const styles = theme => ({
   root: {
     width: "100%"
+  },
+  gridRoot: {
+    flexGrow: 1
   },
   button: {
     marginTop: theme.spacing.unit,
@@ -52,7 +57,18 @@ class StepperController extends React.Component {
 
     switch (step) {
       case 0:
-        return <SelectSources handleNextStep={this.handleNext} />;
+        return (
+          <div className={classes.root}>
+            <Grid container spacing={24}>
+              <Grid item xs={8} sm={8}>
+                <SelectSources handleNextStep={this.handleNext} />
+              </Grid>
+              <Grid item xs={4} sm={4}>
+                <QuickStartWidget />
+              </Grid>
+            </Grid>
+          </div>
+        );
       case 1:
         return (
           <VisualizerCardCollectionView handleNextStep={this.handleNext} />

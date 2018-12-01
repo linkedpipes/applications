@@ -1,2 +1,2 @@
-import QuickStartDialog from "./QuickStart";
-export { QuickStartDialog };
+import QuickStartWidget from "./QuickStart";
+export { QuickStartWidget };
