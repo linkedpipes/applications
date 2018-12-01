@@ -22,7 +22,7 @@ const styles = theme => ({
 
 class CreateAppCard extends React.Component {
   render() {
-    const { classes } = this.props;
+    const { classes, resultGraphIri } = this.props;
 
     return (
       <Grid container justify="center">
@@ -36,7 +36,7 @@ class CreateAppCard extends React.Component {
             </CardContent>
           </CardActionArea>
           <CardActions classes={{ root: classes.root }}>
-            <GoogleMapsPopup />
+            <GoogleMapsPopup resultGraphIri={resultGraphIri} />
           </CardActions>
         </Card>
       </Grid>
@@ -48,4 +48,10 @@ CreateAppCard.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default connect()(withStyles(styles)(CreateAppCard));
+const mapStateToProps = state => {
+  return {
+    resultGraphIri: state.globals.selectedResultGraphIri
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(CreateAppCard));

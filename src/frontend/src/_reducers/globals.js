@@ -4,6 +4,11 @@ export default (state = {}, action) => {
       return { ...state, discoveryId: action.discovery.id };
     case "SET_SELECTED_VISUALIZER":
       return { ...state, selectedVisualizer: action.selectedVisualizer };
+    case "SET_SELECTED_RESULT_GRAPH_IRI":
+      return {
+        ...state,
+        selectedResultGraphIri: action.selectedResultGraphIri
+      };
     default:
       return { ...state };
   }

@@ -59,8 +59,9 @@ class GoogleMapsPopup extends React.Component {
 
   componentDidMount() {
     const self = this;
+    const { resultGraphIri } = self.props;
 
-    DiscoveryService.getMarkers(null, null)
+    DiscoveryService.getMarkers({ resultGraphIri: resultGraphIri })
       .then(
         function(response) {
           return response.json();

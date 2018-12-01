@@ -19,6 +19,7 @@ import {
 } from "../../_services";
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
+import { addSelectedResultGraphIriAction } from "../../_actions/globals";
 import { toast } from "react-toastify";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -196,11 +197,19 @@ class DataSourcesTable extends React.Component {
       .then(function(json) {
         console.log(`Export pipeline request sent!`);
 
+        const response = json;
+
         self.props.dispatch(
           addSingleExport({
-            id: json.pipelineId,
-            etlPipelineIri: json.etlPipelineIri,
-            resultGraphIri: json.resultGraphIri
+            id: response.pipelineId,
+            etlPipelineIri: response.etlPipelineIri,
+            resultGraphIri: response.resultGraphIri
+          })
+        );
+
+        self.props.dispatch(
+          addSelectedResultGraphIriAction({
+            data: response.resultGraphIri
           })
         );
 

@@ -16,8 +16,6 @@ services:
     container_name: lpa-backend
     build:
       context: src/backend/
-    volumes:
-      - ./src/backend/config.properties:/app/config.properties:ro
     ports:
       - 9005:8080
     depends_on:

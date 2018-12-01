@@ -10,12 +10,14 @@ import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
-import org.apache.jena.rdf.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -30,14 +32,17 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
  */
 public class DiscoveryServiceComponent {
 
+    private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
+    private static final Gson DEFAULT_GSON = new Gson();
+
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
         String response = HttpActions.startFromInput(discoveryConfig);
-        return new Gson().fromJson(response, Discovery.class);
+        return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws IOException {
         String response = HttpActions.startFromInputIri(discoveryConfigIri);
-        return new Gson().fromJson(response, Discovery.class);
+        return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
     // TODO strongly type below method params (not simply string)
@@ -50,23 +55,22 @@ public class DiscoveryServiceComponent {
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
-        Gson gson = new Gson();
-
-        JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
+        JsonObject jsonObject = DEFAULT_GSON.fromJson(response, JsonObject.class);
         JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
         JsonArray appGroups = pipelineGroupsJson.getAsJsonArray("applicationGroups");
 
         for (JsonElement appGroup : appGroups) {
             PipelineGroup pipelineGrp = new PipelineGroup();
             JsonObject appGroupObj = appGroup.getAsJsonObject();
-            pipelineGrp.visualizer = gson.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
+            pipelineGrp.visualizer = DEFAULT_GSON.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
 
             JsonArray dataSourceGroups = appGroupObj.getAsJsonArray("dataSourceGroups");
 
             for (JsonElement dataSourceGroup : dataSourceGroups) {
                 DataSourceGroup dataSrcGroup = new DataSourceGroup();
                 JsonArray datasourceInstances = dataSourceGroup.getAsJsonObject().getAsJsonArray("dataSourceInstances");
-                dataSrcGroup.dataSources = gson.fromJson(datasourceInstances, new TypeToken<ArrayList<DataSource>>(){}.getType());
+                dataSrcGroup.dataSources = DEFAULT_GSON.fromJson(datasourceInstances, new TypeToken<ArrayList<DataSource>>() {
+                }.getType());
 
                 JsonArray extractorGroups = dataSourceGroup.getAsJsonObject().getAsJsonArray("extractorGroups");
 
@@ -75,7 +79,7 @@ public class DiscoveryServiceComponent {
 
                     for (JsonElement dataSampleGroup : dataSampleGroups) {
                         JsonObject dataSampleGrpObj = dataSampleGroup.getAsJsonObject();
-                        Pipeline pipeline = gson.fromJson(dataSampleGrpObj.getAsJsonObject("pipeline"), Pipeline.class);
+                        Pipeline pipeline = DEFAULT_GSON.fromJson(dataSampleGrpObj.getAsJsonObject("pipeline"), Pipeline.class);
                         pipeline.minimalIteration = Integer.parseInt(dataSampleGrpObj.getAsJsonPrimitive("minimalIteration").toString());
                         dataSrcGroup.pipelines.add(pipeline);
                     }
@@ -91,14 +95,15 @@ public class DiscoveryServiceComponent {
 
     public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws IOException {
         String response = HttpActions.exportPipeline(discoveryId, pipelineUri);
-        return new Gson().fromJson(response, PipelineExportResult.class);
+        return DEFAULT_GSON.fromJson(response, PipelineExportResult.class);
     }
 
-    public String exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
-        return HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, new Gson().toJson(serviceDescription));
+    public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
+        String exportResult = HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, DEFAULT_GSON.toJson(serviceDescription));
+        return DEFAULT_GSON.fromJson(exportResult, PipelineExportResult.class);
     }
 
-    public String getVirtuosoServiceDescription(String graphName){
+    public String getVirtuosoServiceDescription(String graphName) {
         RIOT.init();
 
         // create an empty model
@@ -107,24 +112,25 @@ public class DiscoveryServiceComponent {
         //read base rdf from resource
         InputStream fileStream = new DataInputStream(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl"));
         model.read(fileStream, "", "TURTLE");
-        String virtuosoEndpoint = Application.getConfig().getString("lpa.sparqlEndpoint");
-        model.setNsPrefix("ns1", virtuosoEndpoint);
 
+        String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint");
         String sd = "http://www.w3.org/ns/sparql-service-description#";
 
         //create triple ns1:service sd:namedGraph [sd:name <graphName>];
         //resource, property, RDFNode
-        Resource bnode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
-        Resource endpoint = model.createResource(virtuosoEndpoint + "service");
+        Resource endpoint = model.createResource(virtuosoEndpoint + "/service");
+        Resource blankNode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
         Statement name = model.createStatement(endpoint,
-                                               new PropertyImpl(sd+"namedGraph"),
-                                               bnode);
+                                               new PropertyImpl(sd + "namedGraph"),
+                                               blankNode);
         model.add(name);
 
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
 
-        return stringWriter.toString();
+        String serviceDescription = stringWriter.toString();
+        logger.debug(String.format("Service description of our Virtuoso server for named graph <%s> is:\n%s", graphName, serviceDescription));
+        return serviceDescription;
     }
 
     private static class HttpActions {

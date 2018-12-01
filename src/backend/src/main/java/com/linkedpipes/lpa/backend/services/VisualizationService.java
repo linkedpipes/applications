@@ -19,7 +19,7 @@ import java.util.List;
 
 public class VisualizationService {
 
-    private static final String ENDPOINT = Application.getConfig().getString("lpa.sparqlEndpoint");
+    private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
 
     public List<Scheme> getSkosSchemes() {
         ConstructSparqlQueryProvider provider = new SchemesQueryProvider();
