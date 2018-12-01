@@ -16,12 +16,12 @@ const styles = {
     justifyContent: "center"
   },
   card: {
-    maxHeight: 300,
-    maxWidth: 345,
-    marginLeft: 8,
-    marginTop: 8,
-    marginBottom: 10,
-    marginRight: 8
+    height: "100%",
+    display: "flex",
+    flexDirection: "column"
+  },
+  cardContent: {
+    flexGrow: 1
   },
   media: {
     objectFit: "cover"
@@ -58,7 +58,7 @@ class VisualizerCard extends React.Component {
       <Card className={classes.card}>
         <CardActionArea style={{ textAlign: "center" }}>
           <MapIcon style={{ fontSize: "80px" }} />
-          <CardContent>
+          <CardContent className={classes.CardContent}>
             <Typography gutterBottom variant="h5" component="h2">
               Test
             </Typography>
