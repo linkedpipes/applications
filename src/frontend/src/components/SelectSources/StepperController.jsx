@@ -42,7 +42,7 @@ function getSteps() {
   ];
 }
 
-class CreateAppStepper extends React.Component {
+class StepperController extends React.Component {
   state = {
     activeStep: 0
   };
@@ -154,7 +154,7 @@ class CreateAppStepper extends React.Component {
   }
 }
 
-CreateAppStepper.propTypes = {
+StepperController.propTypes = {
   classes: PropTypes.object
 };
 
@@ -165,4 +165,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(CreateAppStepper));
+export default connect(mapStateToProps)(withStyles(styles)(StepperController));
