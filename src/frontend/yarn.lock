@@ -2972,6 +2972,16 @@ filename-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY=
 
+filepond-plugin-file-validate-type@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.0.tgz#5ab8d25cb21c8d632a10b4c1a008fb5c0b1ff73a"
+  integrity sha512-oXck6wr37TwN1qcb64ktXIsi15Mfqqfd65T9gp5RP2nkXkwXtvgb5q5PANRqNEAYyJv3Od5DfL8m4BzfBXiBtg==
+
+filepond@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/filepond/-/filepond-3.4.0.tgz#a8b83a84c6f8a7bc7bcab9d32b59836828eddd7c"
+  integrity sha512-mHrXFW8H5c0QAkcMsbUSusyXX/eQ/8nOFHQuxQ9WtjSOSh0LZYJqtpR6JiUsG2fAcp4jMFDIBj9PJGsufEP7UA==
+
 fill-range@^2.1.0:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-2.2.4.tgz#eb1e773abb056dcd8df2bfdf6af59b8b3a936565"
@@ -5649,6 +5659,11 @@ react-event-listener@^0.6.2:
     "@babel/runtime" "7.0.0"
     prop-types "^15.6.0"
     warning "^4.0.1"
+
+react-filepond@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/react-filepond/-/react-filepond-5.0.0.tgz#28c30a878ce27b9b4899f877f4c3ead8dc9a026e"
+  integrity sha512-RmX2t3WHUGDA/x7F1I4HTMBFnJMrHNAC0UEKc7B7Mh2BrhWgyMmEmndxz/0BgrtdQ5dUfgKu1b2dJfA2ClRB7w==
 
 react-google-maps@9.4.x:
   version "9.4.5"
