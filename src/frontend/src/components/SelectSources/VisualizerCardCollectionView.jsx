@@ -54,7 +54,13 @@ class VisualizerCardCollectionView extends React.Component {
   };
 
   render() {
-    const { classes, visualizers, discoveryId, handleNextStep } = this.props;
+    const {
+      classes,
+      visualizers,
+      discoveryId,
+      handleNextStep,
+      hasOneVisualizer
+    } = this.props;
     const { spacing } = this.state;
 
     return (
@@ -86,6 +92,7 @@ class VisualizerCardCollectionView extends React.Component {
                     visualizerData={value}
                     discoveryId={discoveryId}
                     handleNextStep={handleNextStep}
+                    hasOneVisualizer={hasOneVisualizer}
                   />
                 </Grid>
               ))
@@ -104,6 +111,7 @@ VisualizerCardCollectionView.propTypes = {
 const mapStateToProps = state => {
   return {
     visualizers: state.visualizers,
+    hasOneVisualizer: state.visualizers.length === 1,
     discoveryId: state.globals.discoveryId
   };
 };

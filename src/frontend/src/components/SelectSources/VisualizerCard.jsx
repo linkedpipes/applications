@@ -51,6 +51,17 @@ class VisualizerCard extends React.Component {
     });
   };
 
+  componentDidMount() {
+    const self = this;
+    const { handleNextStep, hasOneVisualizer } = self.props;
+
+    if (hasOneVisualizer) {
+      setTimeout(function() {
+        handleNextStep();
+      }, 1000);
+    }
+  }
+
   render() {
     const { classes, visualizerData } = this.props;
 
