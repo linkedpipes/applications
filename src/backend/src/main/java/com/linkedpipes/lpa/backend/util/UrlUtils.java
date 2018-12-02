@@ -1,5 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
+import org.apache.commons.validator.routines.UrlValidator;
+
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,6 +16,12 @@ public final class UrlUtils {
 
     // do not let anyone instantiate this
     private UrlUtils() {
+    }
+
+    public static boolean isValidHttpUri(String url){
+        String[] schemes = {"http", "https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        return urlValidator.isValid(url);
     }
 
     /**
