@@ -122,9 +122,24 @@ class SelectSources extends React.Component {
     })
       .then(
         function(response) {
-          return response.json();
+          if (response.status === 500) {
+            toast.error("Please, try different sources, discovery failed :0", {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: true
+            });
+
+            self.setState({
+              discoveryIsLoading: false,
+              textFieldValue: "",
+              textFieldIsValid: true
+            });
+            throw Promise.reject(RawException(response));
+          } else {
+            return response.json();
+          }
         },
         function(err) {
+          console.log(err.json());
           toast.update(tid, {
             render: "There was an error during the discovery",
             type: toast.TYPE.ERROR,
@@ -278,8 +293,7 @@ class SelectSources extends React.Component {
     console.log("FilePond instance has initialised", this.pond);
   }
 
-  validateField = e => {
-    let rawText = e.target.value;
+  handleValidation = text => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
 
@@ -300,6 +314,11 @@ class SelectSources extends React.Component {
         })
       );
     }
+  };
+
+  validateField = e => {
+    let rawText = e.target.value;
+    this.handleValidation(rawText);
   };
 
   render() {
