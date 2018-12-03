@@ -75,12 +75,12 @@ class CreateApp extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, markers } = this.props;
 
     return (
       <VisualizerController
         visualizerType={VISUALIZER_TYPE.GoogleMaps}
-        visualizerParams={{ markers: [] }}
+        visualizerParams={{ markers: markers }}
         headerParams={{
           title: "Dataset overview",
           subtitle: "Google Maps Visualizer"
@@ -94,4 +94,10 @@ CreateApp.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default connect()(withStyles(styles)(CreateApp));
+const mapStateToProps = state => {
+  return {
+    markers: state.markers
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(CreateApp));

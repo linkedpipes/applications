@@ -15,6 +15,7 @@ import { withRouter } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Filters from "../../VisualizerController/Filters/Filters";
 import { addFilters } from "../../../_actions/filters";
+import { addMultipleMarkers } from "../../../_actions/markers";
 import { optionModes, filterTypes } from "../../../_constants";
 import connect from "react-redux/lib/connect/connect";
 
@@ -80,8 +81,7 @@ class GoogleMapsPopup extends React.Component {
   };
 
   state = {
-    open: false,
-    markers: []
+    open: false
   };
 
   handleClickOpen = () => {
@@ -119,7 +119,7 @@ class GoogleMapsPopup extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        self.setState({ markers: jsonResponse });
+        self.props.dispatch(addMultipleMarkers(jsonResponse));
       });
 
     DiscoveryService.getFilters()
@@ -139,8 +139,8 @@ class GoogleMapsPopup extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { markers, filters } = this.state;
+    const { classes, markers } = this.props;
+    const { filters } = this.state;
     return (
       <span>
         <Button className={classes.button} onClick={this.handleClickOpen}>
@@ -195,4 +195,12 @@ GoogleMapsPopup.propTypes = {
   popupAction: PropTypes.object
 };
 
-export default connect()(withRouter(withStyles(styles)(GoogleMapsPopup)));
+const mapStateToProps = state => {
+  return {
+    markers: state.markers
+  };
+};
+
+export default connect(mapStateToProps)(
+  withRouter(withStyles(styles)(GoogleMapsPopup))
+);
