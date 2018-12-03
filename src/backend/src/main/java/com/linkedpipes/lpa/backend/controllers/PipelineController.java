@@ -5,10 +5,11 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
-import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
+import com.linkedpipes.lpa.backend.services.DiscoveryService;
+import com.linkedpipes.lpa.backend.services.EtlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,12 +25,12 @@ public class PipelineController {
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
     private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/";
 
-    private final DiscoveryServiceComponent discoveryService;
-    private final EtlServiceComponent etlService;
+    private final DiscoveryService discoveryService;
+    private final EtlService etlService;
 
-    public PipelineController() {
-        discoveryService = new DiscoveryServiceComponent();
-        etlService = new EtlServiceComponent();
+    public PipelineController(ApplicationContext context) {
+        discoveryService = context.getBean(DiscoveryService.class);
+        etlService = context.getBean(EtlService.class);
     }
 
     @GetMapping("/api/pipeline")

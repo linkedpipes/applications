@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import com.linkedpipes.lpa.backend.util.Streams;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -18,40 +19,55 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
 /**
  * Provides the functionality of Discovery-related backend operations of the application.
  */
-public class DiscoveryServiceComponent {
+@Service
+public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final Gson DEFAULT_GSON = new Gson();
 
+    private final ApplicationContext context;
+    private final HttpActions httpActions = new HttpActions();
+
+    public DiscoveryServiceComponent(ApplicationContext context) {
+        this.context = context;
+    }
+
+    @Override
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
-        String response = HttpActions.startFromInput(discoveryConfig);
+        String response = httpActions.startFromInput(discoveryConfig);
         return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
+    @Override
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws IOException {
-        String response = HttpActions.startFromInputIri(discoveryConfigIri);
+        String response = httpActions.startFromInputIri(discoveryConfigIri);
         return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
     // TODO strongly type below method params (not simply string)
+    @Override
     public String getDiscoveryStatus(String discoveryId) throws IOException{
-        return HttpActions.getStatus(discoveryId);
+        return httpActions.getStatus(discoveryId);
     }
 
+    @Override
     public PipelineGroups getPipelineGroups(String discoveryId) throws IOException {
-        String response = HttpActions.getPipelineGroups(discoveryId);
+        String response = httpActions.getPipelineGroups(discoveryId);
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
@@ -74,16 +90,13 @@ public class DiscoveryServiceComponent {
 
                 JsonArray extractorGroups = dataSourceGroup.getAsJsonObject().getAsJsonArray("extractorGroups");
 
-                for (JsonElement extractorGroup : extractorGroups) {
-                    JsonArray dataSampleGroups = extractorGroup.getAsJsonObject().getAsJsonArray("dataSampleGroups");
-
-                    for (JsonElement dataSampleGroup : dataSampleGroups) {
-                        JsonObject dataSampleGrpObj = dataSampleGroup.getAsJsonObject();
-                        Pipeline pipeline = DEFAULT_GSON.fromJson(dataSampleGrpObj.getAsJsonObject("pipeline"), Pipeline.class);
-                        pipeline.minimalIteration = Integer.parseInt(dataSampleGrpObj.getAsJsonPrimitive("minimalIteration").toString());
-                        dataSrcGroup.pipelines.add(pipeline);
-                    }
-                }
+                dataSrcGroup.pipelines = Streams.sequentialFromIterable(extractorGroups)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(obj -> obj.getAsJsonArray("dataSampleGroups"))
+                        .flatMap(Streams::sequentialFromIterable)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(this::pipelineFromJson)
+                        .collect(Collectors.toList());
 
                 pipelineGrp.dataSourceGroups.add(dataSrcGroup);
             }
@@ -93,16 +106,25 @@ public class DiscoveryServiceComponent {
         return pipelineGroups;
     }
 
+    private Pipeline pipelineFromJson(JsonObject jsonObject) {
+        Pipeline pipeline = DEFAULT_GSON.fromJson(jsonObject.getAsJsonObject("pipeline"), Pipeline.class);
+        pipeline.minimalIteration = Integer.parseInt(jsonObject.getAsJsonPrimitive("minimalIteration").toString());
+        return pipeline;
+    }
+
+    @Override
     public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-        String response = HttpActions.exportPipeline(discoveryId, pipelineUri);
+        String response = httpActions.exportPipeline(discoveryId, pipelineUri);
         return DEFAULT_GSON.fromJson(response, PipelineExportResult.class);
     }
 
+    @Override
     public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
-        String exportResult = HttpActions.exportPipelineUsingSD(discoveryId, pipelineUri, DEFAULT_GSON.toJson(serviceDescription));
+        String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, DEFAULT_GSON.toJson(serviceDescription));
         return DEFAULT_GSON.fromJson(exportResult, PipelineExportResult.class);
     }
 
+    @Override
     public String getVirtuosoServiceDescription(String graphName) {
         RIOT.init();
 
@@ -133,17 +155,17 @@ public class DiscoveryServiceComponent {
         return serviceDescription;
     }
 
-    private static class HttpActions {
+    private class HttpActions {
 
-        private static final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
-        private static final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
-        private static final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
-        private static final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");
-        private static final String URL_GET_PIPELINE_GROUPS = urlFrom(URL_BASE, "discovery", "%s", "pipeline-groups");
-        private static final String URL_EXPORT_PIPELINE = urlFrom(URL_BASE, "discovery", "%s", "export", "%s");
+        private final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
+        private final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
+        private final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
+        private final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");
+        private final String URL_GET_PIPELINE_GROUPS = urlFrom(URL_BASE, "discovery", "%s", "pipeline-groups");
+        private final String URL_EXPORT_PIPELINE = urlFrom(URL_BASE, "discovery", "%s", "export", "%s");
 
-        private static String startFromInput(String discoveryConfig) throws IOException {
-            return new HttpRequestSender().to(URL_START_FROM_INPUT)
+        private String startFromInput(String discoveryConfig) throws IOException {
+            return new HttpRequestSender(context).to(URL_START_FROM_INPUT)
                     .method(HttpRequestSender.HttpMethod.POST)
                     .requestBody(discoveryConfig)
                     .contentType("text/plain")
@@ -151,33 +173,33 @@ public class DiscoveryServiceComponent {
                     .send();
         }
 
-        private static String startFromInputIri(String discoveryConfigIri) throws IOException {
-            return new HttpRequestSender().to(URL_START_FROM_INPUT_IRI)
+        private String startFromInputIri(String discoveryConfigIri) throws IOException {
+            return new HttpRequestSender(context).to(URL_START_FROM_INPUT_IRI)
                     .parameter("iri", discoveryConfigIri)
                     .acceptType("application/json")
                     .send();
         }
 
-        private static String getStatus(String discoveryId) throws IOException {
-            return new HttpRequestSender().to(String.format(URL_GET_STATUS, discoveryId))
+        private String getStatus(String discoveryId) throws IOException {
+            return new HttpRequestSender(context).to(String.format(URL_GET_STATUS, discoveryId))
                     .acceptType("application/json")
                     .send();
         }
 
-        private static String getPipelineGroups(String discoveryId) throws IOException {
-            return new HttpRequestSender().to(String.format(URL_GET_PIPELINE_GROUPS, discoveryId))
+        private String getPipelineGroups(String discoveryId) throws IOException {
+            return new HttpRequestSender(context).to(String.format(URL_GET_PIPELINE_GROUPS, discoveryId))
                     .acceptType("application/json")
                     .send();
         }
 
-        private static String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
-            return new HttpRequestSender().to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
+        private String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
+            return new HttpRequestSender(context).to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
                     .acceptType("application/json")
                     .send();
         }
 
-        private static String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws IOException {
-            return new HttpRequestSender().to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
+        private String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws IOException {
+            return new HttpRequestSender(context).to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
                     .method(HttpRequestSender.HttpMethod.POST)
                     .requestBody(serviceDescription)
                     .contentType("application/json")

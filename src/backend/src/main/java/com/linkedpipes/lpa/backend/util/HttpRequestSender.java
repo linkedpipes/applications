@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StreamUtils;
 
 import java.io.DataOutputStream;
@@ -31,12 +32,18 @@ public class HttpRequestSender {
     private static final String HTTP_PROPERTY_KEY_CONTENT_TYPE = "Content-Type";
     private static final String HTTP_PROPERTY_KEY_ACCEPT = "Accept";
 
+    private final HttpURLConnectionFactory factory;
+
     private String targetUrl = null;
     private HttpMethod method = HttpMethod.GET;
     private String requestBody = null;
     private String contentType = null;
     private String acceptType = null;
     private final UrlParameters parameters = new UrlParameters();
+
+    public HttpRequestSender(ApplicationContext context) {
+        this.factory = context.getBean(HttpURLConnectionFactory.class);
+    }
 
     /**
      * Sets the target URL to connect to. This setting is mandatory.
@@ -108,14 +115,14 @@ public class HttpRequestSender {
     }
 
     /**
-     * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the given factory.
+     * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the
+     * dependency-injected factory.
      *
-     * @param factory factory for the connection object
      * @return the body of the response obtained by the request
      * @throws IOException           if an I/O error occurs
      * @throws IllegalStateException if a mandatory setting has not been set for this builder
      */
-    public String send(HttpURLConnectionFactory factory) throws IOException {
+    public String send() throws IOException {
         checkMandatorySettings();
         HttpURLConnection connection = factory.getConnectionForUrl(getUrlWithParameters());
 
@@ -135,18 +142,6 @@ public class HttpRequestSender {
         try (InputStream inputStream = connection.getInputStream()) {
             return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
         }
-    }
-
-    /**
-     * Generates and sends the HTTP request, obtaining a {@link HttpURLConnection connection} from the {@link
-     * HttpURLConnectionFactory#getDefaultFactory() default factory}.
-     *
-     * @return the body of the response obtained by the request
-     * @throws IOException           if an I/O error occurs
-     * @throws IllegalStateException if a mandatory setting has not been set for this builder
-     */
-    public String send() throws IOException {
-        return send(HttpURLConnectionFactory.getDefaultFactory());
     }
 
     private void checkMandatorySettings() {
