@@ -119,13 +119,12 @@ class GoogleMapsPopup extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        self.props.dispatch(addMultipleMarkers(jsonResponse.json()));
+        self.props.dispatch(addMultipleMarkers({ markersList: jsonResponse }));
       });
 
     DiscoveryService.getFilters()
       .then(
         function(response) {
-          console.log("CHAAAAAAAAZ");
           console.log(response);
           return response.json();
         },
