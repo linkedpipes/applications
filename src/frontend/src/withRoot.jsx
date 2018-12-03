@@ -28,11 +28,10 @@ function withRoot(Component) {
       <MuiThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...props} />
+        <Component {...props} theme={theme} />
       </MuiThemeProvider>
     );
   }
-
   return WithRoot;
 }
 
