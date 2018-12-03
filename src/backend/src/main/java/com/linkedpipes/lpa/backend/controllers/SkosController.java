@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
 import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
 import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
 import com.linkedpipes.lpa.backend.services.VisualizationService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,8 @@ public class SkosController {
 
     private final VisualizationService visualizationService;
 
-    public SkosController(){
-        visualizationService = new VisualizationService();
+    public SkosController(ApplicationContext context){
+        visualizationService = context.getBean(VisualizationService.class);
     }
 
     @GetMapping("/api/skos/schemes")
