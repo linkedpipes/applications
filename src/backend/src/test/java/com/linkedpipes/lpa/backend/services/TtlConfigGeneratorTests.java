@@ -1,11 +1,11 @@
 package com.linkedpipes.lpa.backend.services;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TtlConfigGeneratorTests {
+class TtlConfigGeneratorTests {
 
     @Test
-    public void foo() {
+    void foo() {
     }
 
 }
