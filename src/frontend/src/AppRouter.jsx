@@ -52,11 +52,8 @@ const AppRouter = props => {
           <Switch>
             <Route exact path="/dashboard" component={Dashboard} />
             <Route exact path="/create-app" component={CreateApp} />
-            <Route exact path="/select-sources" component={CreateAppStepper} />
-            {/*<Route path="/create-app" component={AboutPage} />*/}
+            <Route exact path="/select-sources" component={StepperController} />
             <Route path="/about" component={AboutPage} />
-            {/*<Route path="/login" component={AboutPage} />*/}
-            {/*<Route path="/register" component={AboutPage} />*/}
             <Redirect from="/" to="/dashboard" />
             <Route component={NotFoundPage} />
           </Switch>
