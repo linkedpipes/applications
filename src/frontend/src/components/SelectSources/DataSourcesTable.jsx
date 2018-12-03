@@ -256,7 +256,7 @@ class DataSourcesTable extends React.Component {
     tid =
       tid === undefined
         ? toast.info(
-            "Please, hold on ETL is chatting with Tim Berneres Lee 🕴...",
+            "Please, hold on ETL is chatting with Tim Berners-Lee 🕴...",
             {
               position: toast.POSITION.TOP_RIGHT,
               autoClose: false
