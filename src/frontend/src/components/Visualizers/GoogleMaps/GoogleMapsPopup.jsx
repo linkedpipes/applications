@@ -125,7 +125,6 @@ class GoogleMapsPopup extends React.Component {
     DiscoveryService.getFilters()
       .then(
         function(response) {
-          console.log(response);
           return response.json();
         },
         function(err) {
