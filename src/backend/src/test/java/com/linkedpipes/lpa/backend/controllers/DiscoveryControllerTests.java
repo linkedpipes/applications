@@ -31,7 +31,7 @@ class DiscoveryControllerTests {
 
     private static final List<DataSource> FAKE_DISCOVERY_DATA_SOURCES = List.of(
             new DataSource() {{
-                uri = "http://this.is.a.fake.uri";
+                uri = "http://this.is.a.fake.uri.com";
             }}
     );
 

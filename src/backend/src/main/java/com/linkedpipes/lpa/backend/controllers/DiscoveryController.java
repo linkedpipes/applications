@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.TtlConfigGenerator;
+import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,10 @@ public class DiscoveryController {
     public ResponseEntity<?> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws IOException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             return new ResponseEntity<>(new ErrorResponse("No data sources were provided"), HttpStatus.BAD_REQUEST);
+        }
+
+        if(!dataSourceList.stream().allMatch(ds -> UrlUtils.isValidHttpUri(ds.uri))){
+            return new ResponseEntity<>(new ErrorResponse("Some data sources are not valid HTTP URIS"), HttpStatus.BAD_REQUEST);
         }
 
         String discoveryConfig = TtlConfigGenerator.fromDataSourceList(dataSourceList);
