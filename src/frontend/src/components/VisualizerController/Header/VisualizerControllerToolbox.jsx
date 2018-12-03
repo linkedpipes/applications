@@ -5,6 +5,8 @@ import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import PreviewIcon from "@material-ui/icons/Wallpaper";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const styles = theme => ({
   root: {
@@ -32,6 +34,16 @@ class VisualizerControllerToolbox extends React.Component {
 
     return (
       <div>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={this.state.checkedRefresh}
+              onChange={this.handleChange("checkedRefresh")}
+              value="checkedRefresh"
+            />
+          }
+          label={this.state.checkedRefresh ? "Refresh" : "Fixed"}
+        />
         <Button variant="contained" color="default" className={classes.button}>
           <CloudUploadIcon className={classes.leftIcon} />
           Publish

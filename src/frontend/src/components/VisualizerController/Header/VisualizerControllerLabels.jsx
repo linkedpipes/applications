@@ -40,7 +40,6 @@ class VisualizerControllerLabels extends React.Component {
       <div className={classes.root}>
         <MapIcon style={{ fontSize: "70px" }} />
         <TextField
-          classes={classes.textField}
           label="App title"
           className={classes.textField}
           value={this.state.title}

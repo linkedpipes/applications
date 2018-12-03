@@ -1,9 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-
 import Labels from "./VisualizerControllerLabels";
-import Toolbox from "./VIsualizerControllerToolbox";
+import Toolbox from "./VisualizerControllerToolbox";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 
@@ -12,8 +11,13 @@ const styles = theme => ({
     flex: 1,
     flexGrow: 1
   },
-  card: {},
-  input: {}
+  header: {
+    marginBottom: "1rem",
+    // marginRight: "1rem",
+    marginLeft: "1rem",
+    marginTop: "1rem",
+    right: "-1rem"
+  }
 });
 
 class VisualizerControllerHeader extends React.Component {
@@ -22,7 +26,7 @@ class VisualizerControllerHeader extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar position="static" color="default">
+        <AppBar className={classes.header} position="static" color="default">
           <Toolbar>
             <Labels
               title={headerParams.title}

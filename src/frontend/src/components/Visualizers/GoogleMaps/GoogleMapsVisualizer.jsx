@@ -6,6 +6,7 @@ import {
 } from "react-google-maps";
 import MarkerClusterer from "react-google-maps/lib/components/addons/MarkerClusterer";
 import React from "react";
+import uuid from "uuid";
 
 const GoogleMapsVisualizer = withScriptjs(
   withGoogleMap(props => {
@@ -18,7 +19,7 @@ const GoogleMapsVisualizer = withScriptjs(
           {props.markers &&
             props.markers.map((marker, index) => (
               <Marker
-                key={marker.uri}
+                key={uuid()}
                 position={marker.coordinates}
                 onClick={() => console.log("clicked")}
                 defaultAnimation={null}
