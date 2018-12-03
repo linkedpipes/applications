@@ -12,7 +12,13 @@ export const addSelectedVisualizerAction = ({ data } = {}) => ({
   selectedVisualizer: data
 });
 
-// ADD_SELECTED_VIZUALIZER
+// SET_SELECTED_DATASOURCES_EXAMPLE
+export const setSelectedDatasourcesExample = ({ data } = {}) => ({
+  type: "SET_SELECTED_DATASOURCES_EXAMPLE",
+  datasourcesValues: data
+});
+
+// ADD_SELECTED_RESULT_GRAPH_IRI_ACTION
 export const addSelectedResultGraphIriAction = ({ data } = {}) => ({
   type: "SET_SELECTED_RESULT_GRAPH_IRI",
   selectedResultGraphIri: data

@@ -15,7 +15,14 @@ import { extractUrlGroups } from "../../_helpers";
 import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
-import { QuickStartDialog } from "./QuickStart";
+import Grid from "@material-ui/core/Grid";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { FilePond, File, registerPlugin } from "react-filepond";
+import { setSelectedDatasourcesExample } from "../../_actions/globals";
+import "filepond/dist/filepond.min.css";
+
+// Register the plugins
+registerPlugin(FilePondPluginFileValidateType);
 
 const styles = theme => ({
   root: {
@@ -23,11 +30,18 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 20,
     flex: 1
   },
-  button: {
-    margin: theme.spacing.unit
+  gridRoot: {
+    flexGrow: 1
   },
-  input: {
-    display: "none"
+  itemGrid: {
+    height: "100%",
+    width: "100%",
+    margin: "auto"
+  },
+  textField: {
+    margin: "auto",
+    height: "100%",
+    width: "100%"
   },
   card: {
     flexGrow: 1
@@ -55,27 +69,6 @@ class SelectSources extends React.Component {
     });
   };
 
-  handleClose = value => {
-    let matches = extractUrlGroups(value);
-    let valid = false;
-
-    if (matches instanceof Array) {
-      value = matches.join(",\n");
-      valid = true;
-    }
-
-    this.setState({
-      textFieldValue: value,
-      textFieldIsValid: valid,
-      open: false
-    });
-  };
-
-  onChange = e => {
-    toast.success("File uploaded", { autoClose: 1500 });
-    this.setState({ ttlFile: e.target.files[0] });
-  };
-
   postStartFromFile = () => {
     let tid = toast.info("Running the discovery...", {
       position: toast.POSITION.TOP_RIGHT,
@@ -94,7 +87,6 @@ class SelectSources extends React.Component {
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          // self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -108,9 +100,6 @@ class SelectSources extends React.Component {
           toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
         }
 
-        // self.setState({
-        //   discoveryIsLoading: false
-        // });
         return jsonResponse;
       });
   };
@@ -133,15 +122,29 @@ class SelectSources extends React.Component {
     })
       .then(
         function(response) {
-          return response.json();
+          if (response.status === 500) {
+            toast.error("Please, try different sources, discovery failed :0", {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: true
+            });
+
+            self.setState({
+              discoveryIsLoading: false,
+              textFieldValue: "",
+              textFieldIsValid: true
+            });
+            throw Promise.reject(RawException(response));
+          } else {
+            return response.json();
+          }
         },
         function(err) {
+          console.log(err.json());
           toast.update(tid, {
             render: "There was an error during the discovery",
             type: toast.TYPE.ERROR,
             autoClose: 2000
           });
-          // self.setState({ discoveryIsLoading: false });
         }
       )
       .then(function(jsonResponse) {
@@ -286,8 +289,11 @@ class SelectSources extends React.Component {
       });
   };
 
-  validateField = e => {
-    let rawText = e.target.value;
+  handleInit() {
+    console.log("FilePond instance has initialised", this.pond);
+  }
+
+  handleValidation = text => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
 
@@ -300,92 +306,101 @@ class SelectSources extends React.Component {
       textFieldValue: rawText,
       textFieldIsValid: valid
     });
+
+    if (this.props.selectedDatasources !== undefined) {
+      this.props.dispatch(
+        setSelectedDatasourcesExample({
+          data: undefined
+        })
+      );
+    }
+  };
+
+  validateField = e => {
+    let rawText = e.target.value;
+    this.handleValidation(rawText);
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, selectedDatasources } = this.props;
 
     const { discoveryIsLoading, textFieldValue, textFieldIsValid } = this.state;
 
     return (
       <Card className={classes.card}>
         <CardContent>
-          <TextField
-            id="outlined-textarea"
-            label="Sources validator"
-            disabled={discoveryIsLoading}
-            multiline
-            value={textFieldValue}
-            onChange={this.validateField}
-            placeholder="Input your sources..."
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-        </CardContent>
-
-        <CardActions>
           {discoveryIsLoading ? (
             <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
           ) : (
-            <div>
-              <input
-                accept=".ttl"
-                className={classes.input}
-                onChange={this.onChange}
-                id="contained-button-file"
-                type="file"
-              />
-              <label htmlFor="contained-button-file">
-                <Button
-                  variant="contained"
-                  component="span"
-                  className={classes.button}
-                  size="small"
-                >
-                  Select TTL file
-                </Button>
-              </label>
+            <div className={classes.gridRoot}>
+              <Grid container spacing={24}>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    id="outlined-textarea"
+                    label="Sources validator"
+                    disabled={discoveryIsLoading}
+                    className={classes.textField}
+                    multiline
+                    value={
+                      selectedDatasources === undefined
+                        ? textFieldValue
+                        : selectedDatasources
+                    }
+                    onChange={this.validateField}
+                    placeholder="Input your sources..."
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                  />
+                </Grid>
 
-              <Button
-                variant="contained"
-                component="span"
-                className={classes.button}
-                size="small"
-                onClick={this.handleClickOpen}
-              >
-                Quick start
-              </Button>
-              <QuickStartDialog
-                open={this.state.open}
-                onClose={this.handleClose}
-              />
-              <Button
-                variant="contained"
-                component="span"
-                className={classes.button}
-                disabled={!this.state.ttlFile && !textFieldIsValid}
-                onClick={this.processStartDiscovery}
-                size="small"
-              >
-                Start Discovery
-              </Button>
+                <Grid item xs={12} sm={12}>
+                  <FilePond
+                    ref={ref => (this.pond = ref)}
+                    allowMultiple={false}
+                    allowFileTypeValidation={true}
+                    acceptedFileTypes={["text/turtle", ".ttl"]}
+                    fileValidateTypeLabelExpectedTypesMap={{
+                      "text/turtle": ".ttl"
+                    }}
+                    fileValidateTypeDetectType={(source, type) =>
+                      new Promise((resolve, reject) => {
+                        resolve(".ttl");
+                      })
+                    }
+                    className={classes.itemGrid}
+                    maxFiles={3}
+                    oninit={() => this.handleInit()}
+                    onupdatefiles={fileItems => {
+                      // Set current file objects to this.state
+                      this.setState({
+                        ttlFile: fileItems[0].file
+                      });
+                    }}
+                  />
+                </Grid>
 
-              {this.props.discoveryId && (
-                <Button
-                  variant="contained"
-                  component="span"
-                  className={classes.button}
-                  disabled={!this.props.discoveryId}
-                  onClick={this.props.handleNextStep}
-                  size="small"
-                >
-                  Next
-                </Button>
-              )}
+                <Grid item xs={12} sm={12}>
+                  <Button
+                    className={classes.itemGrid}
+                    variant="contained"
+                    component="span"
+                    color="secondary"
+                    disabled={
+                      !this.state.ttlFile &&
+                      !textFieldIsValid &&
+                      selectedDatasources === undefined
+                    }
+                    onClick={this.processStartDiscovery}
+                    size="small"
+                  >
+                    Start Discovery
+                  </Button>
+                </Grid>
+              </Grid>
             </div>
           )}
-        </CardActions>
+        </CardContent>
       </Card>
     );
   }
@@ -398,8 +413,22 @@ SelectSources.propTypes = {
 const mapStateToProps = state => {
   return {
     datasources: getDatasourcesArray(state.datasources),
-    discoveryId: state.globals.discoveryId
+    discoveryId: state.globals.discoveryId,
+    selectedDatasources: state.globals.datasourcesValues
   };
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
+
+// {this.props.discoveryId && (
+//   <Button
+//     variant="contained"
+//     component="span"
+//     className={classes.button}
+//     disabled={!this.props.discoveryId}
+//     onClick={this.props.handleNextStep}
+//     size="small"
+//   >
+//     Next
+//   </Button>
+// )}

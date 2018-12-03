@@ -8,7 +8,7 @@ import BottomBar from "./components/BottomBar/BottomBar";
 import withRoot from "./withRoot";
 import Redirect from "react-router-dom/es/Redirect";
 import { Dashboard } from "./components/Dashboard/Dashboard";
-import CreateAppStepper from "./components/SelectSources/CreateAppStepper";
+import StepperController from "./components/SelectSources/StepperController";
 import CreateApp from "./components/CreateApp/CreateApp";
 import Grid from "@material-ui/core/Grid";
 
@@ -22,11 +22,8 @@ const AppRouter = () => (
         <Switch>
           <Route exact path="/dashboard" component={Dashboard} />
           <Route exact path="/create-app" component={CreateApp} />
-          <Route exact path="/select-sources" component={CreateAppStepper} />
-          {/*<Route path="/create-app" component={AboutPage} />*/}
+          <Route exact path="/select-sources" component={StepperController} />
           <Route path="/about" component={AboutPage} />
-          {/*<Route path="/login" component={AboutPage} />*/}
-          {/*<Route path="/register" component={AboutPage} />*/}
           <Redirect from="/" to="/dashboard" />
           <Route component={NotFoundPage} />
         </Switch>
