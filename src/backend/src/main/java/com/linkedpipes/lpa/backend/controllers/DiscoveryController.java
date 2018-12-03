@@ -4,8 +4,9 @@ import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
-import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
+import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.TtlConfigGenerator;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DiscoveryController {
 
-    private final DiscoveryServiceComponent discoveryService;
+    private final DiscoveryService discoveryService;
 
-    public DiscoveryController(){
-        discoveryService = new DiscoveryServiceComponent();
+    public DiscoveryController(ApplicationContext context) {
+        discoveryService = context.getBean(DiscoveryService.class);
     }
 
     @PostMapping("/api/pipelines/discover")

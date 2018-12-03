@@ -1,5 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -12,6 +14,8 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
+@Service
+@Profile("test")
 public class FakeHttpURLConnectionFactory implements HttpURLConnectionFactory {
 
     private FakeHttpURLConnection lastConnection;
