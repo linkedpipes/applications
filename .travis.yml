@@ -35,7 +35,6 @@ matrix:
         - cd src/backend
 
       script:
-        - ./gradlew dockerRun
         - ./gradlew assemble
         - ./gradlew test
         - ./gradlew jacocoTestReport
