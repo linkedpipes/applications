@@ -119,7 +119,7 @@ class GoogleMapsPopup extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        self.props.dispatch(addMultipleMarkers(jsonResponse));
+        self.props.dispatch(addMultipleMarkers(jsonResponse.json()));
       });
 
     DiscoveryService.getFilters()
@@ -139,8 +139,7 @@ class GoogleMapsPopup extends React.Component {
   }
 
   render() {
-    const { classes, markers } = this.props;
-    const { filters } = this.state;
+    const { classes, markers, filters } = this.props;
     return (
       <span>
         <Button className={classes.button} onClick={this.handleClickOpen}>
@@ -197,7 +196,8 @@ GoogleMapsPopup.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    markers: state.markers
+    markers: state.markers,
+    filters: state.filters
   };
 };
 
