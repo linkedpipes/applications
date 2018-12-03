@@ -12,6 +12,8 @@ import React from "react";
 import GoogleMapsVisualizer from "./GoogleMapsVisualizer";
 import { DiscoveryService } from "../../../_services";
 import { withRouter } from "react-router-dom";
+import { Grid } from "@material-ui/core";
+import Filters from "../../VisualizerController/Filters/Filters";
 
 const styles = theme => ({
   appBar: {
@@ -73,11 +75,24 @@ class GoogleMapsPopup extends React.Component {
       .then(function(jsonResponse) {
         self.setState({ markers: jsonResponse });
       });
+
+    DiscoveryService.getFilters()
+      .then(
+        function(response) {
+          return response.json();
+        },
+        function(err) {
+          console.log(err);
+        }
+      )
+      .then(function(jsonResponse) {
+        self.props.dispatch(addFilters(self.assembleFilters(jsonResponse)));
+      });
   }
 
   render() {
     const { classes } = this.props;
-    const { markers } = this.state;
+    const { markers, filters } = this.state;
     return (
       <span>
         <Button className={classes.button} onClick={this.handleClickOpen}>
@@ -99,7 +114,7 @@ class GoogleMapsPopup extends React.Component {
                 <CloseIcon />
               </IconButton>
               <Typography variant="h6" color="inherit" className={classes.flex}>
-                GoogleMaps App Preview
+                Google Maps App Preview
               </Typography>
               <Button color="inherit" onClick={this.handleClose}>
                 Create App
@@ -107,13 +122,20 @@ class GoogleMapsPopup extends React.Component {
             </Toolbar>
           </AppBar>
 
-          <GoogleMapsVisualizer
-            markers={markers}
-            googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `100%` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-          />
+          <Grid container>
+            <Grid item md={4}>
+              <Filters filters={filters} />
+            </Grid>
+            <Grid item md={8}>
+              <GoogleMapsVisualizer
+                markers={markers}
+                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
+                loadingElement={<div style={{ height: `100%` }} />}
+                containerElement={<div style={{ height: `100%` }} />}
+                mapElement={<div style={{ height: `100%` }} />}
+              />
+            </Grid>
+          </Grid>
         </Dialog>
       </span>
     );
