@@ -55,7 +55,7 @@ matrix:
 
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - cd ../backend
+        - cd src/backend
         - ./gradlew dockerRun
         - ./gradlew assemble
         - ./gradlew -Dlpa.discoveryServiceUrl=http://localhost:9000 test
