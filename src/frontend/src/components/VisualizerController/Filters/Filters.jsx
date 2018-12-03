@@ -41,13 +41,14 @@ class Filters extends React.Component {
           component="nav"
           subheader={
             <ListSubheader disableSticky={true}>
-              {filters.length == 0
+              {!filters || filters.length == 0
                 ? "No filters available"
                 : "Available filters"}
             </ListSubheader>
           }
         >
-          {filters.length > 0 &&
+          {filters &&
+            filters.length > 0 &&
             filters.map(filter => {
               return (
                 <div key={filter.property.uri}>

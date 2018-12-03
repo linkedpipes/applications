@@ -4,6 +4,7 @@ import visualizers from "./_reducers/visualizers";
 import etl_executions from "./_reducers/etl_executions";
 import etl_exports from "./_reducers/etl_exports";
 import filters from "./_reducers/filters";
+import markers from "./_reducers/markers";
 import logger from "redux-logger";
 import globals from "./_reducers/globals";
 
@@ -24,7 +25,8 @@ export default () => {
       visualizers: visualizers,
       etl_executions: etl_executions,
       etl_exports: etl_exports,
-      filters: filters
+      filters: filters,
+      markers: markers
     }),
     enhancer
   );
