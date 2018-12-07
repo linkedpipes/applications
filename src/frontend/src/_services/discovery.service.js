@@ -1,6 +1,13 @@
 import "whatwg-fetch";
 import { getQueryString } from "../_helpers";
 
+function handleErrors(response) {
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+  return response;
+}
+
 const rest = (
   url,
   body = "",
@@ -20,8 +27,8 @@ const rest = (
           "Content-Type": contentType
         },
         credentials: "same-origin"
-      })
-    : fetch(url);
+      }).then(handleErrors)
+    : fetch(url).then(handleErrors);
 };
 
 const BASE_URL = process.env.BASE_BACKEND_URL;
@@ -116,15 +123,6 @@ export const DiscoveryService = {
       "GET",
       undefined
     );
-    // return fetch(EXPORT_PIPELINE_URL(discoveryId, pipelineId), {
-    //   method: "POST",
-    //   body:
-    //     "https://gist.githubusercontent.com/aorumbayev/f482e49649e1865afb031fdf478eb584/raw/bdb57ffc407b4c3ed1dc8899cd8e7c6cbefdd578/new_sd.ttl",
-    //   headers: {
-    //     "Content-Type": "text/plain"
-    //   },
-    //   credentials: "same-origin"
-    // });
   },
 
   getExecutePipeline: async function({ etlPipelineIri }) {
