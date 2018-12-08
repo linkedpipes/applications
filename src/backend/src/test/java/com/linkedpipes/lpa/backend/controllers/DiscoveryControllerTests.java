@@ -5,7 +5,8 @@ import com.google.gson.reflect.TypeToken;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.util.ConnectionException;
+import com.linkedpipes.lpa.backend.exceptions.ConnectionException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.StreamUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,19 +63,19 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryNull() throws IOException {
+    void testStartDiscoveryNull() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscovery(null);
         assertTrue(response.getStatusCode().isError());
     }
 
     @Test
-    void testStartDiscoveryEmpty() throws IOException {
+    void testStartDiscoveryEmpty() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscovery(List.of());
         assertTrue(response.getStatusCode().isError());
     }
 
     @Test
-    void testStartDiscoveryFakeUri() throws IOException {
+    void testStartDiscoveryFakeUri() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscovery(FAKE_DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
@@ -85,7 +85,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscovery() throws IOException {
+    void testStartDiscovery() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscovery(DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
@@ -95,13 +95,13 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputNull() throws IOException {
+    void testStartDiscoveryFromInputNull() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(null);
         assertTrue(response.getStatusCode().isError());
     }
 
     @Test
-    void testStartDiscoveryFromInputEmpty() throws IOException {
+    void testStartDiscoveryFromInputEmpty() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInput("");
         assertTrue(response.getStatusCode().isError());
     }
@@ -113,7 +113,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInput() throws IOException {
+    void testStartDiscoveryFromInput() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(DISCOVERY_CONFIG);
         assertFalse(response.getStatusCode().isError());
 
@@ -123,13 +123,13 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputIriNull() throws IOException {
+    void testStartDiscoveryFromInputIriNull() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(null);
         assertTrue(response.getStatusCode().isError());
     }
 
     @Test
-    void testStartDiscoveryFromInputIriEmpty() throws IOException {
+    void testStartDiscoveryFromInputIriEmpty() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri("");
         assertTrue(response.getStatusCode().isError());
     }
@@ -141,7 +141,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputIri() throws IOException {
+    void testStartDiscoveryFromInputIri() throws LpAppsException {
         ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(DISCOVERY_CONFIG_IRI);
         assertFalse(response.getStatusCode().isError());
 
@@ -151,7 +151,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testGetStatusNullId() throws IOException {
+    void testGetStatusNullId() throws LpAppsException {
         String statusString = discoveryController.getDiscoveryStatus(NULL_DISCOVERY_ID).getBody();
         assertNotNull(statusString);
         assertFalse(statusString.isEmpty());
@@ -164,7 +164,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryGetStatus() throws IOException {
+    void testStartDiscoveryGetStatus() throws LpAppsException {
         ResponseEntity<?> startResponse = discoveryController.startDiscovery(DISCOVERY_DATA_SOURCES);
         assertFalse(startResponse.getStatusCode().isError());
 
@@ -181,7 +181,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputGetStatus() throws IOException {
+    void testStartDiscoveryFromInputGetStatus() throws LpAppsException {
         ResponseEntity<?> startResponse = discoveryController.startDiscoveryFromInput(DISCOVERY_CONFIG);
         assertFalse(startResponse.getStatusCode().isError());
 
@@ -198,7 +198,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputIriGetStatus() throws IOException {
+    void testStartDiscoveryFromInputIriGetStatus() throws LpAppsException {
         ResponseEntity<?> startResponse = discoveryController.startDiscoveryFromInputIri(DISCOVERY_CONFIG_IRI);
         assertFalse(startResponse.getStatusCode().isError());
 

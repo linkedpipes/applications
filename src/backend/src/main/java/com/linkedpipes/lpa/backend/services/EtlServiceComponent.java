@@ -5,12 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Map;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
@@ -42,19 +42,19 @@ public class EtlServiceComponent implements EtlService {
     }
 
     @Override
-    public Execution executePipeline(String etlPipelineIri) throws IOException {
+    public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
         return GSON.fromJson(response, Execution.class);
     }
 
     @Override
-    public ExecutionStatus getExecutionStatus(String executionIri) throws IOException {
+    public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
         String response = httpActions.getExecutionStatus(executionIri);
         return GSON.fromJson(response, ExecutionStatus.class);
     }
 
     @Override
-    public String getExecutionResult(String executionIri) throws IOException {
+    public String getExecutionResult(String executionIri) throws LpAppsException {
         return httpActions.getExecutionResult(executionIri);
     }
 
@@ -63,7 +63,7 @@ public class EtlServiceComponent implements EtlService {
         private final String URL_BASE = Application.getConfig().getString("lpa.etlServiceUrl");
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
 
-        private String executePipeline(String pipelineIri) throws IOException {
+        private String executePipeline(String pipelineIri) throws LpAppsException {
             return new HttpRequestSender(context).to(URL_EXECUTE_PIPELINE)
                     .parameter("pipeline", pipelineIri)
                     .method(HttpRequestSender.HttpMethod.POST)
@@ -72,14 +72,14 @@ public class EtlServiceComponent implements EtlService {
                     .send();
         }
 
-        private String getExecutionStatus(String executionIri) throws IOException {
+        private String getExecutionStatus(String executionIri) throws LpAppsException {
             String targetUrl = urlFrom(formatExecutionIri(executionIri), "overview");
             return new HttpRequestSender(context).to(targetUrl)
                     .acceptType("application/json")
                     .send();
         }
 
-        private String getExecutionResult(String executionIri) throws IOException {
+        private String getExecutionResult(String executionIri) throws LpAppsException {
             return new HttpRequestSender(context).to(formatExecutionIri(executionIri))
                     .acceptType("application/json")
                     .send();
