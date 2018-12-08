@@ -2,13 +2,12 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-
-import java.io.IOException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 
 public interface EtlService {
-    Execution executePipeline(String etlPipelineIri) throws IOException;
+    Execution executePipeline(String etlPipelineIri) throws LpAppsException;
 
-    ExecutionStatus getExecutionStatus(String executionIri) throws IOException;
+    ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException;
 
-    String getExecutionResult(String executionIri) throws IOException;
+    String getExecutionResult(String executionIri) throws LpAppsException;
 }

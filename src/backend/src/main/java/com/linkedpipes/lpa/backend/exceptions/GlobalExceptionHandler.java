@@ -1,5 +1,6 @@
-package com.linkedpipes.lpa.backend.services;
+package com.linkedpipes.lpa.backend.exceptions;
 
+import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,22 +11,19 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
-import java.io.IOException;
-
+/**
+ * Provides handling for exceptions throughout this service.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    /**
-     * Provides handling for exceptions throughout this service.
-     */
-    @ExceptionHandler(IOException.class)
-    public final ResponseEntity<Object> handleIOException(IOException ex, WebRequest request) {
+    private final String defaultErrorMsg = "An error has occurred. Please contact support.";
+
+    @ExceptionHandler(LpAppsException.class)
+    public final ResponseEntity<Object> handleLpAppsException(LpAppsException ex) {
         logger.error("Exception: ", ex);
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        return handleExceptionInternal(ex, "An error occurred.", headers, status, request);
+        return new ResponseEntity(new ErrorResponse(ex.getErrorStatus().value(), ex.getMessage()), ex.getErrorStatus());
     }
 
     @Override
@@ -35,11 +33,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorMsg, headers, status, request);
     }
 
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, String body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, String errorMsg, HttpHeaders headers, HttpStatus status, WebRequest request) {
         if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status)) {
             request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
         }
 
-        return new ResponseEntity<>(body, headers, status);
+        return new ResponseEntity<>(new ErrorResponse(status.value(), errorMsg), headers, status);
     }
 }
