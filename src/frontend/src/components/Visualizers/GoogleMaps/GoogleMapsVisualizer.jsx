@@ -23,17 +23,22 @@ const GoogleMapsVisualizer = compose(
         zoomToMarkers: map => {
           console.log("Zoom to markers");
           const bounds = new window.google.maps.LatLngBounds();
-          map.props.children.props.children.forEach(child => {
-            if (child.type === Marker) {
-              bounds.extend(
-                new window.google.maps.LatLng(
-                  child.props.position.lat,
-                  child.props.position.lng
-                )
-              );
+          if (map !== null) {
+            const childrenArray = map.props.children.props.children;
+            if (childrenArray.length > 0) {
+              map.props.children.props.children.forEach(child => {
+                if (child.type === Marker) {
+                  bounds.extend(
+                    new window.google.maps.LatLng(
+                      child.props.position.lat,
+                      child.props.position.lng
+                    )
+                  );
+                }
+              });
+              map.fitBounds(bounds);
             }
-          });
-          map.fitBounds(bounds);
+          }
         }
       });
     }
