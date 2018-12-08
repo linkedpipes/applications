@@ -2,10 +2,14 @@ package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
+import com.linkedpipes.lpa.backend.services.EtlService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
@@ -13,10 +17,10 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 public class ExecutionController {
 
-    private final EtlServiceComponent etlService;
+    private final EtlService etlService;
 
-    public ExecutionController(){
-        etlService = new EtlServiceComponent();
+    public ExecutionController(ApplicationContext context) {
+        etlService = context.getBean(EtlService.class);
     }
 
     @GetMapping("/api/execution/status")

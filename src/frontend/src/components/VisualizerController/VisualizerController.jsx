@@ -10,6 +10,9 @@ const styles = theme => ({
     justifyContent: "center",
     flex: 1
   },
+  visualizer: {
+    margin: "1rem"
+  },
   card: {},
   input: {}
 });
@@ -28,6 +31,7 @@ class VisualizerController extends React.Component {
       <div className={classes.root}>
         <VisualizerControllerHeader headerParams={headerParams} />
         <VisualizerContainer
+          className={classes.visualizer}
           filters={filters}
           visualizerType={visualizerType}
           visualizerParams={visualizerParams}

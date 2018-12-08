@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import connect from "react-redux/lib/connect/connect";
 import VisualizerCard from "./VisualizerCard";
+import classNames from "classnames";
 
 const styles = theme => ({
   root: {
@@ -14,12 +15,23 @@ const styles = theme => ({
   control: {
     padding: theme.spacing.unit * 2
   },
+  cardGrid: {
+    padding: `${theme.spacing.unit * 8}px 0`
+  },
+  layout: {
+    width: "auto",
+    marginLeft: theme.spacing.unit * 3,
+    marginRight: theme.spacing.unit * 3,
+    [theme.breakpoints.up(1100 + theme.spacing.unit * 3 * 2)]: {
+      width: 1100,
+      marginLeft: "auto",
+      marginRight: "auto"
+    }
+  },
   card: {
-    minHeight: 40,
-    marginLeft: 8,
-    marginTop: 8,
-    marginBottom: 10,
-    marginRight: 8
+    height: "100%",
+    display: "flex",
+    flexDirection: "column"
   },
   label: {
     marginTop: 5,
@@ -42,44 +54,52 @@ class VisualizerCardCollectionView extends React.Component {
   };
 
   render() {
-    const { classes, visualizers, discoveryId, handleNextStep } = this.props;
+    const {
+      classes,
+      visualizers,
+      discoveryId,
+      handleNextStep,
+      hasOneVisualizer
+    } = this.props;
     const { spacing } = this.state;
 
     return (
-      <Grid container className={classes.root} spacing={16}>
-        <Grid
-          container
-          className={classes.demo}
-          justify="center"
-          xs={12}
-          spacing={Number(spacing)}
-        >
-          {visualizers.length === 0 ? (
-            <Grid item xs={12}>
-              <Card className={classes.card}>
-                <Typography
-                  className={classes.label}
-                  variant="body2"
-                  align="center"
-                  gutterBottom
-                >
-                  No visualizers available, try providing different sources ☹️
-                </Typography>
-              </Card>
-            </Grid>
-          ) : (
-            visualizers.map((value, index) => (
-              <Grid key={index} item xs={4}>
-                <VisualizerCard
-                  visualizerData={value}
-                  discoveryId={discoveryId}
-                  handleNextStep={handleNextStep}
-                />
+      <div className={classNames(classes.layout, classes.cardGrid)}>
+        <Grid container className={classes.root} spacing={40}>
+          <Grid
+            container
+            className={classes.demo}
+            justify="center"
+            spacing={Number(spacing)}
+          >
+            {visualizers.length === 0 ? (
+              <Grid item xs={12}>
+                <Card className={classes.card}>
+                  <Typography
+                    className={classes.label}
+                    variant="body2"
+                    align="center"
+                    gutterBottom
+                  >
+                    No visualizers available, try providing different sources ☹️
+                  </Typography>
+                </Card>
               </Grid>
-            ))
-          )}
+            ) : (
+              visualizers.map((value, index) => (
+                <Grid key={index} item sm={6} md={4} lg={3}>
+                  <VisualizerCard
+                    visualizerData={value}
+                    discoveryId={discoveryId}
+                    handleNextStep={handleNextStep}
+                    hasOneVisualizer={hasOneVisualizer}
+                  />
+                </Grid>
+              ))
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+      </div>
     );
   }
 }
@@ -91,6 +111,7 @@ VisualizerCardCollectionView.propTypes = {
 const mapStateToProps = state => {
   return {
     visualizers: state.visualizers,
+    hasOneVisualizer: state.visualizers.length === 1,
     discoveryId: state.globals.discoveryId
   };
 };

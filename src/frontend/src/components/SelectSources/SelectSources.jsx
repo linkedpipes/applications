@@ -15,7 +15,14 @@ import { extractUrlGroups } from "../../_helpers";
 import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
-import { QuickStartDialog } from "./QuickStart";
+import Grid from "@material-ui/core/Grid";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { FilePond, File, registerPlugin } from "react-filepond";
+import { setSelectedDatasourcesExample } from "../../_actions/globals";
+import "filepond/dist/filepond.min.css";
+
+// Register the plugins
+registerPlugin(FilePondPluginFileValidateType);
 
 const styles = theme => ({
   root: {
@@ -23,11 +30,18 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 20,
     flex: 1
   },
-  button: {
-    margin: theme.spacing.unit
+  gridRoot: {
+    flexGrow: 1
   },
-  input: {
-    display: "none"
+  itemGrid: {
+    height: "100%",
+    width: "100%",
+    margin: "auto"
+  },
+  textField: {
+    margin: "auto",
+    height: "100%",
+    width: "100%"
   },
   card: {
     flexGrow: 1
@@ -46,7 +60,8 @@ class SelectSources extends React.Component {
     open: false,
     discoveryStatusPolling: undefined,
     discoveryStatusPollingFinished: false,
-    discoveryStatusPollingInterval: 2000
+    discoveryStatusPollingInterval: 2000,
+    discoveryLoadingLabel: ""
   };
 
   handleClickOpen = () => {
@@ -55,64 +70,13 @@ class SelectSources extends React.Component {
     });
   };
 
-  handleClose = value => {
-    let matches = extractUrlGroups(value);
-    let valid = false;
-
-    if (matches instanceof Array) {
-      value = matches.join(",\n");
-      valid = true;
-    }
-
-    this.setState({
-      textFieldValue: value,
-      textFieldIsValid: valid,
-      open: false
-    });
-  };
-
-  onChange = e => {
-    toast.success("File uploaded", { autoClose: 1500 });
-    this.setState({ ttlFile: e.target.files[0] });
-  };
-
   postStartFromFile = () => {
-    let tid = toast.info("Running the discovery...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
-
     const self = this;
-    return DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "There was an error during the discovery",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-          // self.setState({ discoveryIsLoading: false });
-        }
-      )
-      .then(function(jsonResponse) {
-        if (toast.isActive(tid)) {
-          toast.update(tid, {
-            render: `Discovery id ${jsonResponse.id}`,
-            type: toast.TYPE.SUCCESS,
-            autoClose: 2000
-          });
-        } else {
-          toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
-        }
-
-        // self.setState({
-        //   discoveryIsLoading: false
-        // });
-        return jsonResponse;
-      });
+    return DiscoveryService.postDiscoverFromTtl({
+      ttlFile: self.state.ttlFile
+    }).then(function(response) {
+      return response.json();
+    });
   };
 
   // TODO: refactor later, move to separate class responsible for _services calls
@@ -122,50 +86,21 @@ class SelectSources extends React.Component {
       return { uri: source };
     });
 
-    let tid = toast.info("Getting the pipeline groups...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
-
-    const self = this;
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL
-    })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "There was an error during the discovery",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-          // self.setState({ discoveryIsLoading: false });
-        }
-      )
-      .then(function(jsonResponse) {
-        if (toast.isActive(tid)) {
-          toast.update(tid, {
-            render: `Discovery id ${jsonResponse.id}`,
-            type: toast.TYPE.SUCCESS,
-            autoClose: 2000
-          });
-        } else {
-          toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
-        }
-
-        return jsonResponse;
-      });
+    }).then(function(response) {
+      return response.json();
+    });
   };
 
-  addDiscoveryId = id => {
+  addDiscoveryId = response => {
     const self = this;
+    const discoveryId = response.id;
 
     return new Promise((resolve, reject) => {
       self.props.dispatch(
         addDiscoveryIdAction({
-          id: id
+          id: discoveryId
         })
       );
       resolve();
@@ -175,27 +110,54 @@ class SelectSources extends React.Component {
   processStartDiscovery = () => {
     const self = this;
 
-    self.setState({ discoveryIsLoading: true });
+    self.setState({
+      discoveryIsLoading: true,
+      discoveryLoadingLabel:
+        "Please, hold on Discovery is casting spells 🧙‍..."
+    });
 
-    if (self.state.ttlFile) {
-      self.postStartFromFile().then(function(discoveryResponse) {
-        self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id, undefined);
+    (self.state.ttlFile
+      ? self.postStartFromFile()
+      : self.postStartFromInputLinks()
+    )
+      .then(function(discoveryResponse) {
+        if (discoveryResponse !== undefined) {
+          self.addDiscoveryId(discoveryResponse).then(function() {
+            self.setState({ discoveryStatusPollingFinished: false });
+            self.checkDiscovery(discoveryResponse, undefined);
+          });
+        }
+      })
+      .catch(function(error) {
+        console.log(error.message);
+
+        // Enable the fields
+        self.setState({
+          discoveryIsLoading: false,
+          textFieldValue: "",
+          textFieldIsValid: true
         });
+
+        // Clear out selected sources that failed
+        self.props.dispatch(
+          setSelectedDatasourcesExample({
+            data: undefined
+          })
+        );
+
+        toast.error(
+          "There was an error during the discovery. Please, try different sources.",
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
       });
-    } else {
-      self.postStartFromInputLinks().then(function(discoveryResponse) {
-        self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id, undefined);
-        });
-      });
-    }
   };
 
-  checkDiscovery = (discoveryId, tid) => {
+  checkDiscovery = response => {
     const self = this;
+    const discoveryId = response.id;
 
     this.state.discoveryStatusPolling &&
       clearTimeout(this.state.discoveryStatusPolling);
@@ -218,38 +180,18 @@ class SelectSources extends React.Component {
       return;
     }
 
-    tid =
-      tid === undefined
-        ? toast.info("Please, hold on Discovery is casting spells 🧙‍...", {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: false
-          })
-        : tid;
-
     DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "Error during discovery run",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(jsonResponse) {
         self.setState({
           discoveryStatusPollingFinished: jsonResponse.isFinished
         });
-        if (jsonResponse.isFinished) {
-          toast.dismiss(tid);
-        }
       });
 
     const discoveryStatusPolling = setTimeout(() => {
-      this.checkDiscovery(discoveryId, tid);
+      this.checkDiscovery(response);
     }, this.state.discoveryStatusPollingInterval);
 
     this.setState({
@@ -258,27 +200,17 @@ class SelectSources extends React.Component {
   };
 
   loadPipelineGroups = discoveryId => {
-    let tid = toast.info("Getting the pipeline groups...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
+    this.setState({
+      discoveryLoadingLabel: "Extracting the magical pipelines 🧙‍..."
     });
 
     const self = this;
+
     return DiscoveryService.getPipelineGroups({ discoveryId: discoveryId })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "Error getting pipeline groups",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(jsonResponse) {
-        toast.dismiss(tid);
         self.props.dispatch(
           addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
         );
@@ -286,8 +218,11 @@ class SelectSources extends React.Component {
       });
   };
 
-  validateField = e => {
-    let rawText = e.target.value;
+  handleInit() {
+    console.log("FilePond instance has initialised", this.pond);
+  }
+
+  handleValidation = rawText => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
 
@@ -300,92 +235,107 @@ class SelectSources extends React.Component {
       textFieldValue: rawText,
       textFieldIsValid: valid
     });
+
+    if (this.props.selectedDatasources !== undefined) {
+      this.props.dispatch(
+        setSelectedDatasourcesExample({
+          data: undefined
+        })
+      );
+    }
+  };
+
+  validateField = e => {
+    let rawText = e.target.value;
+    this.handleValidation(rawText);
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, selectedDatasources } = this.props;
 
-    const { discoveryIsLoading, textFieldValue, textFieldIsValid } = this.state;
+    const {
+      discoveryIsLoading,
+      textFieldValue,
+      textFieldIsValid,
+      discoveryLoadingLabel
+    } = this.state;
 
     return (
       <Card className={classes.card}>
         <CardContent>
-          <TextField
-            id="outlined-textarea"
-            label="Sources validator"
-            disabled={discoveryIsLoading}
-            multiline
-            value={textFieldValue}
-            onChange={this.validateField}
-            placeholder="Input your sources..."
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-        </CardContent>
-
-        <CardActions>
           {discoveryIsLoading ? (
-            <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
+            <LinearLoadingIndicator labelText={discoveryLoadingLabel} />
           ) : (
-            <div>
-              <input
-                accept=".ttl"
-                className={classes.input}
-                onChange={this.onChange}
-                id="contained-button-file"
-                type="file"
-              />
-              <label htmlFor="contained-button-file">
-                <Button
-                  variant="contained"
-                  component="span"
-                  className={classes.button}
-                  size="small"
-                >
-                  Select TTL file
-                </Button>
-              </label>
+            <div className={classes.gridRoot}>
+              <Grid container spacing={24}>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    id="outlined-textarea"
+                    label="Sources validator"
+                    disabled={discoveryIsLoading}
+                    className={classes.textField}
+                    multiline
+                    value={
+                      selectedDatasources === undefined
+                        ? textFieldValue
+                        : selectedDatasources
+                    }
+                    onChange={this.validateField}
+                    placeholder="Input your sources..."
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                  />
+                </Grid>
 
-              <Button
-                variant="contained"
-                component="span"
-                className={classes.button}
-                size="small"
-                onClick={this.handleClickOpen}
-              >
-                Quick start
-              </Button>
-              <QuickStartDialog
-                open={this.state.open}
-                onClose={this.handleClose}
-              />
-              <Button
-                variant="contained"
-                component="span"
-                className={classes.button}
-                disabled={!this.state.ttlFile && !textFieldIsValid}
-                onClick={this.processStartDiscovery}
-                size="small"
-              >
-                Start Discovery
-              </Button>
+                <Grid item xs={12} sm={12}>
+                  <FilePond
+                    ref={ref => (this.pond = ref)}
+                    allowMultiple={false}
+                    allowFileTypeValidation={true}
+                    acceptedFileTypes={["text/turtle", ".ttl"]}
+                    fileValidateTypeLabelExpectedTypesMap={{
+                      "text/turtle": ".ttl"
+                    }}
+                    fileValidateTypeDetectType={(source, type) =>
+                      new Promise((resolve, reject) => {
+                        resolve(".ttl");
+                      })
+                    }
+                    className={classes.itemGrid}
+                    maxFiles={3}
+                    oninit={() => this.handleInit()}
+                    onupdatefiles={fileItems => {
+                      // Set current file objects to this.state
+                      this.setState({
+                        ttlFile:
+                          fileItems.length === 1 ? fileItems[0].file : undefined
+                      });
+                    }}
+                  />
+                </Grid>
 
-              {this.props.discoveryId && (
-                <Button
-                  variant="contained"
-                  component="span"
-                  className={classes.button}
-                  disabled={!this.props.discoveryId}
-                  onClick={this.props.handleNextStep}
-                  size="small"
-                >
-                  Next
-                </Button>
-              )}
+                <Grid item xs={12} sm={12}>
+                  <Button
+                    className={classes.itemGrid}
+                    variant="contained"
+                    component="span"
+                    color="secondary"
+                    disabled={
+                      !this.state.ttlFile &&
+                      !textFieldIsValid &&
+                      selectedDatasources === undefined
+                    }
+                    onClick={this.processStartDiscovery}
+                    size="small"
+                  >
+                    Start Discovery
+                  </Button>
+                </Grid>
+              </Grid>
             </div>
           )}
-        </CardActions>
+        </CardContent>
       </Card>
     );
   }
@@ -398,8 +348,22 @@ SelectSources.propTypes = {
 const mapStateToProps = state => {
   return {
     datasources: getDatasourcesArray(state.datasources),
-    discoveryId: state.globals.discoveryId
+    discoveryId: state.globals.discoveryId,
+    selectedDatasources: state.globals.datasourcesValues
   };
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
+
+// {this.props.discoveryId && (
+//   <Button
+//     variant="contained"
+//     component="span"
+//     className={classes.button}
+//     disabled={!this.props.discoveryId}
+//     onClick={this.props.handleNextStep}
+//     size="small"
+//   >
+//     Next
+//   </Button>
+// )}
