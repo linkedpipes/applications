@@ -17,8 +17,6 @@ import org.springframework.web.util.WebUtils;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final String defaultErrorMsg = "An error has occurred. Please contact support.";
-
     @ExceptionHandler(LpAppsException.class)
     public final ResponseEntity<Object> handleLpAppsException(LpAppsException ex) {
         logger.error("Exception: ", ex);

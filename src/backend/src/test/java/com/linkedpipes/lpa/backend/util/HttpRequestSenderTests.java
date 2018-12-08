@@ -55,7 +55,7 @@ class HttpRequestSenderTests {
     @Test
     void testToEmpty() {
         HttpRequestSender sender = this.sender.to("");
-        assertThrowsExactly(MalformedURLException.class, sender::send);
+        assertThrowsExactly(LpAppsException.class, sender::send);
     }
 
     @Test
