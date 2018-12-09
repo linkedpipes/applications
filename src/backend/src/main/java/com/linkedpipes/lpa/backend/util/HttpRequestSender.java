@@ -1,7 +1,10 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.exceptions.ConnectionException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StreamUtils;
 
 import java.io.DataOutputStream;
@@ -119,28 +122,33 @@ public class HttpRequestSender {
      * dependency-injected factory.
      *
      * @return the body of the response obtained by the request
-     * @throws IOException           if an I/O error occurs
+     * @throws LpAppsException           if an I/O error occurs
      * @throws IllegalStateException if a mandatory setting has not been set for this builder
      */
-    public String send() throws IOException {
-        checkMandatorySettings();
-        HttpURLConnection connection = factory.getConnectionForUrl(getUrlWithParameters());
+    public String send() throws LpAppsException {
+        try {
+            checkMandatorySettings();
+            HttpURLConnection connection = factory.getConnectionForUrl(getUrlWithParameters());
 
-        connection.setRequestMethod(method.name());
-        fillInHeader(connection);
-        fillInBody(connection);
+            connection.setRequestMethod(method.name());
+            fillInHeader(connection);
+            fillInBody(connection);
 
-        if (connection.getResponseCode() != HTTP_OK) {
-            try (InputStream errorStream = connection.getErrorStream()) {
-                int responseCode = connection.getResponseCode();
-                String responseMessage = connection.getResponseMessage();
-                String responseBody = StreamUtils.copyToString(errorStream, Application.DEFAULT_CHARSET);
-                throw new ConnectionException(responseCode, responseMessage, responseBody);
+            if (connection.getResponseCode() != HTTP_OK) {
+                try (InputStream errorStream = connection.getErrorStream()) {
+                    int responseCode = connection.getResponseCode();
+                    String responseMessage = connection.getResponseMessage();
+                    String responseBody = StreamUtils.copyToString(errorStream, Application.DEFAULT_CHARSET);
+                    throw new ConnectionException(responseCode, responseMessage, responseBody);
+                }
+            }
+
+            try (InputStream inputStream = connection.getInputStream()) {
+                return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
             }
         }
-
-        try (InputStream inputStream = connection.getInputStream()) {
-            return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
+        catch(IOException e){
+            throw new LpAppsException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with external service", e);
         }
     }
 

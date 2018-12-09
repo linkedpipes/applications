@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.Streams;
 import org.apache.jena.rdf.model.Model;
@@ -23,7 +24,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -48,25 +48,25 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     }
 
     @Override
-    public Discovery startDiscoveryFromInput(String discoveryConfig) throws IOException {
+    public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
         return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
     @Override
-    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws IOException {
+    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
         return DEFAULT_GSON.fromJson(response, Discovery.class);
     }
 
     // TODO strongly type below method params (not simply string)
     @Override
-    public String getDiscoveryStatus(String discoveryId) throws IOException{
+    public String getDiscoveryStatus(String discoveryId) throws LpAppsException{
         return httpActions.getStatus(discoveryId);
     }
 
     @Override
-    public PipelineGroups getPipelineGroups(String discoveryId) throws IOException {
+    public PipelineGroups getPipelineGroups(String discoveryId) throws LpAppsException {
         String response = httpActions.getPipelineGroups(discoveryId);
 
         PipelineGroups pipelineGroups = new PipelineGroups();
@@ -113,13 +113,13 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     }
 
     @Override
-    public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws IOException {
+    public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws LpAppsException {
         String response = httpActions.exportPipeline(discoveryId, pipelineUri);
         return DEFAULT_GSON.fromJson(response, PipelineExportResult.class);
     }
 
     @Override
-    public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws IOException {
+    public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws LpAppsException {
         String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, DEFAULT_GSON.toJson(serviceDescription));
         return DEFAULT_GSON.fromJson(exportResult, PipelineExportResult.class);
     }
@@ -164,7 +164,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         private final String URL_GET_PIPELINE_GROUPS = urlFrom(URL_BASE, "discovery", "%s", "pipeline-groups");
         private final String URL_EXPORT_PIPELINE = urlFrom(URL_BASE, "discovery", "%s", "export", "%s");
 
-        private String startFromInput(String discoveryConfig) throws IOException {
+        private String startFromInput(String discoveryConfig) throws LpAppsException {
             return new HttpRequestSender(context).to(URL_START_FROM_INPUT)
                     .method(HttpRequestSender.HttpMethod.POST)
                     .requestBody(discoveryConfig)
@@ -173,32 +173,32 @@ public class DiscoveryServiceComponent implements DiscoveryService {
                     .send();
         }
 
-        private String startFromInputIri(String discoveryConfigIri) throws IOException {
+        private String startFromInputIri(String discoveryConfigIri) throws LpAppsException {
             return new HttpRequestSender(context).to(URL_START_FROM_INPUT_IRI)
                     .parameter("iri", discoveryConfigIri)
                     .acceptType("application/json")
                     .send();
         }
 
-        private String getStatus(String discoveryId) throws IOException {
+        private String getStatus(String discoveryId) throws LpAppsException {
             return new HttpRequestSender(context).to(String.format(URL_GET_STATUS, discoveryId))
                     .acceptType("application/json")
                     .send();
         }
 
-        private String getPipelineGroups(String discoveryId) throws IOException {
+        private String getPipelineGroups(String discoveryId) throws LpAppsException {
             return new HttpRequestSender(context).to(String.format(URL_GET_PIPELINE_GROUPS, discoveryId))
                     .acceptType("application/json")
                     .send();
         }
 
-        private String exportPipeline(String discoveryId, String pipelineUri) throws IOException {
+        private String exportPipeline(String discoveryId, String pipelineUri) throws LpAppsException {
             return new HttpRequestSender(context).to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
                     .acceptType("application/json")
                     .send();
         }
 
-        private String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws IOException {
+        private String exportPipelineUsingSD(String discoveryId, String pipelineUri, String serviceDescription) throws LpAppsException {
             return new HttpRequestSender(context).to(String.format(URL_EXPORT_PIPELINE, discoveryId, pipelineUri))
                     .method(HttpRequestSender.HttpMethod.POST)
                     .requestBody(serviceDescription)
