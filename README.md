@@ -9,6 +9,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9589669eb7534112a3f65f0e4b9f69d8)](https://www.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Coverage)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 
+Apiary: https://linkedpipes.docs.apiary.io
+
 ## Quick start
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
