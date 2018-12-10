@@ -9,20 +9,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9589669eb7534112a3f65f0e4b9f69d8)](https://www.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Coverage)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 
-Meeting Logs: https://docs.google.com/document/d/1tvJgEbRWb9dYM34grGARRXQ9gE0fcITw0Rayu2mEbmA/edit
-
-Apiary: https://linkedpipes.docs.apiary.io
-
-Wireframe Designs (Legacy via Moqups): https://app.moqups.com/ponsietta/LMyuSmiQKD/view
-
-Wireframe Designs (Latest) https://docs.google.com/document/d/166u_INZn6jAsKVsmVX88N2dQdX1wb9Mk2ZH1q2gRZV4/edit?usp=sharing
-
-Current App that we will be extracting, modifying and adding to: https://github.com/ld-viz-swp/LDVMi
-
-High level documentation markdown (updated regularly) : [HackMD](https://hackmd.io/lymLxN5AR4KTX4x3kPyiiQ#)
-
-ETL Service API Documentation: https://github.com/linkedpipes/etl/wiki/LinkedPipes-ETL-REST-API
-
 ## Quick start
 
 The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
