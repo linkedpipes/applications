@@ -42,7 +42,6 @@ public class GeoService {
 
     public static List<Property> getProperties() {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
-
         return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
     }
 
