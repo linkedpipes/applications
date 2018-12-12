@@ -1,8 +1,11 @@
 const path = require("path");
 const webpack = require("webpack");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const dev = process.env.NODE_ENV !== "production";
+
+const externalAssets = ["./public/popup.html"];
 
 module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
@@ -18,7 +21,8 @@ module.exports = () => {
       "process.env.BASE_BACKEND_URL": JSON.stringify(
         process.env.BASE_BACKEND_URL
       )
-    })
+    }),
+    new CopyWebpackPlugin(externalAssets.map(a => require.resolve(a)))
   ];
 
   if (dev) plugins.push(new webpack.HotModuleReplacementPlugin());
@@ -30,7 +34,7 @@ module.exports = () => {
       filename: "bundle.js"
     },
     resolve: {
-      extensions: [".js", ".jsx"]
+      extensions: [".js", ".jsx", ".mjs"]
     },
     module: {
       rules: [
@@ -42,6 +46,11 @@ module.exports = () => {
         {
           test: /\.s?css$/,
           use: ["style-loader", "css-loader", "sass-loader"]
+        },
+        {
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: "javascript/auto"
         }
       ]
     },
