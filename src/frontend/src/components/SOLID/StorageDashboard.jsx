@@ -11,7 +11,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import LockIcon from "@material-ui/icons/LockOutlined";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import { LoginButton } from "@solid/react";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 const styles = theme => ({
@@ -47,25 +46,49 @@ const styles = theme => ({
   }
 });
 
-function StorageDashboard(props) {
-  const { classes } = props;
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _solidAuthClient = _interopRequireDefault(require("solid-auth-client"));
 
-  return (
-    <div className={classes.main}>
-      <CssBaseline />
-      <Paper className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Welcome to LPApps Storage 😀
-        </Typography>
-        <form className={classes.form}>
-          <LoginButton popup="popup.html" />
-        </form>
-      </Paper>
-    </div>
-  );
+class StorageDashboard extends React.Component {
+  handleSolidLogin = e => {
+    e.preventDefault();
+
+    _solidAuthClient.default.popupLogin({
+      popupUri: "popup.html"
+    });
+  };
+
+  render() {
+    const { classes } = this.props;
+    const self = this;
+    return (
+      <div className={classes.main}>
+        <CssBaseline />
+        <Paper className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Welcome to LPApps Storage 😀
+          </Typography>
+          <form className={classes.form}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={e => {
+                self.handleSolidLogin(e);
+              }}
+              className={classes.submit}
+            >
+              Sign in to SOLID
+            </Button>
+          </form>
+        </Paper>
+      </div>
+    );
+  }
 }
 
 StorageDashboard.propTypes = {
