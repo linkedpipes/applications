@@ -147,7 +147,7 @@ public class HttpRequestSender {
                 return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
             }
         }
-        catch(IOException e){
+        catch (IOException e) {
             throw new LpAppsException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with external service", e);
         }
     }
