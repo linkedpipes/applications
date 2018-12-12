@@ -60,7 +60,8 @@ class SelectSources extends React.Component {
     open: false,
     discoveryStatusPolling: undefined,
     discoveryStatusPollingFinished: false,
-    discoveryStatusPollingInterval: 2000
+    discoveryStatusPollingInterval: 2000,
+    discoveryLoadingLabel: ""
   };
 
   handleClickOpen = () => {
@@ -70,38 +71,12 @@ class SelectSources extends React.Component {
   };
 
   postStartFromFile = () => {
-    let tid = toast.info("Running the discovery...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
-
     const self = this;
-    return DiscoveryService.postDiscoverFromTtl({ ttlFile: self.state.ttlFile })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "There was an error during the discovery",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
-      .then(function(jsonResponse) {
-        if (toast.isActive(tid)) {
-          toast.update(tid, {
-            render: `Discovery id ${jsonResponse.id}`,
-            type: toast.TYPE.SUCCESS,
-            autoClose: 2000
-          });
-        } else {
-          toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
-        }
-
-        return jsonResponse;
-      });
+    return DiscoveryService.postDiscoverFromTtl({
+      ttlFile: self.state.ttlFile
+    }).then(function(response) {
+      return response.json();
+    });
   };
 
   // TODO: refactor later, move to separate class responsible for _services calls
@@ -111,64 +86,21 @@ class SelectSources extends React.Component {
       return { uri: source };
     });
 
-    let tid = toast.info("Getting the pipeline groups...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
-    });
-
-    const self = this;
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL
-    })
-      .then(
-        function(response) {
-          if (response.status === 500) {
-            toast.error("Please, try different sources, discovery failed :0", {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: true
-            });
-
-            self.setState({
-              discoveryIsLoading: false,
-              textFieldValue: "",
-              textFieldIsValid: true
-            });
-            throw Promise.reject(RawException(response));
-          } else {
-            return response.json();
-          }
-        },
-        function(err) {
-          console.log(err.json());
-          toast.update(tid, {
-            render: "There was an error during the discovery",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
-      .then(function(jsonResponse) {
-        if (toast.isActive(tid)) {
-          toast.update(tid, {
-            render: `Discovery id ${jsonResponse.id}`,
-            type: toast.TYPE.SUCCESS,
-            autoClose: 2000
-          });
-        } else {
-          toast.success(`Discovery id ${jsonResponse.id}`, { autoClose: 2000 });
-        }
-
-        return jsonResponse;
-      });
+    }).then(function(response) {
+      return response.json();
+    });
   };
 
-  addDiscoveryId = id => {
+  addDiscoveryId = response => {
     const self = this;
+    const discoveryId = response.id;
 
     return new Promise((resolve, reject) => {
       self.props.dispatch(
         addDiscoveryIdAction({
-          id: id
+          id: discoveryId
         })
       );
       resolve();
@@ -178,27 +110,54 @@ class SelectSources extends React.Component {
   processStartDiscovery = () => {
     const self = this;
 
-    self.setState({ discoveryIsLoading: true });
+    self.setState({
+      discoveryIsLoading: true,
+      discoveryLoadingLabel:
+        "Please, hold on Discovery is casting spells 🧙‍..."
+    });
 
-    if (self.state.ttlFile) {
-      self.postStartFromFile().then(function(discoveryResponse) {
-        self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id, undefined);
+    (self.state.ttlFile
+      ? self.postStartFromFile()
+      : self.postStartFromInputLinks()
+    )
+      .then(function(discoveryResponse) {
+        if (discoveryResponse !== undefined) {
+          self.addDiscoveryId(discoveryResponse).then(function() {
+            self.setState({ discoveryStatusPollingFinished: false });
+            self.checkDiscovery(discoveryResponse, undefined);
+          });
+        }
+      })
+      .catch(function(error) {
+        console.log(error.message);
+
+        // Enable the fields
+        self.setState({
+          discoveryIsLoading: false,
+          textFieldValue: "",
+          textFieldIsValid: true
         });
+
+        // Clear out selected sources that failed
+        self.props.dispatch(
+          setSelectedDatasourcesExample({
+            data: undefined
+          })
+        );
+
+        toast.error(
+          "There was an error during the discovery. Please, try different sources.",
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
       });
-    } else {
-      self.postStartFromInputLinks().then(function(discoveryResponse) {
-        self.addDiscoveryId(discoveryResponse.id).then(function() {
-          self.setState({ discoveryStatusPollingFinished: false });
-          self.checkDiscovery(discoveryResponse.id, undefined);
-        });
-      });
-    }
   };
 
-  checkDiscovery = (discoveryId, tid) => {
+  checkDiscovery = response => {
     const self = this;
+    const discoveryId = response.id;
 
     this.state.discoveryStatusPolling &&
       clearTimeout(this.state.discoveryStatusPolling);
@@ -221,38 +180,18 @@ class SelectSources extends React.Component {
       return;
     }
 
-    tid =
-      tid === undefined
-        ? toast.info("Please, hold on Discovery is casting spells 🧙‍...", {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: false
-          })
-        : tid;
-
     DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "Error during discovery run",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(jsonResponse) {
         self.setState({
           discoveryStatusPollingFinished: jsonResponse.isFinished
         });
-        if (jsonResponse.isFinished) {
-          toast.dismiss(tid);
-        }
       });
 
     const discoveryStatusPolling = setTimeout(() => {
-      this.checkDiscovery(discoveryId, tid);
+      this.checkDiscovery(response);
     }, this.state.discoveryStatusPollingInterval);
 
     this.setState({
@@ -261,27 +200,17 @@ class SelectSources extends React.Component {
   };
 
   loadPipelineGroups = discoveryId => {
-    let tid = toast.info("Getting the pipeline groups...", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: false
+    this.setState({
+      discoveryLoadingLabel: "Extracting the magical pipelines 🧙‍..."
     });
 
     const self = this;
+
     return DiscoveryService.getPipelineGroups({ discoveryId: discoveryId })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(err) {
-          toast.update(tid, {
-            render: "Error getting pipeline groups",
-            type: toast.TYPE.ERROR,
-            autoClose: 2000
-          });
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(jsonResponse) {
-        toast.dismiss(tid);
         self.props.dispatch(
           addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
         );
@@ -293,7 +222,7 @@ class SelectSources extends React.Component {
     console.log("FilePond instance has initialised", this.pond);
   }
 
-  handleValidation = text => {
+  handleValidation = rawText => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
 
@@ -324,13 +253,18 @@ class SelectSources extends React.Component {
   render() {
     const { classes, selectedDatasources } = this.props;
 
-    const { discoveryIsLoading, textFieldValue, textFieldIsValid } = this.state;
+    const {
+      discoveryIsLoading,
+      textFieldValue,
+      textFieldIsValid,
+      discoveryLoadingLabel
+    } = this.state;
 
     return (
       <Card className={classes.card}>
         <CardContent>
           {discoveryIsLoading ? (
-            <LinearLoadingIndicator labelText="Processing sources through Discovery, hang in there 😉" />
+            <LinearLoadingIndicator labelText={discoveryLoadingLabel} />
           ) : (
             <div className={classes.gridRoot}>
               <Grid container spacing={24}>
@@ -374,7 +308,8 @@ class SelectSources extends React.Component {
                     onupdatefiles={fileItems => {
                       // Set current file objects to this.state
                       this.setState({
-                        ttlFile: fileItems[0].file
+                        ttlFile:
+                          fileItems.length === 1 ? fileItems[0].file : undefined
                       });
                     }}
                   />

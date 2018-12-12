@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,12 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -43,33 +39,33 @@ class HttpRequestSenderTests {
 
     @Test
     void testSend() {
-        assertThrowsExactly(IllegalStateException.class, this.sender::send);
+        assertThrows(IllegalStateException.class, this.sender::send);
     }
 
     @Test
     void testToNull() {
         HttpRequestSender sender = this.sender.to(null);
-        assertThrowsExactly(IllegalStateException.class, sender::send);
+        assertThrows(IllegalStateException.class, sender::send);
     }
 
     @Test
     void testToEmpty() {
         HttpRequestSender sender = this.sender.to("");
-        assertThrowsExactly(MalformedURLException.class, sender::send);
+        assertThrows(LpAppsException.class, sender::send);
     }
 
     @Test
-    void testToGoogle() throws IOException {
+    void testToGoogle() throws LpAppsException {
         sender.to(GOOGLE_URL).send(); // implicit assert that this call does not throw
     }
 
     @Test
-    void testToFake() throws IOException {
+    void testToFake() throws LpAppsException {
         sender.to(FAKE_URL).send();
     }
 
     @Test
-    void testUrlWithNoParameters() throws IOException {
+    void testUrlWithNoParameters() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .send();
@@ -78,7 +74,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testUrlWithOneParameter() throws IOException {
+    void testUrlWithOneParameter() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .parameter("param", "value")
@@ -88,7 +84,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testUrlWithTwoParameters() throws IOException {
+    void testUrlWithTwoParameters() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
@@ -99,7 +95,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testUrlWithManyParameters() throws IOException {
+    void testUrlWithManyParameters() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
@@ -113,7 +109,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testUrlAfterResettingParameters() throws IOException {
+    void testUrlAfterResettingParameters() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
@@ -130,7 +126,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNoMethodSet() throws IOException {
+    void testNoMethodSet() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .send();
@@ -140,7 +136,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testGetMethodSet() throws IOException {
+    void testGetMethodSet() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .method(HttpRequestSender.HttpMethod.GET)
@@ -151,7 +147,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testPostMethodSet() throws IOException {
+    void testPostMethodSet() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .method(HttpRequestSender.HttpMethod.POST)
@@ -162,7 +158,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNoRequestBody() throws IOException {
+    void testNoRequestBody() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .send();
@@ -172,7 +168,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNullRequestBody() throws IOException {
+    void testNullRequestBody() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .requestBody(null)
@@ -183,7 +179,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testEmptyRequestBody() throws IOException {
+    void testEmptyRequestBody() throws LpAppsException {
         String expectedBody = "";
 
         sender
@@ -196,7 +192,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testASCIIRequestBody() throws IOException {
+    void testASCIIRequestBody() throws LpAppsException {
         String expectedBody = "This is a request body with only ASCII characters.";
 
         sender
@@ -209,7 +205,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNoContentType() throws IOException {
+    void testNoContentType() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .send();
@@ -219,7 +215,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNullContentType() throws IOException {
+    void testNullContentType() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .contentType(null)
@@ -230,7 +226,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testEmptyContentType() throws IOException {
+    void testEmptyContentType() throws LpAppsException {
         String expectedContentType = "";
         sender
                 .to(FAKE_URL)
@@ -242,7 +238,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testContentType() throws IOException {
+    void testContentType() throws LpAppsException {
         String expectedContentType = "text/plain";
         sender
                 .to(FAKE_URL)
@@ -254,7 +250,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNoAcceptType() throws IOException {
+    void testNoAcceptType() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .send();
@@ -264,7 +260,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testNullAcceptType() throws IOException {
+    void testNullAcceptType() throws LpAppsException {
         sender
                 .to(FAKE_URL)
                 .acceptType(null)
@@ -275,7 +271,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testEmptyAcceptType() throws IOException {
+    void testEmptyAcceptType() throws LpAppsException {
         String expectedAcceptType = "";
         sender
                 .to(FAKE_URL)
@@ -287,7 +283,7 @@ class HttpRequestSenderTests {
     }
 
     @Test
-    void testAcceptType() throws IOException {
+    void testAcceptType() throws LpAppsException {
         String expectedAcceptType = "text/plain";
         sender
                 .to(FAKE_URL)

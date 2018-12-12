@@ -22,15 +22,7 @@ class VisualizerControllerContainer extends React.Component {
     if (type === VISUALIZER_TYPE.GoogleMaps) {
       const markers = params.markers;
 
-      return (
-        <GoogleMapsVisualizer
-          markers={markers}
-          googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
-          loadingElement={<div style={{ height: `100%` }} />}
-          containerElement={<div style={{ height: `100%` }} />}
-          mapElement={<div style={{ height: `100%` }} />}
-        />
-      );
+      return <GoogleMapsVisualizer markers={markers} />;
     } else {
       return <div />;
     }

@@ -7,9 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LocalizedValue {
-    private Map<String, String> languageMap = new HashMap<>();
 
-    public int size = languageMap.size();
+    private Map<String, String> languageMap = new HashMap<>();
 
     public LocalizedValue(Map<String, String> variants){
         variants.forEach(this::put);
@@ -34,4 +33,9 @@ public class LocalizedValue {
     public String get(String language) {
         return languageMap.get(language);
     }
+
+    public int size() {
+        return languageMap.size();
+    }
+
 }
