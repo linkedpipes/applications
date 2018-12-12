@@ -16,6 +16,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import HomeIcon from "@material-ui/icons/Home";
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
+import DatabaseIcon from "@material-ui/icons/storage";
 import HelpIcon from "@material-ui/icons/Help";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
@@ -185,6 +186,15 @@ class NavigationBar extends React.Component {
                   <ViewModuleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Applications" />
+              </ListItem>
+            </Link>
+
+            <Link to="/storage">
+              <ListItem button>
+                <ListItemIcon>
+                  <DatabaseIcon />
+                </ListItemIcon>
+                <ListItemText primary="Storage" />
               </ListItem>
             </Link>
 

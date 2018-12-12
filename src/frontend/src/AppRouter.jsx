@@ -9,6 +9,7 @@ import Redirect from "react-router-dom/es/Redirect";
 import { Dashboard } from "./components/Dashboard/Dashboard";
 import StepperController from "./components/SelectSources/StepperController";
 import CreateApp from "./components/CreateApp/CreateApp";
+import StorageDashboard from "./components/SOLID/StorageDashboard";
 import Grid from "@material-ui/core/Grid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
@@ -54,6 +55,7 @@ const AppRouter = props => {
             <Route exact path="/create-app" component={CreateApp} />
             <Route exact path="/select-sources" component={StepperController} />
             <Route path="/about" component={AboutPage} />
+            <Route path="/storage" component={StorageDashboard} />
             <Redirect from="/" to="/dashboard" />
             <Route component={NotFoundPage} />
           </Switch>
