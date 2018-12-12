@@ -21,7 +21,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleLpAppsException(LpAppsException ex) {
         logger.error("Exception: ", ex);
 
-        return new ResponseEntity(new ErrorResponse(ex.getErrorStatus().value(), ex.getMessage()), ex.getErrorStatus());
+        return new ResponseEntity<>(new ErrorResponse(ex.getErrorStatus().value(), ex.getMessage()), ex.getErrorStatus());
     }
 
     @Override
