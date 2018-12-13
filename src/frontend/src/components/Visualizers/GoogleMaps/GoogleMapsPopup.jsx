@@ -10,7 +10,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import PropTypes from "prop-types";
 import React from "react";
 import GoogleMapsVisualizer from "./GoogleMapsVisualizer";
-import { DiscoveryService } from "../../../_services";
+import { VisualizersService } from "../../../_services";
 import { withRouter } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Filters from "../../VisualizerController/Filters/Filters";
@@ -109,7 +109,7 @@ class GoogleMapsPopup extends React.Component {
     const self = this;
     const { resultGraphIri } = self.props;
 
-    DiscoveryService.getMarkers({ resultGraphIri: resultGraphIri })
+    VisualizersService.getMarkers({ resultGraphIri: resultGraphIri })
       .then(
         function(response) {
           return response.json();
@@ -122,7 +122,7 @@ class GoogleMapsPopup extends React.Component {
         self.props.dispatch(addMultipleMarkers({ markersList: jsonResponse }));
       });
 
-    DiscoveryService.getFilters()
+    VisualizersService.getFilters()
       .then(
         function(response) {
           return response.json();

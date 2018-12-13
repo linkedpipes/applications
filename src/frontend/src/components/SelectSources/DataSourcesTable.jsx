@@ -14,6 +14,7 @@ import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
 import {
   DiscoveryService,
+  ETLService,
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE
 } from "../../_services";
@@ -243,7 +244,7 @@ class DataSourcesTable extends React.Component {
 
     console.log("Sending the execute pipeline request...");
 
-    return DiscoveryService.getExecutePipeline({
+    return ETLService.getExecutePipeline({
       etlPipelineIri: etlPipelineIri
     })
       .then(function(response) {
@@ -279,7 +280,7 @@ class DataSourcesTable extends React.Component {
           )
         : tid;
 
-    return DiscoveryService.getExecutionStatus({
+    return ETLService.getExecutionStatus({
       executionIri: executionValues.executionIri
     })
       .then(function(response) {
