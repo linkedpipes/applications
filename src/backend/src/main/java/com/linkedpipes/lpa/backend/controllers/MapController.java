@@ -9,15 +9,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @SuppressWarnings("unused")
 public class MapController {
 
     @PostMapping("/api/map/markers")
-    public ResponseEntity<List<Marker>> getMarkers(@RequestParam("resultGraphIri") String graphIri,
+    public ResponseEntity<List<Marker>> getMarkers(@RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                    @RequestBody(required = false) Map<String, List<ValueFilter>> filters) {
-        return ResponseEntity.ok(GeoService.getMarkersFromNamed(graphIri, filters));
+        return Optional.ofNullable(graphIri)
+                .map(iri -> GeoService.getMarkersFromNamed(iri, filters))
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.ok(GeoService.getMarkers(filters)));
     }
 
     @GetMapping("/api/map/properties")
