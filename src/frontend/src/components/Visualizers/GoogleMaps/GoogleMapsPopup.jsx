@@ -172,13 +172,7 @@ class GoogleMapsPopup extends React.Component {
               <Filters filters={filters} />
             </Grid>
             <Grid item md={9}>
-              <GoogleMapsVisualizer
-                markers={markers}
-                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=geometry,drawing,places"
-                loadingElement={<div style={{ height: `100%` }} />}
-                containerElement={<div style={{ height: `100%` }} />}
-                mapElement={<div style={{ height: `100%` }} />}
-              />
+              <GoogleMapsVisualizer markers={markers} />
             </Grid>
           </Grid>
         </Dialog>
