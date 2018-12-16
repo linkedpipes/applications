@@ -14,6 +14,8 @@ services:
   backend:
     image: linkedpipes/applications:backend
     container_name: lpa-backend
+    ports:
+      - 9005:9005 # port configure in lpapps server
     depends_on:
       - etl
       - discovery
@@ -30,6 +32,8 @@ services:
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
+    ports:
+      - 8890:8890
     volumes:
       - ./data/virtuoso:/data
 
@@ -46,6 +50,8 @@ services:
     depends_on:
       - db
       - etl
+    ports:
+      - 9000:9000
 
   etl:
     image: linkedpipes/etl

@@ -17,7 +17,7 @@ services:
     build:
       context: src/backend/
     ports:
-      - 9005:8080
+      - 9005:9005
     depends_on:
       - etl
       - discovery
