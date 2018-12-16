@@ -4,7 +4,7 @@ import com.linkedpipes.lpa.backend.entities.visualization.Concept;
 import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
 import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
 import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
-import com.linkedpipes.lpa.backend.services.VisualizationService;
+import com.linkedpipes.lpa.backend.services.interfaces.IVisualizationService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,10 +17,10 @@ import java.util.List;
 @Controller
 public class SkosController {
 
-    private final VisualizationService visualizationService;
+    private final IVisualizationService visualizationService;
 
     public SkosController(ApplicationContext context){
-        visualizationService = context.getBean(VisualizationService.class);
+        visualizationService = context.getBean(IVisualizationService.class);
     }
 
     @GetMapping("/api/skos/schemes")

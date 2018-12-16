@@ -6,12 +6,10 @@ import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.Optional;
-
 public class NodesQueryProvider extends ConstructSparqlQueryProvider {
     //TODO combine implementation of NodesByUrisQuery in LDVMi with this class (no need for seperate query provider imo)
-    private Optional<Integer> limit;
-    private Optional<Integer> offset;
+    private Integer limit;
+    private Integer offset;
 
     // PREFIXES
     private static final String RDF_PREFIX = "rdf";
@@ -22,8 +20,7 @@ public class NodesQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_NODE = var("node");
     public static final String VAR_LABEL = var("label");
 
-    public NodesQueryProvider(Optional<Integer> limit, Optional<Integer> offset){
-
+    public NodesQueryProvider(Integer limit, Integer offset){
         this.limit = limit;
         this.offset = offset;
     }
@@ -65,16 +62,16 @@ public class NodesQueryProvider extends ConstructSparqlQueryProvider {
 
     @Override
     public ConstructBuilder addLimit(ConstructBuilder builder) {
-        if(this.limit.isPresent())
-            builder.setLimit(this.limit.get());
+        if(this.limit != null && this.limit > 0)
+            builder.setLimit(this.limit);
 
         return builder;
     }
 
     @Override
     public ConstructBuilder addOffset(ConstructBuilder builder) {
-        if(this.offset.isPresent())
-            builder.setOffset(this.offset.get());
+        if(this.offset != null && this.offset > 0)
+            builder.setOffset(this.offset);
 
         return builder;
     }
