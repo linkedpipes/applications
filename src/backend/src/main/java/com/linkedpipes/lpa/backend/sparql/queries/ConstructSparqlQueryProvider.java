@@ -18,6 +18,9 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider {
         addConstructs(builder);
         addWheres(builder);
         addOptionals(builder);
+        addGroupBy(builder);
+        addLimit(builder);
+        addOffset(builder);
 
         return builder.build();
     }
@@ -43,6 +46,18 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider {
     protected abstract ConstructBuilder addWheres(ConstructBuilder builder);
 
     protected ConstructBuilder addOptionals(ConstructBuilder builder) {
+        return builder;
+    }
+
+    protected ConstructBuilder addGroupBy(ConstructBuilder builder) {
+        return builder;
+    }
+
+    protected ConstructBuilder addLimit(ConstructBuilder builder) {
+        return builder;
+    }
+
+    protected ConstructBuilder addOffset(ConstructBuilder builder) {
         return builder;
     }
 

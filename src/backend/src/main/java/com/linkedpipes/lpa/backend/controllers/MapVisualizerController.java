@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @SuppressWarnings("unused")
-public class MapController {
+public class MapVisualizerController {
 
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@RequestParam(value = "resultGraphIri", required = false) String graphIri,
