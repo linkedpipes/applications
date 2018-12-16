@@ -1,28 +1,30 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.ErrorResponse;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.services.EtlServiceComponent;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.services.EtlService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @SuppressWarnings("unused")
 public class ExecutionController {
 
-    private final EtlServiceComponent etlService;
+    private final EtlService etlService;
 
-    public ExecutionController(){
-        etlService = new EtlServiceComponent();
+    public ExecutionController(ApplicationContext context) {
+        etlService = context.getBean(EtlService.class);
     }
 
     @GetMapping("/api/execution/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "executionIri") String executionIri) throws IOException {
+    public ResponseEntity<?> getStatus(@RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
         if(executionIri == null || executionIri.isEmpty()) {
-            return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Execution IRI not provided.");
         }
 
         ExecutionStatus status = etlService.getExecutionStatus(executionIri);
@@ -31,9 +33,9 @@ public class ExecutionController {
 
     @GetMapping("/api/execution/result")
     @ResponseBody
-    public ResponseEntity<?> getResult(@RequestParam(value = "executionIri") String executionIri) throws IOException {
+    public ResponseEntity<?> getResult(@RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
         if(executionIri == null || executionIri.isEmpty()) {
-            return new ResponseEntity<>(new ErrorResponse("Execution IRI not provided."), HttpStatus.BAD_REQUEST);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Execution IRI not provided.");
         }
 
         String result = etlService.getExecutionResult(executionIri);

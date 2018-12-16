@@ -19,8 +19,10 @@ import {
 } from "../../_services";
 import { addSingleExecution } from "../../_actions/etl_executions";
 import { addSingleExport } from "../../_actions/etl_exports";
+import { addSelectedResultGraphIriAction } from "../../_actions/globals";
 import { toast } from "react-toastify";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import uuid from "uuid";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -153,25 +155,52 @@ class DataSourcesTable extends React.Component {
     loadingButtons: {}
   };
 
+  updateLoadingButton = (loadingButtonId, enabled) => {
+    let loadingButtons = this.state.loadingButtons;
+
+    if (enabled) {
+      delete loadingButtons[loadingButtonId];
+    } else {
+      loadingButtons[loadingButtonId] = true;
+    }
+
+    this.setState({ loadingButtons: loadingButtons });
+  };
+
   exportAndStartPolling = (discoveryId, datasourceAndPipelines) => {
     const self = this;
     const pipelines = datasourceAndPipelines.pipelines;
-    const randomPipeline =
-      pipelines[Math.floor(Math.random() * pipelines.length)];
-    const pipelineId = randomPipeline.id;
-    const datasourceUri = datasourceAndPipelines.dataSources[0].uri;
-    const loadingButtonId = "button_" + datasourceUri;
+    pipelines.sort((a, b) => a.minimalIteration < b.minimalIteration);
 
-    self.exportPipeline(discoveryId, pipelineId).then(function(json) {
-      self
-        .executePipeline(json.pipelineId, json.etlPipelineIri)
-        .then(function(pipelineId) {
-          let loadingButtons = self.state.loadingButtons;
-          loadingButtons[loadingButtonId] = true;
-          self.setState({ loadingButtons: loadingButtons });
-          self.checkExecutionStatus(pipelineId, loadingButtonId);
-        });
-    });
+    const pipelineWithMinIterations = pipelines[0];
+    const pipelineId = pipelineWithMinIterations.id;
+    const datasourceTitle = datasourceAndPipelines.dataSources[0].label;
+    const loadingButtonId = "button_" + datasourceTitle;
+
+    self.updateLoadingButton(loadingButtonId, false);
+    self
+      .exportPipeline(discoveryId, pipelineId)
+      .then(function(json) {
+        self
+          .executePipeline(json.pipelineId, json.etlPipelineIri)
+          .then(function(pipelineId) {
+            self.checkExecutionStatus(pipelineId, loadingButtonId, undefined);
+          });
+      })
+      .catch(function(error) {
+        console.log(error.message);
+
+        // Enable the fields
+        self.updateLoadingButton(loadingButtonId, true);
+
+        toast.error(
+          "Sorry, the ETL is unable to execute the pipeline, try selecting different source...",
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      });
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -183,23 +212,25 @@ class DataSourcesTable extends React.Component {
       discoveryId: discoveryId,
       pipelineId: pipelineId
     })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(error) {
-          console.log("Error sending the export pipeline request");
-          console.error(error);
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(json) {
         console.log(`Export pipeline request sent!`);
 
+        const response = json;
+
         self.props.dispatch(
           addSingleExport({
-            id: json.pipelineId,
-            etlPipelineIri: json.etlPipelineIri,
-            resultGraphIri: json.resultGraphIri
+            id: response.pipelineId,
+            etlPipelineIri: response.etlPipelineIri,
+            resultGraphIri: response.resultGraphIri
+          })
+        );
+
+        self.props.dispatch(
+          addSelectedResultGraphIriAction({
+            data: response.resultGraphIri
           })
         );
 
@@ -215,14 +246,9 @@ class DataSourcesTable extends React.Component {
     return DiscoveryService.getExecutePipeline({
       etlPipelineIri: etlPipelineIri
     })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(error) {
-          console.error(error);
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(json) {
         console.log(`Execute pipeline request sent!`, { autoClose: 2000 });
 
@@ -237,36 +263,37 @@ class DataSourcesTable extends React.Component {
       });
   };
 
-  checkExecutionStatus = (pipelineId, loadingButtonId) => {
+  checkExecutionStatus = (pipelineId, loadingButtonId, tid) => {
     const { executions } = this.props;
     const executionValues = executions.executions[pipelineId];
-    let status = undefined;
     const self = this;
+
+    tid =
+      tid === undefined
+        ? toast.info(
+            "Please, hold on ETL is chatting with Tim Berners-Lee 🕴...",
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: false
+            }
+          )
+        : tid;
 
     return DiscoveryService.getExecutionStatus({
       executionIri: executionValues.executionIri
     })
-      .then(
-        function(response) {
-          return response.json();
-        },
-        function(error) {
-          console.log("Error while checking the execution status");
-          console.error(error);
-        }
-      )
+      .then(function(response) {
+        return response.json();
+      })
       .then(function(json) {
         let response = "Status: ";
         let status = ETL_STATUS_MAP[json.status.id];
 
         if (status === undefined) {
-          console.log("Unkown status for checking pipeline execution");
+          console.log("Unknown status for checking pipeline execution");
         }
 
         response += status;
-
-        // TODO : hack value
-        response = "Success";
 
         if (
           status === ETL_STATUS_TYPE.Finished ||
@@ -275,17 +302,28 @@ class DataSourcesTable extends React.Component {
           status === ETL_STATUS_TYPE.Failed ||
           response === "Success"
         ) {
-          let loadingButtons = self.state.loadingButtons;
-          delete loadingButtons[loadingButtonId];
-          self.setState({ loadingButtons: loadingButtons });
-          toast.info(response, { autoClose: EXECUTION_STATUS_TIMEOUT });
+          self.updateLoadingButton(loadingButtonId, true);
+          if (status === ETL_STATUS_TYPE.Failed) {
+            toast.update(tid, {
+              render:
+                "Sorry, the ETL is unable to execute the pipeline, try selecting different source...",
+              type: toast.TYPE.ERROR,
+              autoClose: EXECUTION_STATUS_TIMEOUT
+            });
+          } else {
+            toast.update(tid, {
+              render: response,
+              type: toast.TYPE.INFO,
+              autoClose: EXECUTION_STATUS_TIMEOUT
+            });
 
-          setTimeout(function() {
-            self.props.handleNextStep();
-          }, 500);
+            setTimeout(function() {
+              self.props.handleNextStep();
+            }, 500);
+          }
         } else {
           setTimeout(() => {
-            self.checkExecutionStatus(pipelineId, loadingButtonId);
+            self.checkExecutionStatus(pipelineId, loadingButtonId, tid);
           }, 5000);
         }
       });
@@ -307,7 +345,7 @@ class DataSourcesTable extends React.Component {
   };
 
   render() {
-    const { classes, dataSourceGroups, discoveryId, exportsDict } = this.props;
+    const { classes, dataSourceGroups, discoveryId } = this.props;
     const { order, orderBy, rowsPerPage, page, loadingButtons } = this.state;
 
     const emptyRows =
@@ -332,14 +370,11 @@ class DataSourcesTable extends React.Component {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(datasourceAndPipelines => {
                   return (
-                    <TableRow
-                      hover
-                      tabIndex={-1}
-                      key={datasourceAndPipelines.dataSources[0].uri}
-                    >
+                    <TableRow hover tabIndex={-1} key={uuid()}>
                       <TableCell component="th" scope="row" padding="checkbox">
                         {loadingButtons[
-                          "button_" + datasourceAndPipelines.dataSources[0].uri
+                          "button_" +
+                            datasourceAndPipelines.dataSources[0].label
                         ] !== undefined ? (
                           <CircularProgress size={25} />
                         ) : (
@@ -349,6 +384,7 @@ class DataSourcesTable extends React.Component {
                               datasourceAndPipelines.dataSources[0].uri
                             }
                             size="small"
+                            disabled={Object.keys(loadingButtons).length > 0}
                             variant="contained"
                             color="secondary"
                             onClick={() => {

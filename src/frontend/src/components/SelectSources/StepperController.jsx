@@ -12,11 +12,16 @@ import SelectSources from "./SelectSources";
 import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
 import connect from "react-redux/lib/connect/connect";
 import DataSourcesTable from "./DataSourcesTable";
-import CreateAppCard from "./CreateAppCard";
+import { CreateAppCard } from "../CreateApp";
+import Grid from "@material-ui/core/Grid";
+import { QuickStartWidget } from "./QuickStart";
 
 const styles = theme => ({
   root: {
     width: "100%"
+  },
+  gridRoot: {
+    flexGrow: 1
   },
   button: {
     marginTop: theme.spacing.unit,
@@ -42,7 +47,7 @@ function getSteps() {
   ];
 }
 
-class CreateAppStepper extends React.Component {
+class StepperController extends React.Component {
   state = {
     activeStep: 0
   };
@@ -52,7 +57,18 @@ class CreateAppStepper extends React.Component {
 
     switch (step) {
       case 0:
-        return <SelectSources handleNextStep={this.handleNext} />;
+        return (
+          <div className={classes.root}>
+            <Grid container spacing={24}>
+              <Grid item xs={8} sm={8}>
+                <SelectSources handleNextStep={this.handleNext} />
+              </Grid>
+              <Grid item xs={4} sm={4}>
+                <QuickStartWidget />
+              </Grid>
+            </Grid>
+          </div>
+        );
       case 1:
         return (
           <VisualizerCardCollectionView handleNextStep={this.handleNext} />
@@ -61,6 +77,7 @@ class CreateAppStepper extends React.Component {
         return (
           <DataSourcesTable
             handleNextStep={this.handleNext}
+            handlePrevStep={this.handleBack}
             discoveryId={discoveryId}
             dataSourceGroups={
               selectedVisualizer !== undefined
@@ -153,7 +170,7 @@ class CreateAppStepper extends React.Component {
   }
 }
 
-CreateAppStepper.propTypes = {
+StepperController.propTypes = {
   classes: PropTypes.object
 };
 
@@ -164,4 +181,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(CreateAppStepper));
+export default connect(mapStateToProps)(withStyles(styles)(StepperController));

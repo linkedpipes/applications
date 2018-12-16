@@ -97,11 +97,6 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
         return builder;
     }
 
-    @Override
-    protected SelectBuilder addAdditional(SelectBuilder builder) {
-        return builder.setLimit(500);
-    }
-
     private String getLabelOrUri(ValueFilter filter) {
         if (StringUtils.isNotEmpty(filter.uri)) {
             return SparqlUtils.formatUri(filter.uri);

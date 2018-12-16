@@ -1,100 +1,116 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
-import org.junit.Test;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrows;
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-public class HttpRequestSenderTests {
-
-    private static final FakeHttpURLConnectionFactory FAKE_FACTORY = new FakeHttpURLConnectionFactory();
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
+class HttpRequestSenderTests {
 
     private static final String GOOGLE_URL = "http://www.google.com/";
     private static final String FAKE_URL = "http://this.url.does.not.exist/";
     private static final String REQUEST_PROPERTY_CONTENT_TYPE = "Content-Type";
     private static final String REQUEST_PROPERTY_ACCEPT = "Accept";
 
-    @Test
-    public void testSend() {
-        HttpRequestSender sender = new HttpRequestSender();
-        assertThrowsExactly(IllegalStateException.class, sender::send);
+    private final ApplicationContext context;
+    private final FakeHttpURLConnectionFactory fakeFactory;
+    
+    private HttpRequestSender sender;
+
+    HttpRequestSenderTests(ApplicationContext context) {
+        this.context = context;
+        fakeFactory = (FakeHttpURLConnectionFactory) context.getBean(HttpURLConnectionFactory.class);
+    }
+
+    @BeforeEach
+    void setUpSender() {
+        sender = new HttpRequestSender(context);
     }
 
     @Test
-    public void testToNull() {
-        HttpRequestSender sender = new HttpRequestSender().to(null);
-        assertThrowsExactly(IllegalStateException.class, sender::send);
+    void testSend() {
+        assertThrows(IllegalStateException.class, this.sender::send);
     }
 
     @Test
-    public void testToEmpty() {
-        HttpRequestSender sender = new HttpRequestSender().to("");
-        assertThrowsExactly(MalformedURLException.class, sender::send);
+    void testToNull() {
+        HttpRequestSender sender = this.sender.to(null);
+        assertThrows(IllegalStateException.class, sender::send);
     }
 
     @Test
-    public void testToGoogle() throws IOException {
-        new HttpRequestSender().to(GOOGLE_URL).send(); // implicit assert that this call does not throw
+    void testToEmpty() {
+        HttpRequestSender sender = this.sender.to("");
+        assertThrows(LpAppsException.class, sender::send);
     }
 
     @Test
-    public void testToFake() {
-        assertThrows(IOException.class, () -> new HttpRequestSender().to(FAKE_URL).send());
+    void testToGoogle() throws LpAppsException {
+        sender.to(GOOGLE_URL).send(); // implicit assert that this call does not throw
     }
 
     @Test
-    public void testUrlWithNoParameters() throws IOException {
-        new HttpRequestSender()
+    void testToFake() throws LpAppsException {
+        sender.to(FAKE_URL).send();
+    }
+
+    @Test
+    void testUrlWithNoParameters() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
-                .send(FAKE_FACTORY);
-        String urlWithParameters = FAKE_FACTORY.getLastConnection().getURL().toString();
+                .send();
+        String urlWithParameters = fakeFactory.getLastConnection().getURL().toString();
         assertEquals(FAKE_URL, urlWithParameters);
     }
 
     @Test
-    public void testUrlWithOneParameter() throws IOException {
-        new HttpRequestSender()
+    void testUrlWithOneParameter() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .parameter("param", "value")
-                .send(FAKE_FACTORY);
-        String urlWithParameters = FAKE_FACTORY.getLastConnection().getURL().toString();
+                .send();
+        String urlWithParameters = fakeFactory.getLastConnection().getURL().toString();
         assertEquals(FAKE_URL + "?param=value", urlWithParameters);
     }
 
     @Test
-    public void testUrlWithTwoParameters() throws IOException {
-        new HttpRequestSender()
+    void testUrlWithTwoParameters() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
                 .parameter("param2", "value2")
-                .send(FAKE_FACTORY);
-        String urlWithParameters = FAKE_FACTORY.getLastConnection().getURL().toString();
+                .send();
+        String urlWithParameters = fakeFactory.getLastConnection().getURL().toString();
         assertEquals(FAKE_URL + "?param1=value1&param2=value2", urlWithParameters);
     }
 
     @Test
-    public void testUrlWithManyParameters() throws IOException {
-        new HttpRequestSender()
+    void testUrlWithManyParameters() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
                 .parameter("param2", "value2")
                 .parameter("param3", "value3")
                 .parameter("param4", "value4")
                 .parameter("param5", "value5")
-                .send(FAKE_FACTORY);
-        String urlWithParameters = FAKE_FACTORY.getLastConnection().getURL().toString();
+                .send();
+        String urlWithParameters = fakeFactory.getLastConnection().getURL().toString();
         assertEquals(FAKE_URL + "?param1=value1&param2=value2&param3=value3&param4=value4&param5=value5", urlWithParameters);
     }
 
     @Test
-    public void testUrlAfterResettingParameters() throws IOException {
-        new HttpRequestSender()
+    void testUrlAfterResettingParameters() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .parameter("param1", "value1")
                 .parameter("param2", "value2")
@@ -103,179 +119,180 @@ public class HttpRequestSenderTests {
                 .parameter("param5", "value5")
 
                 .parameter("param1", "value6")
-                .send(FAKE_FACTORY);
+                .send();
 
-        String urlWithParameters = FAKE_FACTORY.getLastConnection().getURL().toString();
+        String urlWithParameters = fakeFactory.getLastConnection().getURL().toString();
         assertEquals(FAKE_URL + "?param1=value6&param2=value2&param3=value3&param4=value4&param5=value5", urlWithParameters);
     }
 
     @Test
-    public void testNoMethodSet() throws IOException {
-        new HttpRequestSender()
+    void testNoMethodSet() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String methodName = FAKE_FACTORY.getLastConnection().getRequestMethod();
+        String methodName = fakeFactory.getLastConnection().getRequestMethod();
         assertEquals(HttpRequestSender.HttpMethod.GET.name(), methodName);
     }
 
     @Test
-    public void testGetMethodSet() throws IOException {
-        new HttpRequestSender()
+    void testGetMethodSet() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .method(HttpRequestSender.HttpMethod.GET)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String methodName = FAKE_FACTORY.getLastConnection().getRequestMethod();
+        String methodName = fakeFactory.getLastConnection().getRequestMethod();
         assertEquals(HttpRequestSender.HttpMethod.GET.name(), methodName);
     }
 
     @Test
-    public void testPostMethodSet() throws IOException {
-        new HttpRequestSender()
+    void testPostMethodSet() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .method(HttpRequestSender.HttpMethod.POST)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String methodName = FAKE_FACTORY.getLastConnection().getRequestMethod();
+        String methodName = fakeFactory.getLastConnection().getRequestMethod();
         assertEquals(HttpRequestSender.HttpMethod.POST.name(), methodName);
     }
 
     @Test
-    public void testNoRequestBody() throws IOException {
-        new HttpRequestSender()
+    void testNoRequestBody() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
+        String actualBody = fakeFactory.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
         assertEquals("", actualBody);
     }
 
     @Test
-    public void testNullRequestBody() throws IOException {
-        new HttpRequestSender()
+    void testNullRequestBody() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .requestBody(null)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
+        String actualBody = fakeFactory.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
         assertEquals("", actualBody);
     }
 
     @Test
-    public void testEmptyRequestBody() throws IOException {
+    void testEmptyRequestBody() throws LpAppsException {
         String expectedBody = "";
 
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .requestBody(expectedBody)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
+        String actualBody = fakeFactory.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
         assertEquals(expectedBody, actualBody);
     }
 
     @Test
-    public void testASCIIRequestBody() throws IOException {
+    void testASCIIRequestBody() throws LpAppsException {
         String expectedBody = "This is a request body with only ASCII characters.";
 
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .requestBody(expectedBody)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualBody = FAKE_FACTORY.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
+        String actualBody = fakeFactory.getLastConnection().getOutputStream().toString(Application.DEFAULT_CHARSET);
         assertEquals(expectedBody, actualBody);
     }
 
     @Test
-    public void testNoContentType() throws IOException {
-        new HttpRequestSender()
+    void testNoContentType() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        String actualContentType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
         assertNull(actualContentType);
     }
 
     @Test
-    public void testNullContentType() throws IOException {
-        new HttpRequestSender()
+    void testNullContentType() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .contentType(null)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        String actualContentType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
         assertNull(actualContentType);
     }
 
     @Test
-    public void testEmptyContentType() throws IOException {
+    void testEmptyContentType() throws LpAppsException {
         String expectedContentType = "";
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .contentType(expectedContentType)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        String actualContentType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
         assertEquals(expectedContentType, actualContentType);
     }
 
     @Test
-    public void testContentType() throws IOException {
+    void testContentType() throws LpAppsException {
         String expectedContentType = "text/plain";
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .contentType(expectedContentType)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualContentType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
+        String actualContentType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_CONTENT_TYPE);
         assertEquals(expectedContentType, actualContentType);
     }
 
     @Test
-    public void testNoAcceptType() throws IOException {
-        new HttpRequestSender()
+    void testNoAcceptType() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        String actualAcceptType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
         assertNull(actualAcceptType);
     }
 
     @Test
-    public void testNullAcceptType() throws IOException {
-        new HttpRequestSender()
+    void testNullAcceptType() throws LpAppsException {
+        sender
                 .to(FAKE_URL)
                 .acceptType(null)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        String actualAcceptType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
         assertNull(actualAcceptType);
     }
 
     @Test
-    public void testEmptyAcceptType() throws IOException {
+    void testEmptyAcceptType() throws LpAppsException {
         String expectedAcceptType = "";
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .acceptType(expectedAcceptType)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        String actualAcceptType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
         assertEquals(expectedAcceptType, actualAcceptType);
     }
 
     @Test
-    public void testAcceptType() throws IOException {
+    void testAcceptType() throws LpAppsException {
         String expectedAcceptType = "text/plain";
-        new HttpRequestSender()
+        sender
                 .to(FAKE_URL)
                 .acceptType(expectedAcceptType)
-                .send(FAKE_FACTORY);
+                .send();
 
-        String actualAcceptType = FAKE_FACTORY.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
+        String actualAcceptType = fakeFactory.getLastConnection().getRequestProperty(REQUEST_PROPERTY_ACCEPT);
         assertEquals(expectedAcceptType, actualAcceptType);
     }
 
 }
+
