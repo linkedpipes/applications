@@ -1,8 +1,9 @@
-version: "3"
+version: "3.3"
 services:
   nginx:
     image: nginx:stable
     container_name: lpa-reverse-proxy
+    restart: on-failure
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -14,6 +15,7 @@ services:
   backend:
     image: linkedpipes/applications:backend
     container_name: lpa-backend
+    restart: on-failure
     ports:
       - 9005:9005 # port configure in lpapps server
     depends_on:
@@ -23,12 +25,14 @@ services:
   frontend:
     image: linkedpipes/applications:frontend-prod
     container_name: lpa-frontend
+    restart: on-failure
     depends_on:
       - backend
 
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
     container_name: lpa-virtuoso
+    restart: on-failure
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
@@ -40,9 +44,10 @@ services:
   discovery:
     image: linkedpipes/applications:discovery
     container_name: lpa-discovery
+    restart: on-failure
     command:
       [
-        "40",
+        "0",
         "-Dldcp.etl.hostname=http://lpa-etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",
@@ -56,5 +61,6 @@ services:
   etl:
     image: linkedpipes/etl
     container_name: lpa-etl
+    restart: on-failure
     ports:
       - 8080:8080
