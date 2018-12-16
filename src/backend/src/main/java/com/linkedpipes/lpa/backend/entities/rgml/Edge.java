@@ -5,4 +5,11 @@ public class Edge {
     public String source;
     public String target;
     public Double weight;
+
+    public Edge(String uri, String source, String target, Double weight){
+        this.uri = uri;
+        this.source = source;
+        this.target = target;
+        this.weight = weight;
+    }
 }
