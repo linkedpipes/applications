@@ -12,6 +12,17 @@ import LockIcon from "@material-ui/icons/LockOutlined";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
+import {
+  AuthButton,
+  LoggedIn,
+  LoggedOut,
+  Value,
+  Image,
+  List,
+  Link,
+  Label
+} from "@solid/react";
+import UploadFilePopup from "./UploadFilePopup";
 
 const styles = theme => ({
   main: {
@@ -50,6 +61,10 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 var _solidAuthClient = _interopRequireDefault(require("solid-auth-client"));
 
 class StorageDashboard extends React.Component {
+  state = {
+    loggedIn: false
+  };
+
   handleSolidLogin = e => {
     e.preventDefault();
 
@@ -58,8 +73,17 @@ class StorageDashboard extends React.Component {
     });
   };
 
+  handleLoginConfirmed = () => {
+    this.setState({ loggedIn: true });
+  };
+
+  handleLogoutConfirmed = () => {
+    this.setState({ loggedIn: false });
+  };
+
   render() {
     const { classes } = this.props;
+    const { loggedIn } = this.state;
     const self = this;
     return (
       <div className={classes.main}>
@@ -72,18 +96,24 @@ class StorageDashboard extends React.Component {
             Welcome to LPApps Storage 😀
           </Typography>
           <form className={classes.form}>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              onClick={e => {
-                self.handleSolidLogin(e);
-              }}
-              className={classes.submit}
-            >
-              Sign in to SOLID
-            </Button>
+            <LoggedOut>
+              <Button
+                type="submit"
+                fullWidth
+                hidden={!loggedIn}
+                variant="contained"
+                color="primary"
+                onClick={e => {
+                  self.handleSolidLogin(e);
+                }}
+                className={classes.submit}
+              >
+                Sign in via WebID
+              </Button>
+            </LoggedOut>
+            <LoggedIn>
+              <UploadFilePopup />
+            </LoggedIn>
           </form>
         </Paper>
       </div>
