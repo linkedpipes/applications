@@ -14,7 +14,7 @@ RUN gradle unpack
 FROM openjdk:10-jre-slim
 
 # Expose port 8080
-EXPOSE 8080
+EXPOSE 9005
 
 COPY --from=builder /app/build/dependency/BOOT-INF/lib /app/lib
 COPY --from=builder /app/build/dependency/META-INF /app/META-INF

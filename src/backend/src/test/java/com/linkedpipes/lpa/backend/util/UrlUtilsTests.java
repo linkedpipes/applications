@@ -2,8 +2,8 @@ package com.linkedpipes.lpa.backend.util;
 
 import org.junit.jupiter.api.Test;
 
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UrlUtilsTests {
 
@@ -19,7 +19,7 @@ class UrlUtilsTests {
 
     @Test
     void testUrlFromArrayNull() {
-        assertThrowsExactly(NullPointerException.class, () -> UrlUtils.urlFrom((String[]) null));
+        assertThrows(NullPointerException.class, () -> UrlUtils.urlFrom((String[]) null));
     }
 
     @Test

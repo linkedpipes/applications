@@ -10,11 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.net.MalformedURLException;
-
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -43,19 +39,19 @@ class HttpRequestSenderTests {
 
     @Test
     void testSend() {
-        assertThrowsExactly(IllegalStateException.class, this.sender::send);
+        assertThrows(IllegalStateException.class, this.sender::send);
     }
 
     @Test
     void testToNull() {
         HttpRequestSender sender = this.sender.to(null);
-        assertThrowsExactly(IllegalStateException.class, sender::send);
+        assertThrows(IllegalStateException.class, sender::send);
     }
 
     @Test
     void testToEmpty() {
         HttpRequestSender sender = this.sender.to("");
-        assertThrowsExactly(LpAppsException.class, sender::send);
+        assertThrows(LpAppsException.class, sender::send);
     }
 
     @Test

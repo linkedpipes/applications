@@ -5,11 +5,10 @@ import com.google.gson.reflect.TypeToken;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.exceptions.ConnectionException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -21,8 +20,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.linkedpipes.lpa.backend.testutil.TestUtils.assertThrowsExactly;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(SpringExtension.class)
@@ -63,15 +61,13 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryNull() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(null);
-        assertTrue(response.getStatusCode().isError());
+    void testStartDiscoveryNull() {
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(null));
     }
 
     @Test
-    void testStartDiscoveryEmpty() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(List.of());
-        assertTrue(response.getStatusCode().isError());
+    void testStartDiscoveryEmpty() {
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(List.of()));
     }
 
     @Test
@@ -95,20 +91,18 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputNull() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(null);
-        assertTrue(response.getStatusCode().isError());
+    void testStartDiscoveryFromInputNull() {
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(null));
     }
 
     @Test
-    void testStartDiscoveryFromInputEmpty() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput("");
-        assertTrue(response.getStatusCode().isError());
+    void testStartDiscoveryFromInputEmpty() {
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(""));
     }
 
     @Test
     void testStartDiscoveryFromInputFakeConfig() {
-        assertThrowsExactly(ConnectionException.class, () ->
+        assertThrows(LpAppsException.class, () ->
                 discoveryController.startDiscoveryFromInput("This is a fake Discovery configuration."));
     }
 
@@ -123,20 +117,18 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputIriNull() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(null);
-        assertTrue(response.getStatusCode().isError());
+    void testStartDiscoveryFromInputIriNull() {
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(null));
     }
 
     @Test
     void testStartDiscoveryFromInputIriEmpty() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri("");
-        assertTrue(response.getStatusCode().isError());
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(""));
     }
 
     @Test
     void testStartDiscoveryFromInputIriFake() {
-        assertThrowsExactly(ConnectionException.class, () ->
+        assertThrows(LpAppsException.class, () ->
                 discoveryController.startDiscoveryFromInputIri("This is a fake Discovery IRI."));
     }
 
@@ -160,7 +152,7 @@ class DiscoveryControllerTests {
 
     @Test
     void testGetStatusFakeId() {
-        assertThrowsExactly(ConnectionException.class, () -> discoveryController.getDiscoveryStatus(FAKE_DISCOVERY_ID));
+        assertThrows(LpAppsException.class, () -> discoveryController.getDiscoveryStatus(FAKE_DISCOVERY_ID));
     }
 
     @Test
