@@ -1,9 +1,10 @@
 import { BASE_URL, rest } from "./api.service";
+import { getQueryString } from "../_helpers";
 
 const GET_MARKERS_URL = BASE_URL + "map/markers";
 const GET_PROPERTIES_URL = BASE_URL + "map/properties";
-const SKOS_CONCEPTS_URL = BASE_URL + "/api/skos/concepts";
-const SKOS_CONCEPTS_COUNT_URL = BASE_URL + "/api/skos/conceptsCounts";
+const SKOS_CONCEPTS_URL = BASE_URL + "skos/concepts";
+const SKOS_CONCEPTS_COUNT_URL = BASE_URL + "skos/conceptsCounts";
 
 export const VisualizersService = {
   getFilters: async function() {

@@ -18,6 +18,7 @@ import { addFilters } from "../../../_actions/filters";
 import { addMultipleMarkers } from "../../../_actions/markers";
 import { optionModes, filterTypes } from "../../../_constants";
 import connect from "react-redux/lib/connect/connect";
+import { toast } from "react-toastify";
 
 const styles = theme => ({
   appBar: {
@@ -67,8 +68,8 @@ const option2 = {
 };
 
 class GoogleMapsPopup extends React.Component {
-  assembleFilters = properties => {
-    return properties.map(property => {
+  assembleFilters = (filtersResponse, skosConceptsResponse) => {
+    return filtersResponse.map(property => {
       return {
         property: { uri: property.uri, label: property.label.variants.cs },
         type: filterTypes.CHECKBOX,
@@ -89,6 +90,10 @@ class GoogleMapsPopup extends React.Component {
   };
 
   handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  handleClickCreate = () => {
     const self = this;
 
     self.setState(
@@ -131,8 +136,29 @@ class GoogleMapsPopup extends React.Component {
           console.log(err);
         }
       )
-      .then(function(jsonResponse) {
-        self.props.dispatch(addFilters(self.assembleFilters(jsonResponse)));
+      .then(function(filtersResponse) {
+        VisualizersService.getSKOSConcepts().then(function(
+          skosConceptsResponse
+        ) {
+          self.props.dispatch(
+            addFilters(
+              self.assembleFilters(filtersResponse, skosConceptsResponse)
+            )
+          );
+        });
+      })
+      .catch(function(error) {
+        console.log(error.message);
+
+        self.handleClose();
+
+        toast.error(
+          "Sorry, unable to extract data for your visualizer. Please try another datasource!",
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
       });
   }
 
@@ -161,7 +187,7 @@ class GoogleMapsPopup extends React.Component {
               <Typography variant="h6" color="inherit" className={classes.flex}>
                 Google Maps App Preview
               </Typography>
-              <Button color="inherit" onClick={this.handleClose}>
+              <Button color="inherit" onClick={this.handleClickCreate}>
                 Create App
               </Button>
             </Toolbar>

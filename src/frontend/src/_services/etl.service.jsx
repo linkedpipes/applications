@@ -26,6 +26,15 @@ export const ETL_STATUS_TYPE = {
 };
 
 const EXECUTION_URL = BASE_URL + "execution/";
+const PIPELINE_URL = BASE_URL + "pipeline/";
+
+const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
+  return discoveryId && pipelineId
+    ? PIPELINE_URL +
+        "exportWithSD?" +
+        getQueryString({ discoveryId: discoveryId, pipelineUri: pipelineId })
+    : "";
+};
 
 const EXECUTE_PIPELINE_URL = etlPipelineIri => {
   return etlPipelineIri
@@ -48,6 +57,15 @@ export const ETLService = {
   getExecutePipeline: async function({ etlPipelineIri }) {
     return rest(
       EXECUTE_PIPELINE_URL(etlPipelineIri),
+      undefined,
+      "GET",
+      undefined
+    );
+  },
+
+  getExportPipeline: async function({ discoveryId, pipelineId }) {
+    return rest(
+      EXPORT_PIPELINE_URL(discoveryId, pipelineId),
       undefined,
       "GET",
       undefined

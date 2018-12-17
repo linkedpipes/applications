@@ -209,7 +209,7 @@ class DataSourcesTable extends React.Component {
 
     console.log("Sending the execute pipeline request...");
 
-    return DiscoveryService.getExportPipeline({
+    return ETLService.getExportPipeline({
       discoveryId: discoveryId,
       pipelineId: pipelineId
     })
