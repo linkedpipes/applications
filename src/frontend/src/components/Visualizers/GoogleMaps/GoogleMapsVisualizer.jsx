@@ -53,6 +53,7 @@ const GoogleMapsVisualizer = compose(
   >
     <MarkerClusterer averageCenter enableRetinaIcons gridSize={60}>
       {props.markers &&
+        props.markers.length > 0 &&
         props.markers.map((marker, index) => (
           <Marker
             key={uuid()}
