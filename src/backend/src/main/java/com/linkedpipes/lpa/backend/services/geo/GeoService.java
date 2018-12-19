@@ -45,6 +45,11 @@ public class GeoService {
         return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
     }
 
+    public static List<Property> getPropertiesFromNamed(String graphIri) {
+        SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
+        return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
     public List<Polygon> getPolygons(){
         return new ArrayList<>();
     }

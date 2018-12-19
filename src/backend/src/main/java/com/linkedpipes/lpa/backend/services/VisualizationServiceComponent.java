@@ -30,15 +30,33 @@ public class VisualizationServiceComponent implements VisualizationService {
     }
 
     @Override
+    public List<Scheme> getSkosSchemesFromNamed(String graphIri) {
+        ConstructSparqlQueryProvider provider = new SchemesQueryProvider();
+        return new SchemesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
+    @Override
     public List<Concept> getSkosConcepts() {
         ConstructSparqlQueryProvider provider = new ConceptsQueryProvider();
         return new ConceptsExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
     }
 
     @Override
+    public List<Concept> getSkosConceptsFromNamed(String graphIri) {
+        ConstructSparqlQueryProvider provider = new ConceptsQueryProvider();
+        return new ConceptsExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
+    @Override
     public List<ConceptCount> getSkosConceptsCounts(ConceptCountRequest request) {
         SelectSparqlQueryProvider provider = new ConceptsCountsQueryProvider(request.propertyUri, request.conceptUris);
         return new ConceptCountExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+    }
+
+    @Override
+    public List<ConceptCount> getSkosConceptsCountsFromNamed(String graphIri, ConceptCountRequest request) {
+        SelectSparqlQueryProvider provider = new ConceptsCountsQueryProvider(request.propertyUri, request.conceptUris);
+        return new ConceptCountExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
 }
