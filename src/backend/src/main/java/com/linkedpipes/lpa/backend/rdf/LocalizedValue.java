@@ -1,11 +1,17 @@
 package com.linkedpipes.lpa.backend.rdf;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonSerialize(using = LocalizedValue.Serializer.class)
 public class LocalizedValue {
 
     private Map<String, String> languageMap = new HashMap<>();
@@ -36,6 +42,21 @@ public class LocalizedValue {
 
     public int size() {
         return languageMap.size();
+    }
+
+    public static class Serializer extends StdSerializer<LocalizedValue> {
+
+        public Serializer() {
+            super((Class<LocalizedValue>) null);
+        }
+
+        @Override
+        public void serialize(LocalizedValue value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeStartObject();
+            gen.writeObjectField("languageMap", value.languageMap);
+            gen.writeEndObject();
+        }
+
     }
 
 }
