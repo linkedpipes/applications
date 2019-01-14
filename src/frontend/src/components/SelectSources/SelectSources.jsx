@@ -218,10 +218,6 @@ class SelectSources extends React.Component {
       });
   };
 
-  handleInit() {
-    console.log("FilePond instance has initialised", this.pond);
-  }
-
   handleValidation = rawText => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
@@ -304,7 +300,6 @@ class SelectSources extends React.Component {
                     }
                     className={classes.itemGrid}
                     maxFiles={3}
-                    oninit={() => this.handleInit()}
                     onupdatefiles={fileItems => {
                       // Set current file objects to this.state
                       this.setState({
