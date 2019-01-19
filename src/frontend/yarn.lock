@@ -3027,10 +3027,10 @@ filepond-plugin-file-validate-type@1.2.1:
   resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.1.tgz#02f5ca2411db0bf23c4afd81355f15c5a57b2c3a"
   integrity sha512-DPgkHQ9n88kUAJcgozTqMwmmt9k3Ibn8xBatv91krpLnbQiVgRszocx7v3NMySw2R2Pil9fgPF7opAYaTpwlfA==
 
-filepond@3.7.4:
-  version "3.7.4"
-  resolved "https://registry.yarnpkg.com/filepond/-/filepond-3.7.4.tgz#4cb2e98a85afcf0b726cc523bf22ee2aaba58dd8"
-  integrity sha512-rXOG8JcypIGQJPz28kCuWYNgh8NNsOOzEOUQC0bNQSZ70Z1xTOHkGqf04Sll7veRZM2yA3lXdneS+wNqsfxMUw==
+filepond@3.7.6:
+  version "3.7.6"
+  resolved "https://registry.yarnpkg.com/filepond/-/filepond-3.7.6.tgz#0d7a5dfed713fa884fcfbebb19224f5116660c64"
+  integrity sha512-+Jua80kjTSXxEgseAUXwYkVMfhV+rvxiakrcb71G0/XnxOb5ZAboMjKQQ5LAj1Kkz3HgoHfsEaZYojOINV0l0w==
 
 fill-range@^2.1.0:
   version "2.2.4"
@@ -6792,13 +6792,6 @@ string-width@^1.0.1, string-width@^1.0.2:
     strip-ansi "^4.0.0"
 
 string_decoder@^1.0.0, string_decoder@^1.1.1:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.2.0.tgz#fe86e738b19544afe70469243b2a1ee9240eae8d"
-  integrity sha512-6YqyX6ZWEYguAxgZzHGL7SsCeGx3V2TtOTqZz1xSTSWnqsbWwbptafNyvf/ACquZUXV3DANr5BDIwNYe1mN42w==
-  dependencies:
-    safe-buffer "~5.1.0"
-
-string_decoder@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.2.0.tgz#fe86e738b19544afe70469243b2a1ee9240eae8d"
   integrity sha512-6YqyX6ZWEYguAxgZzHGL7SsCeGx3V2TtOTqZz1xSTSWnqsbWwbptafNyvf/ACquZUXV3DANr5BDIwNYe1mN42w==
