@@ -51,41 +51,44 @@ const AppRouter = props => {
             <div className={classes.devBar}>DEVELOPMENT MODE</div>
           )}
           <Switch>
-            <Redirect from="/" to="/dashboard" />
-            <Route component={NotFoundPage} />
+            <UnauthRoute
+              path="/login"
+              component={AuthenticationScreen}
+              redirectTo="/dashboard"
+              authenticated={props.authenticationStatus}
+            />
 
             <AuthRoute
               path="/dashboard"
               component={Dashboard}
               redirectTo="/login"
-              authenticated={props.authenticated}
+              authenticated={props.authenticationStatus}
             />
 
             <AuthRoute
               path="/create-app"
               component={CreateApp}
               redirectTo="/login"
-              authenticated={props.authenticated}
+              authenticated={props.authenticationStatus}
             />
 
             <AuthRoute
               path="/select-sources"
               component={StepperController}
               redirectTo="/login"
-              authenticated={props.authenticated}
+              authenticated={props.authenticationStatus}
             />
 
             <AuthRoute
               path="/about"
               component={AboutPage}
               redirectTo="/login"
-              authenticated={props.authenticated}
+              authenticated={props.authenticationStatus}
             />
 
-            <UnauthRoute
-              path="/login"
-              component={AuthenticationScreen}
-              redirectTo="/dashboard"
+            <AuthRoute
+              component={NotFoundPage}
+              redirectTo="/login"
               authenticated={props.authenticationStatus}
             />
           </Switch>

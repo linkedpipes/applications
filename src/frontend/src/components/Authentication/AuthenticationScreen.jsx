@@ -3,10 +3,9 @@ import { render } from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Paper from "@material-ui/core/Paper";
 import LoginRegister from "react-mui-login-register";
+import { setUserAuthenticationStatus } from "../../_actions/globals";
+import connect from "react-redux/lib/connect/connect";
 
 const styles = theme => ({
   root: {
@@ -26,7 +25,7 @@ class AuthenticationScreen extends Component {
   state = {
     disableLocal: false,
     disableRegister: false,
-    disableRegisterProviders: false
+    disableRegisterProviders: true
   };
 
   render() {
@@ -35,8 +34,8 @@ class AuthenticationScreen extends Component {
     const header = (
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="title" color="inherit">
-            Welcome
+          <Typography variant="h6" color="inherit">
+            Welcome to LinkedPipes Applications
           </Typography>
         </Toolbar>
       </AppBar>
@@ -55,50 +54,15 @@ class AuthenticationScreen extends Component {
         <CssBaseline />
         <LoginRegister
           header={header}
-          footer={footer}
+          // footer={footer}
           onLogin={this.handleLogin}
-          onLoginWithProvider={this.handleLoginWithProvider}
           onRegister={this.handleRegister}
-          onRegisterWithProvider={this.handleRegisterWithProvider}
+          // onRegisterWithProvider={this.handleRegisterWithProvider}
           disableLocal={this.state.disableLocal}
           disableRegister={this.state.disableRegister}
-          disableRegisterProviders={this.state.disableRegisterProviders}
+          providers={[]}
+          // disableRegisterProviders={this.state.disableRegisterProviders}
         />
-        <Paper className={classes.controls}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.disableLocal}
-                onChange={this.handleChange("disableLocal")}
-                value="disableLocal"
-                color="primary"
-              />
-            }
-            label="Disable local login/register"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.disableRegister}
-                onChange={this.handleChange("disableRegister")}
-                value="disableRegister"
-                color="primary"
-              />
-            }
-            label="Disable registering"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.disableRegisterProviders}
-                onChange={this.handleChange("disableRegisterProviders")}
-                value="disableRegisterProviders"
-                color="primary"
-              />
-            }
-            label="Disable providers when registering"
-          />
-        </Paper>
       </div>
     );
   }
@@ -109,6 +73,8 @@ class AuthenticationScreen extends Component {
 
   handleLogin = content => {
     alert(`Logging in with content '${JSON.stringify(content)}'`);
+    this.props.dispatch(setUserAuthenticationStatus({ status: true }));
+    this.props.history.push("/dashboard");
   };
 
   handleLoginWithProvider = providerId => {
@@ -124,4 +90,15 @@ class AuthenticationScreen extends Component {
   };
 }
 
-export default withStyles(styles)(AuthenticationScreen);
+const mapStateToProps = state => {
+  return {
+    authenticationStatus:
+      state.globals.authenticationStatus !== undefined
+        ? state.globals.authenticationStatus
+        : false
+  };
+};
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(AuthenticationScreen)
+);
