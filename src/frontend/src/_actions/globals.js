@@ -23,3 +23,9 @@ export const addSelectedResultGraphIriAction = ({ data } = {}) => ({
   type: "SET_SELECTED_RESULT_GRAPH_IRI",
   selectedResultGraphIri: data
 });
+
+// SET_USER_AUTHENTICATION_STATUS
+export const setUserAuthenticationStatus = ({ status } = {}) => ({
+  type: "SET_USER_AUTHENTICATION_STATUS",
+  authenticationStatus: status
+});

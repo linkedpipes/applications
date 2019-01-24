@@ -11,6 +11,9 @@ export default (state = {}, action) => {
         ...state,
         selectedResultGraphIri: action.selectedResultGraphIri
       };
+    case "SET_USER_AUTHENTICATION_STATUS":
+      return { ...state, authenticationStatus: action.authenticationStatus };
+
     default:
       return { ...state };
   }
