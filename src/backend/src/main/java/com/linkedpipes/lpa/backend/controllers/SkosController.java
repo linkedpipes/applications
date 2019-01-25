@@ -1,9 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.visualization.Concept;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
-import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
+import com.linkedpipes.lpa.backend.entities.visualization.*;
 import com.linkedpipes.lpa.backend.services.VisualizationService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +27,14 @@ public class SkosController {
         return Optional.ofNullable(graphIri)
                 .map(visualizationService::getSkosSchemesFromNamed)
                 .or(() -> Optional.of(visualizationService.getSkosSchemes()))
+                .map(ResponseEntity::ok)
+                .orElseThrow();
+    }
+
+    @GetMapping("/api/skos/scheme")
+    public ResponseEntity<HierarchyNode> getSkosScheme(@RequestParam(value = "resultGraphIri", required = false) String graphIri, @RequestParam(value = "schemeUri") String schemeUri) {
+        return Optional.ofNullable(graphIri)
+                .map(iri -> visualizationService.getSkosScheme(graphIri, schemeUri))
                 .map(ResponseEntity::ok)
                 .orElseThrow();
     }
