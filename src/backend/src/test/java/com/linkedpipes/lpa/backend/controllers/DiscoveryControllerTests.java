@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.testutil.TestError;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.junit.jupiter.api.Tag;
@@ -48,7 +49,7 @@ class DiscoveryControllerTests {
                     }
             );
         } catch (LpAppsException e) {
-            throw new Error(e);
+            throw new TestError(e);
         }
     }
 
