@@ -93,7 +93,7 @@ class SelectSources extends React.Component {
 
     if (this.props.selectedDatasources !== undefined) {
       // Clear out selected sources that failed
-      self.props.dispatch(
+      this.props.dispatch(
         setSelectedDatasourcesExample({
           data: undefined
         })
