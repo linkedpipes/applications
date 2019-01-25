@@ -20,13 +20,18 @@ public class MapController {
                                                    @RequestBody(required = false) Map<String, List<ValueFilter>> filters) {
         return Optional.ofNullable(graphIri)
                 .map(iri -> GeoService.getMarkersFromNamed(iri, filters))
+                .or(() -> Optional.of(GeoService.getMarkers(filters)))
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.ok(GeoService.getMarkers(filters)));
+                .orElseThrow();
     }
 
     @GetMapping("/api/map/properties")
-    public ResponseEntity<List<Property>> getProperties() {
-        return ResponseEntity.ok(GeoService.getProperties());
+    public ResponseEntity<List<Property>> getProperties(@RequestParam(value = "resultGraphIri", required = false) String graphIri) {
+        return Optional.ofNullable(graphIri)
+                .map(GeoService::getPropertiesFromNamed)
+                .or(() -> Optional.of(GeoService.getProperties()))
+                .map(ResponseEntity::ok)
+                .orElseThrow();
     }
 
 }
