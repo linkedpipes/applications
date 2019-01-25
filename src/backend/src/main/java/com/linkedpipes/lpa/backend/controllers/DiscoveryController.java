@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -49,7 +50,7 @@ public class DiscoveryController {
     }
 
     @GetMapping("/api/pipelines/discoverFromInputIri")
-    public ResponseEntity<?> startDiscoveryFromInputIri(@RequestParam(value="discoveryConfigIri") String discoveryConfigIri) throws LpAppsException{
+    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
         if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Input IRI not provided");
         }
