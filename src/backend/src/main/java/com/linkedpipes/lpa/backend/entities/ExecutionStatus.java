@@ -1,18 +1,18 @@
 package com.linkedpipes.lpa.backend.entities;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
 public class ExecutionStatus {
 
-    @SerializedName("status")
+    @JsonProperty("status")
     public EtlStatus status;
 
-    @SerializedName("executionStarted")
+    @JsonProperty("executionStarted")
     public Date started;
 
-    @SerializedName("executionFinished")
+    @JsonProperty("executionFinished")
     public Date finished;
 
 }
