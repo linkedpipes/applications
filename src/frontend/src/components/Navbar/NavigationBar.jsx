@@ -188,6 +188,15 @@ class NavigationBar extends React.Component {
               </ListItem>
             </Link>
 
+            <Link to="/treemap-demo">
+              <ListItem button>
+                <ListItemIcon>
+                  <ViewModuleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Treemap Demo" />
+              </ListItem>
+            </Link>
+
             <Link to="/about">
               <ListItem button>
                 <ListItemIcon>

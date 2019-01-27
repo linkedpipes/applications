@@ -12,6 +12,7 @@ import CreateApp from "./components/CreateApp/CreateApp";
 import Grid from "@material-ui/core/Grid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
+import TreemapVisualizer from "./components/Visualizers/Treemap/TreemapVisualizer";
 
 const styles = theme => ({
   root: {
@@ -53,6 +54,7 @@ const AppRouter = props => {
             <Route exact path="/dashboard" component={Dashboard} />
             <Route exact path="/create-app" component={CreateApp} />
             <Route exact path="/select-sources" component={StepperController} />
+            <Route exact path="/treemap-demo" component={TreemapVisualizer} />
             <Route path="/about" component={AboutPage} />
             <Redirect from="/" to="/dashboard" />
             <Route component={NotFoundPage} />
