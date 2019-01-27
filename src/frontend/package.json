@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Altynbek Orumbayev",
+  "contributors": [
+    "Esteban Jenkins <stbnjenkins@gmail.com>"
+  ],
   "license": "MIT",
   "scripts": {
     "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ webpack-dev-server",
