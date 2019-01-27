@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ webpack-dev-server",
+    "startMockDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://private-723649-linkedpipes.apiary-mock.com/ webpack-dev-server",
     "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ webpack-dev-server",
     "build": "cross-env BASE_BACKEND_URL=./api/ NODE_ENV=production webpack"
   },
@@ -22,9 +23,10 @@
     "material-ui-chip-input": "^1.0.0-beta.6",
     "normalize.css": "^8.0.0",
     "prop-types": "^15.6.2",
-    "react": "^16.4.2",
+    "react": "^16.7.0",
     "react-dom": "^16.4.2",
     "react-filepond": "5.0.0",
+    "react-google-charts": "^3.0.10",
     "react-google-maps": "9.4.x",
     "react-json-view": "^1.19.1",
     "react-modal": "^3.5.1",
