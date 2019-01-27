@@ -288,7 +288,7 @@ class DataSourcesTable extends React.Component {
       })
       .then(function(json) {
         let response = "Status: ";
-        let status = ETL_STATUS_MAP[json.status.id];
+        let status = ETL_STATUS_MAP[json.status["@id"]];
 
         if (status === undefined) {
           console.log("Unknown status for checking pipeline execution");
