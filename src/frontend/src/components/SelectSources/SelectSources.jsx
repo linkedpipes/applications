@@ -81,10 +81,24 @@ class SelectSources extends React.Component {
 
   // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = () => {
-    const splitFieldValue = this.state.textFieldValue.split(",\n");
+    const textContent =
+      this.props.selectedDatasources !== undefined
+        ? this.props.selectedDatasources
+        : this.state.textFieldIsValid;
+
+    const splitFieldValue = textContent.split(",\n");
     const datasourcesForTTL = splitFieldValue.map(source => {
       return { uri: source };
     });
+
+    if (this.props.selectedDatasources !== undefined) {
+      // Clear out selected sources that failed
+      this.props.dispatch(
+        setSelectedDatasourcesExample({
+          data: undefined
+        })
+      );
+    }
 
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL
@@ -218,10 +232,6 @@ class SelectSources extends React.Component {
       });
   };
 
-  handleInit() {
-    console.log("FilePond instance has initialised", this.pond);
-  }
-
   handleValidation = rawText => {
     let matches = extractUrlGroups(rawText);
     let valid = false;
@@ -304,7 +314,6 @@ class SelectSources extends React.Component {
                     }
                     className={classes.itemGrid}
                     maxFiles={3}
-                    oninit={() => this.handleInit()}
                     onupdatefiles={fileItems => {
                       // Set current file objects to this.state
                       this.setState({
@@ -354,16 +363,3 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
-
-// {this.props.discoveryId && (
-//   <Button
-//     variant="contained"
-//     component="span"
-//     className={classes.button}
-//     disabled={!this.props.discoveryId}
-//     onClick={this.props.handleNextStep}
-//     size="small"
-//   >
-//     Next
-//   </Button>
-// )}

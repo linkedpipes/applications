@@ -13,15 +13,14 @@ public final class UrlUtils {
 
     private static final char SLASH = '/';
     private static final String SLASH_STRING = "" + SLASH;
+    private static final UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https"});
 
     // do not let anyone instantiate this
     private UrlUtils() {
     }
 
     public static boolean isValidHttpUri(String url){
-        String[] schemes = {"http", "https"};
-        UrlValidator urlValidator = new UrlValidator(schemes);
-        return urlValidator.isValid(url);
+        return URL_VALIDATOR.isValid(url);
     }
 
     /**

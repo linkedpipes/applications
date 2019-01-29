@@ -1,14 +1,14 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.Streams;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -38,7 +38,7 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
-    private static final Gson DEFAULT_GSON = new Gson();
+    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -50,13 +50,13 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     @Override
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        return DEFAULT_GSON.fromJson(response, Discovery.class);
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @Override
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        return DEFAULT_GSON.fromJson(response, Discovery.class);
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     // TODO strongly type below method params (not simply string)
@@ -71,30 +71,29 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
-        JsonObject jsonObject = DEFAULT_GSON.fromJson(response, JsonObject.class);
-        JsonObject pipelineGroupsJson = jsonObject.getAsJsonObject("pipelineGroups");
-        JsonArray appGroups = pipelineGroupsJson.getAsJsonArray("applicationGroups");
+        ObjectNode jsonObject = OBJECT_MAPPER.readValue(response, ObjectNode.class);
+        ObjectNode pipelineGroupsJson = (ObjectNode) jsonObject.get("pipelineGroups");
+        ArrayNode appGroups = (ArrayNode) pipelineGroupsJson.get("applicationGroups");
 
-        for (JsonElement appGroup : appGroups) {
+        for (JsonNode appGroup : appGroups) {
             PipelineGroup pipelineGrp = new PipelineGroup();
-            JsonObject appGroupObj = appGroup.getAsJsonObject();
-            pipelineGrp.visualizer = DEFAULT_GSON.fromJson(appGroupObj.getAsJsonObject("applicationInstance"), ApplicationInstance.class);
+            ObjectNode appGroupObj = (ObjectNode) appGroup;
+            pipelineGrp.visualizer = OBJECT_MAPPER.convertValue(appGroupObj.get("applicationInstance"), ApplicationInstance.class);
 
-            JsonArray dataSourceGroups = appGroupObj.getAsJsonArray("dataSourceGroups");
+            ArrayNode dataSourceGroups = (ArrayNode) appGroupObj.get("dataSourceGroups");
 
-            for (JsonElement dataSourceGroup : dataSourceGroups) {
+            for (JsonNode dataSourceGroup : dataSourceGroups) {
                 DataSourceGroup dataSrcGroup = new DataSourceGroup();
-                JsonArray datasourceInstances = dataSourceGroup.getAsJsonObject().getAsJsonArray("dataSourceInstances");
-                dataSrcGroup.dataSources = DEFAULT_GSON.fromJson(datasourceInstances, new TypeToken<ArrayList<DataSource>>() {
-                }.getType());
+                ArrayNode datasourceInstances = (ArrayNode) dataSourceGroup.get("dataSourceInstances");
+                dataSrcGroup.dataSources = OBJECT_MAPPER.convertValue(datasourceInstances, new TypeReference<ArrayList<DataSource>>() {
+                });
 
-                JsonArray extractorGroups = dataSourceGroup.getAsJsonObject().getAsJsonArray("extractorGroups");
+                ArrayNode extractorGroups = (ArrayNode) dataSourceGroup.get("extractorGroups");
 
                 dataSrcGroup.pipelines = Streams.sequentialFromIterable(extractorGroups)
-                        .map(JsonElement::getAsJsonObject)
-                        .map(obj -> obj.getAsJsonArray("dataSampleGroups"))
+                        .map(obj -> (ArrayNode) obj.get("dataSampleGroups"))
                         .flatMap(Streams::sequentialFromIterable)
-                        .map(JsonElement::getAsJsonObject)
+                        .map(node -> (ObjectNode) node)
                         .map(this::pipelineFromJson)
                         .collect(Collectors.toList());
 
@@ -106,22 +105,22 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         return pipelineGroups;
     }
 
-    private Pipeline pipelineFromJson(JsonObject jsonObject) {
-        Pipeline pipeline = DEFAULT_GSON.fromJson(jsonObject.getAsJsonObject("pipeline"), Pipeline.class);
-        pipeline.minimalIteration = Integer.parseInt(jsonObject.getAsJsonPrimitive("minimalIteration").toString());
+    private Pipeline pipelineFromJson(ObjectNode node) {
+        Pipeline pipeline = OBJECT_MAPPER.convertValue(node.get("pipeline"), Pipeline.class);
+        pipeline.minimalIteration = node.get("minimalIteration").asInt();
         return pipeline;
     }
 
     @Override
     public PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws LpAppsException {
         String response = httpActions.exportPipeline(discoveryId, pipelineUri);
-        return DEFAULT_GSON.fromJson(response, PipelineExportResult.class);
+        return OBJECT_MAPPER.readValue(response, PipelineExportResult.class);
     }
 
     @Override
     public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws LpAppsException {
-        String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, DEFAULT_GSON.toJson(serviceDescription));
-        return DEFAULT_GSON.fromJson(exportResult, PipelineExportResult.class);
+        String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, OBJECT_MAPPER.writeValueAsString(serviceDescription));
+        return OBJECT_MAPPER.readValue(exportResult, PipelineExportResult.class);
     }
 
     @Override
