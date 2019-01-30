@@ -1,7 +1,10 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
+import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.WhereBuilder;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -34,7 +37,7 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_BROADER_DCTERMS_TITLE = var("b_dctt");
 
     public SchemeQueryProvider(String schemeUri){
-        this.schemeUri = schemeUri;
+        this.schemeUri = SparqlUtils.formatUri(schemeUri);
     }
 
     @Override
@@ -68,8 +71,42 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
 
     @Override
     protected ConstructBuilder addWheres(ConstructBuilder builder) {
+        //TODO test below
         return builder
-                .addOptional(schemeUri, SKOS.prefLabel, VAR_SCHEME_PREF_LABEL);
-        //TODO continue
+                .addOptional(schemeUri, SKOS.prefLabel, VAR_SCHEME_PREF_LABEL)
+                .addOptional(schemeUri, RDFS.label, VAR_SCHEME_RDFS_LABEL)
+                .addOptional(schemeUri, DCTerms.title, VAR_SCHEME_DCTERMS_TITLE)
+                .addUnion(broaderPattern(SKOS.broader))
+                .addUnion(broaderPattern(SKOS.broaderTransitive))
+                .addUnion(narrowerPattern(SKOS.narrower))
+                .addUnion(narrowerPattern(SKOS.narrowerTransitive));
+    }
+
+    private WhereBuilder broaderPattern(Property property) {
+        WhereBuilder broaderPatternBuilder = new WhereBuilder();
+        return broaderPatternBuilder
+                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
+                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
+                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
+                .addOptional(new WhereBuilder()
+                                .addWhere(VAR_CONCEPT, property, VAR_BROADER)
+                                .addWhere(VAR_BROADER, RDF.type, SKOS.Concept)
+                                .addOptional(VAR_BROADER, DCTerms.title, VAR_BROADER_DCTERMS_TITLE)
+                                .addOptional(VAR_BROADER, SKOS.prefLabel, VAR_BROADER_PREF_LABEL));
+    }
+
+    private WhereBuilder narrowerPattern(Property property) {
+        WhereBuilder narrowerPatternBuilder = new WhereBuilder();
+        return narrowerPatternBuilder
+                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
+                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
+                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
+                .addOptional(new WhereBuilder()
+                        .addWhere(VAR_CONCEPT, property, VAR_NARROWER)
+                        .addWhere(VAR_NARROWER, RDF.type, SKOS.Concept)
+                        .addOptional(VAR_NARROWER, DCTerms.title, VAR_NARROWER_DCTERMS_TITLE)
+                        .addOptional(VAR_NARROWER, SKOS.prefLabel, VAR_NARROWER_PREF_LABEL));
     }
 }
