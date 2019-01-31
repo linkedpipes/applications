@@ -8,29 +8,73 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
-
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SchemeExtractor {
 
     private String schemeUri;
+    private HashMap<String, HierarchyNode> conceptsByUri;
+    private HashMap<String, List<String>> hierarchyLinksByUri;
 
     public SchemeExtractor(String schemeUri){
         this.schemeUri = SparqlUtils.formatUri(schemeUri);
+        this.conceptsByUri = new HashMap();
+        this.hierarchyLinksByUri = new HashMap();
     }
 
     public HierarchyNode extract(QueryExecution queryExec){
         Model model = queryExec.execConstruct();
         List<Resource> concepts = model.listSubjectsWithProperty(RDF.type, SKOS.Concept).toList();
         Resource schemeResource = model.getResource(schemeUri);
-        return buildHierarchy(schemeResource, concepts, model);
+        return (schemeResource == null) ? null : buildHierarchy(schemeResource, concepts, model);
     }
 
     private HierarchyNode buildHierarchy(Resource schemeResource, List<Resource> concepts, Model model){
-        //TODO
-        return null;
+        var rootUris = concepts.stream().map (n -> {
+            var nodeResource = n.asResource();
+            conceptsByUri.put(nodeResource.getURI(), getNode(model, nodeResource));
+
+            var broaderNodeResource = nodeResource.getPropertyResourceValue(SKOS.broader);
+
+            //TODO check if we should cater for multiple broader resources.. if so we need to use flatmap instead of map
+            if (broaderNodeResource != null) {
+                List<String> updatedHierarchyLinksForUri = hierarchyLinksByUri.getOrDefault(broaderNodeResource.getURI(), new ArrayList());
+                updatedHierarchyLinksForUri.add(nodeResource.getURI());
+                hierarchyLinksByUri.put(broaderNodeResource.getURI(), updatedHierarchyLinksForUri);
+                return nodeResource.getURI();
+            }
+
+            return null;
+        });
+
+        var roots = rootUris.map(this::buildSubtree).collect(Collectors.toList());
+
+        var possibleLabels = new ArrayList<>(
+                List.of(SKOS.prefLabel, DCTerms.title, RDFS.label));
+
+        var literals = possibleLabels.stream().flatMap(labelProperty -> {
+            var properties = schemeResource.listProperties(labelProperty).toList();
+            return properties.stream().map(p -> p.getLiteral());
+        });
+
+        //TODO in ldvmi, the reverse function is used for below.. check if it's necessary
+        var literalsMap = literals.collect(Collectors.toMap(i -> i.getLanguage(), i -> i.getString()));
+
+        LocalizedValue schemeLabel;
+        if(literalsMap.isEmpty()){
+            String[] splitSchemeUri = schemeUri.split("[/#]");
+
+            String name = splitSchemeUri.length == 0 ? schemeUri : splitSchemeUri[splitSchemeUri.length-1];
+            schemeLabel = new LocalizedValue(LocalizedValue.noLanguageLabel, name);
+        }
+        else{
+            schemeLabel = new LocalizedValue(literalsMap);
+        }
+
+        return new HierarchyNode(schemeLabel, schemeUri, 1, roots);
     }
 
     private HierarchyNode getNode(Model model, Resource nodeResource) {
@@ -58,5 +102,19 @@ public class SchemeExtractor {
         }
 
         return new HierarchyNode(localizedName, nodeResource.getURI(), value);
+    }
+
+    private HierarchyNode buildSubtree(String rootUri) {
+
+        HierarchyNode maybeConceptNode = conceptsByUri.get(rootUri);
+
+        List<String> maybeChildrenList = hierarchyLinksByUri.get(rootUri);
+
+        //TODO check if we are missing some important logic below from LDVMi
+        var maybeChildren = maybeChildrenList.stream().map(this::buildSubtree).collect(Collectors.toList());
+
+        Integer size = (maybeChildren == null || maybeChildren.isEmpty()) ? 1 : null;
+
+        return new HierarchyNode(maybeConceptNode.localizedName, maybeConceptNode.uri, size, maybeChildren);
     }
 }
