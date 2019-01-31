@@ -12,4 +12,10 @@ public class HierarchyNode {
     //String parentId;
     List<HierarchyNode> children;
 
+    public HierarchyNode(LocalizedValue localizedName, String uri, Integer size){
+        this.localizedName = localizedName;
+        this.uri = uri;
+        this.size = size;
+    }
+
 }

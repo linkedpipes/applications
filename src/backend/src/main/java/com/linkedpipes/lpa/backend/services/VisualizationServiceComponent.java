@@ -33,7 +33,7 @@ public class VisualizationServiceComponent implements VisualizationService {
         ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
         System.out.print(provider.getForNamed(graphIri));
 
-        return new SchemeExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+        return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
     @Override

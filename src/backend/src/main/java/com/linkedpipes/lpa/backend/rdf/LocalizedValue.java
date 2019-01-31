@@ -9,12 +9,15 @@ import org.apache.jena.rdf.model.Literal;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonSerialize(using = LocalizedValue.Serializer.class)
 public class LocalizedValue {
 
     private Map<String, String> languageMap = new HashMap<>();
+
+    public static String noLanguageLabel = "nolang";
 
     public LocalizedValue(Map<String, String> variants){
         variants.forEach(this::put);
@@ -32,8 +35,12 @@ public class LocalizedValue {
         put(literal.getLanguage(), literal.getString());
     }
 
+    public LocalizedValue(List<Literal> literals) {
+        literals.forEach(l -> put(l.getLanguage(), l.getString()));
+    }
+
     public void put(String language, String localizedValue) {
-        languageMap.put((StringUtils.isEmpty(language) ? "" : language), localizedValue);
+        languageMap.put((StringUtils.isEmpty(language) ? noLanguageLabel : language), localizedValue);
     }
 
     public String get(String language) {

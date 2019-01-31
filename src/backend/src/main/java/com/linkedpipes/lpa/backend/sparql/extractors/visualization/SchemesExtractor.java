@@ -46,7 +46,7 @@ public class SchemesExtractor {
                             .collect(toMap(Literal::getLanguage, Literal::getString));
                     LocalizedValue localizedLabel = map.isEmpty() ?
                             new LocalizedValue(Map.of(
-                                    "nolang",
+                                    LocalizedValue.noLanguageLabel,
                                     reversed(Arrays.stream(schemeResource.getURI().split("[/#]"))).findFirst().orElse(schemeResource.getURI()))) :
                             new LocalizedValue(map);
 

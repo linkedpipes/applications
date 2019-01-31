@@ -31,7 +31,6 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_NARROWER = var("n");
     public static final String VAR_NARROWER_PREF_LABEL = var("n_spl");
     public static final String VAR_NARROWER_DCTERMS_TITLE = var("n_dctt");
-    public static final String VAR_NARROWER_SKOS_BROADER = var("n_broader");
     public static final String VAR_BROADER = var("b");
     public static final String VAR_BROADER_PREF_LABEL = var("b_spl");
     public static final String VAR_BROADER_DCTERMS_TITLE = var("b_dctt");
@@ -66,7 +65,7 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
                 .addConstruct(VAR_NARROWER, RDF.type, SKOS.Concept)
                 .addConstruct(VAR_NARROWER, DCTerms.title, VAR_NARROWER_DCTERMS_TITLE)
                 .addConstruct(VAR_NARROWER, SKOS.prefLabel, VAR_NARROWER_PREF_LABEL)
-                .addConstruct(VAR_NARROWER, SKOS.broader, VAR_NARROWER_SKOS_BROADER);
+                .addConstruct(VAR_NARROWER, SKOS.broader, VAR_CONCEPT);
     }
 
     @Override
