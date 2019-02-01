@@ -32,7 +32,14 @@ public class SchemeExtractor {
         return (schemeResource == null) ? null : buildHierarchy(schemeResource, concepts, model);
     }
 
+    //TODO also consider adding parent node for each created hierarchyNode
     private HierarchyNode buildHierarchy(Resource schemeResource, List<Resource> concepts, Model model){
+        /* iterate over all the concepts and add them to the conceptsByUri hashmap. If a concept has a value for broader,
+        we add this broader in a seperate hierarchyLinksByUri hashmap we use for holding links to children - ie. the
+        original concept is added as a child of the broader uri because the broader the term, the higher it is in the
+        hierarchy tree. */
+
+        //The rootUris are only those that have no broader link.
         var rootUris = concepts.stream().map (n -> {
             var nodeResource = n.asResource();
             conceptsByUri.put(nodeResource.getURI(), getNode(model, nodeResource));
@@ -44,10 +51,13 @@ public class SchemeExtractor {
                 List<String> updatedHierarchyLinksForUri = hierarchyLinksByUri.getOrDefault(broaderNodeResource.getURI(), new ArrayList());
                 updatedHierarchyLinksForUri.add(nodeResource.getURI());
                 hierarchyLinksByUri.put(broaderNodeResource.getURI(), updatedHierarchyLinksForUri);
-                return nodeResource.getURI();
+
+                //since concept has a broader node, it is not a root uri thus return null
+                return null;
             }
 
-            return null;
+            //concept has no broader node, thus return it's uri to add to the list of roots
+            return nodeResource.getURI();
         });
 
         var roots = rootUris.map(this::buildSubtree).collect(Collectors.toList());
