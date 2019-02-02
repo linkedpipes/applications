@@ -24,8 +24,6 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryRepository discoveryRepository;
 
-    public UserServiceComponent() {}
-
     @Override
     public void addUser(String username, String displayName) throws UserTakenException {
         try {
