@@ -48,6 +48,10 @@ dependencies {
     compile 'commons-validator:commons-validator:1.6'
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.postgresql:postgresql:42.2.5'
+    runtime 'javax.xml.bind:jaxb-api:2.3.0'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
