@@ -2,7 +2,6 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
@@ -39,7 +38,7 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
-    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(new ObjectMapper());
+    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -120,7 +119,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     @Override
     public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws LpAppsException {
-        String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, OBJECT_MAPPER.convertValue(serviceDescription, String.class));
+        String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, OBJECT_MAPPER.writeValueAsString(serviceDescription));
         return OBJECT_MAPPER.readValue(exportResult, PipelineExportResult.class);
     }
 
