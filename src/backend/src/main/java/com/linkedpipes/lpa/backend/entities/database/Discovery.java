@@ -14,9 +14,6 @@ public class Discovery implements Serializable {
     @Column(nullable = false)
     private String discoveryId;
 
-    @Column(nullable = false)
-    private Date started;
-
     @ManyToOne
     private User user;
 
@@ -39,5 +36,9 @@ public class Discovery implements Serializable {
 
     public String getDiscoveryId() {
         return discoveryId;
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -46,4 +46,8 @@ public class User implements Serializable {
     public void setUserName(String name) {
         this.userName = name;
     }
+
+    public long getId() {
+        return id;
+    }
 }
