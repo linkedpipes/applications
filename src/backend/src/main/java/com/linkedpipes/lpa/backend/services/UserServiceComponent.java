@@ -4,8 +4,6 @@ import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 
-
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,22 +18,18 @@ import org.slf4j.LoggerFactory;
 public class UserServiceComponent implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
 
-    private final ApplicationContext context;
-
     @Autowired
     private UserRepository repository;
 
     @Autowired
     private DiscoveryRepository discoveryRepository;
 
-    public UserServiceComponent(ApplicationContext context) {
-        this.context = context;
-    }
+    public UserServiceComponent() {}
 
     @Override
     public void addUser(String username, String displayName) throws UserTakenException {
         try {
-            User u = getUser(username);
+            getUser(username);
             throw new UserTakenException(username);
         } catch (UserNotFoundException e) {
             User user = new User();
