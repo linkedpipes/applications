@@ -23,7 +23,7 @@ import java.util.UUID;
 public class PipelineController {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
-    private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/";
+    private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/graph/";
 
     private final DiscoveryService discoveryService;
     private final EtlService etlService;

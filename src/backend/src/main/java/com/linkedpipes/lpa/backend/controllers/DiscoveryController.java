@@ -5,7 +5,7 @@ import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.TtlConfigGenerator;
+import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Some data sources are not valid HTTP URIS");
         }
 
-        String discoveryConfig = TtlConfigGenerator.fromDataSourceList(dataSourceList);
+        String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
         Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
         return ResponseEntity.ok(newDiscovery);
     }
