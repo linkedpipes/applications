@@ -17,14 +17,12 @@ import org.apache.jena.riot.RIOT;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class TtlGenerator {
 
@@ -43,16 +41,9 @@ public class TtlGenerator {
 
     @NotNull
     public static String getTemplateDescription(@NotNull String sparqlEndpointIri,
-                                                @NotNull String dataSampleIri,
-                                                @Nullable String graphName) {
-        String extractorQuery = Optional.ofNullable(graphName)
-                .map(EXTRACTOR_QUERY_PROVIDER::getForNamed)
-                .orElseGet(EXTRACTOR_QUERY_PROVIDER)
-                .toString();
-        String configurationQuery = Optional.ofNullable(graphName)
-                .map(CONFIGURATION_QUERY_PROVIDER::getForNamed)
-                .orElseGet(CONFIGURATION_QUERY_PROVIDER)
-                .toString();
+                                                @NotNull String dataSampleIri) {
+        String extractorQuery = EXTRACTOR_QUERY_PROVIDER.get().toString();
+        String configurationQuery = CONFIGURATION_QUERY_PROVIDER.get().toString();
 
         return writeModelToString(
                 getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,

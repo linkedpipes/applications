@@ -9,13 +9,11 @@ import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.UriBuilder;
 
 import java.util.List;
 
@@ -27,7 +25,6 @@ public class DiscoveryController {
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
     static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
-    static final String GRAPH_NAME_PARAM = "graphName";
 
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
@@ -71,8 +68,7 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
-                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                                @Nullable @RequestParam(name = GRAPH_NAME_PARAM, required = false) String graphName) throws LpAppsException {
+                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException {
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -80,22 +76,19 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Data Sample IRI not provided");
         }
 
-        String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, graphName);
+        String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri);
         String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
         return ResponseEntity.ok(discoveryService.startDiscoveryFromInput(discoveryConfig));
     }
 
     @NotNull
-    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @Nullable String graphName) {
+    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri) {
         String hostUri = Application.getConfig().getString("lpa.hostUrl");
-        UriBuilder templateDescUriBuilder = new DefaultUriBuilderFactory()
+        return new DefaultUriBuilderFactory()
                 .uriString(hostUri + DataSourceController.TEMPLATE_DESCRIPTION_PATH)
                 .queryParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
-                .queryParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri);
-        if (graphName != null) {
-            templateDescUriBuilder.queryParam(GRAPH_NAME_PARAM, graphName);
-        }
-        return templateDescUriBuilder.build()
+                .queryParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri)
+                .build()
                 .toString();
     }
 
