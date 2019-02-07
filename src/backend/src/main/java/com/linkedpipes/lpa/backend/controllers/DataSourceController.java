@@ -14,9 +14,9 @@ public class DataSourceController {
 
     public static final String TEMPLATE_DESCRIPTION_PATH = "/api/datasources/template";
 
-    public static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
-    public static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
-    public static final String GRAPH_NAME_PARAM = "graphName";
+    private static final String SPARQL_ENDPOINT_IRI_PARAM = DiscoveryController.SPARQL_ENDPOINT_IRI_PARAM;
+    private static final String DATA_SAMPLE_IRI_PARAM = DiscoveryController.DATA_SAMPLE_IRI_PARAM;
+    private static final String GRAPH_NAME_PARAM = DiscoveryController.GRAPH_NAME_PARAM;
 
     @GetMapping(TEMPLATE_DESCRIPTION_PATH)
     public ResponseEntity<String> getTemplateDescription(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,

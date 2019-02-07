@@ -25,6 +25,10 @@ public class DiscoveryController {
 
     private final DiscoveryService discoveryService;
 
+    static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
+    static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
+    static final String GRAPH_NAME_PARAM = "graphName";
+
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
     }
@@ -66,9 +70,9 @@ public class DiscoveryController {
 
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
-    public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam("endpointIri") String sparqlEndpointIri,
-                                                                @NotNull @RequestParam("dataSampleIri") String dataSampleIri,
-                                                                @Nullable @RequestParam(name = "graphName", required = false) String graphName) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
+                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+                                                                @Nullable @RequestParam(name = GRAPH_NAME_PARAM, required = false) String graphName) throws LpAppsException {
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -86,10 +90,10 @@ public class DiscoveryController {
         String hostUri = Application.getConfig().getString("lpa.hostUrl");
         UriBuilder templateDescUriBuilder = new DefaultUriBuilderFactory()
                 .uriString(hostUri + DataSourceController.TEMPLATE_DESCRIPTION_PATH)
-                .queryParam(DataSourceController.SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
-                .queryParam(DataSourceController.DATA_SAMPLE_IRI_PARAM, dataSampleIri);
+                .queryParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
+                .queryParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri);
         if (graphName != null) {
-            templateDescUriBuilder.queryParam(DataSourceController.GRAPH_NAME_PARAM, graphName);
+            templateDescUriBuilder.queryParam(GRAPH_NAME_PARAM, graphName);
         }
         return templateDescUriBuilder.build()
                 .toString();
