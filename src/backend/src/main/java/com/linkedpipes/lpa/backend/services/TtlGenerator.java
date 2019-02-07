@@ -23,7 +23,7 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 
 public class TtlGenerator {
@@ -38,6 +38,29 @@ public class TtlGenerator {
 
     @NotNull
     public static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
+        return writeModelToString(getDiscoveryConfigModel(dataSourceList));
+    }
+
+    @NotNull
+    public static String getTemplateDescription(@NotNull String sparqlEndpointIri,
+                                                @NotNull String dataSampleIri,
+                                                @Nullable String graphName) {
+        String extractorQuery = Optional.ofNullable(graphName)
+                .map(EXTRACTOR_QUERY_PROVIDER::getForNamed)
+                .orElseGet(EXTRACTOR_QUERY_PROVIDER)
+                .toString();
+        String configurationQuery = Optional.ofNullable(graphName)
+                .map(CONFIGURATION_QUERY_PROVIDER::getForNamed)
+                .orElseGet(CONFIGURATION_QUERY_PROVIDER)
+                .toString();
+
+        return writeModelToString(
+                getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
+                        extractorQuery, configurationQuery));
+    }
+
+    @NotNull
+    private static Model getDiscoveryConfigModel(@NotNull List<DataSource> dataSourceList) {
         RIOT.init();
 
         // create an empty model
@@ -55,42 +78,30 @@ public class TtlGenerator {
                 .map(dataSource -> dataSource.uri)
                 .map(model::createResource)
                 .forEach(resource -> model.add(subject, property, resource));
-
-        StringWriter stringWriter = new StringWriter();
-        RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
-        return stringWriter.toString();
+        return model;
     }
 
     @NotNull
-    public static String getTemplateDescription(@NotNull String sparqlEndpointUrl,
-                                                @NotNull String dataSampleUrl,
-                                                @Nullable String graphName) {
-        Objects.requireNonNull(sparqlEndpointUrl);
-        Objects.requireNonNull(dataSampleUrl);
-
-        Optional<String> graphNameOptional = Optional.ofNullable(graphName);
-
-        String extractorQuery = graphNameOptional
-                .map(EXTRACTOR_QUERY_PROVIDER::getForNamed)
-                .orElseGet(EXTRACTOR_QUERY_PROVIDER)
-                .toString();
-        String configurationQuery = graphNameOptional
-                .map(CONFIGURATION_QUERY_PROVIDER::getForNamed)
-                .orElseGet(CONFIGURATION_QUERY_PROVIDER)
-                .toString();
-
+    private static Model getTemplateDescriptionModel(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, String extractorQuery, String configurationQuery) {
         RIOT.init();
 
-        Model model = ModelFactory.createDefaultModel();
+        Model model = ModelFactory.createDefaultModel()
+                .setNsPrefixes(Map.of(
+                        "dataset", DATASET_URI,
+                        "lpd", LPD.uri,
+                        "dcterms", DCTerms.getURI(),
+                        "lpd-sparql", LPDSparql.uri,
+                        "sd", SD.uri
+                ));
 
         Resource output = model.createResource(DATASET_URI + "output");
         model.add(output, RDF.type, LPD.OutputDataPortTemplate);
         model.add(output, DCTerms.title, DATASET_OUTPUT_TITLE);
-        model.add(output, LPD.outputDataSample, model.createResource(dataSampleUrl));
+        model.add(output, LPD.outputDataSample, model.createResource(dataSampleIri));
 
         Resource defaultService = model.createResource(DATASET_URI + "defaultService");
         model.add(defaultService, RDF.type, SD.Service);
-        model.add(defaultService, SD.endpoint, model.createResource(sparqlEndpointUrl));
+        model.add(defaultService, SD.endpoint, model.createResource(sparqlEndpointIri));
 
         Resource defaultConfiguration = model.createResource(DATASET_URI + "defaultConfiguration");
         model.add(defaultConfiguration, RDF.type, LPDSparql.SparqlEndpointDataSourceConfiguration);
@@ -104,7 +115,11 @@ public class TtlGenerator {
         model.add(template, DCTerms.title, DATASET_TEMPLATE_TITLE, "en");
         model.add(template, LPD.outputTemplate, output);
         model.add(template, LPD.componentConfigurationTemplate, defaultConfiguration);
+        return model;
+    }
 
+    @NotNull
+    private static String writeModelToString(Model model) {
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
         return stringWriter.toString();

@@ -61,7 +61,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     // TODO strongly type below method params (not simply string)
     @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException{
+    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
         return httpActions.getStatus(discoveryId);
     }
 

@@ -12,11 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("unused")
 public class DataSourceController {
 
-    @GetMapping("/api/datasources/template")
-    public ResponseEntity<String> getTemplateDescription(@NotNull @RequestParam("sparqlEndpointUrl") String sparqlEndpointUrl,
-                                                         @NotNull@RequestParam("dataSampleUrl") String dataSampleUrl,
-                                                         @Nullable @RequestParam(name = "graphName", required = false) String graphName) {
-        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointUrl, dataSampleUrl, graphName));
+    public static final String TEMPLATE_DESCRIPTION_PATH = "/api/datasources/template";
+
+    public static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
+    public static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
+    public static final String GRAPH_NAME_PARAM = "graphName";
+
+    @GetMapping(TEMPLATE_DESCRIPTION_PATH)
+    public ResponseEntity<String> getTemplateDescription(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
+                                                         @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+                                                         @Nullable @RequestParam(name = GRAPH_NAME_PARAM, required = false) String graphName) {
+        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointIri, dataSampleIri, graphName));
     }
     
 }
