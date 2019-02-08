@@ -1,11 +1,13 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.testutil.TestError;
+import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.StreamUtils;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +34,24 @@ class DiscoveryControllerTests {
             }}
     );
 
-    private static final Type dataSourcesType = new TypeToken<ArrayList<DataSource>>() {
-    }.getType();
-    private static final List<DataSource> DISCOVERY_DATA_SOURCES = new Gson().fromJson(
-            ThrowableUtils.rethrowAsUnchecked(() ->
-                    StreamUtils.copyToString(
-                            DiscoveryControllerTests.class.getResourceAsStream("discovery.data.sources.json"),
-                            Application.DEFAULT_CHARSET
-                    )
-            ),
-            dataSourcesType
-    );
+    private static final List<DataSource> DISCOVERY_DATA_SOURCES;
+
+    static {
+        try {
+            DISCOVERY_DATA_SOURCES = new LpAppsObjectMapper(new ObjectMapper()).readValue(
+                    ThrowableUtils.rethrowAsUnchecked(() ->
+                            StreamUtils.copyToString(
+                                    DiscoveryControllerTests.class.getResourceAsStream("discovery.data.sources.json"),
+                                    Application.DEFAULT_CHARSET
+                            )
+                    ),
+                    new TypeReference<ArrayList<DataSource>>() {
+                    }
+            );
+        } catch (LpAppsException e) {
+            throw new TestError(e);
+        }
+    }
 
     private static final String DISCOVERY_CONFIG = ThrowableUtils.rethrowAsUnchecked(() ->
             StreamUtils.copyToString(DiscoveryControllerTests.class.getResourceAsStream("discovery.config.rdf"),
@@ -122,7 +130,7 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputIriEmpty() throws LpAppsException {
+    void testStartDiscoveryFromInputIriEmpty() {
         assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(""));
     }
 

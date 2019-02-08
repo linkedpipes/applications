@@ -1,16 +1,17 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
@@ -21,9 +22,9 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 @Service
 public class EtlServiceComponent implements EtlService {
 
-    private static final Gson GSON = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-            .create();
+    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
+            new ObjectMapper()
+                    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
     private static final Map<String, String> EXECUTION_STATUS = Map.of(
             "http://etl.linkedpipes.com/resources/status/failed", "FAILED",
@@ -44,13 +45,13 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
-        return GSON.fromJson(response, Execution.class);
+        return OBJECT_MAPPER.readValue(response, Execution.class);
     }
 
     @Override
     public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
         String response = httpActions.getExecutionStatus(executionIri);
-        return GSON.fromJson(response, ExecutionStatus.class);
+        return OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
     }
 
     @Override
