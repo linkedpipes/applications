@@ -5791,10 +5791,10 @@ react-event-listener@^0.6.2:
     prop-types "^15.6.0"
     warning "^4.0.1"
 
-react-filepond@6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/react-filepond/-/react-filepond-6.0.1.tgz#37b5ce8abf8eb64f7444a3a8da9771371a13bc5d"
-  integrity sha512-d+B35az6AYqvVc0aZ52cW9FMVmT40QCp2sIn4PdjvcqmSAhU9KnzxFb+Z65C211RY7jc+99cOWIbnQTDK68RFQ==
+react-filepond@7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/react-filepond/-/react-filepond-7.0.1.tgz#caf96526287140884a31a1476b8328d9d6ecdee2"
+  integrity sha512-PitNM44JP0K5hXnkSYV3HRlkObsWbhqaJRWizMrdHpS3pPz9/iyiOGmRpc+4T4ST3vblmiUTLRYq/+1bDcSqQw==
 
 react-google-maps@9.4.x:
   version "9.4.5"
