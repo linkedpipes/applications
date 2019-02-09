@@ -3014,10 +3014,10 @@ filename-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY=
 
-filepond-plugin-file-validate-type@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.1.tgz#02f5ca2411db0bf23c4afd81355f15c5a57b2c3a"
-  integrity sha512-DPgkHQ9n88kUAJcgozTqMwmmt9k3Ibn8xBatv91krpLnbQiVgRszocx7v3NMySw2R2Pil9fgPF7opAYaTpwlfA==
+filepond-plugin-file-validate-type@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.2.tgz#8ac215b893b6beef28d82874cddcff6cd3069451"
+  integrity sha512-ZBVU9a18EWhfk3kkqULp7GX3KcSSAlZbLFqlquJ5VTerecL1BkUlQ/cpFJ5EucAdJ1Qdi1zEyPQ+e7JLxL+5Rg==
 
 filepond@4.1.0:
   version "4.1.0"
