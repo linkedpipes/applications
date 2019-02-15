@@ -7,10 +7,8 @@ import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
@@ -41,13 +39,14 @@ public class TtlGenerator {
 
     @NotNull
     public static String getTemplateDescription(@NotNull String sparqlEndpointIri,
-                                                @NotNull String dataSampleIri) {
+                                                @NotNull String dataSampleIri,
+                                                String namedGraph) {
         String extractorQuery = EXTRACTOR_QUERY_PROVIDER.get().toString();
         String configurationQuery = CONFIGURATION_QUERY_PROVIDER.get().toString();
 
         return writeModelToString(
                 getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
-                        extractorQuery, configurationQuery));
+                        extractorQuery, configurationQuery, namedGraph));
     }
 
     @NotNull
@@ -73,7 +72,7 @@ public class TtlGenerator {
     }
 
     @NotNull
-    private static Model getTemplateDescriptionModel(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, String extractorQuery, String configurationQuery) {
+    private static Model getTemplateDescriptionModel(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, String extractorQuery, String configurationQuery, String namedGraph) {
         RIOT.init();
 
         Model model = ModelFactory.createDefaultModel()
@@ -93,6 +92,16 @@ public class TtlGenerator {
         Resource defaultService = model.createResource(DATASET_URI + "defaultService");
         model.add(defaultService, RDF.type, SD.Service);
         model.add(defaultService, SD.endpoint, model.createResource(sparqlEndpointIri));
+
+        if (namedGraph != null && !namedGraph.isEmpty()) {
+            //create triple :service sd:namedGraph [sd:name <graphName>];
+            Resource blankNode = model.createResource().addProperty(new PropertyImpl(SD.uri + "name"), model.createResource(namedGraph));
+            Statement name = model.createStatement(defaultService,
+                    new PropertyImpl(SD.uri + "namedGraph"),
+                    blankNode);
+
+            model.add(name);
+        }
 
         Resource defaultConfiguration = model.createResource(DATASET_URI + "defaultConfiguration");
         model.add(defaultConfiguration, RDF.type, LPDSparql.SparqlEndpointDataSourceConfiguration);

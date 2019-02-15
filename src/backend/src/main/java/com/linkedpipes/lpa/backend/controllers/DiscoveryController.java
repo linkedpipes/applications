@@ -25,6 +25,7 @@ public class DiscoveryController {
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
     static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
+    static final String NAMED_GRAPH_PARAM = "namedGraph";
 
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
@@ -68,7 +69,8 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
-                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException {
+                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+                                                                @RequestParam(value = NAMED_GRAPH_PARAM, required = false) String namedGraph) throws LpAppsException {
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -76,18 +78,19 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Data Sample IRI not provided");
         }
 
-        String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri);
+        String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
         String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
         return ResponseEntity.ok(discoveryService.startDiscoveryFromInput(discoveryConfig));
     }
 
     @NotNull
-    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri) {
+    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, String namedGraph) {
         String hostUri = Application.getConfig().getString("lpa.hostUrl");
         return new DefaultUriBuilderFactory()
                 .uriString(hostUri + DataSourceController.TEMPLATE_DESCRIPTION_PATH)
                 .queryParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
                 .queryParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri)
+                .queryParam(NAMED_GRAPH_PARAM, namedGraph)
                 .build()
                 .toString();
     }

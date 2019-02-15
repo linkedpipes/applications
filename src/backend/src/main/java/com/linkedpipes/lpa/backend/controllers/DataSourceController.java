@@ -15,11 +15,13 @@ public class DataSourceController {
 
     private static final String SPARQL_ENDPOINT_IRI_PARAM = DiscoveryController.SPARQL_ENDPOINT_IRI_PARAM;
     private static final String DATA_SAMPLE_IRI_PARAM = DiscoveryController.DATA_SAMPLE_IRI_PARAM;
+    private static final String NAMED_GRAPH_PARAM = DiscoveryController.NAMED_GRAPH_PARAM;
 
     @GetMapping(TEMPLATE_DESCRIPTION_PATH)
     public ResponseEntity<String> getTemplateDescription(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
-                                                         @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) {
-        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointIri, dataSampleIri));
+                                                         @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+                                                         @RequestParam(value = NAMED_GRAPH_PARAM, required = false) String namedGraph) {
+        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointIri, dataSampleIri, namedGraph));
     }
     
 }
