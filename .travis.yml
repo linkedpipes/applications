@@ -34,7 +34,7 @@ matrix:
         - postgresql
       before_script:
         - cd src/backend
-        - psql -c "CREATE DATABASE lpa_postgres;" -U postgres
+        - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew assemble
