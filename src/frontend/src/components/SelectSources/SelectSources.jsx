@@ -2,11 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
-import TextField from "@material-ui/core/TextField";
 import { addVisualizer } from "../../_actions/visualizers";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,13 +14,14 @@ import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
 import Grid from "@material-ui/core/Grid";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { FilePond, File, registerPlugin } from "react-filepond";
 import { setSelectedDatasourcesExample } from "../../_actions/globals";
-import "filepond/dist/filepond.min.css";
+import SimpleSourcesInput from "./InputModes/Simple/SimpleSourcesInput";
 
-// Register the plugins
-registerPlugin(FilePondPluginFileValidateType);
+import SwipeableViews from "react-swipeable-views";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import AdvancedSourcesInput from "./InputModes/Advanced/AdvancedSourcesInput";
 
 const styles = theme => ({
   root: {
@@ -40,14 +39,10 @@ const styles = theme => ({
   },
   textField: {
     margin: "auto",
-    height: "100%",
     width: "100%"
   },
   card: {
     flexGrow: 1
-  },
-  chip: {
-    margin: theme.spacing.unit / 2
   }
 });
 
@@ -61,7 +56,20 @@ class SelectSources extends React.Component {
     discoveryStatusPolling: undefined,
     discoveryStatusPollingFinished: false,
     discoveryStatusPollingInterval: 2000,
-    discoveryLoadingLabel: ""
+    discoveryLoadingLabel: "",
+    tabValue: 0
+  };
+
+  handleChange = (event, newValue) => {
+    this.setState({
+      tabValue: newValue
+    });
+  };
+
+  handleChangeIndex = index => {
+    this.setState({
+      tabValue: index
+    });
   };
 
   handleClickOpen = () => {
@@ -262,7 +270,7 @@ class SelectSources extends React.Component {
 
   render() {
     const { classes, selectedDatasources } = this.props;
-
+    const self = this;
     const {
       discoveryIsLoading,
       textFieldValue,
@@ -279,49 +287,45 @@ class SelectSources extends React.Component {
             <div className={classes.gridRoot}>
               <Grid container spacing={24}>
                 <Grid item xs={12} sm={12}>
-                  <TextField
-                    id="outlined-textarea"
-                    label="Sources validator"
-                    disabled={discoveryIsLoading}
-                    className={classes.textField}
-                    multiline
-                    value={
-                      selectedDatasources === undefined
-                        ? textFieldValue
-                        : selectedDatasources
-                    }
-                    onChange={this.validateField}
-                    placeholder="Input your sources..."
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
+                  <AppBar
+                    position="static"
+                    color="default"
+                    className={classes.appBar}
+                  >
+                    <Tabs
+                      value={self.state.tabValue}
+                      onChange={self.handleChange}
+                      indicatorColor="primary"
+                      textColor="primary"
+                      variant="fullWidth"
+                    >
+                      <Tab label="Simple" />
+                      <Tab label="Advanced" />
+                    </Tabs>
+                  </AppBar>
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <FilePond
-                    ref={ref => (this.pond = ref)}
-                    allowMultiple={false}
-                    allowFileTypeValidation={true}
-                    acceptedFileTypes={["text/turtle", ".ttl"]}
-                    fileValidateTypeLabelExpectedTypesMap={{
-                      "text/turtle": ".ttl"
-                    }}
-                    fileValidateTypeDetectType={(source, type) =>
-                      new Promise((resolve, reject) => {
-                        resolve(".ttl");
-                      })
-                    }
-                    className={classes.itemGrid}
-                    maxFiles={3}
-                    onupdatefiles={fileItems => {
-                      // Set current file objects to this.state
-                      this.setState({
-                        ttlFile:
-                          fileItems.length === 1 ? fileItems[0].file : undefined
-                      });
-                    }}
-                  />
+                  <SwipeableViews
+                    axis={"x"}
+                    index={self.state.tabValue}
+                    onChangeIndex={self.handleChangeIndex}
+                  >
+                    <SimpleSourcesInput
+                      classes={classes}
+                      selectedDatasources={selectedDatasources}
+                      discoveryIsLoading={discoveryIsLoading}
+                      textFieldValue={textFieldValue}
+                      validateField={this.validateField}
+                    />
+                    <AdvancedSourcesInput
+                      classes={classes}
+                      selectedDatasources={selectedDatasources}
+                      discoveryIsLoading={discoveryIsLoading}
+                      textFieldValue={textFieldValue}
+                      validateField={this.validateField}
+                    />
+                  </SwipeableViews>
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
@@ -362,4 +366,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(SelectSources));
+export default connect(mapStateToProps)(
+  withStyles(styles, { withTheme: true })(SelectSources)
+);
