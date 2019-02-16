@@ -9,8 +9,12 @@ FROM node:8.15.0-alpine
 # Add package.json and respective lock
 ADD package.json yarn.* /tmp/
 
+# Install git 
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
+
 # Install packages
-RUN cd /tmp && yarn install --frozen-lockfile --check-files
+RUN git --version && cd /tmp && yarn install --pure-lockfile 
 
 # Create a symlink to node_modules
 RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules
