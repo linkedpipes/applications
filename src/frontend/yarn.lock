@@ -3019,10 +3019,10 @@ filepond-plugin-file-validate-type@1.2.2:
   resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.2.tgz#8ac215b893b6beef28d82874cddcff6cd3069451"
   integrity sha512-ZBVU9a18EWhfk3kkqULp7GX3KcSSAlZbLFqlquJ5VTerecL1BkUlQ/cpFJ5EucAdJ1Qdi1zEyPQ+e7JLxL+5Rg==
 
-filepond@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/filepond/-/filepond-4.1.0.tgz#25abbaf9ded12f32b58d5ec5104bc7c6a1fe8b91"
-  integrity sha512-8HlgvPhIJ000N5ZWaIcb69MPrvmEMClVOSEYvtFYLtpgakl3mqSp4s24//f+wM6tX1RbdwBxyyxHvJWVSKcmaw==
+filepond@4.1.4:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/filepond/-/filepond-4.1.4.tgz#1def80459bfa4f29d4191b9ce22c34a487aaed8b"
+  integrity sha512-B3r/mIAoFZWznkgstL+QXmatQLgZN9T5Njtt5/Y97a/pDs3VSG6WxbL5nsGXB7f8fR44pGYhjPp6mJjtLnjmQA==
 
 fill-range@^2.1.0:
   version "2.2.4"
