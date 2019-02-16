@@ -38,7 +38,7 @@ matrix:
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew assemble
-        - ./gradlew test
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
