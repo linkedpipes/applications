@@ -107,7 +107,7 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 
 static def lpaRelatedProperties() {
     System.properties.findAll { key, _ ->
-        key.startsWith "lpa."
+        key.startsWith("lpa.") || key.startsWith("spring.datasource.")
     }
 }
 
