@@ -15,7 +15,7 @@ public class User implements Serializable {
     private String userName;
 
     @Column(nullable = true)
-    private String displayName;
+    private String webId;
 
     @OneToMany(mappedBy="user")
     private List<Discovery> discoveries;
@@ -45,12 +45,12 @@ public class User implements Serializable {
         return this.executions;
     }
 
-    public String getDisplayName() {
-        return this.displayName;
+    public String getWebId() {
+        return this.webId;
     }
 
-    public void setDisplayName(String name) {
-        this.displayName = name;
+    public void setWebId(String webId) {
+        this.webId = webId;
     }
 
     public String getUserName() {

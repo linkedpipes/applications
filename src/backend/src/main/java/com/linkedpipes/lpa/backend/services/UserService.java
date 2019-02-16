@@ -2,13 +2,16 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Execution;
+import com.linkedpipes.lpa.backend.entities.UserProfile;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 
 import java.util.List;
 
 public interface UserService {
-    public void addUser(String user, String display) throws UserTakenException;
+    public UserProfile addUser(String user, String webId) throws UserTakenException;
+    public UserProfile updateUser(String user, String webId) throws UserTakenException;
+    public UserProfile getUserProfile(String user) throws UserNotFoundException;
 
     public void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
     public List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;

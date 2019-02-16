@@ -92,13 +92,35 @@ public class UserController {
     }
 
     @PostMapping("/api/user")
-    public void addUser(@RequestParam(value="userId", required=true) String user,
-                        @RequestParam(value="fullName", required=false) String name)
+    public ResponseEntity<UserProfile> addUser(@RequestParam(value="userId", required=true) String user,
+                        @RequestParam(value="webId", required=false) String webId)
                     throws LpAppsException {
         try {
-            userService.addUser(user, name);
+            return ResponseEntity.ok(userService.addUser(user, webId));
         } catch (UserTakenException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
+        }
+    }
+
+    @PutMapping("/api/user")
+    public ResponseEntity<UserProfile> updateUser(@RequestParam(value="userId", required=true) String user,
+                        @RequestParam(value="webId", required=false) String webId)
+                    throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.updateUser(user, webId));
+        } catch (UserTakenException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
+        }
+    }
+
+    @GetMapping("/api/user")
+    public ResponseEntity<UserProfile> getUser(@RequestParam(value="userId", required=true) String user)
+                    throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.getUserProfile(user));
+        } catch(UserNotFoundException e) {
+            logger.error("User not found: " + user);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 }

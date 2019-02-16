@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.database.*;
+import com.linkedpipes.lpa.backend.entities.UserProfile;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 
@@ -28,15 +29,16 @@ public class UserServiceComponent implements UserService {
     private ExecutionRepository executionRepository;
 
     @Override
-    public void addUser(String username, String displayName) throws UserTakenException {
+    public UserProfile addUser(String username, String webId) throws UserTakenException {
         try {
             getUser(username);
             throw new UserTakenException(username);
         } catch (UserNotFoundException e) {
             User user = new User();
             user.setUserName(username);
-            user.setDisplayName(displayName);
+            user.setWebId(webId);
             repository.save(user);
+            return getUserProfile(username);
         }
     }
 
@@ -144,5 +146,22 @@ public class UserServiceComponent implements UserService {
         } catch (UserNotFoundException e) {
             logger.warn("User not found: " + user);
         }
+    }
+
+    @Override
+    public UserProfile getUserProfile(String username) throws UserNotFoundException {
+        User user = getUser(username);
+        UserProfile profile = new UserProfile();
+        profile.userId = user.getUserName();
+        profile.webId = user.getWebId();
+        return profile;
+    }
+
+    @Override
+    public UserProfile updateUser(String username, String webId) throws UserNotFoundException {
+        User user = getUser(username);
+        user.setWebId(webId);
+        repository.save(user);
+        return getUserProfile(username);
     }
 }
