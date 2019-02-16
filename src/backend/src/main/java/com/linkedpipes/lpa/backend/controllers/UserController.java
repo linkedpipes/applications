@@ -4,6 +4,7 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.services.UserService;
 
 import org.springframework.context.ApplicationContext;
@@ -56,6 +57,38 @@ public class UserController {
                               throws LpAppsException {
         logger.info("Delete discovery:: user = '" + user + "', discovery = '" + discovery + "'");
         userService.deleteUserDiscovery(user, discovery);
+    }
+
+    @PutMapping("/api/user/execution")
+    public void setUserExecution(@RequestParam(value="userId", required=true) String user,
+                                 @RequestParam(value="executionIri", required=true) String execution)
+                              throws LpAppsException {
+        try {
+            logger.info("Set user execution:: user = " + user + ", executionIri = " + execution);
+            userService.setUserExecution(user, execution);
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + user);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
+    }
+
+    @PostMapping("/api/user/execution")
+    public ResponseEntity<List<Execution>> getUserExecutions(@RequestParam(value="userId", required=true) String user)
+                            throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.getUserExecutions(user));
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + user);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
+    }
+
+    @DeleteMapping("/api/user/execution")
+    public void deleteUserExecution(@RequestParam(value="userId", required=true) String user,
+                                    @RequestParam(value="executionIri", required=true) String execution)
+                              throws LpAppsException {
+        logger.info("Delete execution:: user = '" + user + "', execution = '" + execution + "'");
+        userService.deleteUserExecution(user, execution);
     }
 
     @PostMapping("/api/user")

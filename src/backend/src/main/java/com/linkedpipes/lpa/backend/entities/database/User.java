@@ -20,6 +20,9 @@ public class User implements Serializable {
     @OneToMany(mappedBy="user")
     private List<Discovery> discoveries;
 
+    @OneToMany(mappedBy="user")
+    private List<Execution> executions;
+
     public void addDiscovery(Discovery discovery) {
         this.discoveries.add(discovery);
         if (discovery.getUser() != this) {
@@ -29,6 +32,17 @@ public class User implements Serializable {
 
     public List<Discovery> getDiscoveries() {
         return this.discoveries;
+    }
+
+    public void addExecution(Execution execution) {
+        this.executions.add(execution);
+        if (execution.getUser() != this) {
+            execution.setUser(this);
+        }
+    }
+
+    public List<Execution> getExecutions() {
+        return this.executions;
     }
 
     public String getDisplayName() {

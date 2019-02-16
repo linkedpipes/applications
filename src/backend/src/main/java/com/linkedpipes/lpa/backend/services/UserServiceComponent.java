@@ -24,6 +24,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryRepository discoveryRepository;
 
+    @Autowired
+    private ExecutionRepository executionRepository;
+
     @Override
     public void addUser(String username, String displayName) throws UserTakenException {
         try {
@@ -90,6 +93,53 @@ public class UserServiceComponent implements UserService {
                 discoveryRepository.delete(toDelete);
             } else {
                 logger.warn("Discovery not found: " + discoveryId);
+            }
+        } catch (UserNotFoundException e) {
+            logger.warn("User not found: " + user);
+        }
+    }
+
+    private List<Execution> getExecutions(String username) throws UserNotFoundException {
+        User user = getUser(username);
+        return user.getExecutions();
+    }
+
+    @Override
+    public void setUserExecution(String username, String executionIri) throws UserNotFoundException {
+        User user = getUser(username);
+        Execution e = new Execution();
+        e.setExecutionStarted(executionIri, new Date());
+        user.addExecution(e);
+        executionRepository.save(e);
+        repository.save(user);
+    }
+
+    @Override
+    public List<com.linkedpipes.lpa.backend.entities.Execution> getUserExecutions(String username) throws UserNotFoundException {
+        List<com.linkedpipes.lpa.backend.entities.Execution> executions = new ArrayList<>();
+        for (Execution e : getExecutions(username)) {
+            com.linkedpipes.lpa.backend.entities.Execution execution = new com.linkedpipes.lpa.backend.entities.Execution();
+            execution.iri = e.getExecutionIri();
+            executions.add(execution);
+        }
+        return executions;
+    }
+
+    @Override
+    public void deleteUserExecution(String user, String executionIri) {
+        Execution toDelete = null;
+        try {
+            for (Execution e : getExecutions(user)) {
+                if (e.getExecutionIri().equals(executionIri)) {
+                    toDelete = e;
+                    break;
+                }
+            }
+
+            if (null != toDelete) {
+                executionRepository.delete(toDelete);
+            } else {
+                logger.warn("Execution not found: " + executionIri);
             }
         } catch (UserNotFoundException e) {
             logger.warn("User not found: " + user);
