@@ -57,7 +57,9 @@ class SelectSources extends React.Component {
     discoveryStatusPollingFinished: false,
     discoveryStatusPollingInterval: 2000,
     discoveryLoadingLabel: "",
-    tabValue: 0
+    tabValue: 0,
+    sparqlEndpointIri: "",
+    dataSampleIri: ""
   };
 
   handleChange = (event, newValue) => {
@@ -115,6 +117,15 @@ class SelectSources extends React.Component {
     });
   };
 
+  postStartFromSparqlEndpoint = () => {
+    return DiscoveryService.postDiscoverFromEndpoint({
+      sparqlEndpointIri: this.state.sparqlEndpointIri,
+      dataSampleIri: this.state.dataSampleIri
+    }).then(function(response) {
+      return response.json();
+    });
+  };
+
   addDiscoveryId = response => {
     const self = this;
     const discoveryId = response.id;
@@ -138,43 +149,45 @@ class SelectSources extends React.Component {
         "Please, hold on Discovery is casting spells 🧙‍..."
     });
 
-    (self.state.ttlFile
-      ? self.postStartFromFile()
-      : self.postStartFromInputLinks()
-    )
-      .then(function(discoveryResponse) {
-        if (discoveryResponse !== undefined) {
-          self.addDiscoveryId(discoveryResponse).then(function() {
-            self.setState({ discoveryStatusPollingFinished: false });
-            self.checkDiscovery(discoveryResponse, undefined);
-          });
-        }
-      })
-      .catch(function(error) {
-        console.log(error.message);
-
-        // Enable the fields
-        self.setState({
-          discoveryIsLoading: false,
-          textFieldValue: "",
-          textFieldIsValid: true
-        });
-
-        // Clear out selected sources that failed
-        self.props.dispatch(
-          setSelectedDatasourcesExample({
-            data: undefined
+    self.state.tabValue === 0
+      ? self.state.ttlFile
+        ? self.postStartFromFile()
+        : self.postStartFromInputLinks()
+      : self
+          .postStartFromSparqlEndpoint()
+          .then(function(discoveryResponse) {
+            if (discoveryResponse !== undefined) {
+              self.addDiscoveryId(discoveryResponse).then(function() {
+                self.setState({ discoveryStatusPollingFinished: false });
+                self.checkDiscovery(discoveryResponse, undefined);
+              });
+            }
           })
-        );
+          .catch(function(error) {
+            console.log(error.message);
 
-        toast.error(
-          "There was an error during the discovery. Please, try different sources.",
-          {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 2000
-          }
-        );
-      });
+            // Enable the fields
+            self.setState({
+              discoveryIsLoading: false,
+              textFieldValue: "",
+              textFieldIsValid: true
+            });
+
+            // Clear out selected sources that failed
+            self.props.dispatch(
+              setSelectedDatasourcesExample({
+                data: undefined
+              })
+            );
+
+            toast.error(
+              "There was an error during the discovery. Please, try different sources.",
+              {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 2000
+              }
+            );
+          });
   };
 
   checkDiscovery = response => {
@@ -263,9 +276,29 @@ class SelectSources extends React.Component {
     }
   };
 
+  handleSelectedFile = fileItems => {
+    this.setState({
+      ttlFile: fileItems.length === 1 ? fileItems[0].file : undefined
+    });
+  };
+
   validateField = e => {
     let rawText = e.target.value;
     this.handleValidation(rawText);
+  };
+
+  setSparqlIri = e => {
+    let rawText = e.target.value;
+    this.setState({
+      sparqlEndpointIri: rawText
+    });
+  };
+
+  setDataSampleIri = e => {
+    let rawText = e.target.value;
+    this.setState({
+      dataSampleIri: rawText
+    });
   };
 
   render() {
@@ -316,14 +349,15 @@ class SelectSources extends React.Component {
                       selectedDatasources={selectedDatasources}
                       discoveryIsLoading={discoveryIsLoading}
                       textFieldValue={textFieldValue}
-                      validateField={this.validateField}
+                      validateField={self.validateField}
+                      handleSelectedFile={self.handleSelectedFile}
                     />
                     <AdvancedSourcesInput
                       classes={classes}
                       selectedDatasources={selectedDatasources}
                       discoveryIsLoading={discoveryIsLoading}
-                      textFieldValue={textFieldValue}
-                      validateField={this.validateField}
+                      sparqlTextFieldHandler={self.setSparqlIri}
+                      dataSampleTextFieldHandler={self.setDataSampleIri}
                     />
                   </SwipeableViews>
                 </Grid>
@@ -335,9 +369,12 @@ class SelectSources extends React.Component {
                     component="span"
                     color="secondary"
                     disabled={
-                      !this.state.ttlFile &&
-                      !textFieldIsValid &&
-                      selectedDatasources === undefined
+                      this.state.tabValue === 0
+                        ? !this.state.ttlFile &&
+                          !textFieldIsValid &&
+                          selectedDatasources === undefined
+                        : this.state.sparqlEndpointIri === "" ||
+                          this.state.dataSampleIri === ""
                     }
                     onClick={this.processStartDiscovery}
                     size="small"

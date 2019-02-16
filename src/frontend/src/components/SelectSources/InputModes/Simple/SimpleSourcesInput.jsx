@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import LinearLoadingIndicator from "../../../Loaders/LinearLoadingIndicator";
 import { Grid, TextField } from "@material-ui/core";
 import { FilePond, File, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -14,7 +13,8 @@ export default class SimpleSourcesInput extends Component {
       classes,
       selectedDatasources,
       discoveryIsLoading,
-      textFieldValue
+      textFieldValue,
+      handleSelectedFile
     } = this.props;
 
     return (
@@ -57,9 +57,7 @@ export default class SimpleSourcesInput extends Component {
             maxFiles={3}
             onupdatefiles={fileItems => {
               // Set current file objects to this.state
-              this.setState({
-                ttlFile: fileItems.length === 1 ? fileItems[0].file : undefined
-              });
+              handleSelectedFile(fileItems);
             }}
           />
         </Grid>

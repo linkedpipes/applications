@@ -2,13 +2,20 @@ import React, { Component, Fragment } from "react";
 import { Grid, TextField } from "@material-ui/core";
 
 export default class AdvancedSourcesInput extends Component {
+  state = {
+    sparqlTextFieldValue: "",
+    dataSampleTextFieldValue: ""
+  };
+
   render() {
     const {
       classes,
-      selectedDatasources,
       discoveryIsLoading,
-      textFieldValue
+      sparqlTextFieldHandler,
+      dataSampleTextFieldHandler
     } = this.props;
+
+    const { sparqlTextFieldValue, dataSampleTextFieldValue } = this.state;
 
     return (
       <Grid container spacing={16}>
@@ -19,12 +26,7 @@ export default class AdvancedSourcesInput extends Component {
             disabled={discoveryIsLoading}
             className={classes.textField}
             multiline
-            value={
-              selectedDatasources === undefined
-                ? textFieldValue
-                : selectedDatasources
-            }
-            onChange={this.props.validateField}
+            onChange={sparqlTextFieldHandler}
             placeholder="Input your SPARQL IRI..."
             fullWidth
             margin="normal"
@@ -36,12 +38,7 @@ export default class AdvancedSourcesInput extends Component {
             disabled={discoveryIsLoading}
             className={classes.textField}
             multiline
-            value={
-              selectedDatasources === undefined
-                ? textFieldValue
-                : selectedDatasources
-            }
-            onChange={this.props.validateField}
+            onChange={dataSampleTextFieldHandler}
             placeholder="Input your data sample IRI..."
             fullWidth
             margin="normal"
