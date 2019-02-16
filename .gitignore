@@ -70,6 +70,6 @@ chrome-user-data
 *.swo
 
 #Database
-data/
+data/virtuoso/
 
 src/frontend/public/
