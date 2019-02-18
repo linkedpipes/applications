@@ -14,8 +14,6 @@ import com.linkedpipes.lpa.backend.util.Streams;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
@@ -140,11 +138,8 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         //create triple ns1:service sd:namedGraph [sd:name <graphName>];
         //resource, property, RDFNode
         Resource endpoint = model.createResource(virtuosoEndpoint + "/service");
-        Resource blankNode = model.createResource().addProperty(new PropertyImpl(SD.uri + "name"), model.createResource(graphName));
-        Statement name = model.createStatement(endpoint,
-                                               new PropertyImpl(SD.uri + "namedGraph"),
-                                               blankNode);
-        model.add(name);
+        Resource blankNode = model.createResource().addProperty(SD.name, model.createResource(graphName));
+        model.add(endpoint, SD.namedGraph, blankNode);
 
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);

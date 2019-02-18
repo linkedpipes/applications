@@ -10,5 +10,7 @@ public class SD extends Vocabulary {
     public static final Resource Service = createResource(uri, "Service");
 
     public static final Property endpoint = createProperty(uri, "endpoint");
+    public static final Property name = createProperty(uri, "name");
+    public static final Property namedGraph = createProperty(uri, "namedGraph");
 
 }
