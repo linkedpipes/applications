@@ -69,3 +69,16 @@ services:
     restart: on-failure
     ports:
       - 8080:8080
+
+  postgres:
+    image: postgres
+    container_name: lpa-postgres
+    restart: on-failure
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: lpa
+      PGDATA: /tmp
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
