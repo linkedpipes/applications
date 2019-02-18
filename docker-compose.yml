@@ -74,10 +74,11 @@ services:
   postgres:
     image: postgres
     container_name: lpa-postgres
-    restart: always
+    restart: on-failure
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
+      PGDATA: /tmp
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ports:

@@ -1,0 +1,216 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ns1:	<http://linked.opendata.cz/resource/concept-scheme/> .
+@prefix skos:	<http://www.w3.org/2004/02/skos/core#> .
+ns1:cpv-2008	rdf:type	skos:ConceptScheme .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:	<http://purl.org/dc/terms/> .
+ns1:cpv-2008	dcterms:created	"2008-01-01+01:00"^^xsd:date ;
+	dcterms:title	"Common Procurement Vocabulary 2008"@en .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03000000>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:topConceptOf	ns1:cpv-2008 ;
+	skos:prefLabel	"\u017Dem\u0117s \u016Bkio, \u016Bkininkavimo, \u017Evejybos, mi\u0161kininkyst\u0117s ir susij\u0119 produktai"@lt ,
+		"Prodotti agrikoli, tal-biedja, tas-sajd, tal-foresti u\u00A0prodotti relatati"@mt ,
+		"Produkty zem\u011Bd\u011Blstv\u00ED, hospod\u00E1\u0159sk\u00E9 produkty, produkty akvakultury, lesnictv\u00ED a\u00A0souvisej\u00EDc\u00ED produkty"@cs ,
+		"Lauksaimniec\u012Bbas, saimniec\u012Bbas, zivsaimniec\u012Bbas, me\u017Esaimniec\u012Bbas un saist\u012Bt\u0101 produkcija"@lv ,
+		"Produkter fra landbrug, husdyrbrug, fiskeri og skovbrug samt lignende produkter"@da ,
+		"Kmetijski, ribi\u0161ki, gozdarski in z\u00A0njimi povezani proizvodi"@sl ,
+		"Produtos da agricultura, da pesca, da silvicultura e afins"@pt ,
+		"Landwirtschaftliche Erzeugnisse des Pflanzenbaus und der Tierhaltung sowie Fischerei-, Forst- und zugeh\u00F6rige Erzeugnisse"@de ,
+		"Produse agricole, de ferm\u0103, de pescuit, de silvicultur\u0103 \u015Fi produse conexe"@ro ,
+		"Produits agricoles, de l'\u00E9levage, de la p\u00EAche, de la sylviculture et produits connexes"@fr ,
+		"Landbouw- en veeteelt-, kwekerij-, visserij-, bosbouw- en aanverwante producten"@nl ,
+		"Maa-, karja-, kala- ja mets\u00E4taloustuotteet sek\u00E4 vastaavat tuotteet"@fi ,
+		"P\u00F5llumajandussaadused, loomakasvatus-, kalandus-, metsandus- ja seonduvad tooted"@et ,
+		"Agricultural, farming, fishing, forestry and related products"@en ,
+		"Jordbruks-, jakt-, fiske- och skogsbruksprodukter samt tillh\u00F6rande produkter"@sv ,
+		"Productos de la agricultura, ganader\u00EDa, pesca, silvicultura y productos afines"@es ,
+		"Produkty rolnictwa, hodowli, rybo\u0142\u00F3wstwa, le\u015Bnictwa i\u00A0podobne"@pl ,
+		"\u03A0\u03C1\u03BF\u03CA\u03CC\u03BD\u03C4\u03B1 \u03B3\u03B5\u03C9\u03C1\u03B3\u03AF\u03B1\u03C2, \u03BA\u03C4\u03B7\u03BD\u03BF\u03C4\u03C1\u03BF\u03C6\u03AF\u03B1\u03C2, \u03B1\u03BB\u03B9\u03B5\u03AF\u03B1\u03C2, \u03B4\u03B1\u03C3\u03BF\u03BA\u03BF\u03BC\u03AF\u03B1\u03C2 \u03BA\u03B1\u03B9 \u03C3\u03C5\u03BD\u03B1\u03C6\u03AE \u03C0\u03C1\u03BF\u03CA\u03CC\u03BD\u03C4\u03B1"@el ,
+		"Prodotti dell'agricoltura, dell'allevamento, della pesca, della silvicoltura e prodotti affini"@it ,
+		"\u041F\u0440\u043E\u0434\u0443\u043A\u0442\u0438 \u043D\u0430 \u0437\u0435\u043C\u0435\u0434\u0435\u043B\u0438\u0435\u0442\u043E, \u0436\u0438\u0432\u043E\u0442\u043D\u043E\u0432\u044A\u0434\u0441\u0442\u0432\u043E\u0442\u043E, \u0440\u0438\u0431\u0430\u0440\u0441\u0442\u0432\u043E\u0442\u043E, \u043B\u0435\u0441\u043E\u0432\u044A\u0434\u0441\u0442\u0432\u043E\u0442\u043E \u0438 \u0441\u0432\u044A\u0440\u0437\u0430\u043D\u0438 \u0441 \u0442\u044F\u0445 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u0438"@bg ,
+		"Po\u013Enohospod\u00E1rske, farm\u00E1rske, ryb\u00E1rske, lesn\u00EDcke a\u00A0s\u00FAvisiace produkty"@sk ,
+		"Agricultural, farming, fishing, forestry and related products"@ga ,
+		"N\u00F6v\u00E9nytermeszt\u00E9si, \u00E1llatteny\u00E9szt\u00E9si, hal\u00E1szati, erd\u00E9szeti \u00E9s kapcsol\u00F3d\u00F3 term\u00E9kek"@hu ;
+	skos:notation	"03000000" ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03300000> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03200000> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03100000> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03400000> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03200000>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"Viljat, perunat, kasvikset, hedelm\u00E4t ja p\u00E4hkin\u00E4t"@fi ,
+		"Spannm\u00E5l, potatis, gr\u00F6nsaker, frukt och n\u00F6tter"@sv ,
+		"C\u00E9r\u00E9ales, pommes de terre, l\u00E9gumes, fruits et noix"@fr ,
+		"Cereales, patatas, hortalizas, frutas y frutos de c\u00E1scara"@es ,
+		"Cereals, potatoes, vegetables, fruits and nuts"@ga ,
+		"Obilniny, zemiaky, zelenina, ovocie a\u00A0orechy"@sk ,
+		"Korn, kartofler, gr\u00F8ntsager, frugt og n\u00F8dder"@da ,
+		"Cereali, patate, verdura, frutta e noci"@it ,
+		"\u0417\u044A\u0440\u043D\u0435\u043D\u0438 \u043A\u0443\u043B\u0442\u0443\u0440\u0438, \u043A\u0430\u0440\u0442\u043E\u0444\u0438, \u0437\u0435\u043B\u0435\u043D\u0447\u0443\u0446\u0438, \u043F\u043B\u043E\u0434\u043E\u0432\u0435 \u0438 \u0447\u0435\u0440\u0443\u043F\u043A\u043E\u0432\u0438 \u043F\u043B\u043E\u0434\u043E\u0432\u0435"@bg ,
+		"Cereals, potatoes, vegetables, fruits and nuts"@en ,
+		"\u017Dita, krompir, vrtnine, sadje in lupinarji"@sl ,
+		"Granen, aardappelen, groenten, vruchten en noten"@nl ,
+		"Cereale, cartofi, legume, fructe \u015Fi fructe cu coaj\u0103"@ro ,
+		"Getreide, Kartoffeln/Erd\u00E4pfel, Gem\u00FCse und Obst"@de ,
+		"Javai, bulv\u0117s, dar\u017Eov\u0117s, vaisiai ir rie\u0161utai"@lt ,
+		"Cereais, batatas, produtos hort\u00EDcolas, frutas e frutos de casca rija"@pt ,
+		"\u0394\u03B7\u03BC\u03B7\u03C4\u03C1\u03B9\u03B1\u03BA\u03AC, \u03C0\u03B1\u03C4\u03AC\u03C4\u03B5\u03C2, \u03BB\u03B1\u03C7\u03B1\u03BD\u03B9\u03BA\u03AC, \u03C6\u03C1\u03BF\u03CD\u03C4\u03B1 \u03BA\u03B1\u03B9 \u03BE\u03B7\u03C1\u03BF\u03AF \u03BA\u03B1\u03C1\u03C0\u03BF\u03AF"@el ,
+		"Zbo\u017Ca, ziemniaki, warzywa, owoce i\u00A0orzechy"@pl ,
+		"Teravili, kartulid, k\u00F6\u00F6giviljad, puuviljad ja p\u00E4hklid"@et ,
+		"Gabonaf\u00E9l\u00E9k, burgonya, z\u00F6lds\u00E9gek, gy\u00FCm\u00F6lcs\u00F6k \u00E9s di\u00F3f\u00E9l\u00E9k"@hu ,
+		"Obiloviny, brambory, zelenina, ovoce a\u00A0o\u0159echy"@cs ,
+		"Graudaugu produkti, kartupe\u013Ci, d\u0101rze\u0146i, aug\u013Ci un rieksti"@lv ,
+		"\u010Aereali, patata, \u0127axix, frott u\u00A0\u0121ew\u017C"@mt ;
+	skos:notation	"03200000" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03000000> ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03220000> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03210000> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03220000>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"K\u00F6\u00F6giviljad, puuviljad ja p\u00E4hklid"@et ,
+		"Vegetables, fruits and nuts"@ga ,
+		"D\u0101rze\u0146i, aug\u013Ci un rieksti"@lv ,
+		"Vrtnine, sadje in lupinarji"@sl ,
+		"Hortalizas, frutas y frutos de c\u00E1scara"@es ,
+		"Verdura, frutta e noci"@it ,
+		"\u0126axix, frott u\u00A0\u0121ew\u017C"@mt ,
+		"Gr\u00F6nsaker, frukt och n\u00F6tter"@sv ,
+		"L\u00E9gumes, fruits et noix"@fr ,
+		"Groenten, vruchten en noten"@nl ,
+		"Zelenina, ovoce a\u00A0o\u0159echy"@cs ,
+		"Produtos hort\u00EDcolas, frutas e frutos de casca rija"@pt ,
+		"Gr\u00F8ntsager, frugt og n\u00F8dder"@da ,
+		"Z\u00F6lds\u00E9gek, gy\u00FCm\u00F6lcs\u00F6k \u00E9s di\u00F3f\u00E9l\u00E9k"@hu ,
+		"Warzywa, owoce i\u00A0orzechy"@pl ,
+		"\u039B\u03B1\u03C7\u03B1\u03BD\u03B9\u03BA\u03AC, \u03C6\u03C1\u03BF\u03CD\u03C4\u03B1 \u03BA\u03B1\u03B9 \u03BE\u03B7\u03C1\u03BF\u03AF \u03BA\u03B1\u03C1\u03C0\u03BF\u03AF"@el ,
+		"Vegetables, fruits and nuts"@en ,
+		"Kasvikset, hedelm\u00E4t, p\u00E4hkin\u00E4t"@fi ,
+		"Dar\u017Eov\u0117s, vaisiai ir rie\u0161utai"@lt ,
+		"\u0417\u0435\u043B\u0435\u043D\u0447\u0443\u0446\u0438, \u043F\u043B\u043E\u0434\u043E\u0432\u0435 \u0438 \u0447\u0435\u0440\u0443\u043F\u043A\u043E\u0432\u0438 \u043F\u043B\u043E\u0434\u043E\u0432\u0435"@bg ,
+		"Legume, fructe \u015Fi fructe cu coaj\u0103"@ro ,
+		"Zelenina, ovocie a\u00A0orechy"@sk ,
+		"Gem\u00FCse, Obst und Schalenfr\u00FCchte"@de ;
+	skos:notation	"03220000" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03200000> ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03221000> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222000> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03222000>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"Fruit and nuts"@ga ,
+		"Frugter og n\u00F8dder"@da ,
+		"Vruchten en noten"@nl ,
+		"Sadje in ore\u0161ki"@sl ,
+		"Owoce i\u00A0orzechy"@pl ,
+		"Fr\u00FCchte und N\u00FCsse"@de ,
+		"Frutas y frutos de c\u00E1scara"@es ,
+		"Fruits et fruits \u00E0 coque"@fr ,
+		"Hedelm\u00E4t ja p\u00E4hkin\u00E4t"@fi ,
+		"Aug\u013Ci un rieksti"@lv ,
+		"Frutta e frutta con guscio"@it ,
+		"Gy\u00FCm\u00F6lcs\u00F6k \u00E9s di\u00F3f\u00E9l\u00E9k"@hu ,
+		"Ovocie a\u00A0orechy"@sk ,
+		"Ovoce a\u00A0o\u0159echy"@cs ,
+		"Vaisiai ir rie\u0161utai"@lt ,
+		"\u041F\u043B\u043E\u0434\u043E\u0432\u0435, \u0432\u043A\u043B. \u0447\u0435\u0440\u0443\u043F\u043A\u043E\u0432\u0438"@bg ,
+		"Frott u\u00A0\u0121ew\u017C"@mt ,
+		"Fruta e frutos de casca rija"@pt ,
+		"Fructe \u015Fi fructe cu coaj\u0103"@ro ,
+		"Frukt och n\u00F6tter"@sv ,
+		"Fruit and nuts"@en ,
+		"\u03A6\u03C1\u03BF\u03CD\u03C4\u03B1 \u03BA\u03B1\u03B9 \u03BA\u03B1\u03C1\u03C0\u03BF\u03AF"@el ,
+		"Puuviljad ja p\u00E4hklid"@et ;
+	skos:notation	"03222000" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03220000> ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222200> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222100> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222400> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222300> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03222300>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"\u039C\u03B7 \u03C4\u03C1\u03BF\u03C0\u03B9\u03BA\u03AC \u03C6\u03C1\u03BF\u03CD\u03C4\u03B1"@el ,
+		"Frutta non tropicale"@it ,
+		"Frutos n\u00E3o tropicais"@pt ,
+		"Frott mhux tropikali"@mt ,
+		"Icke tropisk frukt"@sv ,
+		"Nichttropisches Obst"@de ,
+		"\u041D\u0435\u0442\u0440\u043E\u043F\u0438\u0447\u0435\u0441\u043A\u0438 \u043F\u043B\u043E\u0434\u043E\u0432\u0435"@bg ,
+		"Aug\u013Ci, kas nav tropu aug\u013Ci"@lv ,
+		"Non-tropical fruit"@en ,
+		"Non-tropical fruit"@ga ,
+		"Netropick\u00E9 ovocie"@sk ,
+		"Hedelm\u00E4t, lukuun ottamatta trooppisia hedelmi\u00E4"@fi ,
+		"Fruits non tropicaux"@fr ,
+		"Owoce inne ni\u017C tropikalne"@pl ,
+		"Netropsko sadje"@sl ,
+		"Ne atogr\u0105\u017E\u0173 vaisiai"@lt ,
+		"Frutas no tropicales"@es ,
+		"Nem d\u00E9ligy\u00FCm\u00F6lcs"@hu ,
+		"Ikke-tropisk frugt"@da ,
+		"Niet-tropisch fruit"@nl ,
+		"Jin\u00E9 ne\u017E tropick\u00E9 ovoce"@cs ,
+		"Mittetroopilised puuviljad"@et ,
+		"Fructe, altele dec\u00E2t cele tropicale"@ro ;
+	skos:notation	"03222300" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222000> ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222310> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222320> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222340> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222330> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03222320>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"Tuffie\u0127, lan\u0121as u\u00A0sfra\u0121el"@mt ,
+		"Alma, k\u00F6rte \u00E9s birs"@hu ,
+		"Obuoliai, kriau\u0161\u0117s ir svarainiai"@lt ,
+		"Ma\u00E7\u00E3s, peras e marmelos"@pt ,
+		"Mere, pere \u015Fi gutui"@ro ,
+		"Omenat, p\u00E4\u00E4ryn\u00E4t ja kvittenit"@fi ,
+		"Manzanas, peras y membrillos"@es ,
+		"\u00C6bler, p\u00E6rer og kv\u00E6der"@da ,
+		"Mele, pere e mele cotogne"@it ,
+		"Jabolka, hru\u0161ke in kutine"@sl ,
+		"\u042F\u0431\u044A\u043B\u043A\u0438, \u043A\u0440\u0443\u0448\u0438 \u0438 \u0434\u044E\u043B\u0438"@bg ,
+		"Apples, pears and quinces"@ga ,
+		"\u00C4pfel, Birnen und Quitten"@de ,
+		"Pommes, poires et coings"@fr ,
+		"Jablka, hru\u0161ky a\u00A0kdoule"@cs ,
+		"Apples, pears and quinces"@en ,
+		"Appels, peren en kweeperen"@nl ,
+		"Jab\u0142ka, gruszki i\u00A0pigwy"@pl ,
+		"\u00D5unad, pirnid ja k\u00FCdooniad"@et ,
+		"\u0100boli, bumbieri un cidonijas"@lv ,
+		"\u00C4pplen, p\u00E4ron och kvitten"@sv ,
+		"\u039C\u03AE\u03BB\u03B1, \u03B1\u03C7\u03BB\u03AC\u03B4\u03B9\u03B1 \u03BA\u03B1\u03B9 \u03BA\u03C5\u03B4\u03CE\u03BD\u03B9\u03B1"@el ,
+		"Jablk\u00E1, hru\u0161ky a\u00A0dule"@sk ;
+	skos:notation	"03222320" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222300> ;
+	skos:narrowerTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222321> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222322> ,
+		<http://linked.opendata.cz/resource/cpv-2008/concept/03222323> .
+<http://linked.opendata.cz/resource/cpv-2008/concept/03222321>	rdf:type	skos:Concept ;
+	skos:inScheme	ns1:cpv-2008 ;
+	skos:prefLabel	"Tuffie\u0127"@mt ,
+		"Jablka"@cs ,
+		"Pommes"@fr ,
+		"Jabolka"@sl ,
+		"\u00D5unad"@et ,
+		"\u00C4pplen"@sv ,
+		"\u0100boli"@lv ,
+		"\u00C4pfel"@de ,
+		"Ma\u00E7\u00E3s"@pt ,
+		"Apples"@en ,
+		"\u00C6bler"@da ,
+		"Alma"@hu ,
+		"Mere"@ro ,
+		"\u039C\u03AE\u03BB\u03B1"@el ,
+		"Omenat"@fi ,
+		"Obuoliai"@lt ,
+		"Appels"@nl ,
+		"Jab\u0142ka"@pl ,
+		"Mele"@it ,
+		"Apples"@ga ,
+		"Jablk\u00E1"@sk ,
+		"Manzanas"@es ,
+		"\u042F\u0431\u044A\u043B\u043A\u0438"@bg ;
+	skos:notation	"03222321" ;
+	skos:broaderTransitive	<http://linked.opendata.cz/resource/cpv-2008/concept/03222320> .
