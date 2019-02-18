@@ -9,7 +9,7 @@ public class Discovery implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @Column(nullable = false)
     private String discoveryId;

@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.Execution;
+import com.linkedpipes.lpa.backend.entities.UserProfile;
 import com.linkedpipes.lpa.backend.services.UserService;
 
 import org.springframework.context.ApplicationContext;
@@ -108,8 +109,8 @@ public class UserController {
                     throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.updateUser(user, webId));
-        } catch (UserTakenException e) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 

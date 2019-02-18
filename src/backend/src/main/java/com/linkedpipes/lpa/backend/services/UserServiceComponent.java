@@ -38,7 +38,12 @@ public class UserServiceComponent implements UserService {
             user.setUserName(username);
             user.setWebId(webId);
             repository.save(user);
-            return getUserProfile(username);
+            try {
+                return getUserProfile(username);
+            } catch(UserNotFoundException f) {
+                logger.error("Failed to store user.");
+                throw new RuntimeException(f);
+            }
         }
     }
 

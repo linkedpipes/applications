@@ -73,7 +73,7 @@ services:
 
   postgres:
     image: postgres
-    container_name: lpa_postgres
+    container_name: lpa-postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: example

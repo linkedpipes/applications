@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
     public UserProfile addUser(String user, String webId) throws UserTakenException;
-    public UserProfile updateUser(String user, String webId) throws UserTakenException;
+    public UserProfile updateUser(String user, String webId) throws UserNotFoundException;
     public UserProfile getUserProfile(String user) throws UserNotFoundException;
 
     public void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
