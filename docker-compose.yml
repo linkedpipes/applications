@@ -23,6 +23,7 @@ services:
     depends_on:
       - etl
       - discovery
+      - postgres
 
   frontend:
     image: linkedpipes/applications:frontend

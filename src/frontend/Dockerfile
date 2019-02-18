@@ -7,17 +7,23 @@ FROM node:8.15.0-alpine
 # https://hackernoon.com/using-yarn-with-docker-c116ad289d56
 
 # Add package.json and respective lock
-ADD package.json yarn.* /tmp/
+COPY package.json yarn.* /tmp/
+
+# Install git 
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
 
 # Install packages
-RUN cd /tmp && yarn install --frozen-lockfile --check-files
+RUN git --version
+WORKDIR /tmp
+RUN yarn install --pure-lockfile 
 
 # Create a symlink to node_modules
-RUN mkdir -p /app && cd /app && ln -s /tmp/node_modules
-
+RUN mkdir -p /app 
 WORKDIR /app
+RUN ln -s /tmp/node_modules
 
-ADD . /app
+COPY . /app
 
 EXPOSE 9001
 

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.4.RELEASE'
+        springBootVersion = '2.1.2.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -49,6 +49,10 @@ dependencies {
     compile 'com.typesafe:config:1.3.3'
     compile 'commons-validator:commons-validator:1.6'
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
+
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.postgresql:postgresql:42.2.5'
+    runtime 'javax.xml.bind:jaxb-api:2.3.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -105,7 +109,7 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 
 static def lpaRelatedProperties() {
     System.properties.findAll { key, _ ->
-        key.startsWith "lpa."
+        key.startsWith("lpa.") || key.startsWith("spring.datasource.")
     }
 }
 
