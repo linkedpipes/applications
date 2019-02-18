@@ -23,6 +23,7 @@ services:
     depends_on:
       - etl
       - discovery
+      - postgres
 
   frontend:
     image: linkedpipes/applications:frontend
@@ -69,3 +70,15 @@ services:
     restart: on-failure
     ports:
       - 8080:8080
+
+  postgres:
+    image: postgres
+    container_name: lpa-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: lpa
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
