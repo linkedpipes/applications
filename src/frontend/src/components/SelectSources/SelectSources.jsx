@@ -140,6 +140,18 @@ class SelectSources extends React.Component {
     });
   };
 
+  handleDiscoveryInputCase = () => {
+    if (this.state.tabValue === 1) {
+      return this.postStartFromSparqlEndpoint();
+    } else {
+      if (this.state.ttlFile) {
+        return this.postStartFromFile();
+      } else {
+        return this.postStartFromInputLinks();
+      }
+    }
+  };
+
   processStartDiscovery = () => {
     const self = this;
 
@@ -149,45 +161,41 @@ class SelectSources extends React.Component {
         "Please, hold on Discovery is casting spells 🧙‍..."
     });
 
-    self.state.tabValue === 0
-      ? self.state.ttlFile
-        ? self.postStartFromFile()
-        : self.postStartFromInputLinks()
-      : self
-          .postStartFromSparqlEndpoint()
-          .then(function(discoveryResponse) {
-            if (discoveryResponse !== undefined) {
-              self.addDiscoveryId(discoveryResponse).then(function() {
-                self.setState({ discoveryStatusPollingFinished: false });
-                self.checkDiscovery(discoveryResponse, undefined);
-              });
-            }
-          })
-          .catch(function(error) {
-            console.log(error.message);
-
-            // Enable the fields
-            self.setState({
-              discoveryIsLoading: false,
-              textFieldValue: "",
-              textFieldIsValid: true
-            });
-
-            // Clear out selected sources that failed
-            self.props.dispatch(
-              setSelectedDatasourcesExample({
-                data: undefined
-              })
-            );
-
-            toast.error(
-              "There was an error during the discovery. Please, try different sources.",
-              {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 2000
-              }
-            );
+    self
+      .handleDiscoveryInputCase()
+      .then(function(discoveryResponse) {
+        if (discoveryResponse !== undefined) {
+          self.addDiscoveryId(discoveryResponse).then(function() {
+            self.setState({ discoveryStatusPollingFinished: false });
+            self.checkDiscovery(discoveryResponse, undefined);
           });
+        }
+      })
+      .catch(function(error) {
+        console.log(error.message);
+
+        // Enable the fields
+        self.setState({
+          discoveryIsLoading: false,
+          textFieldValue: "",
+          textFieldIsValid: true
+        });
+
+        // Clear out selected sources that failed
+        self.props.dispatch(
+          setSelectedDatasourcesExample({
+            data: undefined
+          })
+        );
+
+        toast.error(
+          "There was an error during the discovery. Please, try different sources.",
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      });
   };
 
   checkDiscovery = response => {
