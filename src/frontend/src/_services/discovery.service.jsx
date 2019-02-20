@@ -21,14 +21,16 @@ export const DiscoveryService = {
 
   postDiscoverFromEndpoint: async function({
     sparqlEndpointIri,
-    dataSampleIri
+    dataSampleIri,
+    namedGraph
   }) {
     return rest(
       DISCOVER_FROM_ENDPOINT +
         "?" +
         getQueryString({
           sparqlEndpointIri: sparqlEndpointIri,
-          dataSampleIri: dataSampleIri
+          dataSampleIri: dataSampleIri,
+          namedGraph: namedGraph
         }),
       undefined,
       "POST",
