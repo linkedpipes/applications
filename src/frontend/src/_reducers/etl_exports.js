@@ -4,7 +4,7 @@ const exportsReducerDefaultState = { exportRecords: {} };
 
 export default (state = exportsReducerDefaultState, action) => {
   switch (action.type) {
-    case "ADD_EXPORT":
+    case 'ADD_EXPORT':
       return {
         ...state,
         exportRecords: {
@@ -12,7 +12,7 @@ export default (state = exportsReducerDefaultState, action) => {
           [action.pipelineId]: action.exportValues
         }
       };
-    case "REMOVE_EXPORT":
+    case 'REMOVE_EXPORT':
       return state.filter(({ id }) => id !== action.id);
     default:
       return state;

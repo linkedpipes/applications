@@ -1,6 +1,6 @@
 // ADD_DISCOVERY
 export const addDiscoveryIdAction = ({ id } = {}) => ({
-  type: "SET_DISCOVERY_ID",
+  type: 'SET_DISCOVERY_ID',
   discovery: {
     id: id
   }
@@ -8,18 +8,18 @@ export const addDiscoveryIdAction = ({ id } = {}) => ({
 
 // ADD_SELECTED_VIZUALIZER
 export const addSelectedVisualizerAction = ({ data } = {}) => ({
-  type: "SET_SELECTED_VISUALIZER",
+  type: 'SET_SELECTED_VISUALIZER',
   selectedVisualizer: data
 });
 
 // SET_SELECTED_DATASOURCES_EXAMPLE
 export const setSelectedDatasourcesExample = ({ data } = {}) => ({
-  type: "SET_SELECTED_DATASOURCES_EXAMPLE",
+  type: 'SET_SELECTED_DATASOURCES_EXAMPLE',
   datasourcesValues: data
 });
 
 // ADD_SELECTED_RESULT_GRAPH_IRI_ACTION
 export const addSelectedResultGraphIriAction = ({ data } = {}) => ({
-  type: "SET_SELECTED_RESULT_GRAPH_IRI",
+  type: 'SET_SELECTED_RESULT_GRAPH_IRI',
   selectedResultGraphIri: data
 });

@@ -1,39 +1,39 @@
-import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
-import NotFoundPage from "./containers/NotFoundPage";
-import { NavigationBar } from "./components/Navbar";
-import AboutPage from "./containers/AboutPage";
-import withRoot from "./withRoot";
-import Redirect from "react-router-dom/es/Redirect";
-import { Dashboard } from "./components/Dashboard/Dashboard";
-import StepperController from "./components/SelectSources/StepperController";
-import CreateApp from "./components/CreateApp/CreateApp";
-import Grid from "@material-ui/core/Grid";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { withStyles } from "@material-ui/core/styles";
+import Redirect from 'react-router-dom/es/Redirect';
+import Grid from '@material-ui/core/Grid';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { withStyles } from '@material-ui/core/styles';
+import NotFoundPage from './containers/NotFoundPage';
+import { NavigationBar } from './components/Navbar';
+import AboutPage from './containers/AboutPage';
+import withRoot from './withRoot';
+import { Dashboard } from './components/Dashboard/Dashboard';
+import StepperController from './components/SelectSources/StepperController';
+import CreateApp from './components/CreateApp/CreateApp';
 
 const styles = theme => ({
   root: {
-    display: "flex"
+    display: 'flex'
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    height: "100vh",
-    overflow: "auto"
+    height: '100vh',
+    overflow: 'auto'
   },
   devBar: {
-    fontSize: "1rem",
-    height: "2rem",
-    paddingBottom: "0.5rem",
-    paddingTop: "0.5rem",
-    fontWeight: "bold",
-    color: "#606060",
-    textAlign: "center",
-    verticalAlign: "middle",
-    background: "#ffdb4d",
-    width: "100%"
+    fontSize: '1rem',
+    height: '2rem',
+    paddingBottom: '0.5rem',
+    paddingTop: '0.5rem',
+    fontWeight: 'bold',
+    color: '#606060',
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    background: '#ffdb4d',
+    width: '100%'
   }
 });
 
@@ -46,7 +46,7 @@ const AppRouter = props => {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <CssBaseline />
-          {process.env.NODE_ENV !== "production" && (
+          {process.env.NODE_ENV !== 'production' && (
             <div className={classes.devBar}>DEVELOPMENT MODE</div>
           )}
           <Switch>

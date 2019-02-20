@@ -3,7 +3,7 @@ import {
   TOGGLE_EXPAND_FILTER,
   ADD_FILTERS,
   ADD_FILTER
-} from "../_constants/filters.constants";
+} from '../_constants/filters.constants';
 
 export const addFilter = filter => ({
   type: ADD_FILTER,

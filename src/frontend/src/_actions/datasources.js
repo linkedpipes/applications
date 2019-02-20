@@ -1,19 +1,19 @@
 // ADD_SOURCE
 export const addSingleSource = ({ name, url } = {}) => ({
-  type: "ADD_SOURCE",
+  type: 'ADD_SOURCE',
   source: {
-    name: name,
-    url: url
+    name,
+    url
   }
 });
 
 export const addMultipleSources = ({ sourcesList } = {}) => ({
-  type: "ADD_MULTIPLE_SOURCES",
+  type: 'ADD_MULTIPLE_SOURCES',
   source: sourcesList
 });
 
 // REMOVE_SOURCE
 export const removeSingleSource = ({ url } = {}) => ({
-  type: "REMOVE_SOURCE",
+  type: 'REMOVE_SOURCE',
   url
 });

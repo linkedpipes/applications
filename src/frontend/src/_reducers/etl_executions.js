@@ -4,7 +4,7 @@ const executionsReducerDefaultState = { executions: {} };
 
 export default (state = executionsReducerDefaultState, action) => {
   switch (action.type) {
-    case "ADD_EXECUTION":
+    case 'ADD_EXECUTION':
       return {
         ...state,
         executions: {
@@ -12,7 +12,7 @@ export default (state = executionsReducerDefaultState, action) => {
           [action.pipelineId]: action.executionValues
         }
       };
-    case "REMOVE_EXECUTION":
+    case 'REMOVE_EXECUTION':
       return state.filter(({ id }) => id !== action.id);
     default:
       return state;

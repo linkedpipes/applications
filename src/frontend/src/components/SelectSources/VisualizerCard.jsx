@@ -1,30 +1,30 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import connect from "react-redux/lib/connect/connect";
-import { addSelectedVisualizerAction } from "../../_actions/globals";
-import MapIcon from "@material-ui/icons/Map";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import connect from 'react-redux/lib/connect/connect';
+import MapIcon from '@material-ui/icons/Map';
+import { addSelectedVisualizerAction } from '../../_actions/globals';
 
 const styles = {
   root: {
-    justifyContent: "center"
+    justifyContent: 'center'
   },
   card: {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column"
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column'
   },
   cardContent: {
     flexGrow: 1
   },
   media: {
-    objectFit: "cover"
+    objectFit: 'cover'
   }
 };
 
@@ -67,8 +67,8 @@ class VisualizerCard extends React.Component {
 
     return (
       <Card className={classes.card}>
-        <CardActionArea style={{ textAlign: "center" }}>
-          <MapIcon style={{ fontSize: "80px" }} />
+        <CardActionArea style={{ textAlign: 'center' }}>
+          <MapIcon style={{ fontSize: '80px' }} />
           <CardContent className={classes.CardContent}>
             <Typography gutterBottom variant="h5" component="h2">
               Test

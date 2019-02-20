@@ -1,4 +1,4 @@
-import "whatwg-fetch";
+import 'whatwg-fetch';
 
 function handleErrors(response) {
   if (!response.ok) {
@@ -9,23 +9,23 @@ function handleErrors(response) {
 
 export const rest = (
   url,
-  body = "",
-  method = "POST",
-  contentType = "application/json"
+  body = '',
+  method = 'POST',
+  contentType = 'application/json'
 ) => {
-  console.log("Sending request:\n");
-  console.log("URL: " + url + "\n");
-  console.log("Body: " + JSON.stringify(body) + "\n");
-  console.log("Method: " + method + "\n");
+  console.log('Sending request:\n');
+  console.log(`URL: ${  url  }\n`);
+  console.log(`Body: ${  JSON.stringify(body)  }\n`);
+  console.log(`Method: ${  method  }\n`);
 
-  return method === "POST"
+  return method === 'POST'
     ? fetch(url, {
-        method: method,
+        method,
         body: body.constructor === File ? body : JSON.stringify(body),
         headers: {
-          "Content-Type": contentType
+          'Content-Type': contentType
         },
-        credentials: "same-origin"
+        credentials: 'same-origin'
       }).then(handleErrors)
     : fetch(url).then(handleErrors);
 };

@@ -1,14 +1,14 @@
-import { Component } from "react";
-import React from "react";
-import IconButton from "@material-ui/core/IconButton/IconButton";
-import MenuItem from "@material-ui/core/MenuItem/MenuItem";
-import Menu from "@material-ui/core/Menu/Menu";
-import SettingsIcon from "@material-ui/icons/Settings";
-import PersonIcon from "@material-ui/icons/Person";
-import RemoveIcon from "@material-ui/icons/Remove";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText/ListItemText";
+import { Component } from 'react';
+import React from 'react';
+import IconButton from '@material-ui/core/IconButton/IconButton';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
+import Menu from '@material-ui/core/Menu/Menu';
+import SettingsIcon from '@material-ui/icons/Settings';
+import PersonIcon from '@material-ui/icons/Person';
+import RemoveIcon from '@material-ui/icons/Remove';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 
 const styles = {
   root: {
@@ -52,12 +52,12 @@ class UserButton extends Component {
           <Menu
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: "top",
-              horizontal: "center"
+              vertical: 'top',
+              horizontal: 'center'
             }}
             transformOrigin={{
-              vertical: "bottom",
-              horizontal: "center"
+              vertical: 'bottom',
+              horizontal: 'center'
             }}
             open={open}
             onClose={this.handleClose}

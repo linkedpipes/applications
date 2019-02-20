@@ -1,17 +1,16 @@
-import React from "react";
-import { render } from "react-dom";
-import { Provider } from "react-redux";
-import store from "./store";
-import * as Sentry from "@sentry/browser";
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import * as Sentry from '@sentry/browser';
+import store from './store';
 
-import "normalize.css/normalize.css";
-import "./_styles/styles.scss";
-import AppRouter from "./AppRouter";
+import 'normalize.css/normalize.css';
+import AppRouter from './AppRouter';
 
 const myStore = store();
 
 const checkDebugMode = () => {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === 'production') {
     console.log = function() {};
   }
 };
@@ -22,8 +21,8 @@ const jsx = (
   </Provider>
 );
 
-render(jsx, document.querySelector("#app"));
+render(jsx, document.querySelector('#app'));
 
 Sentry.init({
-  dsn: "https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419"
+  dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419'
 });

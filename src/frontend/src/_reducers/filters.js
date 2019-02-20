@@ -4,7 +4,7 @@ import {
   ADD_FILTERS,
   ADD_FILTER,
   TOGGLE_CHECKBOX
-} from "../_constants/filters.constants";
+} from '../_constants/filters.constants';
 
 export default (state = [], action) => {
   switch (action.type) {

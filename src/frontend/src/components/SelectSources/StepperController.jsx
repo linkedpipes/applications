@@ -1,24 +1,24 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import SelectSources from "./SelectSources";
-import VisualizerCardCollectionView from "./VisualizerCardCollectionView";
-import connect from "react-redux/lib/connect/connect";
-import DataSourcesTable from "./DataSourcesTable";
-import { CreateAppCard } from "../CreateApp";
-import Grid from "@material-ui/core/Grid";
-import { QuickStartWidget } from "./QuickStart";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import connect from 'react-redux/lib/connect/connect';
+import Grid from '@material-ui/core/Grid';
+import SelectSources from './SelectSources';
+import VisualizerCardCollectionView from './VisualizerCardCollectionView';
+import DataSourcesTable from './DataSourcesTable';
+import { CreateAppCard } from '../CreateApp';
+import { QuickStartWidget } from './QuickStart';
 
 const styles = theme => ({
   root: {
-    width: "100%"
+    width: '100%'
   },
   gridRoot: {
     flexGrow: 1
@@ -34,16 +34,16 @@ const styles = theme => ({
     padding: theme.spacing.unit * 3
   },
   createAppButtons: {
-    justifyContent: "center"
+    justifyContent: 'center'
   }
 });
 
 function getSteps() {
   return [
-    "Add Data Source IRIs",
-    "Pick a visualizer",
-    "Pick a source for execution",
-    "Preview & create app"
+    'Add Data Source IRIs',
+    'Pick a visualizer',
+    'Pick a source for execution',
+    'Preview & create app'
   ];
 }
 
@@ -89,7 +89,7 @@ class StepperController extends React.Component {
       case 3:
         return <CreateAppCard />;
       default:
-        return "Unknown step";
+        return 'Unknown step';
     }
   }
 
@@ -120,7 +120,7 @@ class StepperController extends React.Component {
       <div className={classes.root}>
         <Stepper
           activeStep={activeStep}
-          style={{ backgroundColor: "transparent" }}
+          style={{ backgroundColor: 'transparent' }}
           orientation="vertical"
         >
           {steps.map((label, index) => {

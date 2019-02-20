@@ -1,13 +1,13 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { VisualizerController } from "../VisualizerController";
-import { VISUALIZER_TYPE, optionModes, filterTypes } from "../../_constants";
-import connect from "react-redux/lib/connect/connect";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import { VisualizerController } from '../VisualizerController';
+import { VISUALIZER_TYPE, optionModes, filterTypes } from '../../_constants';
+import connect from 'react-redux/lib/connect/connect';
 
 const styles = theme => ({
   root: {
-    justifyContent: "center",
+    justifyContent: 'center',
     flex: 1
   },
   card: {},
@@ -15,16 +15,16 @@ const styles = theme => ({
 });
 
 const skoConcept1 = {
-  label: "skoConcept1label",
-  uri: "skoConcept1URI",
-  schemeUri: "skoConcept1URI",
+  label: 'skoConcept1label',
+  uri: 'skoConcept1URI',
+  schemeUri: 'skoConcept1URI',
   linkUris: []
 };
 
 const skoConcept2 = {
-  label: "skoConcept2 label",
-  uri: "skoConcept2URI",
-  schemeUri: "skoConcept2URI",
+  label: 'skoConcept2 label',
+  uri: 'skoConcept2URI',
+  schemeUri: 'skoConcept2URI',
   linkUris: []
 };
 const option1 = {
@@ -50,8 +50,8 @@ class CreateApp extends React.Component {
         visualizerType={VISUALIZER_TYPE.GoogleMaps}
         visualizerParams={{ markers: markers }}
         headerParams={{
-          title: "Dataset overview",
-          subtitle: "Google Maps Visualizer"
+          title: 'Dataset overview',
+          subtitle: 'Google Maps Visualizer'
         }}
       />
     );

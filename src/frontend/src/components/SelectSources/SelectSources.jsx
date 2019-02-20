@@ -1,31 +1,31 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
-import { connect } from "react-redux";
-import { addVisualizer } from "../../_actions/visualizers";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { DiscoveryService } from "../../_services";
-import { extractUrlGroups } from "../../_helpers";
-import { getDatasourcesArray } from "../../_selectors/datasources";
-import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
-import { addDiscoveryIdAction } from "../../_actions/globals";
-import Grid from "@material-ui/core/Grid";
-import { setSelectedDatasourcesExample } from "../../_actions/globals";
-import SimpleSourcesInput from "./InputModes/Simple/SimpleSourcesInput";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
+import { addVisualizer } from '../../_actions/visualizers';
+import 'react-toastify/dist/ReactToastify.css';
+import { DiscoveryService } from '../../_services';
+import { extractUrlGroups } from '../../_helpers';
+import { getDatasourcesArray } from '../../_selectors/datasources';
+import LinearLoadingIndicator from '../Loaders/LinearLoadingIndicator';
+import { addDiscoveryIdAction } from '../../_actions/globals';
+import Grid from '@material-ui/core/Grid';
+import { setSelectedDatasourcesExample } from '../../_actions/globals';
+import SimpleSourcesInput from './InputModes/Simple/SimpleSourcesInput';
 
-import SwipeableViews from "react-swipeable-views";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import AdvancedSourcesInput from "./InputModes/Advanced/AdvancedSourcesInput";
+import SwipeableViews from 'react-swipeable-views';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import AdvancedSourcesInput from './InputModes/Advanced/AdvancedSourcesInput';
 
 const styles = theme => ({
   root: {
-    textAlign: "center",
+    textAlign: 'center',
     paddingTop: theme.spacing.unit * 20,
     flex: 1
   },
@@ -33,13 +33,13 @@ const styles = theme => ({
     flexGrow: 1
   },
   itemGrid: {
-    height: "100%",
-    width: "100%",
-    margin: "auto"
+    height: '100%',
+    width: '100%',
+    margin: 'auto'
   },
   textField: {
-    margin: "auto",
-    width: "100%"
+    margin: 'auto',
+    width: '100%'
   },
   card: {
     flexGrow: 1
@@ -50,17 +50,17 @@ class SelectSources extends React.Component {
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
-    textFieldValue: "",
+    textFieldValue: '',
     textFieldIsValid: false,
     open: false,
     discoveryStatusPolling: undefined,
     discoveryStatusPollingFinished: false,
     discoveryStatusPollingInterval: 2000,
-    discoveryLoadingLabel: "",
+    discoveryLoadingLabel: '',
     tabValue: 0,
-    sparqlEndpointIri: "",
-    dataSampleIri: "",
-    namedGraph: ""
+    sparqlEndpointIri: '',
+    dataSampleIri: '',
+    namedGraph: ''
   };
 
   handleChange = (event, newValue) => {
@@ -97,7 +97,7 @@ class SelectSources extends React.Component {
         ? this.props.selectedDatasources
         : this.state.textFieldIsValid;
 
-    const splitFieldValue = textContent.split(",\n");
+    const splitFieldValue = textContent.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
       return { uri: source };
     });
@@ -145,13 +145,11 @@ class SelectSources extends React.Component {
   handleDiscoveryInputCase = () => {
     if (this.state.tabValue === 1) {
       return this.postStartFromSparqlEndpoint();
-    } else {
-      if (this.state.ttlFile) {
-        return this.postStartFromFile();
-      } else {
-        return this.postStartFromInputLinks();
-      }
     }
+    if (this.state.ttlFile) {
+      return this.postStartFromFile();
+    }
+    return this.postStartFromInputLinks();
   };
 
   processStartDiscovery = () => {
@@ -160,7 +158,7 @@ class SelectSources extends React.Component {
     self.setState({
       discoveryIsLoading: true,
       discoveryLoadingLabel:
-        "Please, hold on Discovery is casting spells 🧙‍..."
+        'Please, hold on Discovery is casting spells 🧙‍...'
     });
 
     self
@@ -179,7 +177,7 @@ class SelectSources extends React.Component {
         // Enable the fields
         self.setState({
           discoveryIsLoading: false,
-          textFieldValue: "",
+          textFieldValue: '',
           textFieldIsValid: true
         });
 
@@ -191,7 +189,7 @@ class SelectSources extends React.Component {
         );
 
         toast.error(
-          "There was an error during the discovery. Please, try different sources.",
+          'There was an error during the discovery. Please, try different sources.',
           {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 2000
@@ -225,7 +223,7 @@ class SelectSources extends React.Component {
       return;
     }
 
-    DiscoveryService.getDiscoveryStatus({ discoveryId: discoveryId })
+    DiscoveryService.getDiscoveryStatus({ discoveryId })
       .then(function(response) {
         return response.json();
       })
@@ -246,12 +244,12 @@ class SelectSources extends React.Component {
 
   loadPipelineGroups = discoveryId => {
     this.setState({
-      discoveryLoadingLabel: "Extracting the magical pipelines 🧙‍..."
+      discoveryLoadingLabel: 'Extracting the magical pipelines 🧙‍...'
     });
 
     const self = this;
 
-    return DiscoveryService.getPipelineGroups({ discoveryId: discoveryId })
+    return DiscoveryService.getPipelineGroups({ discoveryId })
       .then(function(response) {
         return response.json();
       })
@@ -264,11 +262,11 @@ class SelectSources extends React.Component {
   };
 
   handleValidation = rawText => {
-    let matches = extractUrlGroups(rawText);
+    const matches = extractUrlGroups(rawText);
     let valid = false;
 
     if (matches instanceof Array) {
-      rawText = matches.join(",\n");
+      rawText = matches.join(',\n');
       valid = true;
     }
 
@@ -293,26 +291,26 @@ class SelectSources extends React.Component {
   };
 
   validateField = e => {
-    let rawText = e.target.value;
+    const rawText = e.target.value;
     this.handleValidation(rawText);
   };
 
   setSparqlIri = e => {
-    let rawText = e.target.value;
+    const rawText = e.target.value;
     this.setState({
       sparqlEndpointIri: rawText
     });
   };
 
   setDataSampleIri = e => {
-    let rawText = e.target.value;
+    const rawText = e.target.value;
     this.setState({
       dataSampleIri: rawText
     });
   };
 
   setNamedGraph = e => {
-    let rawText = e.target.value;
+    const rawText = e.target.value;
     this.setState({
       namedGraph: rawText
     });
@@ -357,7 +355,7 @@ class SelectSources extends React.Component {
 
                 <Grid item xs={12} sm={12}>
                   <SwipeableViews
-                    axis={"x"}
+                    axis="x"
                     index={self.state.tabValue}
                     onChangeIndex={self.handleChangeIndex}
                   >
@@ -391,8 +389,8 @@ class SelectSources extends React.Component {
                         ? !this.state.ttlFile &&
                           !textFieldIsValid &&
                           selectedDatasources === undefined
-                        : this.state.sparqlEndpointIri === "" ||
-                          this.state.dataSampleIri === ""
+                        : this.state.sparqlEndpointIri === '' ||
+                          this.state.dataSampleIri === ''
                     }
                     onClick={this.processStartDiscovery}
                     size="small"

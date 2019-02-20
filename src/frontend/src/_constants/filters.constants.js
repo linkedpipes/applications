@@ -1,12 +1,12 @@
-import { List, Record } from "immutable";
+import { List, Record } from 'immutable';
 
 export const filterTypes = {
-  CHECKBOX: "CHECKBOX",
-  RADIO: "RADIO"
+  CHECKBOX: 'CHECKBOX',
+  RADIO: 'RADIO'
 };
 
 export const Filter = Record({
-  property: "new Property()",
+  property: 'new Property()',
   type: filterTypes.CHECKBOX,
   enabled: true,
   expanded: false,
@@ -14,8 +14,8 @@ export const Filter = Record({
   optionsUris: []
 });
 
-export const ADD_FILTERS = "ADD_FILTERS";
-export const ADD_FILTER = "ADD_FILTER";
-export const TOGGLE_FILTER = "TOGGLE_FILTER";
-export const TOGGLE_EXPAND_FILTER = "TOGGLE_EXPAND_FILTER";
-export const TOGGLE_CHECKBOX = "TOGGLE_CHECKBOX";
+export const ADD_FILTERS = 'ADD_FILTERS';
+export const ADD_FILTER = 'ADD_FILTER';
+export const TOGGLE_FILTER = 'TOGGLE_FILTER';
+export const TOGGLE_EXPAND_FILTER = 'TOGGLE_EXPAND_FILTER';
+export const TOGGLE_CHECKBOX = 'TOGGLE_CHECKBOX';

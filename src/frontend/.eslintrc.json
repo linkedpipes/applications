@@ -1,35 +1,51 @@
 {
-  "extends": [
-    "plugin:react/recommended",
-    "prettier",
-    "prettier/react"
-  ],
-  "plugins": [
-    "prettier",
-    "react"
-  ],
   "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
   "parserOptions": {
-    "ecmaVersion": 6,
     "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true,
-      "modules": true
+      "jsx": true
     }
   },
-  "env": {
-    "es6": true,
-    "browser": true,
-    "node": true
-  },
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["import", "react", "prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "react/prop-types": "off"
+    "new-cap": [2, { "capIsNew": false, "newIsCap": true }],
+    "import/no-unresolved": [2, { "commonjs": true }],
+    "import/no-extraneous-dependencies": 0,
+    "import/named": 2,
+    "import/default": 2,
+    "import/namespace": 2,
+    "import/export": 2,
+    "react/no-unused-prop-types": 0,
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }]
+  },
+  "globals": {
+    "after": false,
+    "afterEach": false,
+    "before": false,
+    "beforeEach": false,
+    "describe": false,
+    "it": false,
+    "require": false
   },
   "settings": {
-    "react": {
-      "pragma": "React",
-      "version": "16.4.2"
+    "import/ignore": ["node_modules", "\\.json$"],
+    "import/parser": "babel-eslint",
+    "import/resolve": {
+      "extensions": [".js", ".jsx", ".json"]
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".json"]
+      }
     }
   }
 }

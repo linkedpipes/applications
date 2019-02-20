@@ -1,16 +1,16 @@
-import { List, Record } from "immutable";
+import { List, Record } from 'immutable';
 
 export const SkosConcept = Record({
-  label: "",
-  uri: "",
-  schemeUri: "",
+  label: '',
+  uri: '',
+  schemeUri: '',
   linkUris: List()
 });
 
 export const optionModes = {
-  ALWAYS_SELECT: "ALWAYS_SELECT",
-  NEVER_SELECT: "NEVER_SELECT",
-  USER_DEFINED: "USER_DEFINED"
+  ALWAYS_SELECT: 'ALWAYS_SELECT',
+  NEVER_SELECT: 'NEVER_SELECT',
+  USER_DEFINED: 'USER_DEFINED'
 };
 
 export const Option = Record({
@@ -20,4 +20,4 @@ export const Option = Record({
   selected: false
 });
 
-export const TOGGLE_OPTION = "TOGGLE_OPTION";
+export const TOGGLE_OPTION = 'TOGGLE_OPTION';

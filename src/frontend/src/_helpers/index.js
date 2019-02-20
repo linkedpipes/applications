@@ -3,4 +3,4 @@ export {
   getQueryString,
   replaceAll,
   extractUrlGroups
-} from "./utils";
+} from './utils';

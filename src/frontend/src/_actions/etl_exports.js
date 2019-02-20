@@ -4,7 +4,7 @@ export const addSingleExport = ({
   resultGraphIri,
   etlPipelineIri
 } = {}) => ({
-  type: "ADD_EXPORT",
+  type: 'ADD_EXPORT',
   pipelineId: id,
   exportValues: {
     resultGraphIri: resultGraphIri,
@@ -14,6 +14,6 @@ export const addSingleExport = ({
 
 // REMOVE_PIPELINE
 export const removeSingleExport = ({ id } = {}) => ({
-  type: "REMOVE_EXPORT",
+  type: 'REMOVE_EXPORT',
   id
 });
