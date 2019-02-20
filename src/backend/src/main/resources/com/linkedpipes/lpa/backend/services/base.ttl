@@ -11,6 +11,7 @@
       <https://discovery.linkedpipes.com/resource/application/map/template>,
       <https://discovery.linkedpipes.com/resource/application/map-labeled-points/template>,
       <https://discovery.linkedpipes.com/resource/application/dcterms/template>,
+      <https://gist.githubusercontent.com/aorumbayev/9597ce6e4fc60e2d44fd4a576b3adda9/raw/ff73e9e3ffcc2b19d4d3c13ffbb55b51be275561/treemap_template.ttl>,
 
 	  # Geo
       <https://discovery.linkedpipes.com/resource/transformer/wikidata-coordinate-location-to-schema-geocoordinates/template>,
