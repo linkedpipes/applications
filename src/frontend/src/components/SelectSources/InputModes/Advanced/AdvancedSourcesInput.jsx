@@ -12,7 +12,8 @@ export default class AdvancedSourcesInput extends Component {
       classes,
       discoveryIsLoading,
       sparqlTextFieldHandler,
-      dataSampleTextFieldHandler
+      dataSampleTextFieldHandler,
+      namedGraphTextFieldHandler
     } = this.props;
 
     const { sparqlTextFieldValue, dataSampleTextFieldValue } = this.state;
@@ -40,6 +41,18 @@ export default class AdvancedSourcesInput extends Component {
             multiline
             onChange={dataSampleTextFieldHandler}
             placeholder="Input your data sample IRI..."
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            id="outlined-textarea"
+            label="Named Graph IRI"
+            disabled={discoveryIsLoading}
+            className={classes.textField}
+            multiline
+            onChange={namedGraphTextFieldHandler}
+            placeholder="Input your named graph IRI..."
             fullWidth
             margin="normal"
             variant="outlined"

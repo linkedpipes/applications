@@ -59,7 +59,8 @@ class SelectSources extends React.Component {
     discoveryLoadingLabel: "",
     tabValue: 0,
     sparqlEndpointIri: "",
-    dataSampleIri: ""
+    dataSampleIri: "",
+    namedGraph: ""
   };
 
   handleChange = (event, newValue) => {
@@ -120,7 +121,8 @@ class SelectSources extends React.Component {
   postStartFromSparqlEndpoint = () => {
     return DiscoveryService.postDiscoverFromEndpoint({
       sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri
+      dataSampleIri: this.state.dataSampleIri,
+      namedGraph: this.state.namedGraph
     }).then(function(response) {
       return response.json();
     });
@@ -309,6 +311,13 @@ class SelectSources extends React.Component {
     });
   };
 
+  setNamedGraph = e => {
+    let rawText = e.target.value;
+    this.setState({
+      namedGraph: rawText
+    });
+  };
+
   render() {
     const { classes, selectedDatasources } = this.props;
     const self = this;
@@ -366,6 +375,7 @@ class SelectSources extends React.Component {
                       discoveryIsLoading={discoveryIsLoading}
                       sparqlTextFieldHandler={self.setSparqlIri}
                       dataSampleTextFieldHandler={self.setDataSampleIri}
+                      namedGraphTextFieldHandler={self.setNamedGraph}
                     />
                   </SwipeableViews>
                 </Grid>
