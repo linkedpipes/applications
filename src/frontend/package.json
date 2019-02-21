@@ -28,6 +28,8 @@
     "classnames": "^2.2.6",
     "dotenv-webpack": "^1.5.7",
     "eslint-config-airbnb": "17.1.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-material-ui": "^1.0.1",
     "filepond": "4.1.4",
     "filepond-plugin-file-validate-type": "1.2.2",
     "immutable": "^4.0.0-rc.12",
@@ -47,6 +49,7 @@
     "recompose": "^0.30.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
+    "reduxsauce": "^1.0.1",
     "reselect": "4.0.x",
     "whatwg-fetch": "^3.0.0"
   },

@@ -54,7 +54,7 @@ class Dashboard extends Component {
               <Typography variant="subtitle1" gutterBottom>
                 Start by creating a new application
               </Typography>
-              <Link to="/select-sources">
+              <Link to="/discover">
                 <Button
                   variant="contained"
                   size="large"

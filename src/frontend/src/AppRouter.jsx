@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-
 import Redirect from 'react-router-dom/es/Redirect';
 import Grid from '@material-ui/core/Grid';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,9 +8,10 @@ import NotFoundPage from './containers/NotFoundPage';
 import { NavigationBar } from './components/Navbar';
 import AboutPage from './containers/AboutPage';
 import withRoot from './withRoot';
-import { Dashboard } from './components/Dashboard/Dashboard';
 import StepperController from './components/SelectSources/StepperController';
 import CreateApp from './components/CreateApp/CreateApp';
+import HomePage from './Home';
+import DiscoverPage from './Discover';
 
 const styles = theme => ({
   root: {
@@ -50,9 +50,9 @@ const AppRouter = props => {
             <div className={classes.devBar}>DEVELOPMENT MODE</div>
           )}
           <Switch>
-            <Route exact path="/dashboard" component={Dashboard} />
+            <Route exact path="/dashboard" component={HomePage} />
             <Route exact path="/create-app" component={CreateApp} />
-            <Route exact path="/select-sources" component={StepperController} />
+            <Route exact path="/discover" component={DiscoverPage} />
             <Route path="/about" component={AboutPage} />
             <Redirect from="/" to="/dashboard" />
             <Route component={NotFoundPage} />
