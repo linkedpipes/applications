@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
@@ -8,6 +7,8 @@ import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.EtlService;
+import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
+import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @RestController
@@ -27,14 +28,16 @@ public class PipelineController {
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
     private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/graph/";
 
-    public static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
+    private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
     private final DiscoveryService discoveryService;
     private final EtlService etlService;
+    private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         etlService = context.getBean(EtlService.class);
+        methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
     @GetMapping("/api/pipeline")
@@ -62,10 +65,10 @@ public class PipelineController {
 
     @NotNull
     private String getOurServiceDescriptionUri(@NotNull String graphId) {
-        String hostUri = Application.getConfig().getString("lpa.hostUrl");
-        return new DefaultUriBuilderFactory()
-                .uriString(hostUri + SERVICE_DESCRIPTION_PATH)
-                .queryParam("graphId", graphId)
+        Method serviceDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
+                PipelineController.class.getDeclaredMethod("serviceDescription", String.class));
+        return methodIntrospector.getHandlerMethodUri(PipelineController.class, serviceDescriptionMethod)
+                .requestParam("graphId", graphId)
                 .build()
                 .toString();
     }

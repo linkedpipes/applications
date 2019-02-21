@@ -5,19 +5,18 @@ import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-
-import java.util.List;
-import java.util.Spliterator;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import static java.util.Spliterator.*;
-import static java.util.Spliterators.spliteratorUnknownSize;
 import org.apache.jena.rdf.model.Literal;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.linkedpipes.lpa.backend.sparql.queries.geo.MarkerQueryProvider.*;
+import static java.util.Spliterator.*;
+import static java.util.Spliterators.spliteratorUnknownSize;
 
 public class MarkerExtractor {
 
@@ -28,7 +27,7 @@ public class MarkerExtractor {
                 spliteratorUnknownSize(result, ORDERED | DISTINCT | NONNULL | IMMUTABLE);
 
         return StreamSupport.stream(spliterator, false)
-                .map(s -> extractMarker(s))
+                .map(MarkerExtractor::extractMarker)
                 .filter(m -> m.coordinates.lat != null && m.coordinates.lng != null)
                 .collect(Collectors.toList());
     }
