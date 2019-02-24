@@ -38,6 +38,7 @@
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
+    "react-emoji-render": "^0.5.0",
     "react-filepond": "7.0.1",
     "react-google-maps": "9.4.x",
     "react-json-view": "^1.19.1",
@@ -51,6 +52,7 @@
     "redux-logger": "^3.0.6",
     "reduxsauce": "^1.0.1",
     "reselect": "4.0.x",
+    "uuid": "^3.3.2",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {

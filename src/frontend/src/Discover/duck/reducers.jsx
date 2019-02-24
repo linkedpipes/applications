@@ -1,7 +1,8 @@
 import types from './types';
 
 const INITIAL_STATE = {
-  activeStep: 0
+  activeStep: 1,
+  selectedInputExample: ''
 };
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
@@ -28,6 +29,14 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         activeStep: 0
+      };
+    }
+
+    case types.SET_SELECTED_INPUT_EXAMPLE: {
+      const { value } = action;
+      return {
+        ...state,
+        selectedInputExample: value
       };
     }
 

@@ -1,4 +1,8 @@
-export default (state = {}, action) => {
+const INITIAL_STATE = {
+  discoveryId: ''
+};
+
+export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'SET_DISCOVERY_ID':
       return { ...state, discoveryId: action.discovery.id };

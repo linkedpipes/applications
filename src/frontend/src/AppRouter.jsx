@@ -1,14 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/es/Redirect';
-import Grid from '@material-ui/core/Grid';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import NotFoundPage from './containers/NotFoundPage';
 import { NavigationBar } from './components/Navbar';
 import AboutPage from './containers/AboutPage';
 import withRoot from './withRoot';
-import StepperController from './components/SelectSources/StepperController';
 import CreateApp from './components/CreateApp/CreateApp';
 import HomePage from './Home';
 import DiscoverPage from './Discover';

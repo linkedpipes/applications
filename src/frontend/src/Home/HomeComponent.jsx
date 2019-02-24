@@ -84,11 +84,7 @@ const HomeComponent = ({ classes }) => (
 );
 
 HomeComponent.propTypes = {
-  classes: PropTypes.objectOf(PropTypes.object)
-};
-
-HomeComponent.defaultProps = {
-  classes: undefined
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(HomeComponent);

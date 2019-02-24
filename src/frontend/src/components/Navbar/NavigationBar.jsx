@@ -1,26 +1,25 @@
-import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import { Toolbar, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
-import { ToastContainer } from "react-toastify";
-import { UserButton } from "./UserDropdown";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import HomeIcon from "@material-ui/icons/Home";
-import ViewModuleIcon from "@material-ui/icons/ViewModule";
-import HelpIcon from "@material-ui/icons/Help";
-import classNames from "classnames";
-import { Link } from "react-router-dom";
-
-import { withTheme } from "@material-ui/core/styles";
+import React from 'react';
+import AppBar from '@material-ui/core/AppBar';
+import { Toolbar, Typography } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import { ToastContainer } from 'react-toastify';
+import { UserButton } from './UserDropdown';
+import Drawer from '@material-ui/core/Drawer';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import HomeIcon from '@material-ui/icons/Home';
+import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import HelpIcon from '@material-ui/icons/Help';
+import classNames from 'classnames';
+import { Link } from 'react-router-dom';
+import { withTheme } from '@material-ui/core/styles';
 
 const styles = theme => ({
   flex: {
@@ -28,16 +27,16 @@ const styles = theme => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     }),
-    height: "4rem"
+    height: '4rem'
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
@@ -47,46 +46,46 @@ const styles = theme => ({
     marginRight: 36
   },
   hide: {
-    display: "none"
+    display: 'none'
   },
   drawer: {
-    position: "relative",
-    whiteSpace: "nowrap",
+    position: 'relative',
+    whiteSpace: 'nowrap',
     flexShrink: 0
   },
   drawerOpen: {
     width: drawerWidth,
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
   },
   drawerClose: {
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     }),
-    overflowX: "hidden",
+    overflowX: 'hidden',
     width: theme.spacing.unit * 7 + 1,
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up('sm')]: {
       width: theme.spacing.unit * 9 + 1
     }
   },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
-    height: "4rem"
+    height: '4rem'
   },
   chevronWrapper: {
-    textAlign: "right"
+    textAlign: 'right'
   },
   chevron: {
-    marginTop: "0.5rem"
+    marginTop: '0.5rem'
   },
   toolbarIcon: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    padding: "0 8px",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
     ...theme.mixins.toolbar
   }
 });
@@ -104,6 +103,7 @@ class NavigationBar extends React.Component {
   handleDrawerClose = () => {
     this.setState({ open: false });
   };
+
   render() {
     const { classes, theme } = this.props;
     return (
@@ -161,7 +161,7 @@ class NavigationBar extends React.Component {
               className={classes.chevron}
               onClick={this.handleDrawerClose}
             >
-              {theme.direction === "rtl" ? (
+              {theme.direction === 'rtl' ? (
                 <ChevronRightIcon />
               ) : (
                 <ChevronLeftIcon />

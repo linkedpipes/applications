@@ -8,12 +8,9 @@ import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { CreateAppCard } from '../components/CreateApp';
-import DataSourcesTable from '../components/SelectSources/DataSourcesTable';
-import VisualizerCardCollectionView from '../components/SelectSources/VisualizerCardCollectionView';
-import SelectSources from '../components/SelectSources/SelectSources';
-import Grid from '@material-ui/core/Grid';
-import { QuickStartWidget } from '../components/SelectSources/QuickStart';
+import Emoji from 'react-emoji-render';
+import DiscoverInputSources from './DiscoverInputSources';
+import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 
 const styles = theme => ({
   root: {
@@ -37,56 +34,31 @@ const styles = theme => ({
   }
 });
 
-const getChildAtStep = (
-  classes,
-  step,
-  onNextClicked,
-  onBackClicked,
-  discoveryId,
-  selectedVisualizer
-) => {
+const getStepContent = step => {
   switch (step) {
     case 0:
-      return (
-        <div className={classes.root}>
-          <Grid container spacing={24}>
-            <Grid item xs={8} sm={8}>
-              <SelectSources handleNextStep={onNextClicked} />
-            </Grid>
-            <Grid item xs={4} sm={4}>
-              <QuickStartWidget />
-            </Grid>
-          </Grid>
-        </div>
-      );
+      return <DiscoverInputSources />;
     case 1:
-      return <VisualizerCardCollectionView handleNextStep={onNextClicked} />;
-    case 2:
-      return (
-        <DataSourcesTable
-          handleNextStep={onNextClicked}
-          handlePrevStep={onBackClicked}
-          discoveryId={discoveryId}
-          dataSourceGroups={
-            selectedVisualizer !== undefined
-              ? selectedVisualizer.dataSourceGroups
-              : selectedVisualizer
-          }
-        />
-      );
-    case 3:
-      return <CreateAppCard />;
+      return <DiscoverVisualizerPicker />;
+
     default:
       return 'Unknown step';
   }
 };
 
+const steps = [
+  'Add Data Source IRIs',
+  'Pick a visualizer',
+  'Pick a source for execution',
+  'Preview & create app'
+];
+
+// 'Pick a source for execution',
+// 'Preview & create app'
+
 const DiscoverComponent = ({
   classes,
   activeStep,
-  discoveryId,
-  selectedVisualizer,
-  steps,
   onNextClicked,
   onBackClicked,
   onResetClicked
@@ -97,20 +69,14 @@ const DiscoverComponent = ({
       style={{ backgroundColor: 'transparent' }}
       orientation="vertical"
     >
-      {steps.map((label, index) => {
+      {steps.map((label, step) => {
         return (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              {getChildAtStep(
-                classes,
-                index,
-                onNextClicked,
-                onBackClicked,
-                discoveryId,
-                selectedVisualizer
-              )}
-              {index > 0 && (
+              {step === 0 && <DiscoverInputSources />}
+              {step === 1 && <DiscoverVisualizerPicker />}
+              {step > 0 && (
                 <div className={classes.actionsContainer}>
                   <div>
                     <Button
@@ -140,7 +106,9 @@ const DiscoverComponent = ({
     </Stepper>
     {activeStep === steps.length && (
       <Paper square elevation={0} className={classes.resetContainer}>
-        <Typography>All steps completed - nice job 👍</Typography>
+        <Typography>
+          <Emoji text="All steps completed - nice job 👍" />
+        </Typography>
         <Button onClick={onResetClicked} className={classes.button}>
           Reset
         </Button>
@@ -150,7 +118,12 @@ const DiscoverComponent = ({
 );
 
 DiscoverComponent.propTypes = {
-  classes: PropTypes.object
+  activeStep: PropTypes.number,
+  classes: PropTypes.object.isRequired,
+  onBackClicked: PropTypes.func,
+  onNextClicked: PropTypes.func,
+  onResetClicked: PropTypes.func,
+  steps: PropTypes.array
 };
 
 export default withStyles(styles)(DiscoverComponent);
