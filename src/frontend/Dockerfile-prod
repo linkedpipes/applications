@@ -1,5 +1,5 @@
 # build environment
-FROM node:8.12.0-alpine as builder
+FROM node:8.15.0-alpine as builder
 
 # Install packages using Yarn
 # References:
@@ -8,6 +8,10 @@ FROM node:8.12.0-alpine as builder
 
 # Add package.json and respective lock
 ADD package.json yarn.* /tmp/
+
+# Install git 
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
 
 # Install packages
 RUN cd /tmp && yarn install --frozen-lockfile --check-files
