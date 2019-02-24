@@ -7,14 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.Streams;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
@@ -61,7 +60,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     // TODO strongly type below method params (not simply string)
     @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException{
+    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
         return httpActions.getStatus(discoveryId);
     }
 
@@ -135,16 +134,12 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         model.read(fileStream, "", "TURTLE");
 
         String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint");
-        String sd = "http://www.w3.org/ns/sparql-service-description#";
 
         //create triple ns1:service sd:namedGraph [sd:name <graphName>];
         //resource, property, RDFNode
         Resource endpoint = model.createResource(virtuosoEndpoint + "/service");
-        Resource blankNode = model.createResource().addProperty(new PropertyImpl(sd + "name"), model.createResource(graphName));
-        Statement name = model.createStatement(endpoint,
-                                               new PropertyImpl(sd + "namedGraph"),
-                                               blankNode);
-        model.add(name);
+        Resource blankNode = model.createResource().addProperty(SD.name, model.createResource(graphName));
+        model.add(endpoint, SD.namedGraph, blankNode);
 
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
