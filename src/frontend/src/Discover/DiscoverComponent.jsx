@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Emoji from 'react-emoji-render';
 import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
+import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 
 const styles = theme => ({
   root: {
@@ -76,6 +77,7 @@ const DiscoverComponent = ({
             <StepContent>
               {step === 0 && <DiscoverInputSources />}
               {step === 1 && <DiscoverVisualizerPicker />}
+              {step === 2 && <DiscoverPipelinesPicker />}
               {step > 0 && (
                 <div className={classes.actionsContainer}>
                   <div>

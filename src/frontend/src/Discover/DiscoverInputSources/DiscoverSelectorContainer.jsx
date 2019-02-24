@@ -154,9 +154,7 @@ class DiscoverSelectorContainer extends PureComponent {
           discoveryIsLoading: false
         });
 
-        setTimeout(() => {
-          self.props.onNextClicked();
-        }, 500);
+        self.props.onNextClicked();
       });
 
       return;

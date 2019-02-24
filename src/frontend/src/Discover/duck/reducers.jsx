@@ -1,7 +1,7 @@
 import types from './types';
 
 const INITIAL_STATE = {
-  activeStep: 1,
+  activeStep: 2,
   selectedInputExample: ''
 };
 
