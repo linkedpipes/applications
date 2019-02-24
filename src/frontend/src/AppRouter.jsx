@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-
 import NotFoundPage from "./containers/NotFoundPage";
 import { NavigationBar } from "./components/Navbar";
 import AboutPage from "./containers/AboutPage";
@@ -13,6 +12,9 @@ import StorageDashboard from "./components/SOLID/StorageDashboard";
 import Grid from "@material-ui/core/Grid";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
+import { AuthRoute, UnauthRoute } from "react-router-auth";
+import AuthenticationScreen from "./components/Authentication/AuthenticationScreen";
+import connect from "react-redux/lib/connect/connect";
 
 const styles = theme => ({
   root: {
@@ -51,13 +53,47 @@ const AppRouter = props => {
             <div className={classes.devBar}>DEVELOPMENT MODE</div>
           )}
           <Switch>
-            <Route exact path="/dashboard" component={Dashboard} />
-            <Route exact path="/create-app" component={CreateApp} />
-            <Route exact path="/select-sources" component={StepperController} />
-            <Route path="/about" component={AboutPage} />
+            <UnauthRoute
+              path="/login"
+              component={AuthenticationScreen}
+              redirectTo="/dashboard"
+              authenticated={props.authenticationStatus}
+            />
+
+            <AuthRoute
+              path="/dashboard"
+              component={Dashboard}
+              redirectTo="/login"
+              authenticated={props.authenticationStatus}
+            />
+
+            <AuthRoute
+              path="/create-app"
+              component={CreateApp}
+              redirectTo="/login"
+              authenticated={props.authenticationStatus}
+            />
+
+            <AuthRoute
+              path="/select-sources"
+              component={StepperController}
+              redirectTo="/login"
+              authenticated={props.authenticationStatus}
+            />
+
+            <AuthRoute
+              path="/about"
+              component={AboutPage}
+              redirectTo="/login"
+              authenticated={props.authenticationStatus}
+            />
+
+            <AuthRoute
+              component={NotFoundPage}
+              redirectTo="/login"
+              authenticated={props.authenticationStatus}
+            />
             <Route path="/storage" component={StorageDashboard} />
-            <Redirect from="/" to="/dashboard" />
-            <Route component={NotFoundPage} />
           </Switch>
         </main>
       </div>
@@ -65,4 +101,15 @@ const AppRouter = props => {
   );
 };
 
-export default withRoot(withStyles(styles)(AppRouter));
+const mapStateToProps = state => {
+  return {
+    authenticationStatus:
+      state.globals.authenticationStatus !== undefined
+        ? state.globals.authenticationStatus
+        : false
+  };
+};
+
+export default connect(mapStateToProps)(
+  withRoot(withStyles(styles)(AppRouter))
+);
