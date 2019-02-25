@@ -1,6 +1,6 @@
 {
   "extends": ["config:base"],
   "schedule": "every weekend",
-  "assignees": ["aorumbayev", "Ponsietta"],
+  "assignees": ["aorumbayev"],
   "baseBranches": ["dependency_updates"]
 }
