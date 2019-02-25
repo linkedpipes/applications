@@ -70,7 +70,7 @@ public class DiscoveryController {
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                                @RequestParam(value = NAMED_GRAPH_PARAM, required = false) String namedGraph) throws LpAppsException {
+                                                                @NotNull @RequestParam(NAMED_GRAPH_PARAM) String namedGraph) throws LpAppsException {
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -84,7 +84,7 @@ public class DiscoveryController {
     }
 
     @NotNull
-    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, String namedGraph) {
+    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull String namedGraph) {
         String hostUri = Application.getConfig().getString("lpa.hostUrl");
         return new DefaultUriBuilderFactory()
                 .uriString(hostUri + DataSourceController.TEMPLATE_DESCRIPTION_PATH)
