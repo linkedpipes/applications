@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.corundumstudio.socketio.listener.*;
 import com.corundumstudio.socketio.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
 
 import java.nio.charset.Charset;
 
@@ -21,6 +23,7 @@ public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
     public static final SocketIOServer SOCKET_IO_SERVER = getSocketIoServer();
+    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1);
 
     @Bean
     @SuppressWarnings("unused")

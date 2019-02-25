@@ -56,7 +56,7 @@ public class Execution implements Serializable {
         return this.executing;
     }
 
-    public void setExeecuting(boolean executing) {
+    public void setExecuting(boolean executing) {
         this.executing = executing;
     }
 }

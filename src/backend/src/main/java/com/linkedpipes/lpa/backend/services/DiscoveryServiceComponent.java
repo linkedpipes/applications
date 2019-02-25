@@ -29,8 +29,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,7 +43,6 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -92,7 +89,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
             }
         };
 
-        ScheduledFuture<?> checkerHandle = scheduler.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
 
         Runnable canceller = new Runnable() {
             @Override
@@ -105,7 +102,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
             }
         };
 
-        scheduler.schedule(canceller, 1, HOURS);
+        Application.SCHEDULER.schedule(canceller, 1, HOURS);
         return discoveryId;
     }
 

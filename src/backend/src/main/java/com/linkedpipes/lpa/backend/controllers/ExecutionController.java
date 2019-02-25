@@ -27,7 +27,7 @@ public class ExecutionController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Execution IRI not provided.");
         }
 
-        ExecutionStatus status = etlService.getExecutionStatus(executionIri);
+        String status = etlService.getExecutionStatus(executionIri);
         return ResponseEntity.ok(status);
     }
 
