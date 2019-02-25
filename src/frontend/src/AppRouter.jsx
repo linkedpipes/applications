@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-
 import NotFoundPage from "./containers/NotFoundPage";
 import { NavigationBar } from "./components/Navbar";
 import AboutPage from "./containers/AboutPage";
