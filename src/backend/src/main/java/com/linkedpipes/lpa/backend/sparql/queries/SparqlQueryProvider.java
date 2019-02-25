@@ -43,4 +43,5 @@ public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> imp
     protected B addAdditional(@NotNull B builder) {
         return builder;
     }
+
 }
