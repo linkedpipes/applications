@@ -4,17 +4,16 @@ import NotFoundPage from "./containers/NotFoundPage";
 import { NavigationBar } from "./components/Navbar";
 import AboutPage from "./containers/AboutPage";
 import withRoot from "./withRoot";
-import Redirect from "react-router-dom/es/Redirect";
 import { Dashboard } from "./components/Dashboard/Dashboard";
 import StepperController from "./components/SelectSources/StepperController";
 import CreateApp from "./components/CreateApp/CreateApp";
-import StorageDashboard from "./components/SOLID/StorageDashboard";
-import Grid from "@material-ui/core/Grid";
+import StorageAppsBrowserContainer from "./components/SOLID/StorageAppsBrowserContainer";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import { AuthRoute, UnauthRoute } from "react-router-auth";
-import AuthenticationScreen from "./components/Authentication/AuthenticationScreen";
+import AuthenticationScreen from "./components/Authentication";
 import connect from "react-redux/lib/connect/connect";
+import { PrivateRoute } from "@inrupt/solid-react-components";
 
 const styles = theme => ({
   root: {
@@ -53,47 +52,36 @@ const AppRouter = props => {
             <div className={classes.devBar}>DEVELOPMENT MODE</div>
           )}
           <Switch>
-            <UnauthRoute
-              path="/login"
-              component={AuthenticationScreen}
-              redirectTo="/dashboard"
-              authenticated={props.authenticationStatus}
-            />
-
-            <AuthRoute
+            <Route path="/login" component={AuthenticationScreen} />
+            <PrivateRoute
               path="/dashboard"
               component={Dashboard}
-              redirectTo="/login"
-              authenticated={props.authenticationStatus}
+              redirect="/login"
             />
-
-            <AuthRoute
+            <PrivateRoute
               path="/create-app"
               component={CreateApp}
-              redirectTo="/login"
-              authenticated={props.authenticationStatus}
+              redirect="/login"
             />
-
-            <AuthRoute
+            <PrivateRoute
               path="/select-sources"
               component={StepperController}
-              redirectTo="/login"
-              authenticated={props.authenticationStatus}
+              redirect="/login"
             />
 
-            <AuthRoute
+            <PrivateRoute
+              path="/storage"
+              component={StorageAppsBrowserContainer}
+              redirect="/login"
+            />
+
+            <PrivateRoute
               path="/about"
               component={AboutPage}
-              redirectTo="/login"
-              authenticated={props.authenticationStatus}
+              redirect="/login"
             />
 
-            <AuthRoute
-              component={NotFoundPage}
-              redirectTo="/login"
-              authenticated={props.authenticationStatus}
-            />
-            <Route path="/storage" component={StorageDashboard} />
+            <Route component={NotFoundPage} />
           </Switch>
         </main>
       </div>

@@ -1,104 +1,68 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
+import React from "react";
+import PropTypes from "prop-types";
+import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { AppBar, Toolbar, Typography } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
-import LoginRegister from "react-mui-login-register";
-import { setUserAuthenticationStatus } from "../../_actions/globals";
-import connect from "react-redux/lib/connect/connect";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import withStyles from "@material-ui/core/styles/withStyles";
+import { ProviderLogin } from "@inrupt/solid-react-components";
 
 const styles = theme => ({
-  root: {
-    fontFamily: theme.typography.fontFamily,
-    padding: 20
+  main: {
+    width: "auto",
+    display: "block", // Fix IE 11 issue.
+    marginLeft: theme.spacing.unit * 3,
+    marginRight: theme.spacing.unit * 3,
+    [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
+      width: 400,
+      marginLeft: "auto",
+      marginRight: "auto"
+    }
   },
-  footer: {
-    padding: "10px"
+  paper: {
+    marginTop: theme.spacing.unit * 8,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
+      .spacing.unit * 3}px`
   },
-  controls: {
-    margin: [[theme.spacing.unit * 2, 0]],
-    padding: theme.spacing.unit
+  avatar: {
+    margin: theme.spacing.unit,
+    backgroundColor: theme.palette.secondary.main
+  },
+  form: {
+    width: "100%", // Fix IE 11 issue.
+    marginTop: theme.spacing.unit
+  },
+  submit: {
+    marginTop: theme.spacing.unit * 3
   }
 });
 
-class AuthenticationScreen extends Component {
-  state = {
-    disableLocal: false,
-    disableRegister: false,
-    disableRegisterProviders: true
-  };
-
-  render() {
-    const { classes } = this.props;
-
-    const header = (
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" color="inherit">
-            Welcome to LinkedPipes Applications
-          </Typography>
-        </Toolbar>
-      </AppBar>
-    );
-
-    const footer = (
-      <div className={classes.footer}>
-        <Typography variant="caption" align="center">
-          Footer Goes Here
+function AuthenticationScreen(props) {
+  const { classes, webId } = props;
+  return (
+    <main className={classes.main}>
+      <CssBaseline />
+      <Paper className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign in
         </Typography>
-      </div>
-    );
-
-    return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <LoginRegister
-          header={header}
-          // footer={footer}
-          onLogin={this.handleLogin}
-          onRegister={this.handleRegister}
-          // onRegisterWithProvider={this.handleRegisterWithProvider}
-          disableLocal={this.state.disableLocal}
-          disableRegister={this.state.disableRegister}
-          providers={[]}
-          // disableRegisterProviders={this.state.disableRegisterProviders}
-        />
-      </div>
-    );
-  }
-
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.checked });
-  };
-
-  handleLogin = content => {
-    alert(`Logging in with content '${JSON.stringify(content)}'`);
-    this.props.dispatch(setUserAuthenticationStatus({ status: true }));
-    this.props.history.push("/dashboard");
-  };
-
-  handleLoginWithProvider = providerId => {
-    alert(`Logging in with provider '${providerId}'`);
-  };
-
-  handleRegister = content => {
-    alert(`Registering with content '${JSON.stringify(content)}'`);
-  };
-
-  handleRegisterWithProvider = providerId => {
-    alert(`Registering with provider '${providerId}'`);
-  };
+        <form className={classes.form}>
+          <ProviderLogin callbackUri={`${window.location.origin}/dashboard`} />
+        </form>
+      </Paper>
+    </main>
+  );
 }
 
-const mapStateToProps = state => {
-  return {
-    authenticationStatus:
-      state.globals.authenticationStatus !== undefined
-        ? state.globals.authenticationStatus
-        : false
-  };
+AuthenticationScreen.propTypes = {
+  classes: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps)(
-  withStyles(styles)(AuthenticationScreen)
-);
+export default withStyles(styles)(AuthenticationScreen);

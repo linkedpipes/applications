@@ -34,7 +34,7 @@ module.exports = () => {
       filename: "bundle.js"
     },
     resolve: {
-      extensions: [".js", ".jsx", ".mjs"]
+      extensions: [".js", ".jsx", ".mjs", ".ts"]
     },
     module: {
       rules: [
@@ -68,6 +68,8 @@ module.exports = () => {
     },
     mode: dev ? "development" : "production",
     plugins: plugins,
-    externals: {}
+    node: {
+      fs: "empty"
+    }
   };
 };
