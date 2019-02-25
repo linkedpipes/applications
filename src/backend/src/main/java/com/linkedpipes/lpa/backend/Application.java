@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.corundumstudio.socketio.listener.*;
+import com.corundumstudio.socketio.*;
 
 import java.nio.charset.Charset;
 
@@ -18,6 +20,7 @@ public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
+    public static final SocketIOServer SOCKET_IO_SERVER = getSocketIoServer();
 
     @Bean
     @SuppressWarnings("unused")
@@ -28,6 +31,17 @@ public class Application {
                 registry.addMapping("/**").allowedOrigins(getConfig().getString("lpa.allowedOrigins"));
             }
         };
+    }
+
+    public static SocketIOServer getSocketIoServer() {
+        Configuration config = new Configuration();
+        config.setHostname("localhost");
+        config.setPort(9092);
+
+        final SocketIOServer server = new SocketIOServer(config);
+
+        server.start();
+        return server;
     }
 
     public static void main(String[] args) {

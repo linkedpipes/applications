@@ -17,6 +17,9 @@ public class Discovery implements Serializable {
     @Column(nullable = false)
     private Date started;
 
+    @Column(nullable = false)
+    private boolean executing;
+
     @ManyToOne
     private User user;
 
@@ -35,6 +38,7 @@ public class Discovery implements Serializable {
     public void setDiscoveryStarted(String discoveryId, Date started) {
         this.discoveryId = discoveryId;
         this.started = started;
+        this.executing = true;
     }
 
     public String getDiscoveryId() {
@@ -47,5 +51,13 @@ public class Discovery implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public boolean getExecuting() {
+        return this.executing;
+    }
+
+    public void setExecuting(boolean executing) {
+        this.executing = executing;
     }
 }

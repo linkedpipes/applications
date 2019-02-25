@@ -17,6 +17,9 @@ public class Execution implements Serializable {
     @Column(nullable = false)
     private Date started;
 
+    @Column(nullable = false)
+    private boolean executing;
+
     @ManyToOne
     private User user;
 
@@ -47,5 +50,13 @@ public class Execution implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public boolean getExecuting() {
+        return this.executing;
+    }
+
+    public void setExeecuting(boolean executing) {
+        this.executing = executing;
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
+import com.linkedpipes.lpa.backend.entities.database.DiscoveryRepository;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
@@ -25,9 +26,15 @@ import org.springframework.stereotype.Service;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import static java.util.concurrent.TimeUnit.*;
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
 /**
@@ -38,9 +45,13 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
+
+    @Autowired
+    private DiscoveryRepository discoveryRepository;
 
     public DiscoveryServiceComponent(ApplicationContext context) {
         this.context = context;
@@ -58,10 +69,44 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
-    // TODO strongly type below method params (not simply string)
     @Override
     public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
-        return httpActions.getStatus(discoveryId);
+        Runnable checker = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String status = httpActions.getStatus(discoveryId);
+                    DiscoveryStatus discoveryStatus = OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
+                    if (discoveryStatus.isFinished) {
+                        Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", status);
+                        for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                            d.setExecuting(false);
+                        }
+
+                        throw new RuntimeException(); //this cancels the scheduler
+                    }
+                } catch (LpAppsException e) {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
+                    throw new RuntimeException(e); //this cancels the scheduler
+                }
+            }
+        };
+
+        ScheduledFuture<?> checkerHandle = scheduler.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+
+        Runnable canceller = new Runnable() {
+            @Override
+            public void run() {
+                checkerHandle.cancel(false);
+                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+                for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                    d.setExecuting(false);
+                }
+            }
+        };
+
+        scheduler.schedule(canceller, 1, HOURS);
+        return discoveryId;
     }
 
     @Override
