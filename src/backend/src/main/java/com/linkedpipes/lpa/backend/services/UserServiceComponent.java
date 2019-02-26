@@ -1,21 +1,21 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.UserProfile;
+import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
-
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
+@Profile("!disableDB")
 public class UserServiceComponent implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
 

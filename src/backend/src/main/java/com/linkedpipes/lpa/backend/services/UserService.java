@@ -9,15 +9,15 @@ import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import java.util.List;
 
 public interface UserService {
-    public UserProfile addUser(String user, String webId) throws UserTakenException;
-    public UserProfile updateUser(String user, String webId) throws UserNotFoundException;
-    public UserProfile getUserProfile(String user) throws UserNotFoundException;
+    UserProfile addUser(String user, String webId) throws UserTakenException;
+    UserProfile updateUser(String user, String webId) throws UserNotFoundException;
+    UserProfile getUserProfile(String user) throws UserNotFoundException;
 
-    public void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
-    public List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;
-    public void deleteUserDiscovery(String user, String discovery);
+    void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
+    List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;
+    void deleteUserDiscovery(String user, String discovery);
 
-    public void setUserExecution(String user, String execution) throws UserNotFoundException;
-    public List<Execution> getUserExecutions(String user) throws UserNotFoundException;
-    public void deleteUserExecution(String user, String execution);
+    void setUserExecution(String user, String execution) throws UserNotFoundException;
+    List<Execution> getUserExecutions(String user) throws UserNotFoundException;
+    void deleteUserExecution(String user, String execution);
 }

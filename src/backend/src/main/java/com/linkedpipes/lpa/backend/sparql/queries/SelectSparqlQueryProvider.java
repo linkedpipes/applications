@@ -5,8 +5,6 @@ import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
@@ -15,9 +13,6 @@ import org.slf4j.LoggerFactory;
  * {@link #addFilters(SelectBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
  */
 public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<SelectBuilder> {
-
-    @NotNull
-    private static final Logger logger = LoggerFactory.getLogger(SelectSparqlQueryProvider.class);
 
     @NotNull
     @Override
@@ -31,9 +26,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
             addOptionals(builder);
             addFilters(builder);
             addAdditional(builder);
-        }
-        catch (ParseException e) {
-            logger.error("Exception while parsing query", e);
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
@@ -54,9 +47,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
             addFilters(subQuery);
             builder.addGraph(VAR_GRAPH, subQuery);
             addAdditional(builder);
-
         } catch (ParseException e) {
-            logger.error("Exception while parsing query", e);
             throw new RuntimeException(e);
         }
 

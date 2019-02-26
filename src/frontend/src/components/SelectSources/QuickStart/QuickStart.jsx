@@ -11,12 +11,24 @@ import MapIcon from "@material-ui/icons/Map";
 import blue from "@material-ui/core/colors/blue";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import { setSelectedDatasourcesExample } from "../../../_actions/globals";
+import {
+  setSelectedDatasourcesExample,
+  changeTabAction
+} from "../../../_actions/globals";
 import connect from "react-redux/lib/connect/connect";
 
 const samples = [
   {
+    label: "Treemap Sample",
+    type: "Advanced",
+    sparqlEndpointIri: "https://linked.opendata.cz/sparql",
+    dataSampleIri:
+      "https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl",
+    namedGraph: "http://linked.opendata.cz/resource/dataset/cpv-2008"
+  },
+  {
     label: "DBPedia Earthquakes",
+    type: "Simple",
     URIS: [
       "https://ldcp.opendata.cz/resource/dbpedia/datasource-templates/Earthquake",
       "https://discovery.linkedpipes.com/resource/lod/templates/http---commons.dbpedia.org-sparql"
@@ -24,6 +36,7 @@ const samples = [
   },
   {
     label: "Wikidata Timeline & Map",
+    type: "Simple",
     URIS: [
       "https://discovery.linkedpipes.com/resource/discovery/wikidata-06/config",
       "https://discovery.linkedpipes.com/vocabulary/discovery/Input",
@@ -56,11 +69,15 @@ class QuickStartWidget extends React.Component {
     this.props.onClose("");
   };
 
-  handleListItemClick = uris => {
-    let value = uris.join(",\n");
+  handleListItemClick = sample => {
+    this.props.dispatch(
+      changeTabAction({
+        selectedTab: sample.type == "Simple" ? 0 : 1
+      })
+    );
     this.props.dispatch(
       setSelectedDatasourcesExample({
-        data: value
+        sample: sample
       })
     );
   };
@@ -82,7 +99,7 @@ class QuickStartWidget extends React.Component {
           {samples.map((sample, index) => (
             <ListItem
               button
-              onClick={() => this.handleListItemClick(sample.URIS)}
+              onClick={() => this.handleListItemClick(sample)}
               key={index}
             >
               <ListItemAvatar>
@@ -107,9 +124,7 @@ QuickStartWidget.propTypes = {
 };
 
 const mapStateToProps = state => {
-  return {
-    selectedDatasources: state.globals.datasourcesValues
-  };
+  return {};
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(QuickStartWidget));

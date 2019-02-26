@@ -13,10 +13,14 @@ export default class AdvancedSourcesInput extends Component {
       discoveryIsLoading,
       sparqlTextFieldHandler,
       dataSampleTextFieldHandler,
-      namedGraphTextFieldHandler
+      namedGraphTextFieldHandler,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph,
+      sparqlTextFieldValue,
+      dataSampleTextFieldValue,
+      namedTextFieldValue
     } = this.props;
-
-    const { sparqlTextFieldValue, dataSampleTextFieldValue } = this.state;
 
     return (
       <Grid container spacing={16}>
@@ -32,6 +36,9 @@ export default class AdvancedSourcesInput extends Component {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={
+              !sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri
+            }
           />
           <TextField
             id="outlined-textarea"
@@ -44,6 +51,7 @@ export default class AdvancedSourcesInput extends Component {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={!dataSampleIri ? dataSampleTextFieldValue : dataSampleIri}
           />
           <TextField
             id="outlined-textarea"
@@ -56,6 +64,7 @@ export default class AdvancedSourcesInput extends Component {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={!namedGraph ? namedTextFieldValue : namedGraph}
           />
         </Grid>
       </Grid>

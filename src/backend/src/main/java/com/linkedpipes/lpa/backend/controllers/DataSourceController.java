@@ -16,7 +16,7 @@ import static com.linkedpipes.lpa.backend.util.Memoizer.memoize;
 public class DataSourceController {
 
     @NotNull
-    public static final String TEMPLATE_DESCRIPTION_PATH = "/api/datasources/template";
+    private static final String TEMPLATE_DESCRIPTION_PATH = "/api/datasources/template";
 
     @NotNull
     private static final String SPARQL_ENDPOINT_IRI_PARAM = DiscoveryController.SPARQL_ENDPOINT_IRI_PARAM;
