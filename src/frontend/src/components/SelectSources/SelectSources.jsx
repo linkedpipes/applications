@@ -133,9 +133,15 @@ class SelectSources extends React.Component {
 
   postStartFromSparqlEndpoint = () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri,
-      namedGraph: this.state.namedGraph
+      sparqlEndpointIri: !this.props.sparqlEndpointIri
+        ? this.state.sparqlTextFieldValue
+        : this.props.sparqlEndpointIri,
+      dataSampleIri: !this.props.dataSampleIri
+        ? dataSampleTextFieldValue
+        : this.props.dataSampleIri,
+      namedGraph: !this.props.namedGraph
+        ? namedTextFieldValue
+        : this.props.namedGraph
     }).then(function(response) {
       return response.json();
     });
