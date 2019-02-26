@@ -14,7 +14,10 @@ import { getDatasourcesArray } from "../../_selectors/datasources";
 import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
 import { addDiscoveryIdAction } from "../../_actions/globals";
 import Grid from "@material-ui/core/Grid";
-import { setSelectedDatasourcesExample } from "../../_actions/globals";
+import {
+  setSelectedDatasourcesExample,
+  changeTabAction
+} from "../../_actions/globals";
 import SimpleSourcesInput from "./InputModes/Simple/SimpleSourcesInput";
 
 import SwipeableViews from "react-swipeable-views";
@@ -58,21 +61,31 @@ class SelectSources extends React.Component {
     discoveryStatusPollingInterval: 2000,
     discoveryLoadingLabel: "",
     tabValue: 0,
-    sparqlEndpointIri: "",
-    dataSampleIri: "",
-    namedGraph: ""
+    sparqlTextFieldValue: "",
+    dataSampleTextFieldValue: "",
+    namedTextFieldValue: ""
   };
 
   handleChange = (event, newValue) => {
-    this.setState({
-      tabValue: newValue
-    });
+    this.props.dispatch(
+      changeTabAction({
+        selectedTab: newValue
+      })
+    );
+    // this.setState({
+    //   tabValue: newValue
+    // });
   };
 
   handleChangeIndex = index => {
-    this.setState({
-      tabValue: index
-    });
+    this.props.dispatch(
+      changeTabAction({
+        selectedTab: index
+      })
+    );
+    // this.setState({
+    //   tabValue: index
+    // });
   };
 
   handleClickOpen = () => {
@@ -120,9 +133,15 @@ class SelectSources extends React.Component {
 
   postStartFromSparqlEndpoint = () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri,
-      namedGraph: this.state.namedGraph
+      sparqlEndpointIri: !this.props.sparqlEndpointIri
+        ? this.state.sparqlTextFieldValue
+        : this.props.sparqlEndpointIri,
+      dataSampleIri: !this.props.dataSampleIri
+        ? dataSampleTextFieldValue
+        : this.props.dataSampleIri,
+      namedGraph: !this.props.namedGraph
+        ? namedTextFieldValue
+        : this.props.namedGraph
     }).then(function(response) {
       return response.json();
     });
@@ -143,7 +162,7 @@ class SelectSources extends React.Component {
   };
 
   handleDiscoveryInputCase = () => {
-    if (this.state.tabValue === 1) {
+    if (this.props.selectedTab === 1) {
       return this.postStartFromSparqlEndpoint();
     } else {
       if (this.state.ttlFile) {
@@ -300,32 +319,43 @@ class SelectSources extends React.Component {
   setSparqlIri = e => {
     let rawText = e.target.value;
     this.setState({
-      sparqlEndpointIri: rawText
+      sparqlTextFieldValue: rawText
     });
   };
 
   setDataSampleIri = e => {
     let rawText = e.target.value;
     this.setState({
-      dataSampleIri: rawText
+      dataSampleTextFieldValue: rawText
     });
   };
 
   setNamedGraph = e => {
     let rawText = e.target.value;
     this.setState({
-      namedGraph: rawText
+      namedTextFieldValue: rawText
     });
   };
 
   render() {
-    const { classes, selectedDatasources } = this.props;
+    const {
+      classes,
+      selectedDatasources,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph,
+      selectedTab
+    } = this.props;
     const self = this;
+
     const {
       discoveryIsLoading,
       textFieldValue,
       textFieldIsValid,
-      discoveryLoadingLabel
+      discoveryLoadingLabel,
+      sparqlTextFieldValue,
+      dataSampleTextFieldValue,
+      namedTextFieldValue
     } = this.state;
 
     return (
@@ -343,7 +373,7 @@ class SelectSources extends React.Component {
                     className={classes.appBar}
                   >
                     <Tabs
-                      value={self.state.tabValue}
+                      value={selectedTab}
                       onChange={self.handleChange}
                       indicatorColor="primary"
                       textColor="primary"
@@ -358,7 +388,7 @@ class SelectSources extends React.Component {
                 <Grid item xs={12} sm={12}>
                   <SwipeableViews
                     axis={"x"}
-                    index={self.state.tabValue}
+                    index={selectedTab}
                     onChangeIndex={self.handleChangeIndex}
                   >
                     <SimpleSourcesInput
@@ -376,6 +406,12 @@ class SelectSources extends React.Component {
                       sparqlTextFieldHandler={self.setSparqlIri}
                       dataSampleTextFieldHandler={self.setDataSampleIri}
                       namedGraphTextFieldHandler={self.setNamedGraph}
+                      sparqlEndpointIri={sparqlEndpointIri}
+                      dataSampleIri={dataSampleIri}
+                      namedGraph={namedGraph}
+                      sparqlTextFieldValue={sparqlTextFieldValue}
+                      dataSampleTextFieldValue={dataSampleTextFieldValue}
+                      namedTextFieldValue={namedTextFieldValue}
                     />
                   </SwipeableViews>
                 </Grid>
@@ -417,7 +453,11 @@ const mapStateToProps = state => {
   return {
     datasources: getDatasourcesArray(state.datasources),
     discoveryId: state.globals.discoveryId,
-    selectedDatasources: state.globals.datasourcesValues
+    selectedDatasources: state.globals.datasourcesValues,
+    sparqlEndpointIri: state.globals.sparqlEndpointIri,
+    dataSampleIri: state.globals.dataSampleIri,
+    namedGraph: state.globals.namedGraph,
+    selectedTab: state.globals.selectedTab
   };
 };
 

@@ -26,11 +26,7 @@ export default class SimpleSourcesInput extends Component {
             disabled={discoveryIsLoading}
             className={classes.textField}
             multiline
-            value={
-              selectedDatasources === undefined
-                ? textFieldValue
-                : selectedDatasources
-            }
+            value={!selectedDatasources ? textFieldValue : selectedDatasources}
             onChange={this.props.validateField}
             placeholder="Input your sources..."
             fullWidth

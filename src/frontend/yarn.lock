@@ -5789,6 +5789,13 @@ react-filepond@7.0.1:
   resolved "https://registry.yarnpkg.com/react-filepond/-/react-filepond-7.0.1.tgz#caf96526287140884a31a1476b8328d9d6ecdee2"
   integrity sha512-PitNM44JP0K5hXnkSYV3HRlkObsWbhqaJRWizMrdHpS3pPz9/iyiOGmRpc+4T4ST3vblmiUTLRYq/+1bDcSqQw==
 
+react-google-charts@^3.0.10:
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-3.0.10.tgz#295217895c456b98b2f291322af3e77303cd245e"
+  integrity sha512-4ECk/Fua1G3tOQuDdMaKrA8QFO/meRihDjNeniPQD2ApwHBJQg6S2cWdovGMcnq6LxEG5Ol3gm7xNE8WXm+r2w==
+  dependencies:
+    react-load-script "^0.0.6"
+
 react-google-maps@9.4.x:
   version "9.4.5"
   resolved "https://registry.yarnpkg.com/react-google-maps/-/react-google-maps-9.4.5.tgz#920c199bdc925e0ce93880edffb09428d263aafa"
@@ -5825,6 +5832,11 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.2, react-lifecycles
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
+
+react-load-script@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/react-load-script/-/react-load-script-0.0.6.tgz#db6851236aaa25bb622677a2eb51dad4f8d2c258"
+  integrity sha512-aRGxDGP9VoLxcsaYvKWIW+LRrMOzz2eEcubTS4NvQPPugjk2VvMhow0wWTkSl7RxookomD1MwcP4l5UStg5ShQ==
 
 react-modal@^3.5.1:
   version "3.8.1"

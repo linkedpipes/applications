@@ -25,6 +25,7 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-filepond": "7.0.1",
+    "react-google-charts": "^3.0.10",
     "react-google-maps": "9.4.x",
     "react-json-view": "^1.19.1",
     "react-modal": "^3.5.1",
