@@ -8,7 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import DiscoverPipelinesHeaderComponent from './DiscoverPipelinesHeaderComponent';
+import DiscoverPipelinesHeader from './DiscoverPipelinesHeaderComponent';
 import uuid from 'uuid';
 
 function desc(a, b, orderBy) {
@@ -51,18 +51,12 @@ const DiscoverPipelinesPickerComponent = ({
   loadingButtons,
   emptyRows,
   exportAndStartPolling,
-  handleRequestSort,
   discoveryId
 }) => (
   <Paper className={classes.root}>
     <div className={classes.tableWrapper}>
       <Table className={classes.table} aria-labelledby="tableTitle">
-        <DiscoverPipelinesHeaderComponent
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-          rowCount={dataSourceGroups.length}
-        />
+        <DiscoverPipelinesHeader />
         <TableBody>
           {dataSourceGroups
             .sort(getSorting(order, orderBy))
@@ -116,7 +110,16 @@ const DiscoverPipelinesPickerComponent = ({
 );
 
 DiscoverPipelinesPickerComponent.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  dataSourceGroups: PropTypes.any,
+  discoveryId: PropTypes.any,
+  emptyRows: PropTypes.any,
+  exportAndStartPolling: PropTypes.any,
+  loadingButtons: PropTypes.any,
+  order: PropTypes.any,
+  orderBy: PropTypes.any,
+  page: PropTypes.any,
+  rowsPerPage: PropTypes.any
 };
 
 export default withStyles(styles)(DiscoverPipelinesPickerComponent);

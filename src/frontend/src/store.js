@@ -8,6 +8,8 @@ import markers from './_reducers/markers';
 import logger from 'redux-logger';
 import globals from './_reducers/globals';
 import { discoverReducer } from './Discover';
+import Reactotron from './ReactotronConfig';
+import thunk from 'redux-thunk';
 
 const composeEnhancers =
   typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
@@ -16,10 +18,12 @@ const composeEnhancers =
       })
     : compose;
 
-const enhancer = composeEnhancers(applyMiddleware(logger));
+const middlewares = [thunk, logger];
+
+const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 
 export default () => {
-  const store = createStore(
+  const store = Reactotron.createStore(
     combineReducers({
       globals,
       discover: discoverReducer,

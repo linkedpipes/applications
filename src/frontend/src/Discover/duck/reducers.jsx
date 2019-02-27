@@ -1,7 +1,7 @@
 import types from './types';
 
 const INITIAL_STATE = {
-  activeStep: 2,
+  activeStep: 0,
   selectedInputExample: ''
 };
 
@@ -10,39 +10,38 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
     case types.INCREMENT_ACTIVE_STEP: {
       const { value } = action;
       const { activeStep } = state;
-      return {
+      return Object.assign({}, state, {
         ...state,
         activeStep: activeStep + value
-      };
+      });
     }
 
     case types.DECREMENT_ACTIVE_STEP: {
       const { value } = action;
       const { activeStep } = state;
-      return {
+      return Object.assign({}, state, {
         ...state,
         activeStep: activeStep - value
-      };
+      });
     }
 
     case types.RESET_ACTIVE_STEP: {
-      return {
+      return Object.assign({}, state, {
         ...state,
         activeStep: 0
-      };
+      });
     }
 
     case types.SET_SELECTED_INPUT_EXAMPLE: {
       const { value } = action;
-      return {
+      return Object.assign({}, state, {
         ...state,
         selectedInputExample: value
-      };
+      });
     }
 
-    default: {
+    default:
       return state;
-    }
   }
 };
 

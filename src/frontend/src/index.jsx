@@ -3,7 +3,6 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import * as Sentry from '@sentry/browser';
 import store from './store';
-
 import 'normalize.css/normalize.css';
 import AppRouter from './AppRouter';
 

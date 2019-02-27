@@ -7,37 +7,7 @@ import { addSingleExecution } from '../../_actions/etl_executions';
 import { addSingleExport } from '../../_actions/etl_exports';
 import { addSelectedResultGraphIriAction } from '../../_actions/globals';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
-
-function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getSorting(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => desc(a, b, orderBy)
-    : (a, b) => -desc(a, b, orderBy);
-}
-
-const rows = [
-  {
-    id: 'label',
-    numeric: false,
-    disablePadding: true,
-    label: 'Label'
-  },
-  {
-    id: 'uri',
-    numeric: false,
-    disablePadding: false,
-    label: 'Uri'
-  }
-];
+import ErrorBoundary from 'react-error-boundary';
 
 const EXECUTION_STATUS_TIMEOUT = 10000;
 
@@ -51,7 +21,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   };
 
   updateLoadingButton = (loadingButtonId, enabled) => {
-    const loadingButtons = this.state.loadingButtons;
+    const { loadingButtons } = this.state.loadingButtons;
 
     if (enabled) {
       delete loadingButtons[loadingButtonId];
@@ -83,8 +53,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
           });
       })
       .catch(error => {
-        console.log(error.message);
-
         // Enable the fields
         self.updateLoadingButton(loadingButtonId, true);
 
@@ -101,8 +69,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   exportPipeline = (discoveryId, pipelineId) => {
     const self = this;
 
-    console.log('Sending the execute pipeline request...');
-
     return ETLService.getExportPipeline({
       discoveryId,
       pipelineId
@@ -111,8 +77,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
         return response.json();
       })
       .then(json => {
-        console.log(`Export pipeline request sent!`);
-
         const response = json;
 
         self.props.dispatch(
@@ -204,7 +168,8 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
           if (status === ETL_STATUS_TYPE.Failed) {
             toast.update(tid, {
               render:
-                'Sorry, the ETL is unable to execute the pipeline, try selecting different source...',
+                `Sorry, the ETL is unable to execute the pipeline, try${ 
+                +'selecting different source...'}`,
               type: toast.TYPE.ERROR,
               autoClose: EXECUTION_STATUS_TIMEOUT
             });
@@ -227,60 +192,51 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
       });
   };
 
-  handleRequestSort = (event, property) => {
-    const orderBy = property;
-    let order = 'desc';
-
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc';
-    }
-
-    this.setState({ order, orderBy });
-  };
-
   handleChangePage = (event, page) => {
     this.setState({ page });
   };
 
   render() {
     const { order, orderBy, rowsPerPage, loadingButtons, page } = this.state;
-    const { dataSourceGroups, discoveryId, selectedVisualizer } = this.props;
+    const { dataSourceGroups, discoveryId } = this.props;
     const emptyRows =
       rowsPerPage -
       Math.min(rowsPerPage, dataSourceGroups.length - page * rowsPerPage);
 
     return (
-      <DiscoverPipelinesPickerComponent
-        order={order}
-        orderBy={orderBy}
-        dataSourceGroups={dataSourceGroups}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        loadingButtons={loadingButtons}
-        emptyRows={emptyRows}
-        exportAndStartPolling={exportAndStartPolling}
-        handleRequestSort={handleRequestSort}
-        discoveryId={discoveryId}
-      />
+      <ErrorBoundary>
+        <DiscoverPipelinesPickerComponent
+          order={order}
+          orderBy={orderBy}
+          dataSourceGroups={dataSourceGroups}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          loadingButtons={loadingButtons}
+          emptyRows={emptyRows}
+          exportAndStartPolling={this.exportAndStartPolling}
+          discoveryId={discoveryId}
+        />
+      </ErrorBoundary>
     );
   }
 }
 
 DiscoverPipelinesPickerContainer.propTypes = {
-  classes: PropTypes.object.isRequired
+  dataSourceGroups: PropTypes.any,
+  discoveryId: PropTypes.any,
+  executions: PropTypes.any
 };
 
 const mapStateToProps = state => {
   return {
     exportsDict: state.etl_exports,
     executions: state.etl_executions,
-
     discoveryId: state.globals.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     dataSourceGroups:
       state.globals.selectedVisualizer !== undefined
         ? state.globals.selectedVisualizer.dataSourceGroups
-        : state.globals.selectedVisualizer
+        : []
   };
 };
 

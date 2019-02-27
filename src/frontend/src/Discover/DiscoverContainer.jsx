@@ -1,14 +1,12 @@
 import { connect } from 'react-redux';
 import DiscoverComponent from './DiscoverComponent';
-import { discoverOperations } from './duck';
+import { discoverActions } from './duck';
 
 const mapDispatchToProps = dispatch => {
   // '1' is the number by which you want to increment the count
-  const onNextClicked = () =>
-    dispatch(discoverOperations.incrementActiveStep(1));
-  const onBackClicked = () =>
-    dispatch(discoverOperations.decrementActiveStep(1));
-  const onResetClicked = () => dispatch(discoverOperations.resetActiveStep());
+  const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
+  const onBackClicked = () => dispatch(discoverActions.decrementActiveStep(1));
+  const onResetClicked = () => dispatch(discoverActions.resetActiveStep());
 
   return {
     onNextClicked,

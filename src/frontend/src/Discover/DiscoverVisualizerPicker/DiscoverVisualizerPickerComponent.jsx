@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
-import VisualizerCard from './children/DiscoverVisualizerCardComponent';
+import DiscoverVisualizerCard from './children';
 import classNames from 'classnames';
 import Emoji from 'react-emoji-render';
 
@@ -42,14 +42,7 @@ const styles = theme => ({
   }
 });
 
-const DiscoverVisualizerPickerComponent = ({
-  classes,
-  visualizers,
-  discoveryId,
-  handleNextStep,
-  hasOneVisualizer,
-  onSelectVisualizer
-}) => (
+const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
   <div className={classNames(classes.layout, classes.cardGrid)}>
     <Grid container className={classes.root} spacing={40}>
       <Grid container className={classes.demo} justify="center" spacing={16}>
@@ -69,13 +62,7 @@ const DiscoverVisualizerPickerComponent = ({
         ) : (
           visualizers.map((value, index) => (
             <Grid key={index} item sm={6} md={4} lg={3}>
-              <VisualizerCard
-                visualizerData={value}
-                discoveryId={discoveryId}
-                handleNextStep={handleNextStep}
-                hasOneVisualizer={hasOneVisualizer}
-                onSelectVisualizer={onSelectVisualizer}
-              />
+              <DiscoverVisualizerCard visualizerData={value} />
             </Grid>
           ))
         )}
@@ -86,10 +73,6 @@ const DiscoverVisualizerPickerComponent = ({
 
 DiscoverVisualizerPickerComponent.propTypes = {
   classes: PropTypes.object.isRequired,
-  discoveryId: PropTypes.any,
-  handleNextStep: PropTypes.any,
-  hasOneVisualizer: PropTypes.any,
-  onSelectVisualizer: PropTypes.any,
   visualizers: PropTypes.any
 };
 

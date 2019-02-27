@@ -7,7 +7,6 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import connect from 'react-redux/lib/connect/connect';
 import MapIcon from '@material-ui/icons/Map';
 
 const styles = {
@@ -30,7 +29,7 @@ const styles = {
 const DiscoverVisualizerCardComponent = ({
   classes,
   visualizerData,
-  onSelectVisualizer
+  handleSelectVisualizer
 }) => (
   <Card className={classes.card}>
     <CardActionArea style={{ textAlign: 'center' }}>
@@ -43,7 +42,7 @@ const DiscoverVisualizerCardComponent = ({
       </CardContent>
     </CardActionArea>
     <CardActions classes={{ root: classes.root }}>
-      <Button size="small" color="primary" onClick={onSelectVisualizer}>
+      <Button size="small" color="primary" onClick={handleSelectVisualizer}>
         Select Vizualizer
       </Button>
     </CardActions>
@@ -52,8 +51,8 @@ const DiscoverVisualizerCardComponent = ({
 
 DiscoverVisualizerCardComponent.propTypes = {
   classes: PropTypes.object.isRequired,
-  onSelectVisualizer: PropTypes.any,
+  handleSelectVisualizer: PropTypes.any,
   visualizerData: PropTypes.any
 };
 
-export default connect()(withStyles(styles)(DiscoverVisualizerCardComponent));
+export default withStyles(styles)(DiscoverVisualizerCardComponent);

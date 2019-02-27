@@ -3,12 +3,20 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-const DiscoverPipelinesHeaderComponent = (
-  order,
-  orderBy,
-  rows,
-  createSortHandler
-) => (
+const rows = [
+  {
+    id: 'label',
+    disablePadding: true,
+    label: 'Label'
+  },
+  {
+    id: 'uri',
+    disablePadding: false,
+    label: 'Uri'
+  }
+];
+
+const DiscoverPipelinesHeaderComponent = () => (
   <TableHead>
     <TableRow>
       <TableCell component="th" scope="row" padding="dense">
@@ -16,25 +24,8 @@ const DiscoverPipelinesHeaderComponent = (
       </TableCell>
       {rows.map(row => {
         return (
-          <TableCell
-            key={row.id}
-            numeric={row.numeric}
-            padding={row.disablePadding ? 'none' : 'default'}
-            sortDirection={orderBy === row.id ? order : false}
-          >
-            <Tooltip
-              title="Sort"
-              placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-              enterDelay={300}
-            >
-              <TableSortLabel
-                active={orderBy === row.id}
-                direction={order}
-                onClick={this.createSortHandler(row.id)}
-              >
-                {row.label}
-              </TableSortLabel>
-            </Tooltip>
+          <TableCell key={row.id} align="left">
+            {row.label}
           </TableCell>
         );
       }, this)}

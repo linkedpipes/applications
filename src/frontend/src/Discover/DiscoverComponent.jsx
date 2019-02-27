@@ -41,6 +41,8 @@ const getStepContent = step => {
       return <DiscoverInputSources />;
     case 1:
       return <DiscoverVisualizerPicker />;
+    case 2:
+      return <DiscoverPipelinesPicker />;
 
     default:
       return 'Unknown step';
@@ -75,9 +77,7 @@ const DiscoverComponent = ({
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              {step === 0 && <DiscoverInputSources />}
-              {step === 1 && <DiscoverVisualizerPicker />}
-              {step === 2 && <DiscoverPipelinesPicker />}
+              {getStepContent(step)}
               {step > 0 && (
                 <div className={classes.actionsContainer}>
                   <div>
@@ -124,8 +124,7 @@ DiscoverComponent.propTypes = {
   classes: PropTypes.object.isRequired,
   onBackClicked: PropTypes.func,
   onNextClicked: PropTypes.func,
-  onResetClicked: PropTypes.func,
-  steps: PropTypes.array
+  onResetClicked: PropTypes.func
 };
 
 export default withStyles(styles)(DiscoverComponent);

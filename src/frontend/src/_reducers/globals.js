@@ -9,7 +9,9 @@ export default (state = INITIAL_STATE, action) => {
     case 'SET_SELECTED_DATASOURCES_EXAMPLE':
       return { ...state, datasourcesValues: action.datasourcesValues };
     case 'SET_SELECTED_VISUALIZER':
-      return { ...state, selectedVisualizer: action.selectedVisualizer };
+      return Object.assign({}, state, {
+        selectedVisualizer: action.selectedVisualizer
+      });
     case 'SET_SELECTED_RESULT_GRAPH_IRI':
       return {
         ...state,

@@ -2,15 +2,17 @@
 export const addDiscoveryIdAction = ({ id } = {}) => ({
   type: 'SET_DISCOVERY_ID',
   discovery: {
-    id: id
+    id
   }
 });
 
 // ADD_SELECTED_VIZUALIZER
-export const addSelectedVisualizerAction = ({ data } = {}) => ({
-  type: 'SET_SELECTED_VISUALIZER',
-  selectedVisualizer: data
-});
+export const addSelectedVisualizerAction = ({ data } = {}) => {
+  return {
+    type: 'SET_SELECTED_VISUALIZER',
+    selectedVisualizer: data
+  };
+};
 
 // SET_SELECTED_DATASOURCES_EXAMPLE
 export const setSelectedDatasourcesExample = ({ data } = {}) => ({

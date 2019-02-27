@@ -1,12 +1,11 @@
 import DiscoverInputSourcesComponent from './DiscoverInputSourcesComponent';
-import { discoverOperations } from '../duck';
+import { discoverActions } from '../duck';
 import { connect } from 'react-redux';
 
 const mapDispatchToProps = dispatch => {
   const onInputExampleClicked = value =>
-    dispatch(discoverOperations.setSelectedInputExample(value));
-  const onNextClicked = () =>
-    dispatch(discoverOperations.incrementActiveStep(1));
+    dispatch(discoverActions.setSelectedInputExample(value));
+  const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
 
   return {
     onInputExampleClicked,

@@ -1,10 +1,36 @@
-import { createActions } from 'reduxsauce';
+import types from './types';
 
-const { Creators, Types } = createActions({
-  incrementActiveStep: ['value'],
-  decrementActiveStep: ['value'],
-  resetActiveStep: ['value'],
-  setSelectedInputExample: ['value']
-});
+export const incrementActiveStep = value => {
+  return {
+    type: types.INCREMENT_ACTIVE_STEP,
+    value
+  };
+};
 
-export { Creators, Types };
+export const decrementActiveStep = value => {
+  return {
+    type: types.DECREMENT_ACTIVE_STEP,
+    value
+  };
+};
+
+export const resetActiveStep = value => {
+  return {
+    type: types.RESET_ACTIVE_STEP,
+    value
+  };
+};
+
+export const setSelectedInputExample = value => {
+  return {
+    type: types.SET_SELECTED_INPUT_EXAMPLE,
+    value
+  };
+};
+
+export default {
+  incrementActiveStep,
+  decrementActiveStep,
+  resetActiveStep,
+  setSelectedInputExample
+};
