@@ -21,7 +21,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   };
 
   updateLoadingButton = (loadingButtonId, enabled) => {
-    const { loadingButtons } = this.state.loadingButtons;
+    const { loadingButtons } = this.state;
 
     if (enabled) {
       delete loadingButtons[loadingButtonId];
@@ -167,9 +167,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
           self.updateLoadingButton(loadingButtonId, true);
           if (status === ETL_STATUS_TYPE.Failed) {
             toast.update(tid, {
-              render:
-                `Sorry, the ETL is unable to execute the pipeline, try${ 
-                +'selecting different source...'}`,
+              render: `Sorry, the ETL is unable to execute the pipeline, try${+'selecting different source...'}`,
               type: toast.TYPE.ERROR,
               autoClose: EXECUTION_STATUS_TIMEOUT
             });
