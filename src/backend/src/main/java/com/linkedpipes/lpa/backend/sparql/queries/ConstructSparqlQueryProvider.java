@@ -22,6 +22,7 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
         addConstructs(builder);
         addWheres(builder);
         addOptionals(builder);
+        addAdditional(builder);
 
         return builder.build();
     }
@@ -37,6 +38,7 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
 
         builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
 
+        addAdditional(builder);
         return builder.build();
     }
 
