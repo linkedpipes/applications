@@ -57,13 +57,17 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     @Override
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        getDiscoveryStatus(result.id);
+        return result;
     }
 
     @Override
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        getDiscoveryStatus(result.id);
+        return result;
     }
 
     @Override
@@ -75,6 +79,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
                     String status = httpActions.getStatus(discoveryId);
                     DiscoveryStatus discoveryStatus = OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
                     if (discoveryStatus.isFinished) {
+                        logger.info("Reporting discovery finished in room " + discoveryId);
                         Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", status);
                         for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                             d.setExecuting(false);
