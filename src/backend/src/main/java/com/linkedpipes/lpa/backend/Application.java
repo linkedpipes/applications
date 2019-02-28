@@ -38,17 +38,21 @@ public class Application {
 
     public static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();
-        config.setHostname("localhost");
         config.setPort(9092);
+        SocketConfig socketConfig = new SocketConfig();
+        socketConfig.setReuseAddress(true);
+        config.setSocketConfig(socketConfig);
+        logger.info("Called getSocketIOServer");
 
-        final SocketIOServer server = new SocketIOServer(config);
-
-        server.start();
-        return server;
+        return new SocketIOServer(config);
     }
 
     public static void main(String[] args) {
+
         SpringApplication.run(Application.class, args);
+
+        SOCKET_IO_SERVER.start();
+
         logger.info("Application started");
     }
 
