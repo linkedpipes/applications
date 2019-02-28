@@ -44,7 +44,25 @@ public class Application {
         config.setSocketConfig(socketConfig);
         logger.info("Called getSocketIOServer");
 
-        return new SocketIOServer(config);
+        SocketIOServer server = new SocketIOServer(config);
+
+        server.addEventListener("join", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) throws Exception {
+                logger.info("Client joined room: " + roomName);
+                socketIOClient.joinRoom(roomName);
+            }
+        });
+
+        server.addEventListener("leave", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) throws Exception {
+                logger.info("Client left room: " + roomName);
+                socketIOClient.leaveRoom(roomName);
+            }
+        });
+
+        return server;
     }
 
     public static void main(String[] args) {

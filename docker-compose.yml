@@ -19,6 +19,7 @@ services:
       context: src/backend/
     ports:
       - 9005:9005
+      - 9092:9092
     restart: on-failure
     depends_on:
       - etl

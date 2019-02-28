@@ -15,6 +15,7 @@ FROM openjdk:11-jre-slim
 
 # Expose port 8080
 EXPOSE 9005
+EXPOSE 9092
 
 COPY --from=builder /app/build/dependency/BOOT-INF/lib /app/lib
 COPY --from=builder /app/build/dependency/META-INF /app/META-INF
