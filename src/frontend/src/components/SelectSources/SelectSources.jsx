@@ -1,26 +1,24 @@
-// import React from 'react';
-// import PropTypes from 'prop-types';
-// import { withStyles } from '@material-ui/core/styles';
-// import Card from '@material-ui/core/Card';
-// import CardContent from '@material-ui/core/CardContent';
-// import Button from '@material-ui/core/Button';
-// import { connect } from 'react-redux';
-// import { toast } from 'react-toastify';
-// import { addVisualizer } from '../../_actions/visualizers';
-// import 'react-toastify/dist/ReactToastify.css';
-// import { DiscoveryService } from '../../_services';
-// import { extractUrlGroups } from '../../_helpers';
-// import { getDatasourcesArray } from '../../_selectors/datasources';
-// import LinearLoadingIndicator from '../Loaders/LinearLoadingIndicator';
-// import { addDiscoveryIdAction } from '../../_actions/globals';
-// import Grid from '@material-ui/core/Grid';
-// import { setSelectedDatasourcesExample } from '../../_actions/globals';
-// import SimpleSourcesInput from './InputModes/Simple/SimpleSourcesInput';
-// import SwipeableViews from 'react-swipeable-views';
-// import AppBar from '@material-ui/core/AppBar';
-// import Tabs from '@material-ui/core/Tabs';
-// import Tab from '@material-ui/core/Tab';
-// import AdvancedSourcesInput from './InputModes/Advanced/AdvancedSourcesInput';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Button from "@material-ui/core/Button";
+import { connect } from "react-redux";
+import { addVisualizer } from "../../_actions/visualizers";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { DiscoveryService } from "../../_services";
+import { extractUrlGroups } from "../../_helpers";
+import { getDatasourcesArray } from "../../_selectors/datasources";
+import LinearLoadingIndicator from "../Loaders/LinearLoadingIndicator";
+import { addDiscoveryIdAction } from "../../_actions/globals";
+import Grid from "@material-ui/core/Grid";
+import {
+  setSelectedDatasourcesExample,
+  changeTabAction
+} from "../../_actions/globals";
+import SimpleSourcesInput from "./InputModes/Simple/SimpleSourcesInput";
 
 // const styles = theme => ({
 //   root: {
@@ -62,23 +60,44 @@
 //     namedGraph: ''
 //   };
 
-//   handleChange = (event, newValue) => {
-//     this.setState({
-//       tabValue: newValue
-//     });
-//   };
+class SelectSources extends React.Component {
+  state = {
+    ttlFile: undefined,
+    discoveryIsLoading: false,
+    textFieldValue: "",
+    textFieldIsValid: false,
+    open: false,
+    discoveryStatusPolling: undefined,
+    discoveryStatusPollingFinished: false,
+    discoveryStatusPollingInterval: 2000,
+    discoveryLoadingLabel: "",
+    tabValue: 0,
+    sparqlTextFieldValue: "",
+    dataSampleTextFieldValue: "",
+    namedTextFieldValue: ""
+  };
 
-//   handleChangeIndex = index => {
-//     this.setState({
-//       tabValue: index
-//     });
-//   };
+  handleChange = (event, newValue) => {
+    this.props.dispatch(
+      changeTabAction({
+        selectedTab: newValue
+      })
+    );
+    // this.setState({
+    //   tabValue: newValue
+    // });
+  };
 
-//   handleClickOpen = () => {
-//     this.setState({
-//       open: true
-//     });
-//   };
+  handleChangeIndex = index => {
+    this.props.dispatch(
+      changeTabAction({
+        selectedTab: index
+      })
+    );
+    // this.setState({
+    //   tabValue: index
+    // });
+  };
 
 //   postStartFromFile = () => {
 //     const self = this;
@@ -127,9 +146,21 @@
 //     });
 //   };
 
-//   addDiscoveryId = response => {
-//     const self = this;
-//     const discoveryId = response.id;
+  postStartFromSparqlEndpoint = () => {
+    return DiscoveryService.postDiscoverFromEndpoint({
+      sparqlEndpointIri: !this.props.sparqlEndpointIri
+        ? this.state.sparqlTextFieldValue
+        : this.props.sparqlEndpointIri,
+      dataSampleIri: !this.props.dataSampleIri
+        ? dataSampleTextFieldValue
+        : this.props.dataSampleIri,
+      namedGraph: !this.props.namedGraph
+        ? namedTextFieldValue
+        : this.props.namedGraph
+    }).then(function(response) {
+      return response.json();
+    });
+  };
 
 //     return new Promise((resolve, reject) => {
 //       self.props.dispatch(
@@ -151,8 +182,17 @@
 //     return this.postStartFromInputLinks();
 //   };
 
-//   processStartDiscovery = () => {
-//     const self = this;
+  handleDiscoveryInputCase = () => {
+    if (this.props.selectedTab === 1) {
+      return this.postStartFromSparqlEndpoint();
+    } else {
+      if (this.state.ttlFile) {
+        return this.postStartFromFile();
+      } else {
+        return this.postStartFromInputLinks();
+      }
+    }
+  };
 
 //     self.setState({
 //       discoveryIsLoading: true,
@@ -301,110 +341,105 @@
 //     });
 //   };
 
-//   setDataSampleIri = e => {
-//     const rawText = e.target.value;
-//     this.setState({
-//       dataSampleIri: rawText
-//     });
-//   };
+  setSparqlIri = e => {
+    let rawText = e.target.value;
+    this.setState({
+      sparqlTextFieldValue: rawText
+    });
+  };
 
-//   setNamedGraph = e => {
-//     const rawText = e.target.value;
-//     this.setState({
-//       namedGraph: rawText
-//     });
-//   };
+  setDataSampleIri = e => {
+    let rawText = e.target.value;
+    this.setState({
+      dataSampleTextFieldValue: rawText
+    });
+  };
 
-//   render() {
-//     const { classes, selectedDatasources } = this.props;
-//     const self = this;
-//     const {
-//       discoveryIsLoading,
-//       textFieldValue,
-//       textFieldIsValid,
-//       discoveryLoadingLabel
-//     } = this.state;
+  setNamedGraph = e => {
+    let rawText = e.target.value;
+    this.setState({
+      namedTextFieldValue: rawText
+    });
+  };
 
-//     return (
-//       <Card className={classes.card}>
-//         <CardContent>
-//           {discoveryIsLoading ? (
-//             <LinearLoadingIndicator labelText={discoveryLoadingLabel} />
-//           ) : (
-//             <div className={classes.gridRoot}>
-//               <Grid container spacing={24}>
-//                 <Grid item xs={12} sm={12}>
-//                   <AppBar
-//                     position="static"
-//                     color="default"
-//                     className={classes.appBar}
-//                   >
-//                     <Tabs
-//                       value={self.state.tabValue}
-//                       onChange={self.handleChange}
-//                       indicatorColor="primary"
-//                       textColor="primary"
-//                       variant="fullWidth"
-//                     >
-//                       <Tab label="Simple" />
-//                       <Tab label="Advanced" />
-//                     </Tabs>
-//                   </AppBar>
-//                 </Grid>
+  render() {
+    const {
+      classes,
+      selectedDatasources,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph,
+      selectedTab
+    } = this.props;
+    const self = this;
 
-//                 <Grid item xs={12} sm={12}>
-//                   <SwipeableViews
-//                     axis="x"
-//                     index={self.state.tabValue}
-//                     onChangeIndex={self.handleChangeIndex}
-//                   >
-//                     <SimpleSourcesInput
-//                       classes={classes}
-//                       selectedDatasources={selectedDatasources}
-//                       discoveryIsLoading={discoveryIsLoading}
-//                       textFieldValue={textFieldValue}
-//                       validateField={self.validateField}
-//                       handleSelectedFile={self.handleSelectedFile}
-//                     />
-//                     <AdvancedSourcesInput
-//                       classes={classes}
-//                       selectedDatasources={selectedDatasources}
-//                       discoveryIsLoading={discoveryIsLoading}
-//                       sparqlTextFieldHandler={self.setSparqlIri}
-//                       dataSampleTextFieldHandler={self.setDataSampleIri}
-//                       namedGraphTextFieldHandler={self.setNamedGraph}
-//                     />
-//                   </SwipeableViews>
-//                 </Grid>
+    const {
+      discoveryIsLoading,
+      textFieldValue,
+      textFieldIsValid,
+      discoveryLoadingLabel,
+      sparqlTextFieldValue,
+      dataSampleTextFieldValue,
+      namedTextFieldValue
+    } = this.state;
 
-//                 <Grid item xs={12} sm={12}>
-//                   <Button
-//                     className={classes.itemGrid}
-//                     variant="contained"
-//                     component="span"
-//                     color="secondary"
-//                     disabled={
-//                       this.state.tabValue === 0
-//                         ? !this.state.ttlFile &&
-//                           !textFieldIsValid &&
-//                           selectedDatasources === undefined
-//                         : this.state.sparqlEndpointIri === '' ||
-//                           this.state.dataSampleIri === ''
-//                     }
-//                     onClick={this.processStartDiscovery}
-//                     size="small"
-//                   >
-//                     Start Discovery
-//                   </Button>
-//                 </Grid>
-//               </Grid>
-//             </div>
-//           )}
-//         </CardContent>
-//       </Card>
-//     );
-//   }
-// }
+    return (
+      <Card className={classes.card}>
+        <CardContent>
+          {discoveryIsLoading ? (
+            <LinearLoadingIndicator labelText={discoveryLoadingLabel} />
+          ) : (
+            <div className={classes.gridRoot}>
+              <Grid container spacing={24}>
+                <Grid item xs={12} sm={12}>
+                  <AppBar
+                    position="static"
+                    color="default"
+                    className={classes.appBar}
+                  >
+                    <Tabs
+                      value={selectedTab}
+                      onChange={self.handleChange}
+                      indicatorColor="primary"
+                      textColor="primary"
+                      variant="fullWidth"
+                    >
+                      <Tab label="Simple" />
+                      <Tab label="Advanced" />
+                    </Tabs>
+                  </AppBar>
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  <SwipeableViews
+                    axis={"x"}
+                    index={selectedTab}
+                    onChangeIndex={self.handleChangeIndex}
+                  >
+                    <SimpleSourcesInput
+                      classes={classes}
+                      selectedDatasources={selectedDatasources}
+                      discoveryIsLoading={discoveryIsLoading}
+                      textFieldValue={textFieldValue}
+                      validateField={self.validateField}
+                      handleSelectedFile={self.handleSelectedFile}
+                    />
+                    <AdvancedSourcesInput
+                      classes={classes}
+                      selectedDatasources={selectedDatasources}
+                      discoveryIsLoading={discoveryIsLoading}
+                      sparqlTextFieldHandler={self.setSparqlIri}
+                      dataSampleTextFieldHandler={self.setDataSampleIri}
+                      namedGraphTextFieldHandler={self.setNamedGraph}
+                      sparqlEndpointIri={sparqlEndpointIri}
+                      dataSampleIri={dataSampleIri}
+                      namedGraph={namedGraph}
+                      sparqlTextFieldValue={sparqlTextFieldValue}
+                      dataSampleTextFieldValue={dataSampleTextFieldValue}
+                      namedTextFieldValue={namedTextFieldValue}
+                    />
+                  </SwipeableViews>
+                </Grid>
 
 // SelectSources.propTypes = {
 //   classes: PropTypes.object.isRequired
@@ -418,6 +453,14 @@
 //   };
 // };
 
-// export default connect(mapStateToProps)(
-//   withStyles(styles, { withTheme: true })(SelectSources)
-// );
+const mapStateToProps = state => {
+  return {
+    datasources: getDatasourcesArray(state.datasources),
+    discoveryId: state.globals.discoveryId,
+    selectedDatasources: state.globals.datasourcesValues,
+    sparqlEndpointIri: state.globals.sparqlEndpointIri,
+    dataSampleIri: state.globals.dataSampleIri,
+    namedGraph: state.globals.namedGraph,
+    selectedTab: state.globals.selectedTab
+  };
+};

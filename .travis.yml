@@ -43,7 +43,7 @@ matrix:
         - ./gradlew sendCoverageToCodacy
 
     - # require the branch name to be master
-      if: branch = master
+      if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       language: java
       jdk: openjdk10
 
@@ -57,7 +57,7 @@ matrix:
       services:
         - postgresql
       before_script:
-        - psql -c "CREATE DATABASE lpa_postgres;" -U postgres
+        - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
