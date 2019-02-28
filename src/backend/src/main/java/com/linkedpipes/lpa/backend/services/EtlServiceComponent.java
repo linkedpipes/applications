@@ -43,8 +43,10 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
-        return OBJECT_MAPPER.readValue(response, Execution.class);
+        Execution execution = OBJECT_MAPPER.readValue(response, Execution.class);
         //TODO: make sure we insert the execution into the database (needs to be mapped on user though) and set executing to true
+        getExecutionStatus(execution.iri);
+        return execution;
     }
 
     @Override
