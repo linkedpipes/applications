@@ -3,13 +3,10 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/es/Redirect';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
-import NotFoundPage from './containers/NotFoundPage';
-import { NavigationBar } from './components/Navbar';
-import AboutPage from './containers/AboutPage';
 import withRoot from './withRoot';
 import CreateApp from './components/CreateApp/CreateApp';
-import HomePage from './Home';
-import DiscoverPage from './Discover';
+import { NavigationBar } from '@components';
+import { DiscoverPage, HomePage, NotFoundPage, AboutPage } from '@containers';
 
 const styles = theme => ({
   root: {
@@ -62,4 +59,3 @@ const AppRouter = props => {
 };
 
 export default withRoot(withStyles(styles)(AppRouter));
- 

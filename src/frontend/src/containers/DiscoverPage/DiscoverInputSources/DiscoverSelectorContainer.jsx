@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addVisualizer } from '../../_actions/visualizers';
+import { addVisualizer } from '../../../_actions/visualizers';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService } from '../../_services';
-import { extractUrlGroups } from '../../_helpers';
-import { getDatasourcesArray } from '../../_selectors/datasources';
-import { addDiscoveryIdAction } from '../../_actions/globals';
+import { DiscoveryService } from '../../../_services';
+import { extractUrlGroups } from '../../../_helpers';
+import { getDatasourcesArray } from '../../../_selectors/datasources';
+import { addDiscoveryIdAction } from '../../../_actions/globals';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 
 class DiscoverSelectorContainer extends PureComponent {

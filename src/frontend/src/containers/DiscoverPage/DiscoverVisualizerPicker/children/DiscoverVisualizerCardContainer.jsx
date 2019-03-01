@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { addSelectedVisualizerAction } from '../../../_actions/globals';
+import { addSelectedVisualizerAction } from '../../../../_actions/globals';
 import { discoverActions } from '../../duck';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 

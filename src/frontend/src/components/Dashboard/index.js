@@ -1,1 +1,3 @@
-export * from "./Dashboard";
+import DashboardComponent from './DashboardComponent';
+
+export default DashboardComponent;

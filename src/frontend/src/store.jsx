@@ -7,7 +7,7 @@ import filters from './_reducers/filters';
 import markers from './_reducers/markers';
 import logger from 'redux-logger';
 import globals from './_reducers/globals';
-import { discoverReducer } from './Discover';
+import { discoverReducer } from '@containers';
 import Reactotron from './ReactotronConfig';
 import thunk from 'redux-thunk';
 

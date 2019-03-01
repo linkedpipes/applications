@@ -16,20 +16,18 @@ const styles = {
   }
 };
 
-function LinearIndeterminate(props) {
-  const { classes, labelText } = props;
-  return (
-    <div className={classes.root}>
-      <Typography variant="body1" align="center" gutterBottom>
-        {labelText}
-      </Typography>
-      <LinearProgress />
-    </div>
-  );
-}
+const LinearLoaderComponent = ({ classes, labelText }) => (
+  <div className={classes.root}>
+    <Typography variant="body1" align="center" gutterBottom>
+      {labelText}
+    </Typography>
+    <LinearProgress />
+  </div>
+);
 
-LinearIndeterminate.propTypes = {
-  classes: PropTypes.object.isRequired
+LinearLoaderComponent.propTypes = {
+  classes: PropTypes.object.isRequired,
+  labelText: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(LinearIndeterminate);
+export default withStyles(styles)(LinearLoaderComponent);

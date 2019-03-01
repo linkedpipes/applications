@@ -2,10 +2,14 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/lib/connect/connect';
 import { toast } from 'react-toastify';
-import { ETLService, ETL_STATUS_MAP, ETL_STATUS_TYPE } from '../../_services';
-import { addSingleExecution } from '../../_actions/etl_executions';
-import { addSingleExport } from '../../_actions/etl_exports';
-import { addSelectedResultGraphIriAction } from '../../_actions/globals';
+import {
+  ETLService,
+  ETL_STATUS_MAP,
+  ETL_STATUS_TYPE
+} from '../../../_services';
+import { addSingleExecution } from '../../../_actions/etl_executions';
+import { addSingleExport } from '../../../_actions/etl_exports';
+import { addSelectedResultGraphIriAction } from '../../../_actions/globals';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
 import ErrorBoundary from 'react-error-boundary';
 

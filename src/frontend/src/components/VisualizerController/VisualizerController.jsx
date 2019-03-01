@@ -1,17 +1,17 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { VisualizerControllerHeader } from "./Header";
-import { VisualizerContainer } from "./Container";
-import connect from "react-redux/lib/connect/connect";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import { VisualizerControllerHeader } from './Header';
+import { VisualizerContainer } from './Container';
+import connect from 'react-redux/lib/connect/connect';
 
-const styles = theme => ({
+const styles = () => ({
   root: {
-    justifyContent: "center",
+    justifyContent: 'center',
     flex: 1
   },
   visualizer: {
-    margin: "1rem"
+    margin: '1rem'
   },
   card: {},
   input: {}
