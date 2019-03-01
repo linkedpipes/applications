@@ -56,7 +56,7 @@ public class EtlServiceComponent implements EtlService {
                 try {
                     String response = httpActions.getExecutionStatus(executionIri);
                     ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
-                    if (executionStatus.status.isPollable()) {
+                    if (!executionStatus.status.isPollable()) {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", response);
                         for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
                             e.setExecuting(false);
