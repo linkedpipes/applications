@@ -45,12 +45,11 @@ public class EtlServiceComponent implements EtlService {
         String response = httpActions.executePipeline(etlPipelineIri);
         Execution execution = OBJECT_MAPPER.readValue(response, Execution.class);
         //TODO: make sure we insert the execution into the database (needs to be mapped on user though) and set executing to true
-        getExecutionStatus(execution.iri);
+        startStatusPolling(execution.iri);
         return execution;
     }
 
-    @Override
-    public String getExecutionStatus(String executionIri) throws LpAppsException {
+    private void startStatusPolling(String executionIri) throws LpAppsException {
         Runnable checker = new Runnable() {
             @Override
             public void run() {
@@ -86,7 +85,6 @@ public class EtlServiceComponent implements EtlService {
         };
 
         Application.SCHEDULER.schedule(canceller, 1, HOURS);
-        return executionIri;
     }
 
     @Override

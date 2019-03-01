@@ -12,8 +12,6 @@ public interface DiscoveryService {
 
     Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException;
 
-    String getDiscoveryStatus(String discoveryId) throws LpAppsException;
-
     PipelineGroups getPipelineGroups(String discoveryId) throws LpAppsException;
 
     PipelineExportResult exportPipeline(String discoveryId, String pipelineUri) throws LpAppsException;

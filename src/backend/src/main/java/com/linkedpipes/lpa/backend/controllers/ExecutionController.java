@@ -21,16 +21,6 @@ public class ExecutionController {
         etlService = context.getBean(EtlService.class);
     }
 
-    @GetMapping("/api/execution/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
-        if(executionIri == null || executionIri.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Execution IRI not provided.");
-        }
-
-        String status = etlService.getExecutionStatus(executionIri);
-        return ResponseEntity.ok(status);
-    }
-
     @GetMapping("/api/execution/result")
     @ResponseBody
     public ResponseEntity<?> getResult(@RequestParam(value = "executionIri") String executionIri) throws LpAppsException {

@@ -58,7 +58,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
         Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        getDiscoveryStatus(result.id);
+        startStatusPolling(result.id);
         return result;
     }
 
@@ -66,12 +66,11 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
         Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        getDiscoveryStatus(result.id);
+        startStatusPolling(result.id);
         return result;
     }
 
-    @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
+    public void startStatusPolling(String discoveryId) throws LpAppsException {
         Runnable checker = new Runnable() {
             @Override
             public void run() {
@@ -108,7 +107,6 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         };
 
         Application.SCHEDULER.schedule(canceller, 1, HOURS);
-        return discoveryId;
     }
 
     @Override
