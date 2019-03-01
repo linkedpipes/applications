@@ -27,8 +27,8 @@ class LpAppsObjectMapperTests {
             "\"status\":{\n\t\t" +
                 "\"id\": \"http://etl.linkedpipes.com/resources/status/finished\"\n\t" +
             "},\n\t" +
-            "\"started\": \"2019-01-18T20:53:50.625+0000\",\n\t" +
-            "\"finished\": \"2019-01-18T20:53:57.379+0000\"\n" +
+            "\"executionStarted\": \"2019-01-18T20:53:50.625+0000\",\n\t" +
+            "\"executionFinished\": \"2019-01-18T20:53:57.379+0000\"\n" +
         "}";
 
         ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(statusMessage, ExecutionStatus.class);

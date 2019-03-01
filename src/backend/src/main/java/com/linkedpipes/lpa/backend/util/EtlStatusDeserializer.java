@@ -12,7 +12,7 @@ public class EtlStatusDeserializer extends JsonDeserializer<EtlStatus> {
     public EtlStatus deserialize(JsonParser parser, DeserializationContext deserializer) throws IOException {
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
-        JsonNode id = node.get("@id");
+        JsonNode id = node.get("id");
         String iri = id.asText();
         return EtlStatus.fromIri(iri);
    }
