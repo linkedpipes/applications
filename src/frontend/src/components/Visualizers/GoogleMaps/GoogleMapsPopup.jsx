@@ -1,34 +1,34 @@
-import AppBar from "@material-ui/core/AppBar";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import IconButton from "@material-ui/core/IconButton";
-import Slide from "@material-ui/core/Slide";
-import { withStyles } from "@material-ui/core/styles";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import CloseIcon from "@material-ui/icons/Close";
-import PropTypes from "prop-types";
-import React from "react";
-import GoogleMapsVisualizer from "./GoogleMapsVisualizer";
-import { VisualizersService } from "../../../_services";
-import { withRouter } from "react-router-dom";
-import { Grid } from "@material-ui/core";
-import Filters from "../../VisualizerController/Filters/Filters";
-import { addFilters } from "../../../_actions/filters";
-import { addMultipleMarkers } from "../../../_actions/markers";
-import { optionModes, filterTypes } from "../../../_constants";
-import connect from "react-redux/lib/connect/connect";
-import { toast } from "react-toastify";
+import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close';
+import PropTypes from 'prop-types';
+import React from 'react';
+import GoogleMapsVisualizer from './GoogleMapsVisualizer';
+import { VisualizersService } from '../../../_services';
+import { withRouter } from 'react-router-dom';
+import { Grid } from '@material-ui/core';
+import Filters from '../../VisualizerController/Filters/Filters';
+import { addFilters } from '../../../_actions/filters';
+import { addMultipleMarkers } from '../../../_actions/markers';
+import { optionModes, filterTypes } from '../../../constants';
+import connect from 'react-redux/lib/connect/connect';
+import { toast } from 'react-toastify';
 
 const styles = theme => ({
   appBar: {
-    position: "relative"
+    position: 'relative'
   },
   flex: {
     flex: 1
   },
   grid: {
-    height: "100vh"
+    height: '100vh'
   },
   button: {
     marginTop: theme.spacing.unit,
@@ -41,16 +41,16 @@ function Transition(props) {
 }
 
 const skoConcept1 = {
-  label: "skoConcept1label",
-  uri: "skoConcept1URI",
-  schemeUri: "skoConcept1URI",
+  label: 'skoConcept1label',
+  uri: 'skoConcept1URI',
+  schemeUri: 'skoConcept1URI',
   linkUris: []
 };
 
 const skoConcept2 = {
-  label: "skoConcept2 label",
-  uri: "skoConcept2URI",
-  schemeUri: "skoConcept2URI",
+  label: 'skoConcept2 label',
+  uri: 'skoConcept2URI',
+  schemeUri: 'skoConcept2URI',
   linkUris: []
 };
 const option1 = {
@@ -76,7 +76,7 @@ class GoogleMapsPopup extends React.Component {
         enabled: true,
         expanded: true,
         options: [option1, option2],
-        optionsUris: ["option1 URI", "option2 URI"]
+        optionsUris: ['option1 URI', 'option2 URI']
       };
     });
   };
@@ -107,7 +107,7 @@ class GoogleMapsPopup extends React.Component {
   };
 
   handleCreateAppPressed = () => {
-    this.props.history.replace("/create-app");
+    this.props.history.replace('/create-app');
   };
 
   componentDidMount() {
@@ -153,7 +153,7 @@ class GoogleMapsPopup extends React.Component {
         self.handleClose();
 
         toast.error(
-          "Sorry, unable to extract data for your visualizer. Please try another datasource!",
+          'Sorry, unable to extract data for your visualizer. Please try another datasource!',
           {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 2000

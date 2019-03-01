@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizerController } from '../VisualizerController';
-import { VISUALIZER_TYPE, optionModes, filterTypes } from '../../_constants';
+import { optionModes } from '../../constants';
 import connect from 'react-redux/lib/connect/connect';
 
 const styles = theme => ({
@@ -48,7 +48,7 @@ class CreateApp extends React.Component {
     return (
       <VisualizerController
         visualizerType={this.props.visualizer.iri}
-        visualizerParams={{ markers: markers }}
+        visualizerParams={{ markers }}
         headerParams={{
           title: 'Dataset overview',
           subtitle: 'Google Maps Visualizer'

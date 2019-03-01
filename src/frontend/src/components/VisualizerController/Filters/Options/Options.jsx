@@ -1,12 +1,12 @@
-import React from "react";
-import Checkbox from "@material-ui/core/Checkbox";
-import Radio from "@material-ui/core/Radio";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import { optionModes as modes } from "../../../../_constants/options.constants";
-import { filterTypes as types } from "../../../../_constants/filters.constants";
-import { withStyles } from "@material-ui/core/styles";
+import React from 'react';
+import Checkbox from '@material-ui/core/Checkbox';
+import Radio from '@material-ui/core/Radio';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import { optionModes as modes } from '../../../../constants/options.constants';
+import { filterTypes as types } from '../../../../constants/filters.constants';
+import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   nested: {

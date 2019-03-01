@@ -1,21 +1,21 @@
-import React from "react";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import Checkbox from "@material-ui/core/Checkbox";
-import Collapse from "@material-ui/core/Collapse";
-import Option from "./Options/Options";
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import { withStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
+import React from 'react';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Checkbox from '@material-ui/core/Checkbox';
+import Collapse from '@material-ui/core/Collapse';
+import Option from './Options/Options';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import {
   TOGGLE_FILTER,
   TOGGLE_EXPAND_FILTER,
   TOGGLE_CHECKBOX
-} from "../../../_constants/filters.constants";
+} from '../../../constants/filters.constants';
 
 const styles = theme => ({});
 
@@ -42,8 +42,8 @@ class Filters extends React.Component {
           subheader={
             <ListSubheader disableSticky={true}>
               {!filters || filters.length == 0
-                ? "No filters available"
-                : "Available filters"}
+                ? 'No filters available'
+                : 'Available filters'}
             </ListSubheader>
           }
         >

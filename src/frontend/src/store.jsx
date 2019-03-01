@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore, combineReducers, compose } from 'redux';
-import datasourcesReducer from './_reducers/datasources';
+import datasourcesReducer from './ducks/discoveryDuck/reducers';
 import visualizers from './_reducers/visualizers';
 import etl_executions from './_reducers/etl_executions';
 import etl_exports from './_reducers/etl_exports';

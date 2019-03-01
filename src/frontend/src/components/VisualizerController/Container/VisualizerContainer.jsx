@@ -1,17 +1,17 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import { GoogleMapsVisualizer, TreemapVisualizer } from "../../Visualizers";
-import { VISUALIZER_TYPE } from "../../../_constants";
-import Filters from "../Filters/Filters";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import { GoogleMapsVisualizer, TreemapVisualizer } from '../../Visualizers';
+import { VISUALIZER_TYPE } from '../../../constants';
+import Filters from '../Filters/Filters';
 
 const styles = theme => ({
   root: {
-    height: "100vh"
+    height: '100vh'
   },
   filterSideBar: {
-    overflowY: "auto"
+    overflowY: 'auto'
   },
   card: {},
   input: {}
