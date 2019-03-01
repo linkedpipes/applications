@@ -47,7 +47,7 @@ class CreateApp extends React.Component {
 
     return (
       <VisualizerController
-        visualizerType={VISUALIZER_TYPE.GoogleMaps}
+        visualizerType={this.props.visualizer.iri}
         visualizerParams={{ markers: markers }}
         headerParams={{
           title: "Dataset overview",
@@ -65,7 +65,8 @@ CreateApp.propTypes = {
 const mapStateToProps = state => {
   return {
     markers: state.markers,
-    filters: state.filters
+    filters: state.filters,
+    visualizer: state.globals.selectedVisualizer.visualizer
   };
 };
 

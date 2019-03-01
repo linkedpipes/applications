@@ -13,13 +13,19 @@ export const addSelectedVisualizerAction = ({ data } = {}) => ({
 });
 
 // SET_SELECTED_DATASOURCES_EXAMPLE
-export const setSelectedDatasourcesExample = ({ data } = {}) => ({
+export const setSelectedDatasourcesExample = ({ sample } = {}) => ({
   type: "SET_SELECTED_DATASOURCES_EXAMPLE",
-  datasourcesValues: data
+  sample: sample
 });
 
 // ADD_SELECTED_RESULT_GRAPH_IRI_ACTION
 export const addSelectedResultGraphIriAction = ({ data } = {}) => ({
   type: "SET_SELECTED_RESULT_GRAPH_IRI",
   selectedResultGraphIri: data
+});
+
+// TAB CHANGED
+export const changeTabAction = ({ selectedTab } = {}) => ({
+  type: "TAB_CHANGED",
+  selectedTab: selectedTab
 });

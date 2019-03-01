@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import { GoogleMapsVisualizer } from "../../Visualizers";
+import { GoogleMapsVisualizer, TreemapVisualizer } from "../../Visualizers";
 import { VISUALIZER_TYPE } from "../../../_constants";
 import Filters from "../Filters/Filters";
 
@@ -19,12 +19,14 @@ const styles = theme => ({
 
 class VisualizerControllerContainer extends React.Component {
   getVisualizer = (type, params) => {
-    if (type === VISUALIZER_TYPE.GoogleMaps) {
-      const markers = params.markers;
-
-      return <GoogleMapsVisualizer markers={markers} />;
-    } else {
-      return <div />;
+    switch (type) {
+      case VISUALIZER_TYPE.GoogleMaps:
+        const markers = params.markers;
+        return <GoogleMapsVisualizer markers={markers} />;
+      case VISUALIZER_TYPE.Treemap:
+        return <TreemapVisualizer />;
+      default:
+        return <div />;
     }
   };
 

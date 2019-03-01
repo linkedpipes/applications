@@ -6,6 +6,7 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.jetbrains.annotations.NotNull;
 
 public class SchemesQueryProvider extends ConstructSparqlQueryProvider {
 
@@ -22,8 +23,9 @@ public class SchemesQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_DCTERMS_TITLE = var("dctt");
     public static final String VAR_CONCEPT = var("c");
 
+    @NotNull
     @Override
-    protected ConstructBuilder addPrefixes(ConstructBuilder builder) {
+    protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
                 .addPrefix(SKOS_PREFIX, SKOS.uri)
                 .addPrefix(RDFS_PREFIX, RDFS.uri)
@@ -31,8 +33,9 @@ public class SchemesQueryProvider extends ConstructSparqlQueryProvider {
                 .addPrefix(RDF_PREFIX, RDF.uri);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addConstructs(ConstructBuilder builder) {
+    protected ConstructBuilder addConstructs(@NotNull ConstructBuilder builder) {
         return builder
                 .addConstruct(VAR_SCHEME, RDF.type, SKOS.ConceptScheme)
                 .addConstruct(VAR_SCHEME, SKOS.prefLabel, VAR_PREF_LABEL)
@@ -40,16 +43,18 @@ public class SchemesQueryProvider extends ConstructSparqlQueryProvider {
                 .addConstruct(VAR_SCHEME, RDFS.label, VAR_RDFS_LABEL);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addWheres(ConstructBuilder builder) {
+    protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
         return builder
                 .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
                 .addWhere(VAR_CONCEPT, SKOS.inScheme, VAR_SCHEME)
                 .addWhere(VAR_SCHEME, RDF.type, SKOS.ConceptScheme);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addOptionals(ConstructBuilder builder) {
+    protected ConstructBuilder addOptionals(@NotNull ConstructBuilder builder) {
         return builder
                 .addOptional(VAR_SCHEME, SKOS.prefLabel, VAR_PREF_LABEL)
                 .addOptional(VAR_SCHEME, RDFS.label, VAR_RDFS_LABEL)

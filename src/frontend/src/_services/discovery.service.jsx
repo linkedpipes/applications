@@ -8,6 +8,7 @@ const DISCOVERY_STATUS_URL = discoveryId => {
 };
 
 const DISCOVER_FROM_INPUT_URL = PIPELINES_URL + "discoverFromInput";
+const DISCOVER_FROM_ENDPOINT = PIPELINES_URL + "discoverFromEndpoint";
 const DISCOVER_FROM_URI_LIST_URL = PIPELINES_URL + "discover";
 const PIPELINE_GROUPS_URL = discoveryId => {
   return DISCOVERY_URL + discoveryId + "/pipelineGroups";
@@ -16,6 +17,25 @@ const PIPELINE_GROUPS_URL = discoveryId => {
 export const DiscoveryService = {
   postDiscoverFromTtl: async function({ ttlFile }) {
     return rest(DISCOVER_FROM_INPUT_URL, ttlFile, "POST", undefined);
+  },
+
+  postDiscoverFromEndpoint: async function({
+    sparqlEndpointIri,
+    dataSampleIri,
+    namedGraph
+  }) {
+    return rest(
+      DISCOVER_FROM_ENDPOINT +
+        "?" +
+        getQueryString({
+          sparqlEndpointIri: sparqlEndpointIri,
+          dataSampleIri: dataSampleIri,
+          namedGraph: namedGraph
+        }),
+      undefined,
+      "POST",
+      undefined
+    );
   },
 
   postDiscoverFromUriList: async function({ datasourceUris }) {

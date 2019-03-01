@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
-import com.linkedpipes.lpa.backend.rdf.vocabulary.SCHEMA;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
@@ -10,6 +10,7 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.jetbrains.annotations.NotNull;
 
 public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
 
@@ -35,18 +36,20 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     public static final String[] NODE_VARIABLES = {VAR_P, VAR_SCHEME};
     public static final String[] LABEL_VARIABLES = {VAR_RDFS_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION, VAR_DCTERMS_TITLE};
 
+    @NotNull
     @Override
-    public SelectBuilder addPrefixes(SelectBuilder builder) {
+    public SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
                 .addPrefix(SKOS_PREFIX, SKOS.getURI())
-                .addPrefix(SCHEMA_PREFIX, SCHEMA.uri)
+                .addPrefix(SCHEMA_PREFIX, Schema.uri)
                 .addPrefix(RDFS_PREFIX, RDFS.getURI())
                 .addPrefix(DCTERMS_PREFIX, DCTerms.getURI())
                 .addPrefix(RDF_PREFIX, RDF.getURI());
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addVars(SelectBuilder builder) {
+    public SelectBuilder addVars(@NotNull SelectBuilder builder) {
         return builder
                 .setDistinct(true)
                 .addVar(VAR_P)
@@ -56,36 +59,40 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
                 .addVar(VAR_SCHEME);
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addWheres(SelectBuilder builder) {
+    public SelectBuilder addWheres(@NotNull SelectBuilder builder) {
         return builder
-                .addWhere(VAR_SUBJECT, SCHEMA.geo, NodeFactory.createBlankNode())
+                .addWhere(VAR_SUBJECT, Schema.geo, NodeFactory.createBlankNode())
                 .addWhere(VAR_SUBJECT, VAR_P, VAR_O)
                 .addWhere(VAR_O, SKOS.inScheme, VAR_SCHEME);
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addOptionals(SelectBuilder builder) {
+    public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
         return builder
                 .addOptional(VAR_SCHEME, SKOS.prefLabel, VAR_PREF_LABEL)
                 .addOptional(VAR_SCHEME, RDFS.label, VAR_RDFS_LABEL)
                 .addOptional(VAR_SCHEME, SKOS.notation, VAR_NOTATION)
                 .addOptional(VAR_SCHEME, DCTerms.title, VAR_DCTERMS_TITLE)
-                .addOptional(VAR_SCHEME, SCHEMA.title, VAR_NAME)
-                .addOptional(VAR_SCHEME, SCHEMA.description, VAR_DESCRIPTION);
+                .addOptional(VAR_SCHEME, Schema.title, VAR_NAME)
+                .addOptional(VAR_SCHEME, Schema.description, VAR_DESCRIPTION);
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addFilters(SelectBuilder builder) throws ParseException {
+    public SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
         return builder
                 .addFilter(VAR_P + "!=" + SparqlUtils.formatUri(SKOS.prefLabel.toString()))
-                .addFilter(VAR_P + "!=" + SparqlUtils.formatUri(SCHEMA.geo.toString()))
+                .addFilter(VAR_P + "!=" + SparqlUtils.formatUri(Schema.geo.toString()))
                 .addFilter(VAR_P + "!=" + SparqlUtils.formatUri(RDF.type.toString()))
                 .addFilter(VAR_P + "!=" + SparqlUtils.formatUri(RDFS.seeAlso.toString()));
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addAdditional(SelectBuilder builder) {
+    public SelectBuilder addAdditional(@NotNull SelectBuilder builder) {
         return builder.setLimit(1000);
     }
 
