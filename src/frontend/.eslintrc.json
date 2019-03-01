@@ -18,7 +18,7 @@
     "prettier",
     "prettier/react"
   ],
-  "plugins": ["babel", "material-ui"],
+  "plugins": ["babel", "material-ui", "import"],
   "rules": {
     // It's buggy
     "react/jsx-curly-brace-presence": "off",
@@ -77,5 +77,15 @@
       }
     ],
     "react/jsx-filename-extension": ["error", { "extensions": [".jsx"] }] // airbnb is using .jsx
+  },
+  "settings": {
+    "import/resolver": {
+      "babel-module": {
+        "alias": {
+          "@components": "./src/components",
+          "@containers": "./src/containers"
+        }
+      }
+    }
   }
 }
