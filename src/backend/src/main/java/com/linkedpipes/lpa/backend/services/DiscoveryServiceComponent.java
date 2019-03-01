@@ -79,7 +79,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
             PipelineGroup pipelineGrp = new PipelineGroup();
             ObjectNode appGroupObj = (ObjectNode) appGroup;
             pipelineGrp.visualizer = OBJECT_MAPPER.convertValue(appGroupObj.get("applicationInstance"), ApplicationInstance.class);
-            pipelineGrp.visualizer.code = Visualizers.map.getOrDefault(pipelineGrp.visualizer.iri, "");
+            pipelineGrp.visualizer.visualizerCode = Visualizers.map.getOrDefault(pipelineGrp.visualizer.iri, "");
 
             ArrayNode dataSourceGroups = (ArrayNode) appGroupObj.get("dataSourceGroups");
 

@@ -8,6 +8,8 @@ public class Visualizers {
         {
             put("https://discovery.linkedpipes.com/resource/application/timeline-with-labels/template", "LABELED_TIMELINE");
             put("https://discovery.linkedpipes.com/resource/application/timeline/template", "TIMELINE");
+            put("https://discovery.linkedpipes.com/resource/application/timeline-periods/template", "TIMELINE_PERIODS");
+            put("https://discovery.linkedpipes.com/resource/application/timeline-periods-with-labels/template", "LABELED_TIMELINE_PERIODS");
             put("https://discovery.linkedpipes.com/resource/application/dcterms/template", "DCTERMS");
             put("https://discovery.linkedpipes.com/resource/application/map/template", "MAP");
             put("https://discovery.linkedpipes.com/resource/application/map-labeled-points/template", "LABELED_POINTS_MAP");
