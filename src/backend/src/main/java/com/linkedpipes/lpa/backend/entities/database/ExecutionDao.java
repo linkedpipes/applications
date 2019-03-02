@@ -6,7 +6,7 @@ import java.util.Date;
 import com.linkedpipes.lpa.backend.entities.EtlStatus;
 
 @Entity(name="execution")
-public class Execution implements Serializable {
+public class ExecutionDao implements Serializable {
 
     @Id
     @GeneratedValue
@@ -22,17 +22,14 @@ public class Execution implements Serializable {
     @Column(nullable = false)
     private String selectedVisualiser;
 
-    @Column(nullable = false)
-    private boolean executing;
-
     @ManyToOne
-    private User user;
+    private UserDao user;
 
-    public User getUser() {
+    public UserDao getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDao user) {
         this.user = user;
 
         if (!user.getExecutions().contains(this)) {

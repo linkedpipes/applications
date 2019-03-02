@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DiscoveryRepository extends CrudRepository<Discovery, Long> {
-    List<Discovery> findByDiscoveryId(String discoveryId);
+public interface DiscoveryRepository extends CrudRepository<DiscoveryDao, Long> {
+    List<DiscoveryDao> findByDiscoveryId(String discoveryId);
 }

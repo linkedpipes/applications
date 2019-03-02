@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ExecutionRepository extends CrudRepository<Execution, Long> {
-    List<Execution> findByExecutionIri(String executionIri);
+public interface ExecutionRepository extends CrudRepository<ExecutionDao, Long> {
+    List<ExecutionDao> findByExecutionIri(String executionIri);
 }

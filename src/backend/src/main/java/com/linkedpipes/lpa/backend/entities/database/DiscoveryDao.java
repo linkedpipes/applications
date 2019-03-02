@@ -5,7 +5,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name="discovery")
-public class Discovery implements Serializable {
+public class DiscoveryDao implements Serializable {
 
     @Id
     @GeneratedValue
@@ -21,13 +21,13 @@ public class Discovery implements Serializable {
     private boolean executing;
 
     @ManyToOne
-    private User user;
+    private UserDao user;
 
-    public User getUser() {
+    public UserDao getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDao user) {
         this.user = user;
 
         if (!user.getDiscoveries().contains(this)) {

@@ -2,10 +2,9 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity(name="application")
-public class Application implements Serializable {
+public class ApplicationDao implements Serializable {
 
     @Id
     @GeneratedValue
@@ -15,13 +14,13 @@ public class Application implements Serializable {
     private String solidIri;
 
     @ManyToOne
-    private User user;
+    private UserDao user;
 
-    public User getUser() {
+    public UserDao getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDao user) {
         this.user = user;
 
         if (!user.getApplications().contains(this)) {
@@ -35,5 +34,9 @@ public class Application implements Serializable {
 
     public String getSolidIri() {
         return this.solidIri;
+    }
+
+    public long getId() {
+        return this.id;
     }
 }

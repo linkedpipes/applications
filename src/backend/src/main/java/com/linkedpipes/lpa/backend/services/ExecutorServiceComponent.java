@@ -3,15 +3,11 @@ package com.linkedpipes.lpa.backend.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.linkedpipes.lpa.backend.Application;
-import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.entities.DiscoveryStatus;
-import com.linkedpipes.lpa.backend.entities.Execution;
-import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.entities.EtlStatus;
-import com.linkedpipes.lpa.backend.entities.database.ExecutionRepository;
-import com.linkedpipes.lpa.backend.entities.database.DiscoveryRepository;
+import com.linkedpipes.lpa.backend.entities.*;
+import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
+import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.slf4j.Logger;
@@ -39,8 +35,6 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private final ApplicationContext context;
-
     private final DiscoveryService discoveryService;
     private final EtlService etlService;
     private final UserService userService;
@@ -52,7 +46,6 @@ public class ExecutorServiceComponent implements ExecutorService {
     private ExecutionRepository executionRepository;
 
     public ExecutorServiceComponent(ApplicationContext context) {
-        this.context = context;
         this.discoveryService = context.getBean(DiscoveryService.class);
         this.etlService = context.getBean(EtlService.class);
         this.userService = context.getBean(UserService.class);
@@ -88,18 +81,18 @@ public class ExecutorServiceComponent implements ExecutorService {
                 ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
 
                 //persist status in DB
-                for (Execution e : executionRepository.findByExecutionIri(executionIri)) {
+                for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                     e.setStatus(executionStatus.status);
-                    executionRepository.store(e);
+                    executionRepository.save(e);
                 }
 
                 if (!executionStatus.status.isPollable()) {
                     Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
-                    throw new RuntimeException(); //this cancels the scheduler
+                    throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
                 Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
-                throw new RuntimeException(e); //this cancels the scheduler
+                throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
 
@@ -108,9 +101,9 @@ public class ExecutorServiceComponent implements ExecutorService {
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
-            for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
+            for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                 e.setStatus(EtlStatus.UNKNOWN);
-                executionRepository.store(e);
+                executionRepository.save(e);
             }
         };
 
@@ -125,16 +118,16 @@ public class ExecutorServiceComponent implements ExecutorService {
                 if (discoveryStatus.isFinished) {
                     logger.info("Reporting discovery finished in room " + discoveryId);
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(discoveryStatus));
-                    for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                    for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                         d.setExecuting(false);
-                        discoveryRepository.store(d);
+                        discoveryRepository.save(d);
                     }
 
-                    throw new RuntimeException(); //this cancels the scheduler
+                    throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
                 Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
-                throw new RuntimeException(e); //this cancels the scheduler
+                throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
 
@@ -143,9 +136,9 @@ public class ExecutorServiceComponent implements ExecutorService {
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
-            for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+            for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                 d.setExecuting(false);
-                discoveryRepository.store(d);
+                discoveryRepository.save(d);
             }
         };
 

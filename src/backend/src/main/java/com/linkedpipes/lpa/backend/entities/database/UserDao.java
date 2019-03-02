@@ -5,7 +5,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity(name="lpa_user")
-public class User implements Serializable {
+public class UserDao implements Serializable {
 
     @Id
     @GeneratedValue
@@ -15,41 +15,41 @@ public class User implements Serializable {
     private String webId;
 
     @OneToMany(mappedBy="user")
-    private List<Discovery> discoveries;
+    private List<DiscoveryDao> discoveries;
 
     @OneToMany(mappedBy="user")
-    private List<Execution> executions;
+    private List<ExecutionDao> executions;
 
     @OneToMany(mappedBy="user")
-    private List<Application> applications;
+    private List<ApplicationDao> applications;
 
-    public void addDiscovery(Discovery discovery) {
+    public void addDiscovery(DiscoveryDao discovery) {
         this.discoveries.add(discovery);
         if (discovery.getUser() != this) {
             discovery.setUser(this);
         }
     }
 
-    public List<Discovery> getDiscoveries() {
+    public List<DiscoveryDao> getDiscoveries() {
         return this.discoveries;
     }
 
-    public void addExecution(Execution execution) {
+    public void addExecution(ExecutionDao execution) {
         this.executions.add(execution);
         if (execution.getUser() != this) {
             execution.setUser(this);
         }
     }
 
-    public List<Execution> getExecutions() {
+    public List<ExecutionDao> getExecutions() {
         return this.executions;
     }
 
-    public List<Application> getApplications() {
+    public List<ApplicationDao> getApplications() {
         return this.applications;
     }
 
-    public void addApplication(Application app) {
+    public void addApplication(ApplicationDao app) {
         this.applications.add(app);
         if (app.getUser() != this) {
             app.setUser(this);
