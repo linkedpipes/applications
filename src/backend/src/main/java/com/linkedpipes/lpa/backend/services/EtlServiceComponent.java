@@ -2,22 +2,17 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
-import com.linkedpipes.lpa.backend.entities.database.ExecutionRepository;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.entities.EtlStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.concurrent.ScheduledFuture;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 
-import static java.util.concurrent.TimeUnit.*;
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
 /**
@@ -33,9 +28,6 @@ public class EtlServiceComponent implements EtlService {
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
 
-    @Autowired
-    private ExecutionRepository executionRepository;
-
     public EtlServiceComponent(ApplicationContext context) {
         this.context = context;
     }
@@ -44,41 +36,13 @@ public class EtlServiceComponent implements EtlService {
     public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
         Execution execution = OBJECT_MAPPER.readValue(response, Execution.class);
-        //TODO: make sure we insert the execution into the database (needs to be mapped on user though) and set executing to true
-        startStatusPolling(execution.iri);
         return execution;
     }
 
-    private void startStatusPolling(String executionIri) throws LpAppsException {
-        Runnable checker = () -> {
-            try {
-                String response = httpActions.getExecutionStatus(executionIri);
-                ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
-                if (!executionStatus.status.isPollable()) {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", response);
-                    for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                        e.setStatus(executionStatus.status);
-                    }
-
-                    throw new RuntimeException(); //this cancels the scheduler
-                }
-            } catch (LpAppsException e) {
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
-                throw new RuntimeException(e); //this cancels the scheduler
-            }
-        };
-
-        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
-
-        Runnable canceller = () -> {
-            checkerHandle.cancel(false);
-            Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
-            for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                e.setStatus(EtlStatus.UNKNOWN);
-            }
-        };
-
-        Application.SCHEDULER.schedule(canceller, 1, HOURS);
+    @Override
+    public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
+        String response = httpActions.getExecutionStatus(executionIri);
+        return OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
     }
 
     @Override

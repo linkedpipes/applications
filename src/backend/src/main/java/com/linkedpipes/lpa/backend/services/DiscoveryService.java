@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.DiscoveryStatus;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
@@ -11,6 +12,8 @@ public interface DiscoveryService {
     Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException;
 
     Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException;
+
+    DiscoveryStatus getDiscoveryStatus(String discoveryId) throws LpAppsException;
 
     PipelineGroups getPipelineGroups(String discoveryId) throws LpAppsException;
 
