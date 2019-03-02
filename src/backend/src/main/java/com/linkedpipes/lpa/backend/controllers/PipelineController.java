@@ -7,6 +7,7 @@ import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.EtlService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,11 +33,13 @@ public class PipelineController {
 
     private final DiscoveryService discoveryService;
     private final EtlService etlService;
+    private final ExecutorService executorService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         etlService = context.getBean(EtlService.class);
+        executorService = context.getBean(ExecutorService.class);
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
@@ -84,8 +87,8 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws LpAppsException {
-        Execution response = etlService.executePipeline(etlPipelineIri);
+    public ResponseEntity<Execution> executePipeline(@RequestParam(value="webId") String webId, @RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws LpAppsException {
+        Execution response = executorService.executePipeline(etlPipelineIri);
         return ResponseEntity.ok(response);
     }
 

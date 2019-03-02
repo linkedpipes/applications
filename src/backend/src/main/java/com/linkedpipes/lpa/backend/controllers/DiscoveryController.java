@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
@@ -23,6 +24,7 @@ import java.util.List;
 public class DiscoveryController {
 
     private final DiscoveryService discoveryService;
+    private final ExecutorService executorService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
@@ -31,11 +33,12 @@ public class DiscoveryController {
 
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
+        executorService = context.getBean(ExecutorService.class);
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
     @PostMapping("/api/pipelines/discover")
-    public ResponseEntity<Discovery> startDiscovery(@RequestBody List<DataSource> dataSourceList) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscovery(@RequestParam("webId") String webId, @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "No data sources were provided");
         }
@@ -45,27 +48,27 @@ public class DiscoveryController {
         }
 
         String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
-        Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
+        Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
         return ResponseEntity.ok(newDiscovery);
     }
 
     @PostMapping("/api/pipelines/discoverFromInput")
-    public ResponseEntity<Discovery> startDiscoveryFromInput(@RequestBody String discoveryConfig) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscoveryFromInput(@RequestParam("webId") String webId, @RequestBody String discoveryConfig) throws LpAppsException {
         if (discoveryConfig == null || discoveryConfig.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Discovery config not provided");
         }
 
-        Discovery newDiscovery = discoveryService.startDiscoveryFromInput(discoveryConfig);
+        Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
         return ResponseEntity.ok(newDiscovery);
     }
 
     @GetMapping("/api/pipelines/discoverFromInputIri")
-    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@RequestParam("webId") String webId, @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
         if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Input IRI not provided");
         }
 
-        Discovery newDiscovery = discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
+        Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
         return ResponseEntity.ok(newDiscovery);
     }
 
@@ -73,7 +76,8 @@ public class DiscoveryController {
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                                @NotNull @RequestParam(NAMED_GRAPH_PARAM) String namedGraph) throws LpAppsException {
+                                                                @NotNull @RequestParam(NAMED_GRAPH_PARAM) String namedGraph,
+                                                                @NotNull @RequestParam("webId") String webId) throws LpAppsException {
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -83,7 +87,7 @@ public class DiscoveryController {
 
         String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
         String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
-        return ResponseEntity.ok(discoveryService.startDiscoveryFromInput(discoveryConfig));
+        return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId));
     }
 
     @NotNull
