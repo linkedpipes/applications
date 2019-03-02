@@ -4,8 +4,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity(name="discovery")
-public class Discovery implements Serializable {
+@Entity(name="application")
+public class Application implements Serializable {
 
     @Id
     @GeneratedValue

@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.linkedpipes.lpa.backend.entities.UserProfile;
+import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
