@@ -3,12 +3,11 @@ package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
-import org.apache.jena.arq.querybuilder.WhereBuilder;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.jetbrains.annotations.NotNull;
 
 public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
 
@@ -21,26 +20,25 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
     private static final String RDF_PREFIX = "rdf";
 
     // VARIABLES
-    public static final String VAR_SCHEME_PREF_LABEL = var("s_spl");
-    public static final String VAR_SCHEME_RDFS_LABEL = var("s_lab");
-    public static final String VAR_SCHEME_DCTERMS_TITLE = var("s_dctt");
-    public static final String VAR_CONCEPT = var("c");
-    public static final String VAR_CONCEPT_PREF_LABEL = var("c_spl");
-    public static final String VAR_CONCEPT_SIZE_VALUE = var("c_val");
-    public static final String VAR_CONCEPT_SKOS_BROADER = var("c_broader");
-    public static final String VAR_NARROWER = var("n");
-    public static final String VAR_NARROWER_PREF_LABEL = var("n_spl");
-    public static final String VAR_NARROWER_DCTERMS_TITLE = var("n_dctt");
-    public static final String VAR_BROADER = var("b");
-    public static final String VAR_BROADER_PREF_LABEL = var("b_spl");
-    public static final String VAR_BROADER_DCTERMS_TITLE = var("b_dctt");
+    private static final String VAR_SCHEME_PREF_LABEL = var("s_spl");
+    private static final String VAR_SCHEME_RDFS_LABEL = var("s_lab");
+    private static final String VAR_SCHEME_DCTERMS_TITLE = var("s_dctt");
+    private static final String VAR_CONCEPT = var("c");
+    private static final String VAR_CONCEPT_PREF_LABEL = var("c_spl");
+    private static final String VAR_CONCEPT_RDFS_LABEL = var("c_lab");
+    private static final String VAR_CONCEPT_DCTERMS_TITLE = var("c_dctt");
+    private static final String VAR_CONCEPT_SIZE_VALUE = var("c_val");
+    private static final String VAR_CONCEPT_TOP_CONCEPT_OF = var("c_tco");
+    private static final String VAR_CONCEPT_BROADER = var("c_b");
+    private static final String VAR_CONCEPT_BROADER_TRANSITIVE = var("c_bt");
 
-    public SchemeQueryProvider(String schemeUri){
+    public SchemeQueryProvider(String schemeUri) {
         this.schemeUri = SparqlUtils.formatUri(schemeUri);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addPrefixes(ConstructBuilder builder) {
+    protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
                 .addPrefix(SKOS_PREFIX, SKOS.uri)
                 .addPrefix(RDFS_PREFIX, RDFS.uri)
@@ -48,64 +46,46 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
                 .addPrefix(RDF_PREFIX, RDF.uri);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addConstructs(ConstructBuilder builder) {
+    protected ConstructBuilder addConstructs(@NotNull ConstructBuilder builder) {
         return builder
+                .addConstruct(schemeUri, RDF.type, SKOS.ConceptScheme)
                 .addConstruct(schemeUri, SKOS.prefLabel, VAR_SCHEME_PREF_LABEL)
                 .addConstruct(schemeUri, RDFS.label, VAR_SCHEME_RDFS_LABEL)
                 .addConstruct(schemeUri, DCTerms.title, VAR_SCHEME_DCTERMS_TITLE)
                 .addConstruct(VAR_CONCEPT, RDF.type, SKOS.Concept)
-                .addConstruct(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
-                .addConstruct(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
                 .addConstruct(VAR_CONCEPT, SKOS.inScheme, schemeUri)
-                .addConstruct(VAR_CONCEPT, SKOS.broader, VAR_CONCEPT_SKOS_BROADER)
-                .addConstruct(VAR_BROADER, RDF.type, SKOS.Concept)
-                .addConstruct(VAR_BROADER, DCTerms.title, VAR_BROADER_DCTERMS_TITLE)
-                .addConstruct(VAR_BROADER, SKOS.prefLabel, VAR_BROADER_PREF_LABEL)
-                .addConstruct(VAR_NARROWER, RDF.type, SKOS.Concept)
-                .addConstruct(VAR_NARROWER, DCTerms.title, VAR_NARROWER_DCTERMS_TITLE)
-                .addConstruct(VAR_NARROWER, SKOS.prefLabel, VAR_NARROWER_PREF_LABEL)
-                .addConstruct(VAR_NARROWER, SKOS.broader, VAR_CONCEPT);
+                .addConstruct(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                .addConstruct(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
+                .addConstruct(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
+                .addConstruct(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
+                .addConstruct(VAR_CONCEPT, SKOS.topConceptOf, VAR_CONCEPT_TOP_CONCEPT_OF);
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addWheres(ConstructBuilder builder) {
-        //TODO test below
+    protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
+        return builder
+                .addWhere(schemeUri, RDF.type, SKOS.ConceptScheme)
+                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
+                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri);
+    }
+
+    @NotNull
+    @Override
+    protected ConstructBuilder addOptionals(@NotNull ConstructBuilder builder) {
         return builder
                 .addOptional(schemeUri, SKOS.prefLabel, VAR_SCHEME_PREF_LABEL)
                 .addOptional(schemeUri, RDFS.label, VAR_SCHEME_RDFS_LABEL)
                 .addOptional(schemeUri, DCTerms.title, VAR_SCHEME_DCTERMS_TITLE)
-                .addUnion(broaderPattern(SKOS.broader))
-                .addUnion(broaderPattern(SKOS.broaderTransitive))
-                .addUnion(narrowerPattern(SKOS.narrower))
-                .addUnion(narrowerPattern(SKOS.narrowerTransitive));
+                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                .addOptional(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
+                .addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
+                .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
+                .addOptional(VAR_CONCEPT, SKOS.topConceptOf, VAR_CONCEPT_TOP_CONCEPT_OF)
+                .addOptional(VAR_CONCEPT, SKOS.broader, VAR_CONCEPT_BROADER)
+                .addOptional(VAR_CONCEPT, SKOS.broaderTransitive, VAR_CONCEPT_BROADER_TRANSITIVE);
     }
 
-    private WhereBuilder broaderPattern(Property property) {
-        WhereBuilder broaderPatternBuilder = new WhereBuilder();
-        return broaderPatternBuilder
-                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
-                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
-                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
-                .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
-                .addOptional(new WhereBuilder()
-                                .addWhere(VAR_CONCEPT, property, VAR_BROADER)
-                                .addWhere(VAR_BROADER, RDF.type, SKOS.Concept)
-                                .addOptional(VAR_BROADER, DCTerms.title, VAR_BROADER_DCTERMS_TITLE)
-                                .addOptional(VAR_BROADER, SKOS.prefLabel, VAR_BROADER_PREF_LABEL));
-    }
-
-    private WhereBuilder narrowerPattern(Property property) {
-        WhereBuilder narrowerPatternBuilder = new WhereBuilder();
-        return narrowerPatternBuilder
-                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
-                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
-                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
-                .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
-                .addOptional(new WhereBuilder()
-                        .addWhere(VAR_CONCEPT, property, VAR_NARROWER)
-                        .addWhere(VAR_NARROWER, RDF.type, SKOS.Concept)
-                        .addOptional(VAR_NARROWER, DCTerms.title, VAR_NARROWER_DCTERMS_TITLE)
-                        .addOptional(VAR_NARROWER, SKOS.prefLabel, VAR_NARROWER_PREF_LABEL));
-    }
 }

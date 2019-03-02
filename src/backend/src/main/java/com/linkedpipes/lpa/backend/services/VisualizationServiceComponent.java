@@ -29,17 +29,23 @@ public class VisualizationServiceComponent implements VisualizationService {
     }
 
     @Override
-    public HierarchyNode getSkosScheme(String graphIri, String schemeUri){
+    public List<Scheme> getSkosSchemesFromNamed(String graphIri) {
+        ConstructSparqlQueryProvider provider = new SchemesQueryProvider();
+        return new SchemesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
+    @Override
+    public List<HierarchyNode> getSkosScheme(String schemeUri) {
+        ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
+        return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+    }
+
+    @Override
+    public List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri) {
         ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
         System.out.print(provider.getForNamed(graphIri));
 
         return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
-    }
-
-    @Override
-    public List<Scheme> getSkosSchemesFromNamed(String graphIri) {
-        ConstructSparqlQueryProvider provider = new SchemesQueryProvider();
-        return new SchemesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
     @Override

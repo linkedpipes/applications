@@ -9,7 +9,9 @@ public interface VisualizationService {
 
     List<Scheme> getSkosSchemesFromNamed(String graphIri);
 
-    HierarchyNode getSkosScheme(String graphIri, String schemeUri);
+    List<HierarchyNode> getSkosScheme(String schemeUri);
+
+    List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri);
 
     List<Concept> getSkosConcepts();
 

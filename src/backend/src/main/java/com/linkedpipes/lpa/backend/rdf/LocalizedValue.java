@@ -28,7 +28,7 @@ public class LocalizedValue {
     }
 
     public LocalizedValue(String value){
-        put(null, value);
+        put(noLanguageLabel, value);
     }
 
     public LocalizedValue(Literal literal){
