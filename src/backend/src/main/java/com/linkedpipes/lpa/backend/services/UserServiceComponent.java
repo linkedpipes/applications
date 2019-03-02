@@ -115,7 +115,7 @@ public class UserServiceComponent implements UserService {
     public void setUserExecution(String username, String executionIri) throws UserNotFoundException {
         User user = getUser(username);
         Execution e = new Execution();
-        e.setExecutionStarted(executionIri, new Date());
+        e.setExecutionStarted(executionIri);
         user.addExecution(e);
         executionRepository.save(e);
         repository.save(user);
@@ -159,6 +159,31 @@ public class UserServiceComponent implements UserService {
         UserProfile profile = new UserProfile();
         profile.userId = user.getUserName();
         profile.webId = user.getWebId();
+
+        profile.applications = new ArrayList<>();
+        for (com.linkedpipes.lpa.backend.entities.database.Application dba : user.getApplications()) {
+            com.linkedpipes.lpa.backend.entities.profile.Application app = new com.linkedpipes.lpa.backend.entities.profile.Application();
+            app.solidIri = dba.getSolidIri();
+            profile.applications.add(app);
+        }
+
+        profile.discoverySessions = new ArrayList<>();
+        for (com.linkedpipes.lpa.backend.entities.database.Discovery d : user.getDiscoveries()) {
+            DiscoverySession session = new DiscoverySession();
+            session.id = d.getDiscoveryId();
+            session.finished = !d.getExecuting();
+            profile.discoverySessions.add(session);
+        }
+
+        profile.pipelineExecutions = new ArrayList<>();
+        for (com.linkedpipes.lpa.backend.entities.database.Execution e : user.getExecutions()) {
+            com.linkedpipes.lpa.backend.entities.profile.PipelineExecution exec = new com.linkedpipes.lpa.backend.entities.profile.PipelineExecution();
+            exec.status = e.getStatus();
+            exec.executionIri = e.getExecutionIri();
+            exec.selectedVisualiser = e.getSelectedVisualiser();
+            profile.pipelineExecutions.add(exec);
+        }
+
         return profile;
     }
 

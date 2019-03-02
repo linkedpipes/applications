@@ -16,11 +16,11 @@ public class Execution implements Serializable {
     private String executionIri;
 
     @Column(nullable = false)
-    private Date started;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EtlStatus status;
+
+    @Column(nullable = false)
+    private String selectedVisualiser;
 
     @ManyToOne
     private User user;
@@ -37,17 +37,12 @@ public class Execution implements Serializable {
         }
     }
 
-    public void setExecutionStarted(String executionIri, Date started) {
+    public void setExecutionStarted(String executionIri) {
         this.executionIri = executionIri;
-        this.started = started;
     }
 
     public String getExecutionIri() {
         return executionIri;
-    }
-
-    public Date getDateStarted() {
-        return started;
     }
 
     public long getId() {
@@ -60,5 +55,13 @@ public class Execution implements Serializable {
 
     public EtlStatus getStatus() {
         return this.status;
+    }
+
+    public void setSelectedVisualiser(String visualizer) {
+        this.selectedVisualiser = visualizer;
+    }
+
+    public String getSelectedVisualiser() {
+        return this.selectedVisualiser;
     }
 }
