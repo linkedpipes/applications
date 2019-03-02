@@ -61,7 +61,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @Override
     public Discovery startDiscoveryFromInput(String discoveryConfig, String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        this.userService.setUserDiscovery(userId, discovery.id);
+        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
@@ -69,7 +69,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @Override
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri, String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        this.userService.setUserDiscovery(userId, discovery.id);
+        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
@@ -77,7 +77,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @Override
     public Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
-        this.userService.setUserExecution(userId, execution.iri, selectedVisualiser);
+        this.userService.setUserExecution(userId, execution.iri, selectedVisualiser);  //this inserts execution in DB
         startEtlStatusPolling(execution.iri);
         return execution;
     }
@@ -86,12 +86,15 @@ public class ExecutorServiceComponent implements ExecutorService {
         Runnable checker = () -> {
             try {
                 ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
+
+                //persist status in DB
+                for (Execution e : executionRepository.findByExecutionIri(executionIri)) {
+                    e.setStatus(executionStatus.status);
+                    executionRepository.store(e);
+                }
+
                 if (!executionStatus.status.isPollable()) {
                     Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
-                    for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                        e.setStatus(executionStatus.status);
-                    }
-
                     throw new RuntimeException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
@@ -107,6 +110,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
                 e.setStatus(EtlStatus.UNKNOWN);
+                executionRepository.store(e);
             }
         };
 
@@ -117,11 +121,13 @@ public class ExecutorServiceComponent implements ExecutorService {
         Runnable checker = () -> {
             try {
                 DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
+
                 if (discoveryStatus.isFinished) {
                     logger.info("Reporting discovery finished in room " + discoveryId);
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(discoveryStatus));
                     for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                         d.setExecuting(false);
+                        discoveryRepository.store(d);
                     }
 
                     throw new RuntimeException(); //this cancels the scheduler
@@ -139,6 +145,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
             for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                 d.setExecuting(false);
+                discoveryRepository.store(d);
             }
         };
 
