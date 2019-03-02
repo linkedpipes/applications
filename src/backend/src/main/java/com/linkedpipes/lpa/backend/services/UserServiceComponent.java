@@ -28,6 +28,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private ExecutionRepository executionRepository;
 
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
     @Override
     public UserProfile addUser(String username, String webId) throws UserTakenException {
         try {
@@ -192,6 +195,31 @@ public class UserServiceComponent implements UserService {
         User user = getUser(username);
         user.setWebId(webId);
         repository.save(user);
+        return getUserProfile(username);
+    }
+
+    @Override
+    public UserProfile addApplication(String username, String solidIri) throws UserNotFoundException {
+        User user = getUser(username);
+        com.linkedpipes.lpa.backend.entities.database.Application app = new com.linkedpipes.lpa.backend.entities.database.Application();
+        app.setSolidIri(solidIri);
+        user.addApplication(app);
+        applicationRepository.save(app);
+        repository.save(user);
+        return getUserProfile(username);
+    }
+
+    @Override
+    public UserProfile deleteApplication(String username, String solidIri) throws UserNotFoundException {
+        User user = getUser(username);
+
+        for (com.linkedpipes.lpa.backend.entities.database.Application app : user.getApplications()) {
+            if (app.getSolidIri().equals(solidIri)) {
+                applicationRepository.delete(app);
+                break;
+            }
+        }
+
         return getUserProfile(username);
     }
 }

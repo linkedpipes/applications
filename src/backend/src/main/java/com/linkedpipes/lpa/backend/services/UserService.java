@@ -13,6 +13,9 @@ public interface UserService {
     UserProfile updateUser(String user, String webId) throws UserNotFoundException;
     UserProfile getUserProfile(String user) throws UserNotFoundException;
 
+    UserProfile addApplication(String user, String solidIri) throws UserNotFoundException;
+    UserProfile deleteApplication(String user, String solidIri) throws UserNotFoundException;
+
     void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
     List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;
     void deleteUserDiscovery(String user, String discovery);

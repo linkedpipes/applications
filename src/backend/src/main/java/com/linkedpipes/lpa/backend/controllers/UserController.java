@@ -124,4 +124,28 @@ public class UserController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
+
+    @PostMapping("/api/user/application")
+    public ResponseEntity<UserProfile> addApplication(@RequestParam(value="userId", required=true) String user,
+                                                      @RequestParam(value="solidIri", required=true) String solidIri)
+                      throws LpAppsException {
+        try {
+          return ResponseEntity.ok(userService.addApplication(user, solidIri));
+        } catch(UserNotFoundException e) {
+          logger.error("User not found: " + user);
+          throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
+    }
+
+    @DeleteMapping("/api/user/application")
+    public ResponseEntity<UserProfile> deleteApplication(@RequestParam(value="userId", required=true) String user,
+                                                         @RequestParam(value="solidIri", required=true) String solidIri)
+                     throws LpAppsException {
+        try {
+          return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
+        } catch(UserNotFoundException e) {
+          logger.error("User not found: " + user);
+          throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
+    }
 }
