@@ -22,6 +22,9 @@ public class Execution implements Serializable {
     @Column(nullable = false)
     private String selectedVisualiser;
 
+    @Column(nullable = false)
+    private boolean executing;
+
     @ManyToOne
     private User user;
 

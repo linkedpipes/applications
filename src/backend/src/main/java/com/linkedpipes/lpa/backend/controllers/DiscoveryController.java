@@ -99,13 +99,6 @@ public class DiscoveryController {
                 .toString();
     }
 
-    @GetMapping("/api/discovery/{id}/status")
-    public ResponseEntity<String> getDiscoveryStatus(@PathVariable("id") String discoveryId) throws LpAppsException {
-        String response = discoveryService.getDiscoveryStatus(discoveryId);
-
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/api/discovery/{id}/pipelineGroups")
     public ResponseEntity<PipelineGroups> getPipelineGroups(@PathVariable("id") String discoveryId) throws LpAppsException {
         PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);

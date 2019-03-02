@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
+import com.linkedpipes.lpa.backend.entities.database.DiscoveryRepository;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
@@ -25,9 +26,13 @@ import org.springframework.stereotype.Service;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.concurrent.ScheduledFuture;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import static java.util.concurrent.TimeUnit.*;
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
 /**
@@ -42,6 +47,9 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
 
+    @Autowired
+    private DiscoveryRepository discoveryRepository;
+
     public DiscoveryServiceComponent(ApplicationContext context) {
         this.context = context;
     }
@@ -49,19 +57,50 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     @Override
     public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        startStatusPolling(result.id);
+        return result;
     }
 
     @Override
     public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        startStatusPolling(result.id);
+        return result;
     }
 
-    // TODO strongly type below method params (not simply string)
-    @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
-        return httpActions.getStatus(discoveryId);
+    public void startStatusPolling(String discoveryId) throws LpAppsException {
+        Runnable checker = () -> {
+            try {
+                String status = httpActions.getStatus(discoveryId);
+                DiscoveryStatus discoveryStatus = OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
+                if (discoveryStatus.isFinished) {
+                    logger.info("Reporting discovery finished in room " + discoveryId);
+                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", status);
+                    for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                        d.setExecuting(false);
+                    }
+
+                    throw new RuntimeException(); //this cancels the scheduler
+                }
+            } catch (LpAppsException e) {
+                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
+                throw new RuntimeException(e); //this cancels the scheduler
+            }
+        };
+
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+
+        Runnable canceller = () -> {
+            checkerHandle.cancel(false);
+            Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+            for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                d.setExecuting(false);
+            }
+        };
+
+        Application.SCHEDULER.schedule(canceller, 1, HOURS);
     }
 
     @Override

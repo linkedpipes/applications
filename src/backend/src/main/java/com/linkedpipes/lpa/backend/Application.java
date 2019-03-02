@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.corundumstudio.socketio.listener.*;
+import com.corundumstudio.socketio.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
 
 import java.nio.charset.Charset;
 
@@ -18,6 +22,8 @@ public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
+    public static final SocketIOServer SOCKET_IO_SERVER = getSocketIoServer();
+    public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1);
 
     @Bean
     @SuppressWarnings("unused")
@@ -30,8 +36,35 @@ public class Application {
         };
     }
 
+    public static SocketIOServer getSocketIoServer() {
+        Configuration config = new Configuration();
+        config.setPort(9092);
+        SocketConfig socketConfig = new SocketConfig();
+        socketConfig.setReuseAddress(true);
+        config.setSocketConfig(socketConfig);
+        logger.info("Called getSocketIOServer");
+
+        SocketIOServer server = new SocketIOServer(config);
+
+        server.addEventListener("join", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
+                logger.info("Client joined room: " + roomName);
+                socketIOClient.joinRoom(roomName);
+            });
+
+        server.addEventListener("leave", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
+                logger.info("Client left room: " + roomName);
+                socketIOClient.leaveRoom(roomName);
+            });
+
+        return server;
+    }
+
     public static void main(String[] args) {
+
         SpringApplication.run(Application.class, args);
+
+        SOCKET_IO_SERVER.start();
+
         logger.info("Application started");
     }
 
