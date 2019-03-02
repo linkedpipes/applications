@@ -1,15 +1,19 @@
 package com.linkedpipes.lpa.backend.sparql.queries;
 
+import org.apache.jena.arq.querybuilder.AbstractQueryBuilder;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.query.Query;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link #addWheres(ConstructBuilder)}.
- * Its non-mandatory hooks are {@link #addPrefixes(ConstructBuilder)} and {@link #addOptionals(ConstructBuilder)}.
+ * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link
+ * #addWheres(AbstractQueryBuilder)}. Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link
+ * #addOptionals(AbstractQueryBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
  */
-public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider {
+public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<ConstructBuilder> {
 
+    @NotNull
     @Override
     public final Query get() {
         ConstructBuilder builder = new ConstructBuilder();
@@ -18,32 +22,27 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider {
         addConstructs(builder);
         addWheres(builder);
         addOptionals(builder);
+        addAdditional(builder);
 
         return builder.build();
     }
 
+    @NotNull
     @Override
-    public final Query getForNamed(String name) {
+    public final Query getForNamed(@NotNull String name) {
         ConstructBuilder builder = new ConstructBuilder();
 
         addPrefixes(builder);
         addConstructs(builder);
         builder.fromNamed(name);
+
         builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
 
+        addAdditional(builder);
         return builder.build();
     }
 
-    protected ConstructBuilder addPrefixes(ConstructBuilder builder) {
-        return builder;
-    }
-
-    protected abstract ConstructBuilder addConstructs(ConstructBuilder builder);
-
-    protected abstract ConstructBuilder addWheres(ConstructBuilder builder);
-
-    protected ConstructBuilder addOptionals(ConstructBuilder builder) {
-        return builder;
-    }
+    @NotNull
+    protected abstract ConstructBuilder addConstructs(@NotNull ConstructBuilder builder);
 
 }

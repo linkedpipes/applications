@@ -1,21 +1,20 @@
 package com.linkedpipes.lpa.backend.sparql.queries;
 
+import org.apache.jena.arq.querybuilder.AbstractQueryBuilder;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addVars(SelectBuilder)} and {@link #addWheres(SelectBuilder)}.
- * Its non-mandatory hooks are {@link #addPrefixes(SelectBuilder)}, {@link #addOptionals(SelectBuilder)}, {@link
- * #addFilters(SelectBuilder)}, and {@link #addAdditional(SelectBuilder)}.
+ * Its mandatory sub-procedures are {@link #addVars(SelectBuilder)} and {@link #addWheres(AbstractQueryBuilder)}.
+ * Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link #addOptionals(AbstractQueryBuilder)},
+ * {@link #addFilters(SelectBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
  */
-public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
+public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<SelectBuilder> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SelectSparqlQueryProvider.class);
-
+    @NotNull
     @Override
     public final Query get() {
         SelectBuilder builder = new SelectBuilder();
@@ -27,17 +26,16 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
             addOptionals(builder);
             addFilters(builder);
             addAdditional(builder);
-        }
-        catch (ParseException e) {
-            logger.error("Exception while parsing query", e);
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
         return builder.build();
     }
 
+    @NotNull
     @Override
-    public final Query getForNamed(String name) {
+    public final Query getForNamed(@NotNull String name) {
         SelectBuilder builder = new SelectBuilder();
 
         try {
@@ -49,32 +47,18 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider {
             addFilters(subQuery);
             builder.addGraph(VAR_GRAPH, subQuery);
             addAdditional(builder);
-
         } catch (ParseException e) {
-            logger.error("Exception while parsing query", e);
             throw new RuntimeException(e);
         }
 
         return builder.build();
     }
 
-    protected SelectBuilder addPrefixes(SelectBuilder builder) {
-        return builder;
-    }
+    @NotNull
+    protected abstract SelectBuilder addVars(@NotNull SelectBuilder builder) throws ParseException;
 
-    protected abstract SelectBuilder addVars(SelectBuilder builder) throws ParseException;
-
-    protected abstract SelectBuilder addWheres(SelectBuilder builder);
-
-    protected SelectBuilder addOptionals(SelectBuilder builder) {
-        return builder;
-    }
-
-    protected SelectBuilder addFilters(SelectBuilder builder) throws ParseException {
-        return builder;
-    }
-
-    protected SelectBuilder addAdditional(SelectBuilder builder) {
+    @NotNull
+    protected SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
         return builder;
     }
 

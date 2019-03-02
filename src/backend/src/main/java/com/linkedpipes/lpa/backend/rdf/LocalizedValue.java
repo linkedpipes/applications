@@ -15,7 +15,7 @@ import java.util.Map;
 @JsonSerialize(using = LocalizedValue.Serializer.class)
 public class LocalizedValue {
 
-    private Map<String, String> languageMap = new HashMap<>();
+    private final Map<String, String> languageMap = new HashMap<>();
 
     public static String noLanguageLabel = "nolang";
 

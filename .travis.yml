@@ -16,7 +16,7 @@ matrix:
         directories:
           - src/frontend/node_modules
       script:
-        - yarn install --no-lockfile
+        - yarn install --frozen-lockfile --check-files
         - yarn run build
 
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
@@ -30,18 +30,20 @@ matrix:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
-
+      services:
+        - postgresql
       before_script:
         - cd src/backend
-
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew assemble
-        - ./gradlew test
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
     - # require the branch name to be master
-      if: branch = master
+      if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       language: java
       jdk: openjdk10
 
@@ -52,14 +54,18 @@ matrix:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
-
+      services:
+        - postgresql
+      before_script:
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - cd src/backend
         - ./gradlew dockerRun
         - ./gradlew assemble
         - sleep 5
-        - ./gradlew -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
         - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
         - docker push linkedpipes/applications:backend
         - cd ../frontend

@@ -5,7 +5,7 @@ FROM gradle:jdk10 as builder
 VOLUME /tmp
 
 # copy files
-ADD --chown=gradle . /app
+COPY --chown=gradle . /app
 WORKDIR /app
 
 # build the app

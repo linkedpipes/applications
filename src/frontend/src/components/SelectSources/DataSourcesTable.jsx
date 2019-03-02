@@ -12,6 +12,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import connect from "react-redux/lib/connect/connect";
 import Button from "@material-ui/core/Button";
+import { withRouter } from "react-router-dom";
+
 import {
   DiscoveryService,
   ETLService,
@@ -288,7 +290,7 @@ class DataSourcesTable extends React.Component {
       })
       .then(function(json) {
         let response = "Status: ";
-        let status = ETL_STATUS_MAP[json.status.id];
+        let status = ETL_STATUS_MAP[json.status["@id"]];
 
         if (status === undefined) {
           console.log("Unknown status for checking pipeline execution");
@@ -389,10 +391,11 @@ class DataSourcesTable extends React.Component {
                             variant="contained"
                             color="secondary"
                             onClick={() => {
-                              self.exportAndStartPolling(
-                                discoveryId,
-                                datasourceAndPipelines
-                              );
+                              // self.exportAndStartPolling(
+                              //   discoveryId,
+                              //   datasourceAndPipelines
+                              // );
+                              this.props.history.replace("/create-app");
                             }}
                           >
                             Execute
@@ -432,4 +435,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(DataSourcesTable));
+export default connect(mapStateToProps)(
+  withRouter(withStyles(styles)(DataSourcesTable))
+);
