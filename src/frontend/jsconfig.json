@@ -1,9 +1,9 @@
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@components": ["src/components"],
-      "@containers": ["src/containers"]
-    }
-  }
-}
+// {
+//   "compilerOptions": {
+//     "baseUrl": ".",
+//     "paths": {
+//       "@components": ["src/components"],
+//       "@containers": ["src/containers"]
+//     }
+//   }
+// }

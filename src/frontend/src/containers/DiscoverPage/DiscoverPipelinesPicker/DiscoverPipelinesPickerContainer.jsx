@@ -2,14 +2,9 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/lib/connect/connect';
 import { toast } from 'react-toastify';
-import {
-  ETLService,
-  ETL_STATUS_MAP,
-  ETL_STATUS_TYPE
-} from '../../../_services';
-import { addSingleExecution } from '../../../_actions/etl_executions';
-import { addSingleExport } from '../../../_actions/etl_exports';
-import { addSelectedResultGraphIriAction } from '../../../_actions/globals';
+import { ETLService, ETL_STATUS_MAP, ETL_STATUS_TYPE } from '@utils';
+import { etlActions } from '@ducks/etlDuck';
+import { globalActions } from '@ducks/globalDuck';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
 import ErrorBoundary from 'react-error-boundary';
 
@@ -84,7 +79,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
         const response = json;
 
         self.props.dispatch(
-          addSingleExport({
+          etlActions.addSingleExport({
             id: response.pipelineId,
             etlPipelineIri: response.etlPipelineIri,
             resultGraphIri: response.resultGraphIri
@@ -92,7 +87,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
         );
 
         self.props.dispatch(
-          addSelectedResultGraphIriAction({
+          globalActions.addSelectedResultGraphIriAction({
             data: response.resultGraphIri
           })
         );
@@ -118,7 +113,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
         // console.log(`Execute pipeline request sent!`, { autoClose: 2000 });
 
         self.props.dispatch(
-          addSingleExecution({
+          etlActions.addSingleExecution({
             id: pipelineId,
             executionIri: json.iri
           })
@@ -130,7 +125,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
 
   checkExecutionStatus = (pipelineId, loadingButtonId, tid) => {
     const { executions } = this.props;
-    const executionValues = executions.executions[pipelineId];
+    const executionValues = executions[pipelineId];
     const self = this;
 
     tid =
@@ -171,7 +166,8 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
           self.updateLoadingButton(loadingButtonId, true);
           if (status === ETL_STATUS_TYPE.Failed) {
             toast.update(tid, {
-              render: `Sorry, the ETL is unable to execute the pipeline, try${+'selecting different source...'}`,
+              render:
+                'Sorry, the ETL is unable to execute the pipeline, try selecting different source...',
               type: toast.TYPE.ERROR,
               autoClose: EXECUTION_STATUS_TIMEOUT
             });
@@ -231,8 +227,8 @@ DiscoverPipelinesPickerContainer.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    exportsDict: state.etl_exports,
-    executions: state.etl_executions,
+    exportsDict: state.etl.exports,
+    executions: state.etl.executions,
     discoveryId: state.globals.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     dataSourceGroups:

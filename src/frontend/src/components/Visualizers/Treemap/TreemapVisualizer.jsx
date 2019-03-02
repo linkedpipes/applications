@@ -1,14 +1,14 @@
-import Chart from "react-google-charts";
-import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import { VisualizersService } from "../../../_services";
+import Chart from 'react-google-charts';
+import React from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import { VisualizersService } from '@utils';
 
 const styles = theme => ({
   root: {
-    height: "72vh"
+    height: '72vh'
   },
   filterSideBar: {
-    overflowY: "auto"
+    overflowY: 'auto'
   },
   card: {},
   input: {}
@@ -17,36 +17,36 @@ const styles = theme => ({
 class TreemapVisualizer extends React.Component {
   constructor() {
     super();
-    this.state = { dataLoadingStatus: "loading", chartData: [] };
+    this.state = { dataLoadingStatus: 'loading', chartData: [] };
   }
 
   async componentDidMount() {
     const response = await VisualizersService.getTreemapData();
-    const headers = [["id", "parentId", "size", "color"]];
+    const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.json();
     const chartData = headers.concat(
       jsonData.map(e => [e.id, e.parentId, e.size, 0])
     );
     this.setState({
-      dataLoadingStatus: "ready",
+      dataLoadingStatus: 'ready',
       chartData: chartData
     });
   }
 
   render() {
-    return this.state.dataLoadingStatus === "ready" ? (
+    return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
-        width={"100%"}
-        height={"72vh"}
+        width={'100%'}
+        height={'72vh'}
         chartType="TreeMap"
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}
         options={{
-          minColor: "#33FF4A",
-          midColor: "#33FFEB",
-          maxColor: "#334AFF",
+          minColor: '#33FF4A',
+          midColor: '#33FFEB',
+          maxColor: '#334AFF',
           headerHeight: 20,
-          fontColor: "black",
+          fontColor: 'black',
           showScale: true
         }}
       />

@@ -80,12 +80,7 @@
   },
   "settings": {
     "import/resolver": {
-      "babel-module": {
-        "alias": {
-          "@components": "./src/components",
-          "@containers": "./src/containers"
-        }
-      }
+      "babel-module": {}
     }
   }
 }

@@ -2,12 +2,11 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addVisualizer } from '../../../_actions/visualizers';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService } from '../../../_services';
-import { extractUrlGroups } from '../../../_helpers';
-import { getDatasourcesArray } from '../../../_selectors/datasources';
-import { addDiscoveryIdAction } from '../../../_actions/globals';
+import { DiscoveryService, extractUrlGroups } from '@utils';
+import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
+import { visualizersActions } from '@ducks/visualizersDuck';
+import { globalActions } from '@ducks/globalDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 
 class DiscoverSelectorContainer extends PureComponent {
@@ -75,7 +74,7 @@ class DiscoverSelectorContainer extends PureComponent {
 
     return new Promise(resolve => {
       self.props.dispatch(
-        addDiscoveryIdAction({
+        globalActions.addDiscoveryIdAction({
           id: discoveryId
         })
       );
@@ -192,7 +191,9 @@ class DiscoverSelectorContainer extends PureComponent {
       })
       .then(jsonResponse => {
         self.props.dispatch(
-          addVisualizer({ visualizersArray: jsonResponse.pipelineGroups })
+          visualizersActions.addVisualizer({
+            visualizersArray: jsonResponse.pipelineGroups
+          })
         );
         return jsonResponse;
       });
@@ -298,7 +299,7 @@ DiscoverSelectorContainer.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    datasources: getDatasourcesArray(state.datasources),
+    datasources: discoverySelectors.getDatasourcesArray(state.datasources),
     discoveryId: state.globals.discoveryId
   };
 };

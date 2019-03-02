@@ -1,14 +1,11 @@
-import { applyMiddleware, createStore, combineReducers, compose } from 'redux';
-import datasourcesReducer from './ducks/discoveryDuck/reducers';
-import visualizers from './_reducers/visualizers';
-import etl_executions from './_reducers/etl_executions';
-import etl_exports from './_reducers/etl_exports';
-import filters from './_reducers/filters';
-import markers from './_reducers/markers';
+import { applyMiddleware, combineReducers, compose } from 'redux';
 import logger from 'redux-logger';
-import globals from './_reducers/globals';
 import { discoverReducer } from '@containers';
 import Reactotron from './ReactotronConfig';
+import { discoveryReducer } from '@ducks/discoveryDuck';
+import { globalReducer } from '@ducks/globalDuck';
+import { etlReducer } from '@ducks/etlDuck';
+import { visualizersReducer } from '@ducks/visualizersDuck';
 import thunk from 'redux-thunk';
 
 const composeEnhancers =
@@ -25,14 +22,11 @@ const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 export default () => {
   const store = Reactotron.createStore(
     combineReducers({
-      globals,
+      globals: globalReducer,
       discover: discoverReducer,
-      datasources: datasourcesReducer,
-      visualizers,
-      etl_executions,
-      etl_exports,
-      filters,
-      markers
+      datasources: discoveryReducer,
+      visualizers: visualizersReducer,
+      etl: etlReducer
     }),
     enhancer
   );

@@ -1,8 +1,5 @@
 {
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react"
-  ],
+  "presets": ["@babel/preset-env", "@babel/preset-react"],
   "plugins": [
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-object-rest-spread",
@@ -10,12 +7,13 @@
     [
       "module-resolver",
       {
-        "root": [
-          "./src"
-        ],
+        "root": ["./src"],
         "alias": {
           "@components": "./src/components",
-          "@containers": "./src/containers"
+          "@containers": "./src/containers",
+          "@ducks": "./src/ducks",
+          "@utils": "./src/utils",
+          "@constants": "./src/constants"
         }
       }
     ]

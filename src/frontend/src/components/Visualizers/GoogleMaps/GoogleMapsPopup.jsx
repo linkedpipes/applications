@@ -10,13 +10,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React from 'react';
 import GoogleMapsVisualizer from './GoogleMapsVisualizer';
-import { VisualizersService } from '../../../_services';
+import { VisualizersService } from '@utils';
+import { optionModes, filterTypes } from '@constants';
 import { withRouter } from 'react-router-dom';
 import { Grid } from '@material-ui/core';
 import Filters from '../../VisualizerController/Filters/Filters';
-import { addFilters } from '../../../_actions/filters';
-import { addMultipleMarkers } from '../../../_actions/markers';
-import { optionModes, filterTypes } from '../../../constants';
+import { visualizersActions } from '@ducks/visualizersDuck';
 import connect from 'react-redux/lib/connect/connect';
 import { toast } from 'react-toastify';
 
@@ -124,7 +123,9 @@ class GoogleMapsPopup extends React.Component {
         }
       )
       .then(function(jsonResponse) {
-        self.props.dispatch(addMultipleMarkers({ markersList: jsonResponse }));
+        self.props.dispatch(
+          visualizersActions.addMultipleMarkers({ markersList: jsonResponse })
+        );
       });
 
     VisualizersService.getFilters()
@@ -141,7 +142,7 @@ class GoogleMapsPopup extends React.Component {
           skosConceptsResponse
         ) {
           self.props.dispatch(
-            addFilters(
+            visualizersActions.addFilters(
               self.assembleFilters(filtersResponse, skosConceptsResponse)
             )
           );
