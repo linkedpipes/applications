@@ -75,9 +75,9 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     @Override
-    public Execution executePipeline(String etlPipelineIri, String userId) throws LpAppsException, UserNotFoundException {
+    public Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
-        this.userService.setUserExecution(userId, execution.iri);
+        this.userService.setUserExecution(userId, execution.iri, selectedVisualiser);
         startEtlStatusPolling(execution.iri);
         return execution;
     }

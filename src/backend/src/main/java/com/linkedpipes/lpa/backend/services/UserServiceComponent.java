@@ -115,10 +115,11 @@ public class UserServiceComponent implements UserService {
     }
 
     @Override
-    public void setUserExecution(String username, String executionIri) throws UserNotFoundException {
+    public void setUserExecution(String username, String executionIri, String selectedVisualiser) throws UserNotFoundException {
         User user = getUser(username);
         Execution e = new Execution();
         e.setExecutionStarted(executionIri);
+        e.setSelectedVisualiser(selectedVisualiser);
         user.addExecution(e);
         executionRepository.save(e);
         repository.save(user);

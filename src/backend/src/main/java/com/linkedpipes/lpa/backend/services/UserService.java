@@ -20,7 +20,7 @@ public interface UserService {
     List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;
     void deleteUserDiscovery(String user, String discovery);
 
-    void setUserExecution(String user, String execution) throws UserNotFoundException;
+    void setUserExecution(String user, String execution, String visualizer) throws UserNotFoundException;
     List<Execution> getUserExecutions(String user) throws UserNotFoundException;
     void deleteUserExecution(String user, String execution);
 }
