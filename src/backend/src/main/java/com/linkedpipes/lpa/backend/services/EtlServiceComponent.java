@@ -57,7 +57,7 @@ public class EtlServiceComponent implements EtlService {
                 if (!executionStatus.status.isPollable()) {
                     Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", response);
                     for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                        e.setExecuting(false);
+                        e.setStatus(executionStatus.status);
                     }
 
                     throw new RuntimeException(); //this cancels the scheduler
@@ -74,7 +74,7 @@ public class EtlServiceComponent implements EtlService {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                e.setExecuting(false);
+                e.setStatus(EtlStatus.UNKNOWN);
             }
         };
 
