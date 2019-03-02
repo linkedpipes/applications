@@ -830,6 +830,13 @@
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.6.3.tgz#e683c46c34937d997923be7270b8f071d6957cc6"
   integrity sha512-g7JEuU8U+pWmgdX7McUe/N8tavRZ4sskZT2tnvjz3pGwxU+TJsm/jrdbApMKQ5MaTSCp+/eDUulAbGOkzJ9uuw==
   dependencies:
+    any-observable "^0.3.0"
+
+"@sentry/browser@4.6.1":
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.6.1.tgz#a51bf4dd0eebc9daf55744ab43844e8d3e09ede4"
+  integrity sha512-P7lbuTf13b6m5392CutSx1wI4Oh/W3TzRac7IOznrbhG26rbtIXCAeQdxDCnAt8+qCrboGvVdtfLRP6h1XUlqA==
+  dependencies:
     "@sentry/core" "4.6.3"
     "@sentry/types" "4.5.3"
     "@sentry/utils" "4.6.3"
@@ -3287,6 +3294,11 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+fn-name@~2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
+  integrity sha1-UhTXU3pNBqSjAcDMJi/rhBiAAuc=
 
 fn-name@~2.0.1:
   version "2.0.1"
@@ -5881,7 +5893,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@1.16.4:
+prettier@^1.16.4:
   version "1.16.4"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.4.tgz#73e37e73e018ad2db9c76742e2647e21790c9717"
   integrity sha512-ZzWuos7TI5CKUeQAtFd6Zhm2s6EpAD/ZLApIhsF9pRvRtM1RFo61dM/4MSRUA0SuLugA/zgrZD8m0BaY46Og7g==
