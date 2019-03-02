@@ -1,4 +1,4 @@
-# Using OpenJDK 10
+# Using OpenJDK 11
 FROM gradle:5.2.1-jdk11 as builder
 
 # Tomcat will eventually create directories here
