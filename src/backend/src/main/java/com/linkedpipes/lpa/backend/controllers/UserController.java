@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/api/user/discovery")
-    public ResponseEntity<List<Discovery>> getUserDiscoveries(@RequestParam(value="userId", required=true) String user)
+    public ResponseEntity<List<Discovery>> getUserDiscoveries(@RequestParam(value="webId", required=true) String user)
                             throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.getUserDiscoveries(user));
@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @DeleteMapping("/api/user/discovery")
-    public void deleteUserDiscovery(@RequestParam(value="userId", required=true) String user,
+    public void deleteUserDiscovery(@RequestParam(value="webId", required=true) String user,
                                     @RequestParam(value="discoveryId", required=true) String discovery)
                               throws LpAppsException {
         logger.info("Delete discovery:: user = '" + user + "', discovery = '" + discovery + "'");
@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping("/api/user/execution")
-    public void deleteUserExecution(@RequestParam(value="userId", required=true) String user,
+    public void deleteUserExecution(@RequestParam(value="webId", required=true) String user,
                                     @RequestParam(value="executionIri", required=true) String execution)
                               throws LpAppsException {
         logger.info("Delete execution:: user = '" + user + "', execution = '" + execution + "'");
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> addUser(@RequestParam(value="userId", required=true) String user) throws LpAppsException {
+    public ResponseEntity<UserProfile> addUser(@RequestParam(value="webId", required=true) String user) throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.addUser(user));
         } catch (UserTakenException e) {
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/api/user")
-    public ResponseEntity<UserProfile> getUser(@RequestParam(value="userId", required=true) String user)
+    public ResponseEntity<UserProfile> getUser(@RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.getUserProfile(user));
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @PostMapping("/api/user/application")
-    public ResponseEntity<UserProfile> addApplication(@RequestParam(value="userId", required=true) String user,
+    public ResponseEntity<UserProfile> addApplication(@RequestParam(value="webId", required=true) String user,
                                                       @RequestParam(value="solidIri", required=true) String solidIri)
                       throws LpAppsException {
         try {
@@ -88,7 +88,7 @@ public class UserController {
     }
 
     @DeleteMapping("/api/user/application")
-    public ResponseEntity<UserProfile> deleteApplication(@RequestParam(value="userId", required=true) String user,
+    public ResponseEntity<UserProfile> deleteApplication(@RequestParam(value="webId", required=true) String user,
                                                          @RequestParam(value="solidIri", required=true) String solidIri)
                      throws LpAppsException {
         try {

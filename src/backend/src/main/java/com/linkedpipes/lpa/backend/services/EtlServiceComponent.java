@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
-import java.util.Set;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
