@@ -50,37 +50,31 @@ public class EtlServiceComponent implements EtlService {
     }
 
     private void startStatusPolling(String executionIri) throws LpAppsException {
-        Runnable checker = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String response = httpActions.getExecutionStatus(executionIri);
-                    ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
-                    if (!executionStatus.status.isPollable()) {
-                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", response);
-                        for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                            e.setExecuting(false);
-                        }
-
-                        throw new RuntimeException(); //this cancels the scheduler
+        Runnable checker = () -> {
+            try {
+                String response = httpActions.getExecutionStatus(executionIri);
+                ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
+                if (!executionStatus.status.isPollable()) {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", response);
+                    for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
+                        e.setExecuting(false);
                     }
-                } catch (LpAppsException e) {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
-                    throw new RuntimeException(e); //this cancels the scheduler
+
+                    throw new RuntimeException(); //this cancels the scheduler
                 }
+            } catch (LpAppsException e) {
+                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
+                throw new RuntimeException(e); //this cancels the scheduler
             }
         };
 
         ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
 
-        Runnable canceller = new Runnable() {
-            @Override
-            public void run() {
-                checkerHandle.cancel(false);
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
-                for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
-                    e.setExecuting(false);
-                }
+        Runnable canceller = () -> {
+            checkerHandle.cancel(false);
+            Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
+            for (com.linkedpipes.lpa.backend.entities.database.Execution e : executionRepository.findByExecutionIri(executionIri)) {
+                e.setExecuting(false);
             }
         };
 

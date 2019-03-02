@@ -71,38 +71,32 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     }
 
     public void startStatusPolling(String discoveryId) throws LpAppsException {
-        Runnable checker = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String status = httpActions.getStatus(discoveryId);
-                    DiscoveryStatus discoveryStatus = OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
-                    if (discoveryStatus.isFinished) {
-                        logger.info("Reporting discovery finished in room " + discoveryId);
-                        Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", status);
-                        for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                            d.setExecuting(false);
-                        }
-
-                        throw new RuntimeException(); //this cancels the scheduler
+        Runnable checker = () -> {
+            try {
+                String status = httpActions.getStatus(discoveryId);
+                DiscoveryStatus discoveryStatus = OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
+                if (discoveryStatus.isFinished) {
+                    logger.info("Reporting discovery finished in room " + discoveryId);
+                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", status);
+                    for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                        d.setExecuting(false);
                     }
-                } catch (LpAppsException e) {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
-                    throw new RuntimeException(e); //this cancels the scheduler
+
+                    throw new RuntimeException(); //this cancels the scheduler
                 }
+            } catch (LpAppsException e) {
+                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
+                throw new RuntimeException(e); //this cancels the scheduler
             }
         };
 
         ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
 
-        Runnable canceller = new Runnable() {
-            @Override
-            public void run() {
-                checkerHandle.cancel(false);
-                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
-                for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                    d.setExecuting(false);
-                }
+        Runnable canceller = () -> {
+            checkerHandle.cancel(false);
+            Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+            for (com.linkedpipes.lpa.backend.entities.database.Discovery d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                d.setExecuting(false);
             }
         };
 
