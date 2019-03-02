@@ -129,7 +129,7 @@ public class UserServiceComponent implements UserService {
     public List<Execution> getUserExecutions(String username) throws UserNotFoundException {
         List<Execution> executions = new ArrayList<>();
         for (ExecutionDao e : getExecutions(username)) {
-            Execution execution = new com.linkedpipes.lpa.backend.entities.Execution();
+            Execution execution = new Execution();
             execution.iri = e.getExecutionIri();
             executions.add(execution);
         }
