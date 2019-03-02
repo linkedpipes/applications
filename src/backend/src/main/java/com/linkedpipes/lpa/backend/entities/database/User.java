@@ -23,6 +23,9 @@ public class User implements Serializable {
     @OneToMany(mappedBy="user")
     private List<Execution> executions;
 
+    @OneToMany(mappedBy="user")
+    private List<Application> applications;
+
     public void addDiscovery(Discovery discovery) {
         this.discoveries.add(discovery);
         if (discovery.getUser() != this) {
@@ -43,6 +46,17 @@ public class User implements Serializable {
 
     public List<Execution> getExecutions() {
         return this.executions;
+    }
+
+    public List<Application> getApplications() {
+        return this.applications;
+    }
+
+    public void addApplication(Application app) {
+        this.applications.add(app);
+        if (app.getUser() != this) {
+            app.setUser(this);
+        }
     }
 
     public String getWebId() {
