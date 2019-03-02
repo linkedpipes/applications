@@ -4,6 +4,7 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.EtlService;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,9 +89,16 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@RequestParam(value="webId") String webId, @RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws LpAppsException {
-        Execution response = executorService.executePipeline(etlPipelineIri);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Execution> executePipeline(@RequestParam(value="webId") String webId,
+                                                     @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
+                                                     @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
+        try {
+            Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser);
+            return ResponseEntity.ok(response);
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + webId);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
 }

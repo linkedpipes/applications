@@ -34,8 +34,8 @@ public class UserServiceComponent implements UserService {
     @Override
     public UserProfile addUser(String webId) throws UserTakenException {
         try {
-            getUser(username);
-            throw new UserTakenException(username);
+            getUser(webId);
+            throw new UserTakenException(webId);
         } catch (UserNotFoundException e) {
             User user = new User();
             user.setWebId(webId);
@@ -160,7 +160,6 @@ public class UserServiceComponent implements UserService {
     public UserProfile getUserProfile(String username) throws UserNotFoundException {
         User user = getUser(username);
         UserProfile profile = new UserProfile();
-        profile.userId = user.getUserName();
         profile.webId = user.getWebId();
 
         profile.applications = new ArrayList<>();
@@ -188,14 +187,6 @@ public class UserServiceComponent implements UserService {
         }
 
         return profile;
-    }
-
-    @Override
-    public UserProfile updateUser(String username, String webId) throws UserNotFoundException {
-        User user = getUser(username);
-        user.setWebId(webId);
-        repository.save(user);
-        return getUserProfile(username);
     }
 
     @Override

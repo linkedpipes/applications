@@ -9,6 +9,6 @@ public interface ExecutorService {
 
     Discovery startDiscoveryFromInput(String discoveryConfig, String userId) throws LpAppsException, UserNotFoundException;
     Discovery startDiscoveryFromInputIri(String discoveryConfigIri, String userId) throws LpAppsException, UserNotFoundException;
-    Execution executePipeline(String etlPipelineIri, String userId) throws LpAppsException, UserNotFoundException;
+    Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException;
 
 }

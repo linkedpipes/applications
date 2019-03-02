@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
@@ -47,9 +48,13 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Some data sources are not valid HTTP URIS");
         }
 
-        String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
-        Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
-        return ResponseEntity.ok(newDiscovery);
+        try {
+            String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
+            Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
+            return ResponseEntity.ok(newDiscovery);
+        } catch(UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
     @PostMapping("/api/pipelines/discoverFromInput")
@@ -58,8 +63,12 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Discovery config not provided");
         }
 
-        Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
-        return ResponseEntity.ok(newDiscovery);
+        try {
+            Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
+            return ResponseEntity.ok(newDiscovery);
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
     @GetMapping("/api/pipelines/discoverFromInputIri")
@@ -68,8 +77,12 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Input IRI not provided");
         }
 
-        Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
-        return ResponseEntity.ok(newDiscovery);
+        try {
+            Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
+            return ResponseEntity.ok(newDiscovery);
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
     @NotNull
@@ -85,9 +98,13 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Data Sample IRI not provided");
         }
 
-        String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
-        String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
-        return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId));
+        try {
+            String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
+            String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId));
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
     @NotNull
