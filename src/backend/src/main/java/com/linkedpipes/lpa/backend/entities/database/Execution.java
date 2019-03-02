@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.entities.database;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import com.linkedpipes.lpa.backend.entities.EtlStatus;
 
 @Entity(name="execution")
 public class Execution implements Serializable {
@@ -18,7 +19,8 @@ public class Execution implements Serializable {
     private Date started;
 
     @Column(nullable = false)
-    private boolean executing;
+    @Enumerated(EnumType.STRING)
+    private EtlStatus status;
 
     @ManyToOne
     private User user;
@@ -52,11 +54,11 @@ public class Execution implements Serializable {
         return id;
     }
 
-    public boolean getExecuting() {
-        return this.executing;
+    public void setStatus(EtlStatus status) {
+        this.status = status;
     }
 
-    public void setExecuting(boolean executing) {
-        this.executing = executing;
+    public EtlStatus getStatus() {
+        return this.status;
     }
 }
