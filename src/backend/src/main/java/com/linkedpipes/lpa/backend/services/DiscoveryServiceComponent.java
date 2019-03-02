@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.Visualizers;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
@@ -78,6 +79,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
             PipelineGroup pipelineGrp = new PipelineGroup();
             ObjectNode appGroupObj = (ObjectNode) appGroup;
             pipelineGrp.visualizer = OBJECT_MAPPER.convertValue(appGroupObj.get("applicationInstance"), ApplicationInstance.class);
+            pipelineGrp.visualizer.visualizerCode = Visualizers.map.getOrDefault(pipelineGrp.visualizer.iri, "");
 
             ArrayNode dataSourceGroups = (ArrayNode) appGroupObj.get("dataSourceGroups");
 
