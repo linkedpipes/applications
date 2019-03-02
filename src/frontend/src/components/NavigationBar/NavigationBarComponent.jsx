@@ -109,7 +109,6 @@ const NavigationBarComponent = ({
       <Toolbar disableGutters={!drawerState} className={classes.toolbar}>
         <div className={classes.toolbarIcon}>
           <IconButton
-            color="inherit"
             aria-label="Open drawer"
             onClick={onHandleDrawerOpen}
             className={classNames(classes.menuButton, {
@@ -119,12 +118,7 @@ const NavigationBarComponent = ({
             <MenuIcon />
           </IconButton>
         </div>
-        <Typography
-          variant="h6"
-          color="inherit"
-          className={classes.flex}
-          noWrap
-        >
+        <Typography variant="h6" className={classes.flex} noWrap>
           Discovery API Assistant Demo
         </Typography>
         <UserProfileButton />
@@ -156,7 +150,7 @@ const NavigationBarComponent = ({
       </div>
       <Divider />
       <List>
-        <Link to="/dashboard">
+        <Link style={{ textDecoration: 'none' }} to="/dashboard">
           <ListItem button>
             <ListItemIcon>
               <HomeIcon />
@@ -165,7 +159,7 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link>
 
-        <Link to="/create-app">
+        <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
             <ListItemIcon>
               <ViewModuleIcon />
@@ -174,7 +168,7 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link>
 
-        <Link to="/about">
+        <Link style={{ textDecoration: 'none' }} to="/about">
           <ListItem button>
             <ListItemIcon>
               <HelpIcon />

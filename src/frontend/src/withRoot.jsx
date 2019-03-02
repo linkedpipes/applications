@@ -6,16 +6,16 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 // It's optional.
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true
+    useNextVariants: true,
+    fontFamily: ['"Roboto"', 'sans-serif'].join(',')
   },
   palette: {
+    type: 'dark',
     primary: {
-      // main: "#2196f3"
-      main: '#154168'
+      main: '#c9b088'
     },
     secondary: {
-      // main: "#ab003c"
-      main: '#fecf8a'
+      main: '#305F7C'
     }
   }
 });
@@ -25,7 +25,7 @@ function withRoot(Component) {
     // MuiThemeProvider makes the theme available down the React tree
     // thanks to React context.
     return (
-      <MuiThemeProvider theme={theme}>      
+      <MuiThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Component {...props} theme={theme} />

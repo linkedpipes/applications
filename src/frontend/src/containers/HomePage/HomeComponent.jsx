@@ -23,18 +23,18 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: '90%'
   },
-  createBtn: {
-    margin: theme.spacing.unit,
-    width: '90%',
-    backgroundColor: '#00695C',
-    color: 'white',
-    textDecoration: 'none'
-  },
   templatesBtn: {
     margin: theme.spacing.unit,
     width: '90%',
-    backgroundColor: '#154168',
+    backgroundColor: '#305F7C',
     color: 'white'
+  },
+  createBtn: {
+    margin: theme.spacing.unit,
+    width: '90%',
+    backgroundColor: '#c9b088',
+    color: 'white',
+    textDecoration: 'none'
   }
 });
 
@@ -46,7 +46,10 @@ const HomeComponent = ({ classes }) => (
           <Typography variant="subtitle1" gutterBottom>
             Start by creating a new application
           </Typography>
-          <Link to="/discover">
+          <Link
+            style={{ textDecoration: 'none', color: 'transparent' }}
+            to="/discover"
+          >
             <Button
               variant="contained"
               size="large"

@@ -17,7 +17,7 @@ const UserProfileButtonComponent = ({
   onHandleMenuOpen
 }) => (
   <div>
-    <IconButton onClick={onHandleMenuOpen} color="inherit">
+    <IconButton onClick={onHandleMenuOpen}>
       <AccountCircle />
     </IconButton>
 

@@ -1,12 +1,11 @@
-import React from "react";
-import Checkbox from "@material-ui/core/Checkbox";
-import Radio from "@material-ui/core/Radio";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import { optionModes as modes } from "../../../../_constants/options.constants";
-import { filterTypes as types } from "../../../../_constants/filters.constants";
-import { withStyles } from "@material-ui/core/styles";
+import React from 'react';
+import Checkbox from '@material-ui/core/Checkbox';
+import Radio from '@material-ui/core/Radio';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import { optionModes, filterTypes } from '@constants';
+import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   nested: {
@@ -18,26 +17,26 @@ const Option = ({ option, type, onChange, classes }) => {
   const { count, mode, skosConcept, selected } = option;
 
   switch (type) {
-    case types.CHECKBOX:
+    case filterTypes.CHECKBOX:
       return (
         <ListItem button className={classes.nested}>
           <ListItemText primary={skosConcept.label} />
           <ListItemSecondaryAction>
             <Checkbox
-              disabled={mode == modes.ALWAYS_SELECT}
+              disabled={mode == optionModes.ALWAYS_SELECT}
               onChange={onChange}
               checked={selected}
             />
           </ListItemSecondaryAction>
         </ListItem>
       );
-    case types.RADIO:
+    case filterTypes.RADIO:
       return (
         <ListItem button className={classes.nested}>
           <ListItemText primary={skosConcept.label} />
           <ListItemSecondaryAction>
             <Radio
-              disabled={mode == modes.ALWAYS_SELECT}
+              disabled={mode == optionModes.ALWAYS_SELECT}
               checked={selected}
               onChange={onChange}
             />

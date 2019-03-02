@@ -33,7 +33,7 @@ const DiscoverVisualizerCardComponent = ({
 }) => (
   <Card className={classes.card}>
     <CardActionArea style={{ textAlign: 'center' }}>
-      <MapIcon style={{ fontSize: '80px' }} />
+      <MapIcon style={{ color: 'white', fontSize: '80px' }} />
       <CardContent className={classes.CardContent}>
         <Typography gutterBottom variant="h5" component="h2">
           Test

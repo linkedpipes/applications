@@ -4,6 +4,7 @@ import Redirect from 'react-router-dom/es/Redirect';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
+import Typography from '@material-ui/core/Typography';
 import CreateApp from './components/CreateApp/CreateApp';
 import { NavigationBar } from '@components';
 import { DiscoverPage, HomePage, NotFoundPage, AboutPage } from '@containers';
@@ -20,14 +21,14 @@ const styles = theme => ({
   },
   devBar: {
     fontSize: '1rem',
-    height: '2rem',
+    height: '3rem',
     paddingBottom: '0.5rem',
     paddingTop: '0.5rem',
     fontWeight: 'bold',
-    color: '#606060',
+    color: 'white',
     textAlign: 'center',
     verticalAlign: 'middle',
-    background: '#ffdb4d',
+    background: '#525C62',
     width: '100%'
   }
 });
@@ -42,11 +43,15 @@ const AppRouter = props => {
           <div className={classes.appBarSpacer} />
           <CssBaseline />
           {process.env.NODE_ENV !== 'production' && (
-            <div className={classes.devBar}>DEVELOPMENT MODE</div>
+            <div className={classes.devBar}>
+              <Typography variant="subtitle1" noWrap>
+                Development Build
+              </Typography>
+            </div>
           )}
           <Switch>
             <Route exact path="/dashboard" component={HomePage} />
-            <Route exact path="/create-app" component={CreateApp} />
+            {/* <Route exact path="/create-app" component={CreateApp} /> */}
             <Route exact path="/discover" component={DiscoverPage} />
             <Route path="/about" component={AboutPage} />
             <Redirect from="/" to="/dashboard" />

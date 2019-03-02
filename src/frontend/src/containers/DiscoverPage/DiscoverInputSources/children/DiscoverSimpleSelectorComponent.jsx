@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Grid, TextField } from '@material-ui/core';
-import { FilePond, File, registerPlugin } from 'react-filepond';
-import 'filepond/dist/filepond.min.css';
+import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import 'filepond/dist/filepond.min.css';
 
 // Register the plugins
 registerPlugin(FilePondPluginFileValidateType);
@@ -61,7 +61,6 @@ const DiscoverSimpleSelectorComponent = ({
   </Grid>
 );
 
-
 DiscoverSimpleSelectorComponent.propTypes = {
   classes: PropTypes.any,
   discoveryIsLoading: PropTypes.any,
@@ -69,6 +68,6 @@ DiscoverSimpleSelectorComponent.propTypes = {
   handleValidateField: PropTypes.any,
   selectedInputExample: PropTypes.any,
   textFieldValue: PropTypes.any
-}
+};
 
 export default DiscoverSimpleSelectorComponent;
