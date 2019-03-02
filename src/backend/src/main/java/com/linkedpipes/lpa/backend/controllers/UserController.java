@@ -93,24 +93,11 @@ public class UserController {
     }
 
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> addUser(@RequestParam(value="userId", required=true) String user,
-                        @RequestParam(value="webId", required=false) String webId)
-                    throws LpAppsException {
+    public ResponseEntity<UserProfile> addUser(@RequestParam(value="userId", required=true) String user) throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.addUser(user, webId));
         } catch (UserTakenException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
-        }
-    }
-
-    @PutMapping("/api/user")
-    public ResponseEntity<UserProfile> updateUser(@RequestParam(value="userId", required=true) String user,
-                        @RequestParam(value="webId", required=false) String webId)
-                    throws LpAppsException {
-        try {
-            return ResponseEntity.ok(userService.updateUser(user, webId));
-        } catch (UserNotFoundException e) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 

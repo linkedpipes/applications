@@ -6,5 +6,5 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-    List<User> findByUserName(String userName);
+    List<User> findByWebId(String webId);
 }

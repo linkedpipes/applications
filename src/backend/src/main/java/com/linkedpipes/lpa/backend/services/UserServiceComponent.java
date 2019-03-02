@@ -32,17 +32,16 @@ public class UserServiceComponent implements UserService {
     private ApplicationRepository applicationRepository;
 
     @Override
-    public UserProfile addUser(String username, String webId) throws UserTakenException {
+    public UserProfile addUser(String webId) throws UserTakenException {
         try {
             getUser(username);
             throw new UserTakenException(username);
         } catch (UserNotFoundException e) {
             User user = new User();
-            user.setUserName(username);
             user.setWebId(webId);
             repository.save(user);
             try {
-                return getUserProfile(username);
+                return getUserProfile(webId);
             } catch(UserNotFoundException f) {
                 logger.error("Failed to store user.");
                 throw new RuntimeException(f);
@@ -77,7 +76,7 @@ public class UserServiceComponent implements UserService {
     }
 
     private User getUser(String username) throws UserNotFoundException {
-        List<User> users = repository.findByUserName(username);
+        List<User> users = repository.findByWebId(username);
         User user;
         if (users.size() == 0) throw new UserNotFoundException(username);
         if (users.size() > 1) {

@@ -12,9 +12,6 @@ public class User implements Serializable {
     private long id;
 
     @Column(nullable = false)
-    private String userName;
-
-    @Column(nullable = true)
     private String webId;
 
     @OneToMany(mappedBy="user")
@@ -65,14 +62,6 @@ public class User implements Serializable {
 
     public void setWebId(String webId) {
         this.webId = webId;
-    }
-
-    public String getUserName() {
-        return this.userName;
-    }
-
-    public void setUserName(String name) {
-        this.userName = name;
     }
 
     public long getId() {
