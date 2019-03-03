@@ -10,13 +10,13 @@ import requests
 app = Flask(__name__)
 
 
-slack_token = "xoxp-366117520291-367109331318-558263684080-0b852271b3f5611a77e8d3824d0816c0"
+slack_token = "<slack token>"
 sc = SlackClient(slack_token)
 
 def deploy(x):
     print("running deployment...")
     process = subprocess.call(["/bin/bash", "home/project/deploy/deploy.sh"])
-    sc.api_call("chat.postMessage", channel="CGGD5F3FY", text="The deployent has been completed!")
+    sc.api_call("chat.postMessage", channel="<channel>", text="The deployent has been completed!")
 
 
 @app.route('/webhooks/lpa', methods=["POST"])
@@ -27,7 +27,7 @@ def listen_webhook():
     merged = data["pull_request"]["merged"]
     if branch and "master" in branch and action == "closed" and merged:
         #Spawn thread to process the data
-        sc.api_call("chat.postMessage", channel="CGGD5F3FY", text="A deployment to https://applications.linkedpipes.com has started...")
+        sc.api_call("chat.postMessage", channel="<channel>", text="A deployment to https://applications.linkedpipes.com has started...")
         t = Thread(target=deploy, args=(data,))
         t.start()
         return jsonify({"message": "deployment will be made"}), 200
