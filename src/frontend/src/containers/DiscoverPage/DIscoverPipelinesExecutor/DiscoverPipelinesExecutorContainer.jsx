@@ -22,12 +22,21 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   }
 
   componentDidMount = () => {
-    const { discoveryId, pipelineId, webId } = this.props;
+    const { discoveryId, pipelineId, webId, selectedVisualizer } = this.props;
+    const visualizerCode =
+      selectedVisualizer !== undefined
+        ? selectedVisualizer.visualizer.visualizerCode
+        : '';
     const self = this;
     self
       .exportPipeline(discoveryId, pipelineId)
       .then(json => {
-        self.executePipeline(json.pipelineId, json.etlPipelineIri, webId);
+        self.executePipeline(
+          json.pipelineId,
+          json.etlPipelineIri,
+          webId,
+          visualizerCode
+        );
       })
       .catch(error => {
         console.log(error.message);
@@ -73,7 +82,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       });
   };
 
-  executePipeline = (pipelineId, etlPipelineIri, webId) => {
+  executePipeline = (pipelineId, etlPipelineIri, webId, visualizerCode) => {
     const self = this;
 
     // TODO : add custom logger
@@ -81,7 +90,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
     return ETLService.getExecutePipeline({
       etlPipelineIri,
-      webId
+      webId,
+      selectedVisualiser: visualizerCode
     })
       .then(response => {
         return response.json();
@@ -170,6 +180,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
   pipelineId: PropTypes.any,
+  selectedVisualizer: PropTypes.any,
   socket: PropTypes.any,
   webId: PropTypes.any
 };
@@ -177,7 +188,8 @@ DiscoverPipelinesExecutorContainer.propTypes = {
 const mapStateToProps = state => {
   return {
     pipelineId: state.globals.pipelineId,
-    discoveryId: state.globals.discoveryId
+    discoveryId: state.globals.discoveryId,
+    selectedVisualizer: state.globals.selectedVisualizer
   };
 };
 
