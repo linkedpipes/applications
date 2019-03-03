@@ -10,9 +10,7 @@ import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
@@ -26,15 +24,6 @@ public class EtlServiceComponent implements EtlService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private static final Map<String, String> EXECUTION_STATUS = Map.of(
-            "http://etl.linkedpipes.com/resources/status/failed", "FAILED",
-            "http://etl.linkedpipes.com/resources/status/queued", "QUEUED",
-            "http://etl.linkedpipes.com/resources/status/running", "RUNNING",
-            "http://etl.linkedpipes.com/resources/status/finished", "FINISHED",
-            "http://etl.linkedpipes.com/resources/status/cancelled", "CANCELLED",
-            "http://etl.linkedpipes.com/resources/status/cancelling", "CANCELLING"
-    );
-
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
 
@@ -45,7 +34,8 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
-        return OBJECT_MAPPER.readValue(response, Execution.class);
+        Execution execution = OBJECT_MAPPER.readValue(response, Execution.class);
+        return execution;
     }
 
     @Override
