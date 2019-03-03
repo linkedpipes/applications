@@ -7,12 +7,10 @@ import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.EtlService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -35,13 +33,11 @@ public class PipelineController {
     private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
     @NotNull private final DiscoveryService discoveryService;
-    @NotNull private final EtlService etlService;
     @NotNull private final ExecutorService executorService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
-        etlService = context.getBean(EtlService.class);
         executorService = context.getBean(ExecutorService.class);
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
