@@ -21,16 +21,22 @@ export const resetActiveStep = value => {
   };
 };
 
-export const setSelectedInputExample = value => {
+export const setSelectedInputExample = sample => {
   return {
     type: types.SET_SELECTED_INPUT_EXAMPLE,
-    value
+    sample
   };
 };
+
+export const changeTabAction = tabValue => ({
+  type: types.CHANGE_TAB,
+  tabValue
+});
 
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
-  setSelectedInputExample
+  setSelectedInputExample,
+  changeTabAction
 };
