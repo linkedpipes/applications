@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
@@ -14,9 +15,6 @@ public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
 
     private final String propertyUri;
     private final String[] conceptUris;
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
 
     // VARIABLES
     public static final String VAR_CONCEPT = var("concept");
@@ -34,7 +32,7 @@ public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
     @Override
     protected SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.uri);
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.uri);
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
@@ -10,15 +11,10 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
 
+//TODO possibly make this query generic, to allow getting hierarchy for only one schema OR multiple schemas if schemeUri is not specified
 public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
 
     private String schemeUri;
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
-    private static final String RDFS_PREFIX = "rdfs";
-    private static final String DCTERMS_PREFIX = "dcterms";
-    private static final String RDF_PREFIX = "rdf";
 
     // VARIABLES
     private static final String VAR_SCHEME_PREF_LABEL = var("s_spl");
@@ -41,10 +37,10 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
     @Override
     protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.uri)
-                .addPrefix(RDFS_PREFIX, RDFS.uri)
-                .addPrefix(DCTERMS_PREFIX, DCTerms.getURI())
-                .addPrefix(RDF_PREFIX, RDF.uri);
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.uri)
+                .addPrefix(Prefixes.RDFS_PREFIX, RDFS.uri)
+                .addPrefix(Prefixes.DCTERMS_PREFIX, DCTerms.getURI())
+                .addPrefix(Prefixes.RDF_PREFIX, RDF.uri);
     }
 
     @NotNull
