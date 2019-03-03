@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 cd /home/project
 
 echo "Pulling from Master" 
