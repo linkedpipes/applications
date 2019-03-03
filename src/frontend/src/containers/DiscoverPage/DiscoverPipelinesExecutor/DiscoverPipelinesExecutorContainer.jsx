@@ -4,21 +4,39 @@ import connect from 'react-redux/lib/connect/connect';
 import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesExecutorComponent from './DiscoverPipelinesExecutorComponent';
-import { ETLService } from '@utils';
-import ErrorBoundary from 'react-error-boundary';
+import {
+  ETLService,
+  ETL_STATUS_MAP,
+  ETL_STATUS_TYPE,
+  SocketContext
+} from '@utils';
+import { withWebId } from '@inrupt/solid-react-components';
 
 class DiscoverPipelinesExecutorContainer extends PureComponent {
-  state = {
-    etlExecutionIsFinished: false,
-    loaderLabelText: 'Hold on...'
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      etlExecutionIsFinished: false,
+      loaderLabelText: 'Hold on...'
+    };
+  }
 
-  componentDidMount() {
-    const { discoveryId, pipelineId } = this.props;
+  componentDidMount = () => {
+    const { discoveryId, pipelineId, webId, selectedVisualizer } = this.props;
+    const visualizerCode =
+      selectedVisualizer !== undefined
+        ? selectedVisualizer.visualizer.visualizerCode
+        : '';
     const self = this;
-    this.exportPipeline(discoveryId, pipelineId)
+    self
+      .exportPipeline(discoveryId, pipelineId)
       .then(json => {
-        self.executePipeline(json.pipelineId, json.etlPipelineIri);
+        self.executePipeline(
+          json.pipelineId,
+          json.etlPipelineIri,
+          webId,
+          visualizerCode
+        );
       })
       .catch(error => {
         console.log(error.message);
@@ -27,7 +45,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
             'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
         });
       });
-  }
+  };
 
   exportPipeline = (discoveryId, pipelineId) => {
     const self = this;
@@ -64,14 +82,16 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       });
   };
 
-  executePipeline = (pipelineId, etlPipelineIri) => {
+  executePipeline = (pipelineId, etlPipelineIri, webId, visualizerCode) => {
     const self = this;
 
     // TODO : add custom logger
     // console.log('Sending the execute pipeline request...');
 
     return ETLService.getExecutePipeline({
-      etlPipelineIri
+      etlPipelineIri,
+      webId,
+      selectedVisualiser: visualizerCode
     })
       .then(response => {
         return response.json();
@@ -92,33 +112,95 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
             'Please, hold on ETL is chatting with Tim Berners-Lee 🕴...'
         });
 
+        self.startSocketListener(etlPipelineIri);
+
         return pipelineId;
       });
+  };
+
+  startSocketListener = executionIri => {
+    const { socket } = this.props;
+    const self = this;
+
+    socket.emit('join', executionIri);
+    socket.on('executionStatus', data => {
+      if (data === undefined) {
+        self.setState({
+          loaderLabelText:
+            'There was an error during the pipeline execution. Please, try different sources.'
+        });
+      } else {
+        const parsedData = JSON.parse(data);
+        let response = 'Status: ';
+        const status = ETL_STATUS_MAP[parsedData.status['@id']];
+
+        if (status === undefined) {
+          self.setState({
+            loaderLabelText: 'Unknown status for checking pipeline execution'
+          });
+        }
+
+        response += status;
+
+        if (
+          status === ETL_STATUS_TYPE.Finished ||
+          status === ETL_STATUS_TYPE.Cancelled ||
+          status === ETL_STATUS_TYPE.Unknown ||
+          status === ETL_STATUS_TYPE.Failed ||
+          response === 'Success'
+        ) {
+          if (status === ETL_STATUS_TYPE.Failed) {
+            self.setState({
+              loaderLabelText:
+                'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
+            });
+          }
+        } else {
+          self.setState({
+            loaderLabelText: `ETL finished with status : ${response}`
+          });
+          // TODO : process next step here
+        }
+      }
+      socket.emit('leave', executionIri);
+    });
   };
 
   render() {
     const { etlExecutionIsFinished, loaderLabelText } = this.state;
     return (
-      <ErrorBoundary>
-        <DiscoverPipelinesExecutorComponent
-          etlExecutionIsFinished={etlExecutionIsFinished}
-          loaderLabelText={loaderLabelText}
-        />
-      </ErrorBoundary>
+      <DiscoverPipelinesExecutorComponent
+        etlExecutionIsFinished={etlExecutionIsFinished}
+        loaderLabelText={loaderLabelText}
+      />
     );
   }
 }
 
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
-  pipelineId: PropTypes.any
+  pipelineId: PropTypes.any,
+  selectedVisualizer: PropTypes.any,
+  socket: PropTypes.any,
+  webId: PropTypes.any
 };
 
 const mapStateToProps = state => {
   return {
     pipelineId: state.globals.pipelineId,
-    discoveryId: state.globals.discoveryId
+    discoveryId: state.globals.discoveryId,
+    selectedVisualizer: state.globals.selectedVisualizer
   };
 };
 
-export default connect(mapStateToProps)(DiscoverPipelinesExecutorContainer);
+const DiscoverPipelinesExecutorContainerWithSocket = props => (
+  <SocketContext.Consumer>
+    {socket => (
+      <DiscoverPipelinesExecutorContainer {...props} socket={socket} />
+    )}
+  </SocketContext.Consumer>
+);
+
+export default withWebId(
+  connect(mapStateToProps)(DiscoverPipelinesExecutorContainerWithSocket)
+);

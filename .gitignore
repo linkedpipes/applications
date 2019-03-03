@@ -71,5 +71,6 @@ chrome-user-data
 
 #Database
 data/virtuoso/
+data/postgres/
 
 src/frontend/public/

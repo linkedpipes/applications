@@ -20,6 +20,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -40,29 +41,31 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
 
-    private final ApplicationContext context;
-    private final HttpActions httpActions = new HttpActions();
+    @NotNull private final ApplicationContext context;
+    @NotNull private final HttpActions httpActions = new HttpActions();
 
     public DiscoveryServiceComponent(ApplicationContext context) {
         this.context = context;
     }
 
-    @Override
-    public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        return result;
     }
 
-    @Override
-    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        return result;
     }
 
-    // TODO strongly type below method params (not simply string)
-    @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
-        return httpActions.getStatus(discoveryId);
+    @NotNull @Override
+    public DiscoveryStatus getDiscoveryStatus(@NotNull String discoveryId) throws LpAppsException {
+        String status = httpActions.getStatus(discoveryId);
+        return OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
     }
 
     @Override

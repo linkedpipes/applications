@@ -5,6 +5,7 @@ import Reactotron from './ReactotronConfig';
 import { discoveryReducer } from '@ducks/discoveryDuck';
 import { globalReducer } from '@ducks/globalDuck';
 import { etlReducer } from '@ducks/etlDuck';
+import { userReducer } from '@ducks/userDuck';
 import { visualizersReducer } from '@ducks/visualizersDuck';
 import thunk from 'redux-thunk';
 
@@ -22,6 +23,7 @@ const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 export default () => {
   const store = Reactotron.createStore(
     combineReducers({
+      user: userReducer,
       globals: globalReducer,
       discover: discoverReducer,
       datasources: discoveryReducer,

@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups } from '@utils';
+import { DiscoveryService, extractUrlGroups, SocketContext } from '@utils';
 import { discoverySelectors } from '@ducks/discoveryDuck';
 import { visualizersActions } from '@ducks/visualizersDuck';
 import { globalActions } from '@ducks/globalDuck';
 import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
+import { withWebId } from '@inrupt/solid-react-components';
 
 const mapDispatchToProps = dispatch => {
   const changeTab = index => dispatch(discoverActions.changeTabAction(index));
@@ -36,7 +37,8 @@ class DiscoverSelectorContainer extends PureComponent {
   postStartFromFile = async () => {
     const self = this;
     return DiscoveryService.postDiscoverFromTtl({
-      ttlFile: self.state.ttlFile
+      ttlFile: self.state.ttlFile,
+      webId: this.props.webId
     }).then(response => {
       return response.json();
     });
@@ -55,7 +57,8 @@ class DiscoverSelectorContainer extends PureComponent {
     });
 
     return DiscoveryService.postDiscoverFromUriList({
-      datasourceUris: datasourcesForTTL
+      datasourceUris: datasourcesForTTL,
+      webId: this.props.webId
     }).then(response => {
       return response.json();
     });
@@ -63,30 +66,24 @@ class DiscoverSelectorContainer extends PureComponent {
 
   postStartFromSparqlEndpoint = async () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri,
-      namedGraph: this.state.namedGraph
+      sparqlEndpointIri: this.props.sparqlEndpointIri,
+      dataSampleIri: this.props.dataSampleIri,
+      namedGraph: this.props.namedGraph
     }).then(response => {
       return response.json();
     });
   };
 
-  addDiscoveryId = response => {
-    const self = this;
+  addDiscoveryId = async (response) => {
+    // const self = this;
     const discoveryId = response.id;
-
-    return new Promise(resolve => {
-      self.props.dispatch(
-        globalActions.addDiscoveryIdAction({
-          id: discoveryId
-        })
-      );
-      resolve();
+    return globalActions.addDiscoveryIdAction({
+      id: discoveryId
     });
   };
 
   handleDiscoveryInputCase = () => {
-    if (this.state.tabValue === 1) {
+    if (this.props.tabValue === 1) {
       return this.postStartFromSparqlEndpoint();
     }
     if (this.state.ttlFile) {
@@ -110,7 +107,7 @@ class DiscoverSelectorContainer extends PureComponent {
         if (discoveryResponse !== undefined) {
           self.addDiscoveryId(discoveryResponse).then(() => {
             self.setState({ discoveryStatusPollingFinished: false });
-            self.checkDiscovery(discoveryResponse, undefined);
+            self.startSocketListener();
           });
         }
       })
@@ -132,49 +129,36 @@ class DiscoverSelectorContainer extends PureComponent {
       });
   };
 
-  checkDiscovery = response => {
+  startSocketListener = () => {
+    const { socket, discoveryId, onNextClicked } = this.props;
     const self = this;
-    const discoveryId = response.id;
-    const {
-      discoveryStatusPolling,
-      discoveryStatusPollingFinished,
-      discoveryStatusPollingInterval
-    } = this.state;
 
-    if (discoveryStatusPolling) {
-      clearTimeout(discoveryStatusPolling);
-    }
-
-    if (discoveryStatusPollingFinished) {
-      this.setState({ discoveryStatusPolling: undefined });
-
-      self.loadPipelineGroups(discoveryId).then(() => {
+    socket.emit('join', discoveryId);
+    socket.on('discoveryStatus', data => {
+      if (data === undefined) {
         self.setState({
           discoveryIsLoading: false
         });
+        toast.error(
+          'There was an error during the discovery. Please, try different sources.',
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      } else {
+        const parsedData = JSON.parse(data);
+        if (parsedData.isFinished) {
+          self.loadPipelineGroups(discoveryId).then(() => {
+            self.setState({
+              discoveryIsLoading: false
+            });
 
-        self.props.onNextClicked();
-      });
-
-      return;
-    }
-
-    DiscoveryService.getDiscoveryStatus({ discoveryId })
-      .then(statusResponse => {
-        return statusResponse.json();
-      })
-      .then(jsonResponse => {
-        self.setState({
-          discoveryStatusPollingFinished: jsonResponse.isFinished
-        });
-      });
-
-    const newDiscoveryStatusPolling = setTimeout(() => {
-      this.checkDiscovery(response);
-    }, discoveryStatusPollingInterval);
-
-    this.setState({
-      discoveryStatusPolling: newDiscoveryStatusPolling
+            onNextClicked();
+          });
+        }
+      }
+      socket.emit('leave', discoveryId);
     });
   };
 
@@ -311,6 +295,12 @@ DiscoverSelectorContainer.propTypes = {
   tabValue:  PropTypes.number
 };
 
+const DiscoverSelectorContainerWithSocket = props => (
+  <SocketContext.Consumer>
+    {socket => <DiscoverSelectorContainer {...props} socket={socket} />}
+  </SocketContext.Consumer>
+);
+
 const mapStateToProps = state => {
   return {
     datasources: discoverySelectors.getDatasourcesArray(state.datasources),
@@ -323,4 +313,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DiscoverSelectorContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(withWebId(DiscoverSelectorContainerWithSocket));

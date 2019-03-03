@@ -7,28 +7,40 @@ const DISCOVERY_STATUS_URL = discoveryId => {
   return `${DISCOVERY_URL + discoveryId}/status`;
 };
 
-const DISCOVER_FROM_INPUT_URL = `${PIPELINES_URL}discoverFromInput`;
+const DISCOVER_FROM_INPUT_URL = webId => {
+  return `${PIPELINES_URL}discoverFromInput?${getQueryString({
+    webId
+  })}`;
+};
 const DISCOVER_FROM_ENDPOINT = `${PIPELINES_URL}discoverFromEndpoint`;
-const DISCOVER_FROM_URI_LIST_URL = `${PIPELINES_URL}discover`;
+
+const DISCOVER_FROM_URI_LIST_URL = webId => {
+  return `${PIPELINES_URL}discover?${getQueryString({
+    webId
+  })}`;
+};
+
 const PIPELINE_GROUPS_URL = discoveryId => {
   return `${DISCOVERY_URL + discoveryId}/pipelineGroups`;
 };
 
 const DiscoveryService = {
-  async postDiscoverFromTtl({ ttlFile }) {
-    return rest(DISCOVER_FROM_INPUT_URL, ttlFile, 'POST', undefined);
+  async postDiscoverFromTtl({ ttlFile, webId }) {
+    return rest(DISCOVER_FROM_INPUT_URL(webId), ttlFile, 'POST', undefined);
   },
 
   async postDiscoverFromEndpoint({
     sparqlEndpointIri,
     dataSampleIri,
-    namedGraph
+    namedGraph,
+    webId
   }) {
     return rest(
       `${DISCOVER_FROM_ENDPOINT}?${getQueryString({
         sparqlEndpointIri,
         dataSampleIri,
-        namedGraph
+        namedGraph,
+        webId
       })}`,
       undefined,
       'POST',
@@ -36,8 +48,13 @@ const DiscoveryService = {
     );
   },
 
-  async postDiscoverFromUriList({ datasourceUris }) {
-    return rest(DISCOVER_FROM_URI_LIST_URL, datasourceUris, 'POST', undefined);
+  async postDiscoverFromUriList({ datasourceUris, webId }) {
+    return rest(
+      DISCOVER_FROM_URI_LIST_URL(webId),
+      datasourceUris,
+      'POST',
+      undefined
+    );
   },
 
   async getDiscoveryStatus({ discoveryId }) {

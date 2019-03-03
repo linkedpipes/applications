@@ -13,7 +13,8 @@
           "@containers": "./src/containers",
           "@ducks": "./src/ducks",
           "@utils": "./src/utils",
-          "@constants": "./src/constants"
+          "@constants": "./src/constants",
+          "@layouts": "./src/layouts"
         }
       }
     ]

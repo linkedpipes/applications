@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
-import VISUALIZER_TYPE from '@constants';
+import { VISUALIZER_TYPE } from '@constants';
 import FiltersComponent from '../Filters';
 
 const styles = () => ({
