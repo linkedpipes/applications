@@ -8,8 +8,6 @@ public class HierarchyNode {
     public String id;
     public LocalizedValue label;
     public String parentId;
-
-    //TODO might have to change below to Integer, depends if Google Charts accepts only whole integers
     public Double size;
 
     /*public HierarchyNode(LocalizedValue label, String id, Integer size) {
