@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
 import auth from 'solid-auth-client';
-import Snackbar from '@material-ui/core/Snackbar';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class AuthorizationContainer extends PureComponent {
   state = {
     session: null,
     idp: null,
     webIdFieldValue: '',
-    withWebId: true,
-    error: null,
-    snackbarOpen: false
+    error: null
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -34,44 +33,20 @@ class AuthorizationContainer extends PureComponent {
     event.preventDefault();
     const idp = 'https://inrupt.net/auth';
     const callbackUri = `${window.location.origin}/dashboard`;
+    const webIdValue = this.state.webIdFieldValue;
 
-    const { withWebId } = this.state;
+    if (!this.isWebIdValid(webIdValue)) {
+      toast.error('Error WebID is not valid! Try again...', {
+        position: toast.POSITION.BOTTOM_RIGHT
+      });
+    } else {
+      const session = auth.login(idp, {
+        callbackUri
+      });
 
-    if (!idp) {
-      const errorMessage = withWebId
-        ? 'Valid WebID is required'
-        : 'Solid Provider is required';
-      // @TODO: better error handling will be here
-      throw new Error(errorMessage, 'idp');
-    }
-
-    if (idp && withWebId && !this.isWebIdValid(idp)) {
-      throw new Error('WeibID is not valid', 'idp');
-    }
-
-    const session = auth.login(idp, {
-      callbackUri
-    });
-
-    if (session) {
-      return this.setState({ session });
-    }
-    // @TODO: better error handling will be here
-    throw new Error('Something is wrong, please try again...', 'unknow');
-  };
-
-  onProviderSelect = event => {
-    const idp = event && event.value;
-    this.setState({ idp: idp || '', error: !idp });
-  };
-
-  optionToggle = () =>
-    this.setState({ withWebId: !this.state.withWebId, idp: '', error: null });
-
-  onChangeInput = event => {
-    this.setState({ [event.target.name]: event.target.value });
-    if (this.isWebIdValid(event.target.value)) {
-      this.setState({ error: null });
+      if (session) {
+        return this.setState({ session });
+      }
     }
   };
 
@@ -80,26 +55,16 @@ class AuthorizationContainer extends PureComponent {
     this.setState({ webIdFieldValue: value });
   };
 
-  handleCloseSnackbar = () => {
-    this.setState({ snackbarOpen: false });
-  };
-
   render() {
     const { handleSignIn, snackbarOpen, handleWebIdFieldChange } = this;
     return (
-      <AuthorizationComponent
-        onWebIdFieldChange={handleWebIdFieldChange}
-        onSignInClick={handleSignIn}
-      />
-      <Snackbar
-          anchorOrigin={{ 'top', 'center' }}
-          open={snackbarOpen}
-          onClose={this.handleCloseSnackbar}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">Error, WebID is invalid! Try again...</span>}
+      <div>
+        <AuthorizationComponent
+          onWebIdFieldChange={handleWebIdFieldChange}
+          onSignInClick={handleSignIn}
         />
+        <ToastContainer />
+      </div>
     );
   }
 }

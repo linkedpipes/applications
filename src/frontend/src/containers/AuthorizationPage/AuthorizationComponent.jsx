@@ -8,7 +8,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -34,8 +34,10 @@ const styles = theme => ({
       .spacing.unit * 3}px`
   },
   avatar: {
-    margin: theme.spacing.unit,
-    backgroundColor: theme.palette.secondary.main
+    margin: theme.spacing.unit * 3,
+    width: 70,
+    height: 70,
+    backgroundColor: theme.palette.primary.main
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -55,7 +57,7 @@ const AuthorizationComponent = ({
     <CssBaseline />
     <Paper className={classes.paper}>
       <Avatar className={classes.avatar}>
-        <LockOutlinedIcon />
+        <LockTwoToneIcon style={{ color: 'white', fontSize: '50px' }} />
       </Avatar>
       <Typography component="h1" variant="h5">
         Authenticate
