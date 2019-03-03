@@ -6,8 +6,6 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 
 public interface EtlService {
     Execution executePipeline(String etlPipelineIri) throws LpAppsException;
-
     ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException;
-
     String getExecutionResult(String executionIri) throws LpAppsException;
 }

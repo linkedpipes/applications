@@ -1,0 +1,11 @@
+[Unit]
+Description=Webhook server listening on 8085 for LPA deployments
+
+[Service]
+Type=simple
+User=project
+ExecStart=/usr/bin/python3 /home/project/deploy/webserver.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
