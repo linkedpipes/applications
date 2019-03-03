@@ -10,10 +10,12 @@ import {
   replaceAll,
   extractUrlGroups
 } from './global.utils';
+import SocketService from './socket.service';
 
 export {
   VisualizersService,
   DiscoveryService,
+  SocketService,
   ETLService,
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
