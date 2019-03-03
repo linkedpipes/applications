@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups } from '@utils';
+import { DiscoveryService, extractUrlGroups, SocketContext } from '@utils';
 import { discoverySelectors } from '@ducks/discoveryDuck';
 import { visualizersActions } from '@ducks/visualizersDuck';
 import { globalActions } from '@ducks/globalDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
-import { SocketContext } from '@utils';
 
 class DiscoverSelectorContainer extends PureComponent {
   state = {
@@ -112,7 +111,6 @@ class DiscoverSelectorContainer extends PureComponent {
         if (discoveryResponse !== undefined) {
           self.addDiscoveryId(discoveryResponse).then(() => {
             self.setState({ discoveryStatusPollingFinished: false });
-            // self.checkDiscovery(discoveryResponse, undefined);
             self.startSocketListener();
           });
         }
@@ -288,6 +286,7 @@ class DiscoverSelectorContainer extends PureComponent {
 DiscoverSelectorContainer.propTypes = {
   discoveryId: PropTypes.any,
   onInputExampleClicked: PropTypes.any,
+  onNextClicked: PropTypes.any,
   selectedInputExample: PropTypes.any,
   socket: PropTypes.any,
   webId: PropTypes.any

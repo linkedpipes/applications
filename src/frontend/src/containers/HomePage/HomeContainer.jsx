@@ -7,7 +7,7 @@ import { userActions } from '@ducks/userDuck';
 import { withWebId } from '@inrupt/solid-react-components';
 
 class HomeContainer extends PureComponent {
-  componentDidMount() {
+  componentDidMount = () => {
     const { webId } = this.props;
     const { handleLoadUserProfile } = this;
 
@@ -26,7 +26,7 @@ class HomeContainer extends PureComponent {
           handleLoadUserProfile();
         }, 500);
       });
-  }
+  };
 
   handleLoadUserProfile = () => {
     const { webId, handleSetUserProfile } = this.props;
