@@ -8,9 +8,11 @@ public class HierarchyNode {
     public String id;
     public LocalizedValue label;
     public String parentId;
-    public double size;
 
-    public HierarchyNode(LocalizedValue label, String id, Integer size) {
+    //TODO might have to change below to Integer, depends if Google Charts accepts only whole integers
+    public Double size;
+
+    /*public HierarchyNode(LocalizedValue label, String id, Integer size) {
         this.label = label;
         this.id = id;
         this.size = size;
@@ -20,16 +22,12 @@ public class HierarchyNode {
         this.label = label;
         this.id = id;
         this.size = size;
-    }
+    }*/
 
-    public HierarchyNode(String id, LocalizedValue label, String parentId, double size) {
+    public HierarchyNode(String id, LocalizedValue label, String parentId, Double size) {
         this.id = id;
         this.label = label;
         this.parentId = parentId;
         this.size = size;
     }
-
-    public HierarchyNode() {
-    }
-
 }

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//This extractor is currently unused, possibly useful for future hierarchy visualizers
+/*
 public class HierarchyExtractor {
 
     private String schemeUri;
@@ -37,10 +39,12 @@ public class HierarchyExtractor {
 
     //TODO also consider adding parent node for each created hierarchyNode
     private HierarchyNode buildHierarchy(Resource schemeResource, List<Resource> concepts, Model model) {
-        /* iterate over all the concepts and add them to the conceptsByUri hashmap. If a concept has a value for broader,
+        */
+/* iterate over all the concepts and add them to the conceptsByUri hashmap. If a concept has a value for broader,
         we add this broader in a seperate hierarchyLinksByUri hashmap we use for holding links to children - ie. the
         original concept is added as a child of the broader uri because the broader the term, the higher it is in the
-        hierarchy tree. */
+        hierarchy tree. *//*
+
 
         //The rootUris are only those that have no broader link.
         var rootUris = concepts.stream().map(n -> {
@@ -129,3 +133,4 @@ public class HierarchyExtractor {
         return new HierarchyNode(maybeConceptNode.label, maybeConceptNode.id, size, maybeChildren);
     }
 }
+*/

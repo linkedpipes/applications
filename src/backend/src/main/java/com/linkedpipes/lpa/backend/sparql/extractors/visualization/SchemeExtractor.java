@@ -30,6 +30,7 @@ public class SchemeExtractor {
     public List<HierarchyNode> extract(@NotNull QueryExecution queryExecution) {
         return queryExecution.execConstruct()
                 .listSubjects()
+                //.filterKeep(s -> s.hasProperty(RDF.type, SKOS.Concept) || s.hasProperty(RDF.type, SKOS.ConceptScheme))
                 .mapWith(this::nodeFromResource)
                 .toList();
     }
@@ -43,6 +44,7 @@ public class SchemeExtractor {
                 .map(Resource::getURI)
                 .orElse(null);
 
+        //TODO should this be integer?
         double size = Optional.ofNullable(resource.getProperty(RDF.value))
                 .map(Statement::getDouble)
                 .orElse(1.0);
@@ -57,15 +59,16 @@ public class SchemeExtractor {
             return Optional.empty();
         }
         if (!childType.equals(SKOS.Concept)) {
-            throw new IllegalArgumentException("resource must be of type Concept or ConceptScheme, actual type: " + childType);
+            throw new IllegalArgumentException("Resource must be of type Concept or ConceptScheme, actual type: " + childType);
         }
 
         Optional<Resource> parent = Optional.ofNullable(resource.getProperty(SKOS.topConceptOf))
                 .or(() -> Optional.ofNullable(resource.getProperty(SKOS.broader)))
                 .or(() -> Optional.ofNullable(resource.getProperty(SKOS.broaderTransitive)))
                 .map(Statement::getResource);
+
         if (!parent.isPresent()) {
-            throw new IllegalArgumentException("concept must have at least one property of {skos:topConceptOf, skos:broader, skos:broaderTransitive}");
+            throw new IllegalArgumentException("Concept must have at least one property of {skos:topConceptOf, skos:broader, skos:broaderTransitive}");
         }
 
         return parent;

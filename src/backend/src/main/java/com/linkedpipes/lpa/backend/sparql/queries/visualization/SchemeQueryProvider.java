@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.WhereBuilder;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -60,7 +61,9 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
                 .addConstruct(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
                 .addConstruct(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
                 .addConstruct(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
-                .addConstruct(VAR_CONCEPT, SKOS.topConceptOf, VAR_CONCEPT_TOP_CONCEPT_OF);
+                .addConstruct(VAR_CONCEPT, SKOS.topConceptOf, VAR_CONCEPT_TOP_CONCEPT_OF)
+                .addConstruct(VAR_CONCEPT, SKOS.broader, VAR_CONCEPT_BROADER)
+                .addConstruct(VAR_CONCEPT, SKOS.broaderTransitive, VAR_CONCEPT_BROADER_TRANSITIVE);
     }
 
     @NotNull
@@ -84,8 +87,12 @@ public class SchemeQueryProvider extends ConstructSparqlQueryProvider {
                 .addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
                 .addOptional(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE)
                 .addOptional(VAR_CONCEPT, SKOS.topConceptOf, VAR_CONCEPT_TOP_CONCEPT_OF)
-                .addOptional(VAR_CONCEPT, SKOS.broader, VAR_CONCEPT_BROADER)
-                .addOptional(VAR_CONCEPT, SKOS.broaderTransitive, VAR_CONCEPT_BROADER_TRANSITIVE);
+                .addOptional(new WhereBuilder()
+                        .addWhere(VAR_CONCEPT, SKOS.broader, VAR_CONCEPT_BROADER)
+                        .addWhere(VAR_CONCEPT_BROADER, RDF.type, SKOS.Concept))
+                .addOptional(new WhereBuilder()
+                        .addWhere(VAR_CONCEPT, SKOS.broaderTransitive, VAR_CONCEPT_BROADER_TRANSITIVE)
+                        .addWhere(VAR_CONCEPT_BROADER_TRANSITIVE, RDF.type, SKOS.Concept));
     }
 
 }
