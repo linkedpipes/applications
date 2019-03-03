@@ -74,11 +74,17 @@ class DiscoverSelectorContainer extends PureComponent {
     });
   };
 
-  addDiscoveryId = async (response) => {
-    // const self = this;
+  addDiscoveryId = response => {
+    const self = this;
     const discoveryId = response.id;
-    return globalActions.addDiscoveryIdAction({
-      id: discoveryId
+
+    return new Promise(resolve => {
+      self.props.dispatch(
+        globalActions.addDiscoveryIdAction({
+          id: discoveryId
+        })
+      );
+      resolve();
     });
   };
 
@@ -309,4 +315,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(DiscoverSelectorContainer);
+export default connect(mapStateToProps)(withWebId(DiscoverSelectorContainerWithSocket));
