@@ -130,7 +130,6 @@ DiscoverComponent.propTypes = {
   activeStep: PropTypes.number,
   classes: PropTypes.object.isRequired,
   onBackClicked: PropTypes.func,
-  onNextClicked: PropTypes.func,
   onResetClicked: PropTypes.func
 };
 

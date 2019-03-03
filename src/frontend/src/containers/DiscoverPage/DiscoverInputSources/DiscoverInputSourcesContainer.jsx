@@ -3,8 +3,8 @@ import { discoverActions } from '../duck';
 import { connect } from 'react-redux';
 
 const mapDispatchToProps = dispatch => {
-  const onInputExampleClicked = value =>
-    dispatch(discoverActions.setSelectedInputExample(value));
+  const onInputExampleClicked = sample =>
+    dispatch(discoverActions.setSelectedInputExample(sample));
   const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
 
   return {
