@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import VISUALIZER_TYPE from '@constants';
+import { VISUALIZER_TYPE } from '@constants';
 import MapIcon from '@material-ui/icons/MapTwoTone';
 import TimelineIcon from '@material-ui/icons/TimelineTwoTone';
 import DCTermsIcon from '@material-ui/icons/ShareTwoTone';

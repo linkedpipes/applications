@@ -14,7 +14,8 @@ const UserProfileButtonComponent = ({
   anchorElement,
   profileMenuIsOpen,
   onHandleMenuClose,
-  onHandleMenuOpen
+  onHandleMenuOpen,
+  onHandleLogoutClicked
 }) => (
   <div>
     <IconButton onClick={onHandleMenuOpen}>
@@ -46,7 +47,7 @@ const UserProfileButtonComponent = ({
         </ListItemIcon>
         <ListItemText inset primary="Settings" />
       </MenuItem>
-      <MenuItem onClick={onHandleMenuClose}>
+      <MenuItem onClick={onHandleLogoutClicked}>
         <ListItemIcon>
           <RemoveIcon />
         </ListItemIcon>
@@ -58,6 +59,7 @@ const UserProfileButtonComponent = ({
 
 UserProfileButtonComponent.propTypes = {
   anchorElement: PropTypes.any,
+  onHandleLogoutClicked: PropTypes.any,
   onHandleMenuClose: PropTypes.any,
   onHandleMenuOpen: PropTypes.any,
   profileMenuIsOpen: PropTypes.any

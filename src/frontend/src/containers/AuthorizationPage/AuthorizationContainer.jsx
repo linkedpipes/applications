@@ -4,6 +4,8 @@ import auth from 'solid-auth-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { withWebId } from '@inrupt/solid-react-components';
+import { AuthenticationService } from '@utils';
+import { Log } from '@utils';
 
 class AuthorizationContainer extends PureComponent {
   state = {
@@ -42,17 +44,13 @@ class AuthorizationContainer extends PureComponent {
           position: toast.POSITION.BOTTOM_RIGHT
         });
       } else {
-        const session = await auth.login(idp, {
+        await auth.login(idp, {
           callbackUri,
           storage: localStorage
         });
-
-        if (session) {
-          return this.setState({ session });
-        }
       }
     } catch (error) {
-      console.log(error); // eslint-disable-line no-console
+      Log.error(error, 'AuthenticationService'); // eslint-disable-line no-console
     }
   };
 

@@ -3,6 +3,7 @@ import {
   getBeautifiedVisualizerTitle
 } from './visualizers.service';
 import DiscoveryService from './discovery.service';
+import AuthenticationService from './authentication.service';
 import { ETLService, ETL_STATUS_MAP, ETL_STATUS_TYPE } from './etl.service';
 import {
   urlDomain,
@@ -10,12 +11,14 @@ import {
   replaceAll,
   extractUrlGroups
 } from './global.utils';
-import SocketService from './socket.service';
+import SocketContext from './socket.service';
+import Log from './logger.service';
 
 export {
   VisualizersService,
   DiscoveryService,
-  SocketService,
+  AuthenticationService,
+  SocketContext,
   ETLService,
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
@@ -23,5 +26,6 @@ export {
   getQueryString,
   replaceAll,
   extractUrlGroups,
-  getBeautifiedVisualizerTitle
+  getBeautifiedVisualizerTitle,
+  Log
 };

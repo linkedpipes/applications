@@ -1,11 +1,5 @@
-import socketIOClient from 'socket.io-client';
+import React from 'react';
 
-const SocketService = () => {
-  // eslint-disable-next-line no-unused-vars
-  const startSocketListeners = endpoint => {
-    const socket = socketIOClient(endpoint);
-    socket.on('change color', col => {});
-  };
-};
+const SocketContext = React.createContext();
 
-export default SocketService;
+export default SocketContext;

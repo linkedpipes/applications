@@ -13,7 +13,11 @@ import {
   AuthorizationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketService } from '@utils';
+import { SocketContext } from '@utils';
+import openSocket from 'socket.io-client';
+import { SOCKET_IO_ENDPOINT } from '@constants';
+
+const socket = openSocket(SOCKET_IO_ENDPOINT);
 
 const styles = () => ({
   root: {
@@ -21,16 +25,11 @@ const styles = () => ({
   }
 });
 
-// <main className={classes.content}>
 class AppRouter extends PureComponent {
-  state = {
-    socketEndpoint: 'localhost:9092'
-  };
-
-  componentDidMount = () => {
-    const { socketEndpoint } = this.state;
-    SocketService.startSocketListeners(socketEndpoint);
-  };
+  componentDidMount() {
+    socket.on('connect', () => console.log('Client connected'));
+    socket.on('disconnect', () => console.log('Client disconnected'));
+  }
 
   render() {
     const { classes } = this.props;
@@ -38,22 +37,32 @@ class AppRouter extends PureComponent {
       <div>
         <BrowserRouter>
           <div className={classes.root}>
-            <Switch>
-              <PublicLayout component={AuthorizationPage} path="/login" exact />
+            <SocketContext.Provider value={socket}>
+              <Switch>
+                <PublicLayout
+                  component={AuthorizationPage}
+                  path="/login"
+                  exact
+                />
 
-              <PrivateLayout path="/dashboard" component={HomePage} exact />
-              <PrivateLayout
-                path="/create-app"
-                component={CreateVisualizerPage}
-                exact
-              />
-              <PrivateLayout path="/discover" component={DiscoverPage} exact />
-              <PrivateLayout path="/about" component={AboutPage} exact />
+                <PrivateLayout path="/dashboard" component={HomePage} exact />
+                <PrivateLayout
+                  path="/create-app"
+                  component={CreateVisualizerPage}
+                  exact
+                />
+                <PrivateLayout
+                  path="/discover"
+                  component={DiscoverPage}
+                  exact
+                />
+                <PrivateLayout path="/about" component={AboutPage} exact />
 
-              <PublicLayout path="/404" component={NotFoundPage} exact />
-              <Redirect from="/" to="/login" exact />
-              <Redirect to="/404" />
-            </Switch>
+                <PublicLayout path="/404" component={NotFoundPage} exact />
+                <Redirect from="/" to="/login" exact />
+                <Redirect to="/404" />
+              </Switch>
+            </SocketContext.Provider>
           </div>
         </BrowserRouter>
       </div>

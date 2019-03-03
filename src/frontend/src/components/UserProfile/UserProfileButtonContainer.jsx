@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
+import auth from 'solid-auth-client';
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Log } from '@utils';
 
 class UserProfileButtonContainer extends PureComponent {
   state = {
-    auth: true,
     anchorElement: null
   };
 
@@ -11,26 +14,38 @@ class UserProfileButtonContainer extends PureComponent {
     this.setState({ anchorElement: event.currentTarget });
   };
 
+  handleLogout = () => {
+    const { history } = this.props;
+    this.setState({ anchorElement: null });
+    auth.logout().then(() => {
+      Log.info('Logout successfull', 'UserProfileButton');
+      // history.push('/login');
+    });
+  };
+
   handleMenuClose = () => {
     this.setState({ anchorElement: null });
   };
 
   render() {
-    const { auth, anchorElement } = this.state;
-    const { handleMenuClose, handleMenuOpen } = this;
+    const { anchorElement } = this.state;
+    const { handleMenuClose, handleMenuOpen, handleLogout } = this;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
-      auth && (
-        <UserProfileButtonComponent
-          profileMenuIsOpen={profileMenuIsOpen}
-          anchorElement={anchorElement}
-          onHandleMenuOpen={handleMenuOpen}
-          onHandleMenuClose={handleMenuClose}
-        />
-      )
+      <UserProfileButtonComponent
+        profileMenuIsOpen={profileMenuIsOpen}
+        anchorElement={anchorElement}
+        onHandleMenuOpen={handleMenuOpen}
+        onHandleMenuClose={handleMenuClose}
+        onHandleLogoutClicked={handleLogout}
+      />
     );
   }
 }
 
-export default UserProfileButtonContainer;
+UserProfileButtonContainer.propTypes = {
+  history: PropTypes.any
+};
+
+export default withRouter(UserProfileButtonContainer);
