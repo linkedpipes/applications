@@ -12,6 +12,7 @@ import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DiscoveryController {
 
-    private final DiscoveryService discoveryService;
-    private final ExecutorService executorService;
+    @NotNull private final DiscoveryService discoveryService;
+    @NotNull private final ExecutorService executorService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
@@ -38,8 +39,10 @@ public class DiscoveryController {
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
+    @NotNull
     @PostMapping("/api/pipelines/discover")
-    public ResponseEntity<Discovery> startDiscovery(@RequestParam("webId") String webId, @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscovery(@NotNull @RequestParam("webId") String webId,
+                                                    @Nullable @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "No data sources were provided");
         }
@@ -57,8 +60,10 @@ public class DiscoveryController {
         }
     }
 
+    @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
-    public ResponseEntity<Discovery> startDiscoveryFromInput(@RequestParam("webId") String webId, @RequestBody String discoveryConfig) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
+                                                             @Nullable @RequestBody String discoveryConfig) throws LpAppsException {
         if (discoveryConfig == null || discoveryConfig.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Discovery config not provided");
         }
@@ -71,8 +76,10 @@ public class DiscoveryController {
         }
     }
 
+    @NotNull
     @GetMapping("/api/pipelines/discoverFromInputIri")
-    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@RequestParam("webId") String webId, @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
+    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
+                                                                @Nullable @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
         if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Input IRI not provided");
         }

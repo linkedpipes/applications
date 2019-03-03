@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,8 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private ApplicationRepository applicationRepository;
 
-    @Override
-    public UserProfile addUser(String webId) throws UserTakenException {
+    @NotNull @Override
+    public UserProfile addUser(@NotNull String webId) throws UserTakenException {
         try {
             getUser(webId);
             throw new UserTakenException(webId);
@@ -50,8 +51,8 @@ public class UserServiceComponent implements UserService {
         }
     }
 
-    @Override
-    public void setUserDiscovery(String username, String discoveryId) throws UserNotFoundException {
+    @NotNull @Override
+    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId) throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
@@ -60,8 +61,8 @@ public class UserServiceComponent implements UserService {
         repository.save(user);
     }
 
-    @Override
-    public List<Discovery> getUserDiscoveries(String username) throws UserNotFoundException {
+    @NotNull @Override
+    public List<Discovery> getUserDiscoveries(@NotNull String username) throws UserNotFoundException {
         List<Discovery> discoveries = new ArrayList<>();
         for (DiscoveryDao d : getDiscoveries(username)) {
             Discovery discovery = new Discovery();
@@ -88,7 +89,7 @@ public class UserServiceComponent implements UserService {
     }
 
     @Override
-    public void deleteUserDiscovery(String user, String discoveryId) {
+    public void deleteUserDiscovery(@NotNull String user, @NotNull String discoveryId) {
         DiscoveryDao toDelete = null;
         try {
             for (DiscoveryDao d : getDiscoveries(user)) {
@@ -114,8 +115,8 @@ public class UserServiceComponent implements UserService {
         return user.getExecutions();
     }
 
-    @Override
-    public void setUserExecution(String username, String executionIri, String selectedVisualiser) throws UserNotFoundException {
+    @NotNull @Override
+    public void setUserExecution(@NotNull String username, @NotNull String executionIri, String selectedVisualiser) throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao e = new ExecutionDao();
         e.setExecutionStarted(executionIri);
@@ -125,8 +126,8 @@ public class UserServiceComponent implements UserService {
         repository.save(user);
     }
 
-    @Override
-    public List<Execution> getUserExecutions(String username) throws UserNotFoundException {
+    @NotNull @Override
+    public List<Execution> getUserExecutions(@NotNull String username) throws UserNotFoundException {
         List<Execution> executions = new ArrayList<>();
         for (ExecutionDao e : getExecutions(username)) {
             Execution execution = new Execution();
@@ -136,8 +137,8 @@ public class UserServiceComponent implements UserService {
         return executions;
     }
 
-    @Override
-    public void deleteUserExecution(String user, String executionIri) {
+    @NotNull @Override
+    public void deleteUserExecution(@NotNull String user, @NotNull String executionIri) {
         ExecutionDao toDelete = null;
         try {
             for (ExecutionDao e : getExecutions(user)) {
@@ -157,8 +158,8 @@ public class UserServiceComponent implements UserService {
         }
     }
 
-    @Override
-    public UserProfile getUserProfile(String username) throws UserNotFoundException {
+    @NotNull @Override
+    public UserProfile getUserProfile(@NotNull String username) throws UserNotFoundException {
         UserDao user = getUser(username);
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
@@ -190,8 +191,8 @@ public class UserServiceComponent implements UserService {
         return profile;
     }
 
-    @Override
-    public UserProfile addApplication(String username, String solidIri) throws UserNotFoundException {
+    @NotNull @Override
+    public UserProfile addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException {
         UserDao user = getUser(username);
         ApplicationDao app = new ApplicationDao();
         app.setSolidIri(solidIri);
@@ -201,8 +202,8 @@ public class UserServiceComponent implements UserService {
         return getUserProfile(username);
     }
 
-    @Override
-    public UserProfile deleteApplication(String username, String solidIri) throws UserNotFoundException {
+    @NotNull @Override
+    public UserProfile deleteApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException {
         UserDao user = getUser(username);
 
         for (ApplicationDao app : user.getApplications()) {

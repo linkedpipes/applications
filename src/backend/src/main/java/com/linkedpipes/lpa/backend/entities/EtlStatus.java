@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.linkedpipes.lpa.backend.util.EtlStatusSerializer;
 import com.linkedpipes.lpa.backend.util.EtlStatusDeserializer;
@@ -21,7 +23,7 @@ public enum EtlStatus {
     FAILED("http://etl.linkedpipes.com/resources/status/failed", false),
     UNKNOWN("http://etl.linkedpipes.com/resources/status/unknown", false);
 
-    @JsonProperty("@id")
+    @NotNull @JsonProperty("@id")
     private String etlStatusIri;
 
     @JsonIgnore private boolean pollable;
@@ -31,6 +33,7 @@ public enum EtlStatus {
         this.pollable = isPollable;
     }
 
+    @NotNull
     public String getStatusIri() {
         return this.etlStatusIri;
     }
@@ -39,7 +42,8 @@ public enum EtlStatus {
         return this.pollable;
     }
 
-    public static EtlStatus fromIri(String iri) {
+    @Nullable
+    public static EtlStatus fromIri(@Nullable String iri) {
         for (EtlStatus s : EtlStatus.values()) {
             if (s.etlStatusIri.equals(iri)) {
                 return s;

@@ -10,6 +10,8 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
+import org.jetbrains.annotations.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +37,9 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private final DiscoveryService discoveryService;
-    private final EtlService etlService;
-    private final UserService userService;
+    @NotNull private final DiscoveryService discoveryService;
+    @NotNull private final EtlService etlService;
+    @NotNull private final UserService userService;
 
     @Autowired
     private DiscoveryRepository discoveryRepository;
@@ -51,24 +53,24 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.userService = context.getBean(UserService.class);
     }
 
-    @Override
-    public Discovery startDiscoveryFromInput(String discoveryConfig, String userId) throws LpAppsException, UserNotFoundException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
         this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
 
-    @Override
-    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri, String userId) throws LpAppsException, UserNotFoundException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
         this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
 
-    @Override
-    public Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException {
+    @NotNull @Override
+    public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
         this.userService.setUserExecution(userId, execution.iri, selectedVisualiser);  //this inserts execution in DB
         startEtlStatusPolling(execution.iri);

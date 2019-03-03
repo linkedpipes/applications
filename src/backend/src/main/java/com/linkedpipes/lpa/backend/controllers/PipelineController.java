@@ -12,6 +12,7 @@ import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -33,9 +34,9 @@ public class PipelineController {
 
     private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
-    private final DiscoveryService discoveryService;
-    private final EtlService etlService;
-    private final ExecutorService executorService;
+    @NotNull private final DiscoveryService discoveryService;
+    @NotNull private final EtlService etlService;
+    @NotNull private final ExecutorService executorService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
@@ -88,10 +89,11 @@ public class PipelineController {
 
     }
 
+    @NotNull
     @GetMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@RequestParam(value="webId") String webId,
-                                                     @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
-                                                     @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
+    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
+                                                     @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
+                                                     @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
         try {
             Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser);
             return ResponseEntity.ok(response);

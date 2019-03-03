@@ -7,6 +7,7 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.services.UserService;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -28,8 +29,9 @@ public class UserController {
         this.userService = context.getBean(UserService.class);
     }
 
+    @NotNull
     @PostMapping("/api/user/discovery")
-    public ResponseEntity<List<Discovery>> getUserDiscoveries(@RequestParam(value="webId", required=true) String user)
+    public ResponseEntity<List<Discovery>> getUserDiscoveries(@NotNull @RequestParam(value="webId", required=true) String user)
                             throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.getUserDiscoveries(user));
@@ -40,23 +42,24 @@ public class UserController {
     }
 
     @DeleteMapping("/api/user/discovery")
-    public void deleteUserDiscovery(@RequestParam(value="webId", required=true) String user,
-                                    @RequestParam(value="discoveryId", required=true) String discovery)
+    public void deleteUserDiscovery(@NotNull @RequestParam(value="webId", required=true) String user,
+                                    @NotNull @RequestParam(value="discoveryId", required=true) String discovery)
                               throws LpAppsException {
         logger.info("Delete discovery:: user = '" + user + "', discovery = '" + discovery + "'");
         userService.deleteUserDiscovery(user, discovery);
     }
 
     @DeleteMapping("/api/user/execution")
-    public void deleteUserExecution(@RequestParam(value="webId", required=true) String user,
-                                    @RequestParam(value="executionIri", required=true) String execution)
+    public void deleteUserExecution(@NotNull @RequestParam(value="webId", required=true) String user,
+                                    @NotNull @RequestParam(value="executionIri", required=true) String execution)
                               throws LpAppsException {
         logger.info("Delete execution:: user = '" + user + "', execution = '" + execution + "'");
         userService.deleteUserExecution(user, execution);
     }
 
+    @NotNull
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> addUser(@RequestParam(value="webId", required=true) String user) throws LpAppsException {
+    public ResponseEntity<UserProfile> addUser(@NotNull @RequestParam(value="webId", required=true) String user) throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.addUser(user));
         } catch (UserTakenException e) {
@@ -64,8 +67,9 @@ public class UserController {
         }
     }
 
+    @NotNull
     @GetMapping("/api/user")
-    public ResponseEntity<UserProfile> getUser(@RequestParam(value="webId", required=true) String user)
+    public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.getUserProfile(user));
@@ -75,9 +79,10 @@ public class UserController {
         }
     }
 
+    @NotNull
     @PostMapping("/api/user/application")
-    public ResponseEntity<UserProfile> addApplication(@RequestParam(value="webId", required=true) String user,
-                                                      @RequestParam(value="solidIri", required=true) String solidIri)
+    public ResponseEntity<UserProfile> addApplication(@NotNull @RequestParam(value="webId", required=true) String user,
+                                                      @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
                       throws LpAppsException {
         try {
           return ResponseEntity.ok(userService.addApplication(user, solidIri));
@@ -87,9 +92,10 @@ public class UserController {
         }
     }
 
+    @NotNull
     @DeleteMapping("/api/user/application")
-    public ResponseEntity<UserProfile> deleteApplication(@RequestParam(value="webId", required=true) String user,
-                                                         @RequestParam(value="solidIri", required=true) String solidIri)
+    public ResponseEntity<UserProfile> deleteApplication(@NotNull @RequestParam(value="webId", required=true) String user,
+                                                         @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
                      throws LpAppsException {
         try {
           return ResponseEntity.ok(userService.deleteApplication(user, solidIri));

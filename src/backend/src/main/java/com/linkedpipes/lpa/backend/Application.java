@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend;
 
 import com.typesafe.config.Config;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -36,6 +37,7 @@ public class Application {
         };
     }
 
+    @NotNull
     public static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();
         config.setPort(9092);
