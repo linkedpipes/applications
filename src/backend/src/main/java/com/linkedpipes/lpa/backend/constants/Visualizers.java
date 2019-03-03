@@ -16,3 +16,4 @@ public class Visualizers {
         map.put("https://discovery.linkedpipes.com/resource/application/map-labeled-points/template", "LABELED_POINTS_MAP");
     }
 }
+

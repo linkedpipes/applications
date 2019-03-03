@@ -5,9 +5,14 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import Typography from '@material-ui/core/Typography';
-import CreateApp from './components/CreateApp/CreateApp';
 import { NavigationBar } from '@components';
-import { DiscoverPage, HomePage, NotFoundPage, AboutPage } from '@containers';
+import {
+  DiscoverPage,
+  HomePage,
+  NotFoundPage,
+  AboutPage,
+  CreateVisualizerPage
+} from '@containers';
 
 const styles = theme => ({
   root: {
@@ -51,7 +56,7 @@ const AppRouter = props => {
           )}
           <Switch>
             <Route exact path="/dashboard" component={HomePage} />
-            {/* <Route exact path="/create-app" component={CreateApp} /> */}
+            <Route exact path="/create-app" component={CreateVisualizerPage} />
             <Route exact path="/discover" component={DiscoverPage} />
             <Route path="/about" component={AboutPage} />
             <Redirect from="/" to="/dashboard" />

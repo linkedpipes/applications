@@ -50,8 +50,7 @@ const DiscoverPipelinesPickerComponent = ({
   page,
   loadingButtons,
   emptyRows,
-  exportAndStartPolling,
-  discoveryId
+  onSelectPipeline
 }) => (
   <Paper className={classes.root}>
     <div className={classes.tableWrapper}>
@@ -65,29 +64,18 @@ const DiscoverPipelinesPickerComponent = ({
               return (
                 <TableRow hover tabIndex={-1} key={uuid()}>
                   <TableCell component="th" scope="row" padding="checkbox">
-                    {loadingButtons[
-                      `button_${datasourceAndPipelines.dataSources[0].label}`
-                    ] !== undefined ? (
-                      <CircularProgress size={25} />
-                    ) : (
-                      <Button
-                        id={`button_${
-                          datasourceAndPipelines.dataSources[0].uri
-                        }`}
-                        size="small"
-                        disabled={Object.keys(loadingButtons).length > 0}
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => {
-                          exportAndStartPolling(
-                            discoveryId,
-                            datasourceAndPipelines
-                          );
-                        }}
-                      >
-                        Execute
-                      </Button>
-                    )}
+                    <Button
+                      id={`button_${datasourceAndPipelines.dataSources[0].uri}`}
+                      size="small"
+                      disabled={Object.keys(loadingButtons).length > 0}
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => {
+                        onSelectPipeline(datasourceAndPipelines);
+                      }}
+                    >
+                      Select
+                    </Button>
                   </TableCell>
                   <TableCell component="th" scope="row" padding="none">
                     {datasourceAndPipelines.dataSources[0].label}

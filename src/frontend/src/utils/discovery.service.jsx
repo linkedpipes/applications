@@ -1,5 +1,5 @@
 import { BASE_URL, rest } from './api.service';
-import { getQueryString } from './utils';
+import { getQueryString } from './global.utils';
 
 const PIPELINES_URL = `${BASE_URL}pipelines/`;
 const DISCOVERY_URL = `${BASE_URL}discovery/`;
@@ -26,9 +26,9 @@ const DiscoveryService = {
   }) {
     return rest(
       `${DISCOVER_FROM_ENDPOINT}?${getQueryString({
-        sparqlEndpointIri: sparqlEndpointIri,
-        dataSampleIri: dataSampleIri,
-        namedGraph: namedGraph
+        sparqlEndpointIri,
+        dataSampleIri,
+        namedGraph
       })}`,
       undefined,
       'POST',

@@ -16,18 +16,23 @@ const styles = {
   }
 };
 
-const LinearLoaderComponent = ({ classes, labelText }) => (
+const LinearLoaderComponent = ({
+  classes,
+  labelText,
+  variant = 'indeterminate'
+}) => (
   <div className={classes.root}>
-    <Typography variant="body1" align="center" gutterBottom>
+    <Typography align="center" gutterBottom>
       {labelText}
     </Typography>
-    <LinearProgress />
+    <LinearProgress variant={variant} />
   </div>
 );
 
 LinearLoaderComponent.propTypes = {
   classes: PropTypes.object.isRequired,
-  labelText: PropTypes.object.isRequired
+  labelText: PropTypes.string.isRequired,
+  variant: PropTypes.string
 };
 
 export default withStyles(styles)(LinearLoaderComponent);

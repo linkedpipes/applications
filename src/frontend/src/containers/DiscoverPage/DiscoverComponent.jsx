@@ -9,9 +9,11 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Emoji from 'react-emoji-render';
+import Link from 'react-router-dom/es/Link';
 import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
+import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
 
 const styles = theme => ({
   root: {
@@ -43,6 +45,8 @@ const getStepContent = step => {
       return <DiscoverVisualizerPicker />;
     case 2:
       return <DiscoverPipelinesPicker />;
+    case 3:
+      return <DiscoverPipelinesExecutor />;
 
     default:
       return 'Unknown step';
@@ -62,7 +66,6 @@ const steps = [
 const DiscoverComponent = ({
   classes,
   activeStep,
-  onNextClicked,
   onBackClicked,
   onResetClicked
 }) => (
@@ -88,15 +91,19 @@ const DiscoverComponent = ({
                     >
                       Back
                     </Button>
-                    {activeStep === steps.length && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={onNextClicked}
-                        className={classes.button}
+                    {activeStep === steps.length - 1 && (
+                      <Link
+                        style={{ textDecoration: 'none', color: 'transparent' }}
+                        to="/create-app"
                       >
-                        Finish
-                      </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          className={classes.button}
+                        >
+                          Create App
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </div>

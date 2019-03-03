@@ -12,8 +12,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
     case types.SET_DISCOVERY_ID:
       return { ...state, discoveryId: action.discovery.id };
 
+    case types.SET_PIPELINE_ID:
+      return { ...state, pipelineId: action.pipeline.id };
+
     case types.TAB_CHANGED:
       return { ...state, selectedTab: action.selectedTab };
+
     case types.SET_SELECTED_DATASOURCES_EXAMPLE:
       switch (action.sample.type) {
         case 'Simple': {

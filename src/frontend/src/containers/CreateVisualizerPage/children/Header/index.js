@@ -1,3 +1,3 @@
-import VisualizerControllerHeader from "./VisualizerControllerHeader";
+import VisualizerControllerHeader from './VisualizerControllerHeaderComponent';
 
-export { VisualizerControllerHeader };
+export default VisualizerControllerHeader;

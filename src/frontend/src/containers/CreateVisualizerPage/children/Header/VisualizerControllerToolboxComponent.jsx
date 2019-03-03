@@ -1,12 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import PreviewIcon from "@material-ui/icons/Wallpaper";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import PreviewIcon from '@material-ui/icons/Wallpaper';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const styles = theme => ({
   root: {
@@ -20,17 +20,21 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerToolbox = ({classes, handleChange, checkedRefresh}) => (
+const VisualizerControllerToolboxComponent = ({
+  classes,
+  handleChange,
+  checkedRefresh
+}) => (
   <div>
     <FormControlLabel
       control={
         <Switch
           checked={checkedRefresh}
-          onChange={handleChange("checkedRefresh")}
+          onChange={handleChange('checkedRefresh')}
           value="checkedRefresh"
         />
       }
-      label={checkedRefresh ? "Refresh" : "Fixed"}
+      label={checkedRefresh ? 'Refresh' : 'Fixed'}
     />
     <Button variant="contained" color="default" className={classes.button}>
       <CloudUploadIcon className={classes.leftIcon} />
@@ -46,15 +50,11 @@ const VisualizerControllerToolbox = ({classes, handleChange, checkedRefresh}) =>
     </Button>
   </div>
 );
-  // handleChange = name => event => {
-  //   this.setState({ [name]: event.target.checked });
-  // };
 
-
-VisualizerControllerToolbox.propTypes = {
+VisualizerControllerToolboxComponent.propTypes = {
   checkedRefresh: PropTypes.bool.isRequired,
   classes: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(VisualizerControllerToolbox);
+export default withStyles(styles)(VisualizerControllerToolboxComponent);

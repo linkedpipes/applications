@@ -137,7 +137,7 @@ DiscoverSelectorComponent.propTypes = {
   classes: PropTypes.object.isRequired,
   dataSampleIri: PropTypes.any,
   discoveryIsLoading: PropTypes.any,
-  discoveryLoadingLabel: PropTypes.any,
+  discoveryLoadingLabel: PropTypes.string,
   onHandleChangeIndex: PropTypes.any,
   onHandleProcessStartDiscovery: PropTypes.any,
   onHandleSelectedFile: PropTypes.any,

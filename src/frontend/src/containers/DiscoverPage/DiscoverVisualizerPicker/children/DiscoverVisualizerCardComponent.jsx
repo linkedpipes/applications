@@ -7,7 +7,8 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import MapIcon from '@material-ui/icons/Map';
+import { VisualizerIcon } from '@components';
+import { getBeautifiedVisualizerTitle } from '@utils';
 
 const styles = {
   root: {
@@ -33,10 +34,15 @@ const DiscoverVisualizerCardComponent = ({
 }) => (
   <Card className={classes.card}>
     <CardActionArea style={{ textAlign: 'center' }}>
-      <MapIcon style={{ color: 'white', fontSize: '80px' }} />
+      <VisualizerIcon
+        visualizerType={visualizerData.visualizer.visualizerCode}
+        style={{ color: 'white', fontSize: '75px' }}
+      />
       <CardContent className={classes.CardContent}>
         <Typography gutterBottom variant="h5" component="h2">
-          Test
+          {getBeautifiedVisualizerTitle(
+            visualizerData.visualizer.visualizerCode
+          )}
         </Typography>
         <Typography component="p">{visualizerData.visualizer.label}</Typography>
       </CardContent>

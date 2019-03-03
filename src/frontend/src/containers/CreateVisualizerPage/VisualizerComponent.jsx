@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-// import VisualizerControllerHeader
+import { VisualizerControllerHeader, VisualizerContainer } from './children';
 
 const VisualizerComponent = ({ classes, selectedVisualizer, headerParams }) => (
   <div className={classes.root}>
@@ -24,4 +24,4 @@ VisualizerComponent.propTypes = {
   selectedVisualizer: PropTypes.number
 };
 
-export default withStyles(styles)(VisualizerComponent);
+export default VisualizerComponent;

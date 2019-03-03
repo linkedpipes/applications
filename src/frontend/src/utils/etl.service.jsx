@@ -1,5 +1,5 @@
 import { BASE_URL, rest } from './api.service';
-import { getQueryString } from './utils';
+import { getQueryString } from './global.utils';
 
 export const ETL_STATUS_MAP = {
   'http://etl.linkedpipes.com/resources/status/queued': 'Queued',
@@ -31,7 +31,7 @@ const PIPELINE_URL = `${BASE_URL}pipeline/`;
 const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
   return discoveryId && pipelineId
     ? `${PIPELINE_URL}exportWithSD?${getQueryString({
-        discoveryId: discoveryId,
+        discoveryId,
         pipelineUri: pipelineId
       })}`
     : '';
@@ -40,16 +40,13 @@ const EXPORT_PIPELINE_URL = (discoveryId, pipelineId) => {
 const EXECUTE_PIPELINE_URL = etlPipelineIri => {
   return etlPipelineIri
     ? `${PIPELINE_URL}execute?${getQueryString({
-        etlPipelineIri: etlPipelineIri
+        etlPipelineIri
       })}`
     : '';
 };
 
 const EXECUTION_STATUS_URL = executionIri => {
-  return (
-    `${EXECUTION_URL}status` +
-    `?${getQueryString({ executionIri: executionIri })}`
-  );
+  return `${EXECUTION_URL}status` + `?${getQueryString({ executionIri })}`;
 };
 
 export const ETLService = {

@@ -1,5 +1,5 @@
 import { BASE_URL, rest } from './api.service';
-import { getQueryString } from './utils';
+import { getQueryString } from './global.utils';
 
 const GET_MARKERS_URL = `${BASE_URL}map/markers`;
 const GET_PROPERTIES_URL = `${BASE_URL}map/properties`;
@@ -15,7 +15,7 @@ const VisualizersService = {
   getMarkers: async ({ resultGraphIri, filters = {} }) => {
     return rest(
       `${GET_MARKERS_URL}?${getQueryString({
-        resultGraphIri: resultGraphIri
+        resultGraphIri
       })}`,
       filters,
       'POST'
@@ -40,4 +40,17 @@ const VisualizersService = {
   }
 };
 
-export default VisualizersService;
+const getBeautifiedVisualizerTitle = visualizerId => {
+  if (visualizerId !== undefined) {
+    // eslint-disable-next-line func-names no-useless-escape
+    const removedUnderscore = visualizerId.replace(/_/g, ' ');
+    const capitalized = removedUnderscore.replace(/\w\S*/g, txt => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+
+    return capitalized;
+  }
+  return '';
+};
+
+export { VisualizersService, getBeautifiedVisualizerTitle };

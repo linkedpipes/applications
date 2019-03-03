@@ -13,7 +13,7 @@ const styles = theme => ({
   }
 });
 
-const Option = ({ option, type, onChange, classes }) => {
+const OptionsComponent = ({ option, type, onChange, classes }) => {
   const { count, mode, skosConcept, selected } = option;
 
   switch (type) {
@@ -48,4 +48,4 @@ const Option = ({ option, type, onChange, classes }) => {
   }
 };
 
-export default withStyles(styles)(Option);
+export default withStyles(styles)(OptionsComponent);

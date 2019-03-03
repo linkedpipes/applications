@@ -7,6 +7,13 @@ const addDiscoveryIdAction = ({ id } = {}) => ({
   }
 });
 
+const setPipelineIdAction = ({ id } = {}) => ({
+  type: types.SET_PIPELINE_ID,
+  pipeline: {
+    id
+  }
+});
+
 const addSelectedVisualizerAction = ({ data } = {}) => {
   return {
     type: types.SET_SELECTED_VISUALIZER,
@@ -31,6 +38,7 @@ const changeTabAction = ({ selectedTab } = {}) => ({
 
 export default {
   addDiscoveryIdAction,
+  setPipelineIdAction,
   addSelectedVisualizerAction,
   setSelectedDatasourcesExample,
   addSelectedResultGraphIriAction,
