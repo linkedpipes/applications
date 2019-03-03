@@ -3,6 +3,7 @@ import AuthorizationComponent from './AuthorizationComponent';
 import auth from 'solid-auth-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { withWebId } from '@inrupt/solid-react-components';
 
 class AuthorizationContainer extends PureComponent {
   state = {
@@ -29,24 +30,29 @@ class AuthorizationContainer extends PureComponent {
   };
 
   // eslint-disable-next-line consistent-return
-  handleSignIn = event => {
-    event.preventDefault();
-    const idp = 'https://inrupt.net/auth';
-    const callbackUri = `${window.location.origin}/dashboard`;
-    const webIdValue = this.state.webIdFieldValue;
+  handleSignIn = async event => {
+    try {
+      event.preventDefault();
+      const idp = 'https://inrupt.net/auth';
+      const callbackUri = `${window.location.origin}/dashboard`;
+      const webIdValue = this.state.webIdFieldValue;
 
-    if (!this.isWebIdValid(webIdValue)) {
-      toast.error('Error WebID is not valid! Try again...', {
-        position: toast.POSITION.BOTTOM_RIGHT
-      });
-    } else {
-      const session = auth.login(idp, {
-        callbackUri
-      });
+      if (!this.isWebIdValid(webIdValue)) {
+        toast.error('Error WebID is not valid! Try again...', {
+          position: toast.POSITION.BOTTOM_RIGHT
+        });
+      } else {
+        const session = await auth.login(idp, {
+          callbackUri,
+          storage: localStorage
+        });
 
-      if (session) {
-        return this.setState({ session });
+        if (session) {
+          return this.setState({ session });
+        }
       }
+    } catch (error) {
+      console.log(error); // eslint-disable-line no-console
     }
   };
 
@@ -69,4 +75,4 @@ class AuthorizationContainer extends PureComponent {
   }
 }
 
-export default AuthorizationContainer;
+export default withWebId(AuthorizationContainer);
