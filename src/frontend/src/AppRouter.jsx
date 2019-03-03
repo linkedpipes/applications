@@ -5,13 +5,15 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import Typography from '@material-ui/core/Typography';
+import { PrivateRoute } from '@inrupt/solid-react-components';
 import { NavigationBar } from '@components';
 import {
   DiscoverPage,
   HomePage,
   NotFoundPage,
   AboutPage,
-  CreateVisualizerPage
+  CreateVisualizerPage,
+  AuthorizationPage
 } from '@containers';
 
 const styles = theme => ({
@@ -55,12 +57,36 @@ const AppRouter = props => {
             </div>
           )}
           <Switch>
-            <Route exact path="/dashboard" component={HomePage} />
-            <Route exact path="/create-app" component={CreateVisualizerPage} />
-            <Route exact path="/discover" component={DiscoverPage} />
-            <Route path="/about" component={AboutPage} />
-            <Redirect from="/" to="/dashboard" />
-            <Route component={NotFoundPage} />
+            <Route component={AuthorizationPage} path="/login" exact />
+
+            <PrivateRoute
+              path="/dashboard"
+              component={HomePage}
+              redirect="/login"
+            />
+
+            <PrivateRoute
+              path="/create-app"
+              component={CreateVisualizerPage}
+              redirect="/login"
+            />
+
+            <PrivateRoute
+              path="/discover"
+              component={DiscoverPage}
+              redirect="/login"
+            />
+
+            <PrivateRoute
+              path="/about"
+              component={AboutPage}
+              redirect="/login"
+            />
+
+            <Route path="/404" component={NotFoundPage} exact />
+
+            <Redirect from="/" to="/login" exact />
+            <Redirect to="/404" />
           </Switch>
         </main>
       </div>

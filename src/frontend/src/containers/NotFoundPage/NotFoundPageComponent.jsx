@@ -1,16 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
 
-const NotFoundPageComponent = ({ location }) => (
-  <div>
-    <h3>
-      No match for <code>{location.pathname}</code>
-    </h3>
+const styles = theme => ({
+  root: {
+    textAlign: 'center',
+    paddingTop: theme.spacing.unit * 20
+  },
+  button: {
+    margin: theme.spacing.unit
+  },
+  input: {
+    display: 'none'
+  }
+});
+
+const NotFoundPageComponent = ({ classes }) => (
+  <div className={classes.root}>
+    <Typography variant="h1" gutterBottom>
+      404
+    </Typography>
+    <Typography variant="h2" gutterBottom>
+      Page not found...
+    </Typography>
   </div>
 );
 
 NotFoundPageComponent.propTypes = {
-  location: PropTypes.any.isRequired
+  classes: PropTypes.object.isRequired
 };
 
-export default NotFoundPageComponent;
+export default withStyles(styles)(NotFoundPageComponent);
