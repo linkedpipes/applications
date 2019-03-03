@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 class LpAppsObjectMapperTests {
     @Test
-    void testEtlStatus() throws LpAppsException {
+    public void testEtlStatus() throws LpAppsException {
         LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
                 new ObjectMapper().setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 

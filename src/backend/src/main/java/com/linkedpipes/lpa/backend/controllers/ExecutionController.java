@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.EtlService;
 import org.springframework.context.ApplicationContext;
