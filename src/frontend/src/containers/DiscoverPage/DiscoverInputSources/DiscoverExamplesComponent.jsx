@@ -43,7 +43,7 @@ const DiscoverExamplesComponent = ({
       {samples.map(sample => (
         <ListItem
           button
-          onClick={() => onHandleListItemClick(sample.URIS)}
+          onClick={() => onHandleListItemClick(sample)}
           key={sample.id}
         >
           <ListItemAvatar>

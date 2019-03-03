@@ -14,14 +14,12 @@ const styles = () => ({
 const DiscoverInputSourcesComponent = ({
   classes,
   onInputExampleClicked,
-  selectedInputExample,
   onNextClicked
 }) => (
   <div className={classes.root}>
     <Grid container spacing={24}>
       <Grid item xs={8} sm={8}>
         <DiscoverSelectorContainer
-          selectedInputExample={selectedInputExample}
           onInputExampleClicked={onInputExampleClicked}
           onNextClicked={onNextClicked}
         />
@@ -39,7 +37,6 @@ DiscoverInputSourcesComponent.propTypes = {
   classes: PropTypes.object.isRequired,
   onInputExampleClicked: PropTypes.any,
   onNextClicked: PropTypes.any,
-  selectedInputExample: PropTypes.any
 };
 
 export default withStyles(styles)(DiscoverInputSourcesComponent);

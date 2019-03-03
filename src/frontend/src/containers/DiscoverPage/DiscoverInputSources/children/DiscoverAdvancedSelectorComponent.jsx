@@ -7,7 +7,13 @@ const DiscoverAdvancedSelectorComponent = ({
   discoveryIsLoading,
   handleNamedGraphTextFieldChange,
   handleDataSampleTextFieldChange,
-  handleSparqlTextFieldChange
+  handleSparqlTextFieldChange,
+  sparqlEndpointIri,
+  dataSampleIri,
+  namedGraph,
+  sparqlTextFieldValue,
+  dataSampleTextFieldValue,
+  namedTextFieldValue
 }) => (
   <Grid container spacing={16}>
     <Grid item xs={12} sm={12}>
@@ -22,6 +28,9 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
+        value={
+          !sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri
+        }
       />
       <TextField
         id="outlined-textarea"
@@ -34,6 +43,7 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
+        value={!dataSampleIri ? dataSampleTextFieldValue : dataSampleIri}
       />
       <TextField
         id="outlined-textarea"
@@ -46,6 +56,7 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
+        value={!namedGraph ? namedTextFieldValue : namedGraph}
       />
     </Grid>
   </Grid>
@@ -53,10 +64,16 @@ const DiscoverAdvancedSelectorComponent = ({
 
 DiscoverAdvancedSelectorComponent.propTypes = {
   classes: PropTypes.any,
+  dataSampleIri: PropTypes.string,
+  dataSampleTextFieldValue: PropTypes.string,
   discoveryIsLoading: PropTypes.any,
-  handleDataSampleTextFieldChange: PropTypes.any,
-  handleNamedGraphTextFieldChange: PropTypes.any,
-  handleSparqlTextFieldChange: PropTypes.any
+  handleDataSampleTextFieldChange: PropTypes.func,
+  handleNamedGraphTextFieldChange: PropTypes.func,
+  handleSparqlTextFieldChange: PropTypes.func,
+  namedGraph: PropTypes.string,
+  namedTextFieldValue: PropTypes.string,
+  sparqlEndpointIri: PropTypes.string,
+  sparqlTextFieldValue: PropTypes.string
 };
 
 export default DiscoverAdvancedSelectorComponent;
