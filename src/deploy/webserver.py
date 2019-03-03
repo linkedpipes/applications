@@ -1,11 +1,9 @@
-import os
 from threading import Thread
 import subprocess
 from slackclient import SlackClient
 from flask import Flask
 from flask import request
-from flask import jsonify 
-import requests
+from flask import jsonify
 
 app = Flask(__name__)
 
@@ -15,7 +13,7 @@ sc = SlackClient(slack_token)
 
 def deploy(x):
     print("running deployment...")
-    process = subprocess.call(["/bin/bash", "home/project/deploy/deploy.sh"])
+    subprocess.call(["/bin/bash", "home/project/deploy/deploy.sh"])
     sc.api_call("chat.postMessage", channel="<channel>", text="The deployent has been completed!")
 
 
