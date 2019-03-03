@@ -66,25 +66,19 @@ class DiscoverSelectorContainer extends PureComponent {
 
   postStartFromSparqlEndpoint = async () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri,
-      namedGraph: this.state.namedGraph
+      sparqlEndpointIri: this.props.sparqlEndpointIri,
+      dataSampleIri: this.props.dataSampleIri,
+      namedGraph: this.props.namedGraph
     }).then(response => {
       return response.json();
     });
   };
 
-  addDiscoveryId = response => {
-    const self = this;
+  addDiscoveryId = async (response) => {
+    // const self = this;
     const discoveryId = response.id;
-
-    return new Promise(resolve => {
-      self.props.dispatch(
-        globalActions.addDiscoveryIdAction({
-          id: discoveryId
-        })
-      );
-      resolve();
+    return globalActions.addDiscoveryIdAction({
+      id: discoveryId
     });
   };
 
@@ -293,8 +287,12 @@ class DiscoverSelectorContainer extends PureComponent {
 }
 
 DiscoverSelectorContainer.propTypes = {
-  onInputExampleClicked: PropTypes.any,
-  selectedInputExample: PropTypes.any
+  changeTab: PropTypes.func,
+  dataSampleIri:  PropTypes.string,
+  dataSourcesUris: PropTypes.string,
+  namedGraph:  PropTypes.string,
+  sparqlEndpointIri:  PropTypes.string,
+  tabValue:  PropTypes.number
 };
 
 const DiscoverSelectorContainerWithSocket = props => (
@@ -315,4 +313,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withWebId(DiscoverSelectorContainerWithSocket));
+export default connect(mapStateToProps, mapDispatchToProps)(withWebId(DiscoverSelectorContainerWithSocket));
