@@ -43,8 +43,6 @@ public class VisualizationServiceComponent implements VisualizationService {
     @Override
     public List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri) {
         ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
-        System.out.print(provider.getForNamed(graphIri));
-
         return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
