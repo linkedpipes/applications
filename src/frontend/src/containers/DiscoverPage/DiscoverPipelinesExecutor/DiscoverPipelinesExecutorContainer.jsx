@@ -117,9 +117,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
           self.setState({
             loaderLabelText: `ETL finished with status : Success`
           });
-        }, 1000);
-
-        onSetEtlExecutionStatus(true);
+          onSetEtlExecutionStatus(true);
+        }, 15000);
 
         return pipelineId;
       });
