@@ -7,7 +7,7 @@
   "scripts": {
     "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=localhost:9092 webpack-dev-server",
     "startDockerDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=./api/ BASE_SOCKET_URL=lpa-backend:9092 webpack-dev-server",
-    "build": "cross-env BASE_BACKEND_URL=./api/ BASE_SOCKET_URL=lpa-backend:9092 NODE_ENV=production webpack"
+    "build": "cross-env BASE_BACKEND_URL=./api/ BASE_SOCKET_URL=./ NODE_ENV=production webpack"
   },
   "precommit": [
     "NODE_ENV=development lint-staged",
