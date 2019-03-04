@@ -4,7 +4,10 @@ const INITIAL_STATE = {
   sparqlEndpointIri: '',
   dataSampleIri: '',
   namedGraph: '',
-  selectedTab: 0
+  selectedTab: 0,
+  headerParams: {
+    title: ''
+  }
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {

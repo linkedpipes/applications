@@ -70,10 +70,12 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     @Override
     public PipelineGroups getPipelineGroups(String discoveryId) throws LpAppsException {
+        logger.info("Get pipeline groups for discovery id: " + discoveryId);
         String response = httpActions.getPipelineGroups(discoveryId);
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
+        logger.error("Pipeline groups response: " + response);
         ObjectNode jsonObject = OBJECT_MAPPER.readValue(response, ObjectNode.class);
         ObjectNode pipelineGroupsJson = (ObjectNode) jsonObject.get("pipelineGroups");
         ArrayNode appGroups = (ArrayNode) pipelineGroupsJson.get("applicationGroups");
