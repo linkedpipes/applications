@@ -19,6 +19,7 @@ services:
       context: src/backend/
     ports:
       - 9005:9005
+      - 9092:9092
     restart: on-failure
     depends_on:
       - etl
@@ -41,6 +42,7 @@ services:
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
+      VIRT_SPARQL_ResultSetMaxRows: 100000
     ports:
       - 8890:8890
     restart: on-failure

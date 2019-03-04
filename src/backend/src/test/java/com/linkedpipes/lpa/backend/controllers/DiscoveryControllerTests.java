@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.testutil.TestError;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,26 +64,39 @@ class DiscoveryControllerTests {
 
     private static final String NULL_DISCOVERY_ID = "00000000-0000-0000-0000-000000000000";
     private static final String FAKE_DISCOVERY_ID = "12345678-90ab-cdef-ghij-klmnopqrstuv";
-    
+
+    private static final String USER_ID = "xyz";
+
     private final DiscoveryController discoveryController;
-    
+    private final UserService userService;
+
     private DiscoveryControllerTests(ApplicationContext context) {
         discoveryController = context.getBean(DiscoveryController.class);
+        userService = context.getBean(UserService.class);
+    }
+
+    @BeforeClass
+    public void setUpUser() {
+        try {
+            userService.addUser(USER_ID);
+        } catch(UserTakenException e) {
+            //User already exists, thats ok on testing DB
+        }
     }
 
     @Test
     void testStartDiscoveryNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(null));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(USER_ID, null));
     }
 
     @Test
     void testStartDiscoveryEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(List.of()));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(USER_ID, List.of()));
     }
 
     @Test
     void testStartDiscoveryFakeUri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(FAKE_DISCOVERY_DATA_SOURCES);
+        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -90,7 +106,7 @@ class DiscoveryControllerTests {
 
     @Test
     void testStartDiscovery() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(DISCOVERY_DATA_SOURCES);
+        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -100,23 +116,23 @@ class DiscoveryControllerTests {
 
     @Test
     void testStartDiscoveryFromInputNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(null));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null));
     }
 
     @Test
     void testStartDiscoveryFromInputEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(""));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, ""));
     }
 
     @Test
     void testStartDiscoveryFromInputFakeConfig() {
         assertThrows(LpAppsException.class, () ->
-                discoveryController.startDiscoveryFromInput("This is a fake Discovery configuration."));
+                discoveryController.startDiscoveryFromInput(USER_ID, "This is a fake Discovery configuration."));
     }
 
     @Test
     void testStartDiscoveryFromInput() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(DISCOVERY_CONFIG);
+        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(USER_ID, DISCOVERY_CONFIG);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -126,23 +142,23 @@ class DiscoveryControllerTests {
 
     @Test
     void testStartDiscoveryFromInputIriNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(null));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(USER_ID, null));
     }
 
     @Test
     void testStartDiscoveryFromInputIriEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(""));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInputIri(USER_ID, ""));
     }
 
     @Test
     void testStartDiscoveryFromInputIriFake() {
         assertThrows(LpAppsException.class, () ->
-                discoveryController.startDiscoveryFromInputIri("This is a fake Discovery IRI."));
+                discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI."));
     }
 
     @Test
     void testStartDiscoveryFromInputIri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(DISCOVERY_CONFIG_IRI);
+        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(USER_ID, DISCOVERY_CONFIG_IRI);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -150,68 +166,5 @@ class DiscoveryControllerTests {
         assertNotNull(((Discovery) responseBody).id);
     }
 
-    @Test
-    void testGetStatusNullId() throws LpAppsException {
-        String statusString = discoveryController.getDiscoveryStatus(NULL_DISCOVERY_ID).getBody();
-        assertNotNull(statusString);
-        assertFalse(statusString.isEmpty());
-        assertEquals("null", statusString);
-    }
-
-    @Test
-    void testGetStatusFakeId() {
-        assertThrows(LpAppsException.class, () -> discoveryController.getDiscoveryStatus(FAKE_DISCOVERY_ID));
-    }
-
-    @Test
-    void testStartDiscoveryGetStatus() throws LpAppsException {
-        ResponseEntity<?> startResponse = discoveryController.startDiscovery(DISCOVERY_DATA_SOURCES);
-        assertFalse(startResponse.getStatusCode().isError());
-
-        Object responseBody = startResponse.getBody();
-        assertTrue(responseBody instanceof Discovery);
-
-        String discoveryId = ((Discovery) responseBody).id;
-        assertNotNull(discoveryId);
-
-        String statusString = discoveryController.getDiscoveryStatus(discoveryId).getBody();
-        assertNotNull(statusString);
-        assertFalse(statusString.isEmpty());
-        assertNotEquals("null", statusString);
-    }
-
-    @Test
-    void testStartDiscoveryFromInputGetStatus() throws LpAppsException {
-        ResponseEntity<?> startResponse = discoveryController.startDiscoveryFromInput(DISCOVERY_CONFIG);
-        assertFalse(startResponse.getStatusCode().isError());
-
-        Object responseBody = startResponse.getBody();
-        assertTrue(responseBody instanceof Discovery);
-
-        String discoveryId = ((Discovery) responseBody).id;
-        assertNotNull(discoveryId);
-
-        String statusString = discoveryController.getDiscoveryStatus(discoveryId).getBody();
-        assertNotNull(statusString);
-        assertFalse(statusString.isEmpty());
-        assertNotEquals("null", statusString);
-    }
-
-    @Test
-    void testStartDiscoveryFromInputIriGetStatus() throws LpAppsException {
-        ResponseEntity<?> startResponse = discoveryController.startDiscoveryFromInputIri(DISCOVERY_CONFIG_IRI);
-        assertFalse(startResponse.getStatusCode().isError());
-
-        Object responseBody = startResponse.getBody();
-        assertTrue(responseBody instanceof Discovery);
-
-        String discoveryId = ((Discovery) responseBody).id;
-        assertNotNull(discoveryId);
-
-        String statusString = discoveryController.getDiscoveryStatus(discoveryId).getBody();
-        assertNotNull(statusString);
-        assertFalse(statusString.isEmpty());
-        assertNotEquals("null", statusString);
-    }
 
 }
