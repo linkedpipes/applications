@@ -3,7 +3,7 @@ import React from 'react';
 import { Grid, TextField } from '@material-ui/core';
 import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-import 'filepond/dist/filepond.min.css';
+import './styles';
 
 // Register the plugins
 registerPlugin(FilePondPluginFileValidateType);
