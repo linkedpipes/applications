@@ -82,21 +82,14 @@ public class ExecutorServiceComponent implements ExecutorService {
             try {
                 ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
 
-                logger.error("Got ETL status IRI: " + executionStatus.status.getStatusIri() + "(pollable: " + (executionStatus.status.isPollable() ? "Yes" : "No") + ")");
-
                 //persist status in DB
                 for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                     e.setStatus(executionStatus.status);
                     executionRepository.save(e);
                 }
 
-                logger.error("Persisted status in DB");
-
+                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                 if (!executionStatus.status.isPollable()) {
-                    logger.error("Sending status via socket");
-                    String x = OBJECT_MAPPER.writeValueAsString(executionStatus);
-                    logger.error("Serialized status: " + x);
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", x);
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
