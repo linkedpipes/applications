@@ -41,7 +41,7 @@ const DiscoverSelectorComponent = ({
   discoveryIsLoading,
   discoveryLoadingLabel,
   tabValue,
-  selectedInputExample,
+  dataSourcesUris,
   textFieldValue,
   ttlFile,
   textFieldIsValid,
@@ -54,7 +54,11 @@ const DiscoverSelectorComponent = ({
   onHandleProcessStartDiscovery,
   onHandleSetNamedGraph,
   onHandleSetDataSampleIri,
-  onHandleSetSparqlIri
+  onHandleSetSparqlIri,
+  namedGraph,
+  sparqlTextFieldValue,
+  namedTextFieldValue,
+  dataSampleTextFieldValue
 }) => (
   <Card className={classes.card}>
     <CardContent>
@@ -90,7 +94,7 @@ const DiscoverSelectorComponent = ({
               >
                 <DiscoverSimpleSelector
                   classes={classes}
-                  selectedInputExample={selectedInputExample}
+                  dataSourcesUris={dataSourcesUris}
                   discoveryIsLoading={discoveryIsLoading}
                   textFieldValue={textFieldValue}
                   validateField={onValidateField}
@@ -98,11 +102,17 @@ const DiscoverSelectorComponent = ({
                 />
                 <DiscoverAdvancedSelector
                   classes={classes}
-                  selectedInputExample={selectedInputExample}
                   discoveryIsLoading={discoveryIsLoading}
                   handleSparqlTextFieldChange={onHandleSetSparqlIri}
                   handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
                   handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+                  sparqlEndpointIri={sparqlEndpointIri}
+                  dataSampleIri={dataSampleIri}
+                  namedGraph={namedGraph}
+                  sparqlTextFieldValue={sparqlTextFieldValue}
+                  namedTextFieldValue={namedTextFieldValue}
+                  dataSampleTextFieldValue={dataSampleTextFieldValue}
+
                 />
               </SwipeableViews>
             </Grid>
@@ -117,7 +127,7 @@ const DiscoverSelectorComponent = ({
                   tabValue === 0
                     ? !ttlFile &&
                       !textFieldIsValid &&
-                      selectedInputExample === undefined
+                      dataSourcesUris === ''
                     : sparqlEndpointIri === '' || dataSampleIri === ''
                 }
                 onClick={onHandleProcessStartDiscovery}
@@ -136,9 +146,13 @@ const DiscoverSelectorComponent = ({
 DiscoverSelectorComponent.propTypes = {
   classes: PropTypes.object.isRequired,
   dataSampleIri: PropTypes.any,
+  dataSampleTextFieldValue: PropTypes.string,
+  dataSourcesUris: PropTypes.string,
   discoveryIsLoading: PropTypes.any,
   discoveryLoadingLabel: PropTypes.string,
-  onHandleChangeIndex: PropTypes.any,
+  namedGraph: PropTypes.string,
+  namedTextFieldValue: PropTypes.string,
+  onHandleChangeIndex: PropTypes.func,
   onHandleProcessStartDiscovery: PropTypes.any,
   onHandleSelectedFile: PropTypes.any,
   onHandleSetDataSampleIri: PropTypes.any,
@@ -146,9 +160,9 @@ DiscoverSelectorComponent.propTypes = {
   onHandleSetSparqlIri: PropTypes.any,
   onHandleTabChange: PropTypes.any,
   onValidateField: PropTypes.any,
-  selectedInputExample: PropTypes.any,
   sparqlEndpointIri: PropTypes.any,
-  tabValue: PropTypes.any,
+  sparqlTextFieldValue: PropTypes.string,
+  tabValue: PropTypes.number,
   textFieldIsValid: PropTypes.any,
   textFieldValue: PropTypes.any,
   ttlFile: PropTypes.any

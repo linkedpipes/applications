@@ -10,7 +10,7 @@ registerPlugin(FilePondPluginFileValidateType);
 
 const DiscoverSimpleSelectorComponent = ({
   classes,
-  selectedInputExample,
+  dataSourcesUris,
   discoveryIsLoading,
   textFieldValue,
   handleSelectedFile,
@@ -25,9 +25,9 @@ const DiscoverSimpleSelectorComponent = ({
         className={classes.textField}
         multiline
         value={
-          selectedInputExample === undefined
+          !dataSourcesUris
             ? textFieldValue
-            : selectedInputExample
+            : dataSourcesUris
         }
         onChange={handleValidateField}
         placeholder="Input your sources..."
@@ -63,10 +63,10 @@ const DiscoverSimpleSelectorComponent = ({
 
 DiscoverSimpleSelectorComponent.propTypes = {
   classes: PropTypes.any,
+  dataSourcesUris: PropTypes.any,
   discoveryIsLoading: PropTypes.any,
   handleSelectedFile: PropTypes.any,
   handleValidateField: PropTypes.any,
-  selectedInputExample: PropTypes.any,
   textFieldValue: PropTypes.any
 };
 

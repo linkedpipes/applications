@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-state */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,8 +8,16 @@ import { DiscoveryService, extractUrlGroups, SocketContext } from '@utils';
 import { discoverySelectors } from '@ducks/discoveryDuck';
 import { visualizersActions } from '@ducks/visualizersDuck';
 import { globalActions } from '@ducks/globalDuck';
+import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
+
+const mapDispatchToProps = dispatch => {
+  const changeTab = index => dispatch(discoverActions.changeTabAction(index));
+  return {
+    changeTab
+  };
+};
 
 class DiscoverSelectorContainer extends PureComponent {
   state = {
@@ -20,10 +29,9 @@ class DiscoverSelectorContainer extends PureComponent {
     discoveryStatusPollingFinished: false,
     discoveryStatusPollingInterval: 2000,
     discoveryLoadingLabel: '',
-    tabValue: 0,
-    sparqlEndpointIri: '',
-    dataSampleIri: '',
-    namedGraph: ''
+    sparqlTextFieldValue: '',
+    dataSampleTextFieldValue: '',
+    namedTextFieldValue: '',
   };
 
   postStartFromFile = async () => {
@@ -39,19 +47,14 @@ class DiscoverSelectorContainer extends PureComponent {
   // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = async () => {
     const textContent =
-      this.props.selectedInputExample !== undefined
-        ? this.props.selectedInputExample
+      !this.props.dataSourcesUris
+        ? this.props.dataSourcesUris
         : this.state.textFieldIsValid;
 
     const splitFieldValue = textContent.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
       return { uri: source };
     });
-
-    if (this.props.selectedInputExample !== undefined) {
-      // Clear out selected sources that failed
-      this.props.onInputExampleClicked(undefined);
-    }
 
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL,
@@ -63,31 +66,24 @@ class DiscoverSelectorContainer extends PureComponent {
 
   postStartFromSparqlEndpoint = async () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.state.sparqlEndpointIri,
-      dataSampleIri: this.state.dataSampleIri,
-      namedGraph: this.state.namedGraph,
-      webId: this.props.webId
+      sparqlEndpointIri: this.props.sparqlEndpointIri,
+      dataSampleIri: this.props.dataSampleIri,
+      namedGraph: this.props.namedGraph
     }).then(response => {
       return response.json();
     });
   };
 
-  addDiscoveryId = response => {
-    const self = this;
+  addDiscoveryId = async (response) => {
+    // const self = this;
     const discoveryId = response.id;
-
-    return new Promise(resolve => {
-      self.props.dispatch(
-        globalActions.addDiscoveryIdAction({
-          id: discoveryId
-        })
-      );
-      resolve();
+    return globalActions.addDiscoveryIdAction({
+      id: discoveryId
     });
   };
 
   handleDiscoveryInputCase = () => {
-    if (this.state.tabValue === 1) {
+    if (this.props.tabValue === 1) {
       return this.postStartFromSparqlEndpoint();
     }
     if (this.state.ttlFile) {
@@ -122,9 +118,6 @@ class DiscoverSelectorContainer extends PureComponent {
           textFieldValue: '',
           textFieldIsValid: true
         });
-
-        // Clear out selected sources that failed
-        self.props.onInputExampleClicked(undefined);
 
         toast.error(
           'There was an error during the discovery. Please, try different sources.',
@@ -191,9 +184,11 @@ class DiscoverSelectorContainer extends PureComponent {
   };
 
   handleTabChange = (event, newValue) => {
-    this.setState({
-      tabValue: newValue
-    });
+    this.props.changeTab(newValue);
+  };
+
+  handleChangeIndex = index => {
+    this.props.changeTab(index);
   };
 
   handleValidation = rawText => {
@@ -209,10 +204,6 @@ class DiscoverSelectorContainer extends PureComponent {
       textFieldValue: rawText,
       textFieldIsValid: valid
     });
-
-    if (this.props.selectedInputExample !== undefined) {
-      this.props.selectedInputExample(undefined);
-    }
   };
 
   handleSelectedFile = fileItems => {
@@ -226,38 +217,45 @@ class DiscoverSelectorContainer extends PureComponent {
     this.handleValidation(rawText);
   };
 
-  handkeSetSparqlIri = e => {
+  handleSetSparqlIri = e => {
     const rawText = e.target.value;
     this.setState({
-      sparqlEndpointIri: rawText
+      sparqlTextFieldValue: rawText
     });
   };
 
   handleSetDataSampleIri = e => {
     const rawText = e.target.value;
     this.setState({
-      dataSampleIri: rawText
+      dataSampleTextFieldValue: rawText
     });
   };
 
   handleSetNamedGraph = e => {
     const rawText = e.target.value;
     this.setState({
-      namedGraph: rawText
+      namedTextFieldValue: rawText
     });
   };
 
   render() {
-    const { selectedInputExample } = this.props;
-    const { tabValue } = this.state;
+    const {
+      dataSourcesUris,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph,
+      tabValue
+    } = this.props;
+
     const {
       discoveryIsLoading,
       textFieldValue,
       textFieldIsValid,
       ttlFile,
-      sparqlEndpointIri,
-      dataSampleIri,
-      discoveryLoadingLabel
+      discoveryLoadingLabel,
+      sparqlTextFieldValue,
+      namedTextFieldValue,
+      dataSampleTextFieldValue
     } = this.state;
 
     return (
@@ -266,7 +264,7 @@ class DiscoverSelectorContainer extends PureComponent {
         discoveryLoadingLabel={discoveryLoadingLabel}
         tabValue={tabValue}
         onHandleTabChange={this.handleTabChange}
-        selectedInputExample={selectedInputExample}
+        dataSourcesUris={dataSourcesUris}
         textFieldValue={textFieldValue}
         onHandleSelectedFile={this.handleSelectedFile}
         onValidateField={this.handleValidateField}
@@ -278,18 +276,23 @@ class DiscoverSelectorContainer extends PureComponent {
         onHandleSetNamedGraph={this.handleSetNamedGraph}
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
+        namedGraph={namedGraph}
+        onHandleChangeIndex={this.handleChangeIndex}
+        sparqlTextFieldValue={sparqlTextFieldValue}
+        namedTextFieldValue={namedTextFieldValue}
+        dataSampleTextFieldValue={dataSampleTextFieldValue}
       />
     );
   }
 }
 
 DiscoverSelectorContainer.propTypes = {
-  discoveryId: PropTypes.any,
-  onInputExampleClicked: PropTypes.any,
-  onNextClicked: PropTypes.any,
-  selectedInputExample: PropTypes.any,
-  socket: PropTypes.any,
-  webId: PropTypes.any
+  changeTab: PropTypes.func,
+  dataSampleIri:  PropTypes.string,
+  dataSourcesUris: PropTypes.string,
+  namedGraph:  PropTypes.string,
+  sparqlEndpointIri:  PropTypes.string,
+  tabValue:  PropTypes.number
 };
 
 const DiscoverSelectorContainerWithSocket = props => (
@@ -301,10 +304,13 @@ const DiscoverSelectorContainerWithSocket = props => (
 const mapStateToProps = state => {
   return {
     datasources: discoverySelectors.getDatasourcesArray(state.datasources),
-    discoveryId: state.globals.discoveryId
+    discoveryId: state.globals.discoveryId,
+    dataSourcesUris: state.discover.dataSourcesUris,
+    sparqlEndpointIri: state.discover.sparqlEndpointIri,
+    dataSampleIri: state.discover.dataSampleIri,
+    namedGraph: state.discover.namedGraph,
+    tabValue: state.discover.tabValue,
   };
 };
 
-export default connect(mapStateToProps)(
-  withWebId(DiscoverSelectorContainerWithSocket)
-);
+export default connect(mapStateToProps, mapDispatchToProps)(withWebId(DiscoverSelectorContainerWithSocket));
