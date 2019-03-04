@@ -16,7 +16,12 @@ const styles = () => ({
 
 const transformData = data => {
   return data.map(row => {
-    return [{ v: row.id, f: row.label.languageMap.en }, row.parentId, row.size];
+    return [
+      { v: row.id, f: row.label.languageMap.en },
+      row.parentId,
+      row.size,
+      null
+    ];
   });
 };
 
@@ -27,7 +32,9 @@ class TreemapVisualizer extends PureComponent {
   }
 
   async componentDidMount() {
-    const response = await VisualizersService.getTreemapData();
+    const response = await VisualizersService.getSkosScheme(
+      'http://linked.opendata.cz/resource/concept-scheme/cpv-2008'
+    );
     const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.json();
     const chartData = headers.concat(transformData(jsonData));
