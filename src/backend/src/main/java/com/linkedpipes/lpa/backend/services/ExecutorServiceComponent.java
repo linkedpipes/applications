@@ -82,17 +82,25 @@ public class ExecutorServiceComponent implements ExecutorService {
             try {
                 ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
 
+                logger.error("Got ETL status IRI: " + executionStatus.status.getStatusIri() + "(pollable: " + (executionStatus.status.isPollable() ? "Yes" : "No") + ")");
+
                 //persist status in DB
                 for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                     e.setStatus(executionStatus.status);
                     executionRepository.save(e);
                 }
 
+                logger.error("Persisted status in DB");
+
                 if (!executionStatus.status.isPollable()) {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
+                    logger.error("Sending status via socket");
+                    String x = OBJECT_MAPPER.writeValueAsString(executionStatus);
+                    logger.error("Serialized status: " + x);
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", x);
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
+                logger.error("Got exception when polling for ETL status.", e);
                 Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
@@ -104,8 +112,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                e.setStatus(EtlStatus.UNKNOWN);
-                executionRepository.save(e);
+                if (e.getStatus().isPollable()) {
+                    e.setStatus(EtlStatus.UNKNOWN);
+                    executionRepository.save(e);
+                }
             }
         };
 
