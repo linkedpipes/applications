@@ -23,7 +23,7 @@ const CreateVisualizerComponent = ({
     <VisualizerContainer
       className={classes.visualizer}
       filters={filters}
-      visualizerType={selectedVisualizer}
+      visualizer={selectedVisualizer.visualizer}
     />
   </div>
 );

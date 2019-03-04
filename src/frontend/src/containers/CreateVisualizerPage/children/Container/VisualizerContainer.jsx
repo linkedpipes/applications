@@ -17,8 +17,8 @@ const styles = () => ({
   input: {}
 });
 
-const getVisualizer = type => {
-  switch (type) {
+const getVisualizer = visualizerCode => {
+  switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
       const markers = [];
@@ -33,7 +33,7 @@ const getVisualizer = type => {
 
 const VisualizerControllerContainer = ({
   classes,
-  visualizerType,
+  visualizer,
   visualizerParams,
   filters
 }) => (
@@ -42,7 +42,7 @@ const VisualizerControllerContainer = ({
       <FiltersComponent filters={filters} />
     </Grid>
     <Grid item lg={9} md={8} xs={12}>
-      {getVisualizer(visualizerType, visualizerParams)}
+      {getVisualizer(visualizer.visualizerCode, visualizerParams)}
     </Grid>
   </Grid>
 );
@@ -50,8 +50,8 @@ const VisualizerControllerContainer = ({
 VisualizerControllerContainer.propTypes = {
   classes: PropTypes.object.isRequired,
   filters: PropTypes.any,
-  visualizerParams: PropTypes.any,
-  visualizerType: PropTypes.any
+  visualizer: PropTypes.object.isRequired,
+  visualizerParams: PropTypes.any
 };
 
 export default withStyles(styles)(VisualizerControllerContainer);
