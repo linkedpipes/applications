@@ -37,6 +37,7 @@ services:
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
+      VIRT_SPARQL_ResultSetMaxRows: 100000
     ports:
       - 8890:8890
     volumes:

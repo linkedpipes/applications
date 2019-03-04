@@ -34,25 +34,24 @@ public class SchemeExtractor {
 
         Resource schemeResource = model.getResource(schemeUri);
 
-        if(schemeResource == null)
+        if (schemeResource == null)
             return new ArrayList<>();
-        else {
-            List<HierarchyNode> nodes = new ArrayList<>();
-            nodes.add(nodeFromSchemeResource(schemeResource));
 
-            nodes.addAll(model
-                    .listSubjectsWithProperty(RDF.type, SKOS.Concept)
-                    .mapWith(this::nodeFromConceptResource)
-                    .toList());
+        List<HierarchyNode> nodes = new ArrayList<>();
+        nodes.add(nodeFromSchemeResource(schemeResource));
 
-            return nodes;
-        }
+        nodes.addAll(model
+                .listSubjectsWithProperty(RDF.type, SKOS.Concept)
+                .mapWith(this::nodeFromConceptResource)
+                .toList());
+
+        return nodes;
     }
 
     @NotNull
     private HierarchyNode nodeFromSchemeResource(@NotNull Resource schemeResource) {
         LocalizedValue schemeLabel = SparqlUtils.getCombinedLabel(schemeResource, labelProperties);
-        if(schemeLabel.size() == 0){
+        if (schemeLabel.size() == 0) {
             String[] splitSchemeUri = schemeUri.split("[/#]");
 
             String name = splitSchemeUri.length == 0 ? schemeUri : splitSchemeUri[splitSchemeUri.length - 1];
