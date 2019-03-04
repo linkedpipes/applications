@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-const BASE = 'awesome-react-app';
+const BASE = 'lpapps';
 const COLOURS = {
   trace: 'lightblue',
   info: 'blue',

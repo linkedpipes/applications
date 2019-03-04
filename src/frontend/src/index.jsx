@@ -9,7 +9,7 @@ import AppRouter from './AppRouter';
 const myStore = store();
 
 if (process.env.NODE_ENV !== 'production') {
-  localStorage.setItem('debug', 'linkedpipes applications:*');
+  localStorage.setItem('debug', 'lpapps:*');
 }
 
 const jsx = (
