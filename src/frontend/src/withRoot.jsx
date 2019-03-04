@@ -1,21 +1,21 @@
-import React from "react";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import React from 'react';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true
+    useNextVariants: true,
+    fontFamily: ['"Roboto"', 'sans-serif'].join(',')
   },
   palette: {
+    type: 'dark',
     primary: {
-      // main: "#2196f3"
-      main: "#154168"
+      main: '#c9b088'
     },
     secondary: {
-      // main: "#ab003c"
-      main: "#fecf8a"
+      main: '#305F7C'
     }
   }
 });

@@ -1,22 +1,17 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.visualization.Concept;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
-import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
+import com.linkedpipes.lpa.backend.entities.visualization.*;
 import com.linkedpipes.lpa.backend.services.VisualizationService;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 public class SkosController {
 
     private final VisualizationService visualizationService;
@@ -30,6 +25,17 @@ public class SkosController {
         return Optional.ofNullable(graphIri)
                 .map(visualizationService::getSkosSchemesFromNamed)
                 .or(() -> Optional.of(visualizationService.getSkosSchemes()))
+                .map(ResponseEntity::ok)
+                .orElseThrow();
+    }
+
+    @NotNull
+    @GetMapping("/api/skos/scheme")
+    public ResponseEntity<List<HierarchyNode>> getSkosScheme(@Nullable @RequestParam(value = "resultGraphIri", required = false) String resultGraphIri,
+                                                             @NotNull @RequestParam("schemeUri") String schemeUri) {
+        return Optional.ofNullable(resultGraphIri)
+                .map(iri -> visualizationService.getSkosSchemeFromNamed(iri, schemeUri))
+                .or(() -> Optional.of(visualizationService.getSkosScheme(schemeUri)))
                 .map(ResponseEntity::ok)
                 .orElseThrow();
     }

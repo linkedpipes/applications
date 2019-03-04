@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDConf;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
@@ -17,7 +18,7 @@ public class DefaultDataSourceConfigurationQueryProvider extends ConstructSparql
     @Override
     protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
-                .addPrefix("dcterms", DCTerms.getURI())
+                .addPrefix(Prefixes.DCTERMS_PREFIX, DCTerms.getURI())
                 .addPrefix("lpd", LPD.uri)
                 .addPrefix("lpd-conf", LPDConf.uri);
     }
