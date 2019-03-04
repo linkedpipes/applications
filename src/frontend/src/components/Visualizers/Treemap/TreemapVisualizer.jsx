@@ -14,6 +14,12 @@ const styles = () => ({
   input: {}
 });
 
+const transformData = data => {
+  return data.map(row => {
+    return [{ v: row.id, f: row.label.languageMap.en }, row.parentId, row.size];
+  });
+};
+
 class TreemapVisualizer extends PureComponent {
   constructor() {
     super();
@@ -24,9 +30,7 @@ class TreemapVisualizer extends PureComponent {
     const response = await VisualizersService.getTreemapData();
     const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.json();
-    const chartData = headers.concat(
-      jsonData.map(e => [e.id, e.parentId, e.size, 0])
-    );
+    const chartData = headers.concat(transformData(jsonData));
     this.setState({
       dataLoadingStatus: 'ready',
       chartData
@@ -42,12 +46,19 @@ class TreemapVisualizer extends PureComponent {
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}
         options={{
-          minColor: '#33FF4A',
-          midColor: '#33FFEB',
-          maxColor: '#334AFF',
           headerHeight: 20,
           fontColor: 'black',
-          showScale: true
+          showScale: true,
+          maxDepth: 1,
+          highlightOnMouseOver: true,
+          maxPostDepth: 2,
+          minHighlightColor: '#8c6bb1',
+          midHighlightColor: '#9ebcda',
+          maxHighlightColor: '#edf8fb',
+          minColor: '#009688',
+          midColor: '#f7f7f7',
+          maxColor: '#ee8100',
+          useWeightedAverageForAggregation: true
         }}
       />
     ) : (
