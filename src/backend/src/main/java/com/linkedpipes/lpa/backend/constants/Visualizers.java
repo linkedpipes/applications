@@ -10,6 +10,7 @@ public class Visualizers {
             "https://discovery.linkedpipes.com/resource/application/timeline-periods-with-labels/template", "LABELED_TIMELINE_PERIODS",
             "https://discovery.linkedpipes.com/resource/application/dcterms/template", "DCTERMS",
             "https://discovery.linkedpipes.com/resource/application/map/template", "MAP",
-            "https://discovery.linkedpipes.com/resource/application/map-labeled-points/template", "LABELED_POINTS_MAP");
+            "https://discovery.linkedpipes.com/resource/application/map-labeled-points/template", "LABELED_POINTS_MAP",
+            "https://discovery.linkedpipes.com/resource/application/treemap/template", "TREEMAP");
 
 }
