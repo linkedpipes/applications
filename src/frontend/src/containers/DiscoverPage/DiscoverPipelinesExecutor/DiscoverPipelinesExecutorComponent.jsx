@@ -22,7 +22,8 @@ const DiscoverPipelinesExecutorComponent = ({
     <CardContent>
       <LinearLoader
         className={classes.loader}
-        variant={'query'}
+        variant={etlExecutionIsFinished ? 'buffer' : 'query'}
+        value={etlExecutionIsFinished ? 100 : undefined}
         labelText={loaderLabelText}
       />
     </CardContent>

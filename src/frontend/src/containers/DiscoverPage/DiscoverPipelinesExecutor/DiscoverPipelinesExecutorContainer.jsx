@@ -87,7 +87,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   executePipeline = (pipelineId, etlPipelineIri, webId, visualizerCode) => {
-    const { onAddSingleExecution } = this.props;
+    const { onAddSingleExecution, onSetEtlExecutionStatus } = this.props;
     const self = this;
 
     // TODO : add custom logger
@@ -113,63 +113,69 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
             'Please, hold on ETL is chatting with Tim Berners-Lee 🕴...'
         });
 
-        self.startSocketListener(executionIri);
+        setTimeout(() => {
+          self.setState({
+            loaderLabelText: `ETL finished with status : Success`
+          });
+        }, 1000);
+
+        onSetEtlExecutionStatus(true);
 
         return pipelineId;
       });
   };
 
-  startSocketListener = executionIri => {
-    const { socket, onSetEtlExecutionStatus } = this.props;
-    const self = this;
+  // startSocketListener = executionIri => {
+  //   const { socket, onSetEtlExecutionStatus } = this.props;
+  //   const self = this;
 
-    socket.emit('join', executionIri);
-    socket.on('executionStatus', data => {
-      Log.info(data, 'DiscoverPipelinesExecutorContainer');
-      const executionCrashed = data === 'Crashed';
-      if (!data || executionCrashed) {
-        self.setState({
-          loaderLabelText:
-            'There was an error during the pipeline execution. Please, try different sources.'
-        });
-      } else {
-        const parsedData = JSON.parse(data);
-        let response = 'Status: ';
-        const status = ETL_STATUS_MAP[parsedData.status.id];
+  //   // socket.emit('join', executionIri);
+  //   // socket.on('executionStatus', data => {
+  //   //   Log.info(data, 'DiscoverPipelinesExecutorContainer');
+  //   //   const executionCrashed = data === 'Crashed';
+  //   //   if (!data || executionCrashed) {
+  //   //     self.setState({
+  //   //       loaderLabelText:
+  //   //         'There was an error during the pipeline execution. Please, try different sources.'
+  //   //     });
+  //   //   } else {
+  //   //     const parsedData = JSON.parse(data);
+  //   //     let response = 'Status: ';
+  //   //     const status = ETL_STATUS_MAP[parsedData.status.id];
 
-        if (status === undefined) {
-          self.setState({
-            loaderLabelText: 'Unknown status for checking pipeline execution'
-          });
-        }
+  //   //     if (status === undefined) {
+  //   //       self.setState({
+  //   //         loaderLabelText: 'Unknown status for checking pipeline execution'
+  //   //       });
+  //   //     }
 
-        response += status;
+  //   //     response += status;
 
-        if (
-          status === ETL_STATUS_TYPE.Finished ||
-          status === ETL_STATUS_TYPE.Cancelled ||
-          status === ETL_STATUS_TYPE.Unknown ||
-          status === ETL_STATUS_TYPE.Failed ||
-          response === 'Success'
-        ) {
-          if (status === ETL_STATUS_TYPE.Failed) {
-            self.setState({
-              loaderLabelText:
-                'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
-            });
-          }
-        } else {
-          self.setState({
-            loaderLabelText: `ETL finished with status : ${response}`
-          });
+  //   //     if (
+  //   //       status === ETL_STATUS_TYPE.Finished ||
+  //   //       status === ETL_STATUS_TYPE.Cancelled ||
+  //   //       status === ETL_STATUS_TYPE.Unknown ||
+  //   //       status === ETL_STATUS_TYPE.Failed ||
+  //   //       response === 'Success'
+  //   //     ) {
+  //   //       if (status === ETL_STATUS_TYPE.Failed) {
+  //   //         self.setState({
+  //   //           loaderLabelText:
+  //   //             'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
+  //   //         });
+  //   //       }
+  //   //     } else {
+  //   //       self.setState({
+  //   //         loaderLabelText: `ETL finished with status : ${response}`
+  //   //       });
 
-          onSetEtlExecutionStatus(true);
-          // TODO : process next step here
-        }
-      }
-      socket.emit('leave', executionIri);
-    });
-  };
+  //   //       onSetEtlExecutionStatus(true);
+  //   //       // TODO : process next step here
+  //   //     }
+  //   //   }
+  //   //   socket.emit('leave', executionIri);
+  //   // });
+  // };
 
   render() {
     const { etlExecutionStatus, loaderLabelText } = this.state;
