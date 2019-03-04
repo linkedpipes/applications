@@ -40,7 +40,7 @@ class AuthorizationContainer extends PureComponent {
 
       if (!this.isWebIdValid(webIdValue)) {
         toast.error('Error WebID is not valid! Try again...', {
-          position: toast.POSITION.BOTTOM_RIGHT
+          position: toast.POSITION.BOTTOM_CENTER
         });
       } else {
         await auth.login(idp, {

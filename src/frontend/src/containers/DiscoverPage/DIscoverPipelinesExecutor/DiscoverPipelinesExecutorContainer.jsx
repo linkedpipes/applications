@@ -103,15 +103,16 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       .then(json => {
         // TODO : add custom logger
         // console.log(`Execute pipeline request sent!`, { autoClose: 2000 });
+        const executionIri = json.iri;
 
-        onAddSingleExecution(pipelineId, json.iri);
+        onAddSingleExecution(pipelineId, executionIri);
 
         self.setState({
           loaderLabelText:
             'Please, hold on ETL is chatting with Tim Berners-Lee 🕴...'
         });
 
-        self.startSocketListener(etlPipelineIri);
+        self.startSocketListener(executionIri);
 
         return pipelineId;
       });
@@ -123,7 +124,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
     socket.emit('join', executionIri);
     socket.on('executionStatus', data => {
-      if (data === undefined) {
+      const executionCrashed = data === 'Crashed';
+      if (!data || executionCrashed) {
         self.setState({
           loaderLabelText:
             'There was an error during the pipeline execution. Please, try different sources.'
