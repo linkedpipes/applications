@@ -8,7 +8,8 @@ import {
   ETLService,
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
-  SocketContext
+  SocketContext,
+  Log
 } from '@utils';
 import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
@@ -124,6 +125,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
     socket.emit('join', executionIri);
     socket.on('executionStatus', data => {
+      Log.info(data, 'DiscoverPipelinesExecutorContainer');
       const executionCrashed = data === 'Crashed';
       if (!data || executionCrashed) {
         self.setState({
@@ -133,7 +135,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       } else {
         const parsedData = JSON.parse(data);
         let response = 'Status: ';
-        const status = ETL_STATUS_MAP[parsedData.status['@id']];
+        const status = ETL_STATUS_MAP[parsedData.status.id];
 
         if (status === undefined) {
           self.setState({
