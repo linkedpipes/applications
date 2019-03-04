@@ -26,16 +26,16 @@ const getVisualizer = (type, params) => {
     case VISUALIZER_TYPE.Treemap:
       return <TreemapVisualizer />;
     default:
-      return <div />;
+      return <div>No valid visualizer selected.</div>;
   }
 };
 
-const VisualizerControllerContainer = (
+const VisualizerControllerContainer = ({
   classes,
   visualizerType,
   visualizerParams,
   filters
-) => (
+}) => (
   <Grid container className={classes.root} direction="row" spacing={0}>
     <Grid item lg={3} md={4} xs={12} className={classes.filterSideBar}>
       <FiltersComponent filters={filters} />

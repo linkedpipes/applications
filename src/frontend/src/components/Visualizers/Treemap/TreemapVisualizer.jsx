@@ -1,9 +1,9 @@
+import React, { PureComponent } from 'react';
 import Chart from 'react-google-charts';
-import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
 
-const styles = theme => ({
+const styles = () => ({
   root: {
     height: '72vh'
   },
@@ -14,7 +14,7 @@ const styles = theme => ({
   input: {}
 });
 
-class TreemapVisualizer extends React.Component {
+class TreemapVisualizer extends PureComponent {
   constructor() {
     super();
     this.state = { dataLoadingStatus: 'loading', chartData: [] };
@@ -29,7 +29,7 @@ class TreemapVisualizer extends React.Component {
     );
     this.setState({
       dataLoadingStatus: 'ready',
-      chartData: chartData
+      chartData
     });
   }
 
@@ -55,23 +55,5 @@ class TreemapVisualizer extends React.Component {
     );
   }
 }
-
-// const TreemapVisualizer = ({ props, classes, getData }) => (
-//   <Chart
-//     width={"100%"}
-//     height={"72vh"}
-//     chartType="TreeMap"
-//     loader={<div>Loading Chart</div>}
-//     data={getData()}
-//     options={{
-//       minColor: "#33FF4A",
-//       midColor: "#33FFEB",
-//       maxColor: "#334AFF",
-//       headerHeight: 20,
-//       fontColor: "black",
-//       showScale: true
-//     }}
-//   />
-// );
 
 export default withStyles(styles)(TreemapVisualizer);

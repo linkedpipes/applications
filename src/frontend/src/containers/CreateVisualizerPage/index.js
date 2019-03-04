@@ -1,3 +1,3 @@
-import CreateVisualizerPage from './VisualizerContainer';
+import CreateVisualizerPage from './CreateVisualizerContainer';
 
 export default CreateVisualizerPage;

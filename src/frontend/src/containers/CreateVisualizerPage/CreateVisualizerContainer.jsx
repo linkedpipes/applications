@@ -3,7 +3,9 @@ import VisualizerComponent from './VisualizerComponent';
 
 const mapStateToProps = state => {
   return {
-    selectedVisualizer: state.globals.selectedVisualizer
+    selectedVisualizer: state.globals.selectedVisualizer,
+    headerParams: state.globals.headerParams,
+    filters: state.visualizers.filters
   };
 };
 

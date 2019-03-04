@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import FiltersComponent from './FiltersComponent';
+import PropTypes from 'prop-types';
 import {
   TOGGLE_FILTER,
   TOGGLE_EXPAND_FILTER,
@@ -7,25 +8,41 @@ import {
 } from '@constants';
 import { connect } from 'react-redux';
 
-
-class FiltersComponent extends PureComponent {
-  handleClick = filter => () => {
-    this.props.dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
-  };
-
-  handleOptionChange = (filterUri, optionUri) => () => {
-    this.props.dispatch({
-      type: TOGGLE_CHECKBOX,
-      payload: { filterUri, optionUri }
-    });
-  };
-
+class FiltersContainer extends PureComponent {
   render() {
-    const { classes, filters } = this.props;
-    const { handleClick, filters} = this
-    return <FiltersComponent filters={filters} handleClick={handleClick} handleOptionChange={handleOptionChange}/>;
+    const { filters, handleClick, handleOptionChange } = this.props;
+    return (
+      <FiltersComponent
+        filters={filters}
+        handleClick={handleClick}
+        handleOptionChange={handleOptionChange}
+      />
+    );
   }
 }
 
+FiltersContainer.propTypes = {
+  filters: PropTypes.array,
+  handleClick: PropTypes.func,
+  handleOptionChange: PropTypes.func
+};
 
-export default connect(null)(FiltersComponent));
+const mapDispatchToProps = dispatch => {
+  const onFilterExpand = filter =>
+    dispatch({ type: TOGGLE_EXPAND_FILTER, payload: filter });
+  const onOptionChange = (filterUri, optionUri) =>
+    dispatch({
+      type: TOGGLE_CHECKBOX,
+      payload: { filterUri, optionUri }
+    });
+
+  return {
+    onFilterExpand,
+    onOptionChange
+  };
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(FiltersContainer);

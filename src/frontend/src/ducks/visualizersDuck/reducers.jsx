@@ -1,17 +1,17 @@
 import types from './types';
 
-const INITIAL_STATE = [];
+const INITIAL_STATE = { filters: [] };
 
 const visualizersReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case types.ADD_FILTERS:
-      return state.concat(action.payload);
+      return { ...state, filters: state.filters.concat(action.payload) };
 
     case types.ADD_FILTER:
-      return [...state, action.payload];
+      return { ...state, filters: [...state.filters, action.payload] };
 
-    case types.TOGGLE_FILTER:
-      return state.filters.map(filter => {
+    case types.TOGGLE_FILTER: {
+      const newFilters = state.filters.map(filter => {
         if (filter.property.uri === action.payload.property.uri) {
           return {
             ...filter,
@@ -20,9 +20,11 @@ const visualizersReducer = (state = INITIAL_STATE, action) => {
         }
         return filter;
       });
+      return { ...state, filters: newFilters };
+    }
 
-    case types.TOGGLE_EXPAND_FILTER:
-      return state.map(filter => {
+    case types.TOGGLE_EXPAND_FILTER: {
+      const newFilters = state.filters.map(filter => {
         if (filter.property.uri === action.payload.property.uri) {
           return {
             ...filter,
@@ -31,6 +33,8 @@ const visualizersReducer = (state = INITIAL_STATE, action) => {
         }
         return filter;
       });
+      return newFilters;
+    }
 
     case types.TOGGLE_CHECKBOX:
       return state.map(filter => {
@@ -66,17 +70,3 @@ const visualizersReducer = (state = INITIAL_STATE, action) => {
 };
 
 export default visualizersReducer;
-
-// case types.TOGGLE_CHECKBOX:
-// return [...state, action.payload];
-
-// case types.TOGGLE_FILTER:
-// return state.filters.map(filter => {
-//   if (filter.property.uri === action.payload.property.uri) {
-//     return {
-//       ...filter,
-//       enabled: !action.payload.enabled
-//     };
-//   }
-//   return filter;
-// });

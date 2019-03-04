@@ -7,15 +7,15 @@ import Collapse from '@material-ui/core/Collapse';
 import OptionsComponent from './Options';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-// import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
-const FiltersComponent = ({ classes, filters }) => (
+const FiltersComponent = ({ filters }) => (
   <div>
     <List
       component="nav"
       subheader={
         <ListSubheader disableSticky>
-          {!filters || filters.length == 0
+          {!filters || filters.length === 0
             ? 'No filters available'
             : 'Available filters'}
         </ListSubheader>
@@ -55,5 +55,9 @@ const FiltersComponent = ({ classes, filters }) => (
     </List>
   </div>
 );
+
+FiltersComponent.propTypes = {
+  filters: PropTypes.array
+};
 
 export default FiltersComponent;
