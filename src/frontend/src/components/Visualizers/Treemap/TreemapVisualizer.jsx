@@ -2,8 +2,10 @@ import React, { PureComponent } from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
+import { CircularProgress } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
-const styles = () => ({
+const styles = theme => ({
   root: {
     height: '72vh'
   },
@@ -11,7 +13,10 @@ const styles = () => ({
     overflowY: 'auto'
   },
   card: {},
-  input: {}
+  input: {},
+  progress: {
+    margin: theme.spacing.unit * 2
+  }
 });
 
 const transformData = data => {
@@ -20,7 +25,7 @@ const transformData = data => {
       { v: row.id, f: row.label.languageMap.en },
       row.parentId,
       row.size,
-      null
+      Math.floor(Math.random() * Math.floor(100))
     ];
   });
 };
@@ -45,6 +50,7 @@ class TreemapVisualizer extends PureComponent {
   }
 
   render() {
+    const { classes } = this.props;
     return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
         width={'100%'}
@@ -58,20 +64,21 @@ class TreemapVisualizer extends PureComponent {
           showScale: true,
           maxDepth: 1,
           highlightOnMouseOver: true,
-          maxPostDepth: 2,
           minHighlightColor: '#8c6bb1',
           midHighlightColor: '#9ebcda',
           maxHighlightColor: '#edf8fb',
           minColor: '#009688',
           midColor: '#f7f7f7',
-          maxColor: '#ee8100',
-          useWeightedAverageForAggregation: true
+          maxColor: '#ee8100'
         }}
       />
     ) : (
-      <div>Fetching data from API</div>
+      <CircularProgress className={classes.progress} />
     );
   }
 }
+TreemapVisualizer.propTypes = {
+  classes: PropTypes.object.isRequired
+};
 
 export default withStyles(styles)(TreemapVisualizer);
