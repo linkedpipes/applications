@@ -45,7 +45,6 @@ export default {
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
-  setSelectedInputExample,
-  changeTabAction
+  changeTabAction,
   setEtlExecutionStatus
 };

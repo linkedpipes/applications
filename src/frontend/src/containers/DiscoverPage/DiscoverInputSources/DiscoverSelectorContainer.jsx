@@ -4,20 +4,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups, SocketContext } from '@utils';
+import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
 import { discoverySelectors } from '@ducks/discoveryDuck';
 import { visualizersActions } from '@ducks/visualizersDuck';
 import { globalActions } from '@ducks/globalDuck';
 import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
-
-const mapDispatchToProps = dispatch => {
-  const changeTab = index => dispatch(discoverActions.changeTabAction(index));
-  return {
-    changeTab
-  };
-};
 
 class DiscoverSelectorContainer extends PureComponent {
   state = {
@@ -31,7 +24,7 @@ class DiscoverSelectorContainer extends PureComponent {
     discoveryLoadingLabel: '',
     sparqlTextFieldValue: '',
     dataSampleTextFieldValue: '',
-    namedTextFieldValue: '',
+    namedTextFieldValue: ''
   };
 
   postStartFromFile = async () => {
@@ -46,10 +39,9 @@ class DiscoverSelectorContainer extends PureComponent {
 
   // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = async () => {
-    const textContent =
-      !this.props.dataSourcesUris
-        ? this.props.dataSourcesUris
-        : this.state.textFieldIsValid;
+    const textContent = !this.props.dataSourcesUris
+      ? this.props.dataSourcesUris
+      : this.state.textFieldIsValid;
 
     const splitFieldValue = textContent.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
@@ -68,17 +60,10 @@ class DiscoverSelectorContainer extends PureComponent {
     return DiscoveryService.postDiscoverFromEndpoint({
       sparqlEndpointIri: this.props.sparqlEndpointIri,
       dataSampleIri: this.props.dataSampleIri,
-      namedGraph: this.props.namedGraph
+      namedGraph: this.props.namedGraph,
+      webId: this.props.webId
     }).then(response => {
       return response.json();
-    });
-  };
-
-  addDiscoveryId = async (response) => {
-    // const self = this;
-    const discoveryId = response.id;
-    return globalActions.addDiscoveryIdAction({
-      id: discoveryId
     });
   };
 
@@ -94,6 +79,7 @@ class DiscoverSelectorContainer extends PureComponent {
 
   handleProcessStartDiscovery = () => {
     const self = this;
+    const { handleSetDiscoveryId } = this.props;
 
     self.setState({
       discoveryIsLoading: true,
@@ -105,14 +91,15 @@ class DiscoverSelectorContainer extends PureComponent {
       .handleDiscoveryInputCase()
       .then(discoveryResponse => {
         if (discoveryResponse !== undefined) {
-          self.addDiscoveryId(discoveryResponse).then(() => {
-            self.setState({ discoveryStatusPollingFinished: false });
-            self.startSocketListener();
-          });
+          const discoveryId = discoveryResponse.id;
+          handleSetDiscoveryId(discoveryId);
+          self.setState({ discoveryStatusPollingFinished: false });
+          self.startSocketListener(discoveryId);
         }
       })
-      .catch(() => {
+      .catch(error => {
         // Enable the fields
+        Log.error(error, 'DiscoverSelectorContainer');
         self.setState({
           discoveryIsLoading: false,
           textFieldValue: '',
@@ -167,18 +154,14 @@ class DiscoverSelectorContainer extends PureComponent {
       discoveryLoadingLabel: 'Extracting the magical pipelines 🧙‍...'
     });
 
-    const self = this;
+    const { handleAddVisualizer } = this.props;
 
     return DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
         return response.json();
       })
       .then(jsonResponse => {
-        self.props.dispatch(
-          visualizersActions.addVisualizer({
-            visualizersArray: jsonResponse.pipelineGroups
-          })
-        );
+        handleAddVisualizer(jsonResponse.pipelineGroups);
         return jsonResponse;
       });
   };
@@ -288,11 +271,17 @@ class DiscoverSelectorContainer extends PureComponent {
 
 DiscoverSelectorContainer.propTypes = {
   changeTab: PropTypes.func,
-  dataSampleIri:  PropTypes.string,
+  dataSampleIri: PropTypes.string,
   dataSourcesUris: PropTypes.string,
-  namedGraph:  PropTypes.string,
-  sparqlEndpointIri:  PropTypes.string,
-  tabValue:  PropTypes.number
+  discoveryId: PropTypes.any,
+  handleAddVisualizer: PropTypes.any,
+  handleSetDiscoveryId: PropTypes.any,
+  namedGraph: PropTypes.string,
+  onNextClicked: PropTypes.any,
+  socket: PropTypes.any,
+  sparqlEndpointIri: PropTypes.string,
+  tabValue: PropTypes.number,
+  webId: PropTypes.any
 };
 
 const DiscoverSelectorContainerWithSocket = props => (
@@ -309,8 +298,34 @@ const mapStateToProps = state => {
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
     namedGraph: state.discover.namedGraph,
-    tabValue: state.discover.tabValue,
+    tabValue: state.discover.tabValue
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withWebId(DiscoverSelectorContainerWithSocket));
+const mapDispatchToProps = dispatch => {
+  const changeTab = index => dispatch(discoverActions.changeTabAction(index));
+  const handleSetDiscoveryId = discoveryId =>
+    dispatch(
+      globalActions.addDiscoveryIdAction({
+        id: discoveryId
+      })
+    );
+
+  const handleAddVisualizer = pipelineGroups =>
+    dispatch(
+      visualizersActions.addVisualizer({
+        visualizersArray: pipelineGroups
+      })
+    );
+
+  return {
+    changeTab,
+    handleSetDiscoveryId,
+    handleAddVisualizer
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withWebId(DiscoverSelectorContainerWithSocket));
