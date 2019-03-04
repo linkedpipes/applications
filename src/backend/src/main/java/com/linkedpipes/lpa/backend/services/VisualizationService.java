@@ -1,9 +1,6 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.linkedpipes.lpa.backend.entities.visualization.Concept;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
-import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
+import com.linkedpipes.lpa.backend.entities.visualization.*;
 
 import java.util.List;
 
@@ -11,6 +8,10 @@ public interface VisualizationService {
     List<Scheme> getSkosSchemes();
 
     List<Scheme> getSkosSchemesFromNamed(String graphIri);
+
+    List<HierarchyNode> getSkosScheme(String schemeUri);
+
+    List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri);
 
     List<Concept> getSkosConcepts();
 
