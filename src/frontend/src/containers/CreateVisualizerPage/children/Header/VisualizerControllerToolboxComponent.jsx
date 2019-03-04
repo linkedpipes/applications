@@ -27,13 +27,7 @@ const VisualizerControllerToolboxComponent = ({
 }) => (
   <div>
     <FormControlLabel
-      control={
-        <Switch
-          checked={checkedRefresh}
-          onChange={handleChange('checkedRefresh')}
-          value="checkedRefresh"
-        />
-      }
+      control={<Switch checked={checkedRefresh} value="checkedRefresh" />}
       label={checkedRefresh ? 'Refresh' : 'Fixed'}
     />
     <Button variant="contained" color="default" className={classes.button}>

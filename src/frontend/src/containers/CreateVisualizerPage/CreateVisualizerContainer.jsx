@@ -1,5 +1,6 @@
+import React from 'react';
 import { connect } from 'react-redux';
-import VisualizerComponent from './VisualizerComponent';
+import CreateVisualizerComponent from './CreateVisualizerComponent';
 
 const mapStateToProps = state => {
   return {
@@ -9,6 +10,8 @@ const mapStateToProps = state => {
   };
 };
 
-const VisualizerContainer = connect(mapStateToProps)(VisualizerComponent);
+const CreateVisualizerContainer = connect(mapStateToProps)(
+  CreateVisualizerComponent
+);
 
-export default VisualizerContainer;
+export default CreateVisualizerContainer;

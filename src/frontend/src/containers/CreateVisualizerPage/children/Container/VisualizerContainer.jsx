@@ -17,13 +17,14 @@ const styles = () => ({
   input: {}
 });
 
-const getVisualizer = (type, params) => {
+const getVisualizer = type => {
   switch (type) {
-    case VISUALIZER_TYPE.GoogleMaps: {
-      const markers = params.markers;
+    case VISUALIZER_TYPE.MAP:
+    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+      const markers = [];
       return <GoogleMapsVisualizer markers={markers} />;
     }
-    case VISUALIZER_TYPE.Treemap:
+    case VISUALIZER_TYPE.TREEMAP:
       return <TreemapVisualizer />;
     default:
       return <div>No valid visualizer selected.</div>;

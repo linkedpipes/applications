@@ -1,6 +1,6 @@
 import types from './types';
 
-const INITIAL_STATE = { filters: [] };
+const INITIAL_STATE = { filters: [], markers: [] };
 
 const visualizersReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
