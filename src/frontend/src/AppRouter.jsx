@@ -13,7 +13,7 @@ import {
   AuthorizationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext } from '@utils';
+import { SocketContext, Log } from '@utils';
 import openSocket from 'socket.io-client';
 import { SOCKET_IO_ENDPOINT } from '@constants';
 
@@ -27,8 +27,8 @@ const styles = () => ({
 
 class AppRouter extends PureComponent {
   componentDidMount() {
-    socket.on('connect', () => console.log('Client connected'));
-    socket.on('disconnect', () => console.log('Client disconnected'));
+    socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
+    socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
   }
 
   render() {

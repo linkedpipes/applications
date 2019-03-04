@@ -67,7 +67,8 @@ const DiscoverComponent = ({
   classes,
   activeStep,
   onBackClicked,
-  onResetClicked
+  onResetClicked,
+  etlExecutionStatus
 }) => (
   <div className={classes.root}>
     <Stepper
@@ -100,6 +101,7 @@ const DiscoverComponent = ({
                           variant="contained"
                           color="primary"
                           className={classes.button}
+                          disabled={etlExecutionStatus}
                         >
                           Create App
                         </Button>
@@ -129,8 +131,8 @@ const DiscoverComponent = ({
 DiscoverComponent.propTypes = {
   activeStep: PropTypes.number,
   classes: PropTypes.object.isRequired,
+  etlExecutionStatus: PropTypes.any,
   onBackClicked: PropTypes.func,
-  onNextClicked: PropTypes.func,
   onResetClicked: PropTypes.func
 };
 

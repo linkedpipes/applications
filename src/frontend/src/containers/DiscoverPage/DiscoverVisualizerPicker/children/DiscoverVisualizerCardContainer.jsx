@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
 import { discoverActions } from '../../duck';
+import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 
 class DiscoverVisualizerPickerContainer extends PureComponent {
@@ -17,7 +18,7 @@ class DiscoverVisualizerPickerContainer extends PureComponent {
   onSelectVisualizer = () => {
     const self = this;
     const { visualizerData } = self.props;
-    console.log('clicked');
+    Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
     self.addVisualizer(visualizerData).then(() => {
       self.props.onNextClicked();
     });

@@ -15,7 +15,8 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
   return {
-    activeStep: state.discover.activeStep
+    activeStep: state.discover.activeStep,
+    etlExecutionStatus: state.discover.etlExecutionStatus
   };
 };
 

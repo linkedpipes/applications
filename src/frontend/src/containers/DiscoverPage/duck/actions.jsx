@@ -28,9 +28,17 @@ export const setSelectedInputExample = value => {
   };
 };
 
+export const setEtlExecutionStatus = value => {
+  return {
+    type: types.SET_ETL_EXECUTION_STATUS,
+    value
+  };
+};
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
-  setSelectedInputExample
+  setSelectedInputExample,
+  setEtlExecutionStatus
 };

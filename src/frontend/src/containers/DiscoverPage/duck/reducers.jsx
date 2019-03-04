@@ -2,7 +2,8 @@ import types from './types';
 
 const INITIAL_STATE = {
   activeStep: 0,
-  selectedInputExample: ''
+  selectedInputExample: '',
+  etlExecutionStatus: false
 };
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
@@ -37,6 +38,14 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, {
         ...state,
         selectedInputExample: value
+      });
+    }
+
+    case types.SET_ETL_EXECUTION_STATUS: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        etlExecutionStatus: value
       });
     }
 
