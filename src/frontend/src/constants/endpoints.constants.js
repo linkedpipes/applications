@@ -1,3 +1,3 @@
-const SOCKET_IO_ENDPOINT = 'localhost:9092';
+const SOCKET_IO_ENDPOINT = process.env.BASE_SOCKET_URL;
 
 export default SOCKET_IO_ENDPOINT;

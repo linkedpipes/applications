@@ -118,7 +118,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
             loaderLabelText: `ETL finished with status : Success`
           });
           onSetEtlExecutionStatus(true);
-        }, 15000);
+        }, 30000);
 
         return pipelineId;
       });
