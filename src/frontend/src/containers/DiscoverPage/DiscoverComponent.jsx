@@ -101,7 +101,7 @@ const DiscoverComponent = ({
                           variant="contained"
                           color="primary"
                           className={classes.button}
-                          disabled={etlExecutionStatus}
+                          disabled={!etlExecutionStatus}
                         >
                           Create App
                         </Button>
