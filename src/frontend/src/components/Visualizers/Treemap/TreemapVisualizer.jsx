@@ -1,77 +1,84 @@
-import Chart from "react-google-charts";
-import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import { VisualizersService } from "../../../_services";
+import React, { PureComponent } from 'react';
+import Chart from 'react-google-charts';
+import { withStyles } from '@material-ui/core/styles';
+import { VisualizersService } from '@utils';
+import { CircularProgress } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 const styles = theme => ({
   root: {
-    height: "72vh"
+    height: '72vh'
   },
   filterSideBar: {
-    overflowY: "auto"
+    overflowY: 'auto'
   },
   card: {},
-  input: {}
+  input: {},
+  progress: {
+    margin: theme.spacing.unit * 2
+  }
 });
 
-class TreemapVisualizer extends React.Component {
+const transformData = data => {
+  return data.map(row => {
+    return [
+      { v: row.id, f: row.label.languageMap.en },
+      row.parentId,
+      row.size,
+      Math.floor(Math.random() * Math.floor(100))
+    ];
+  });
+};
+
+class TreemapVisualizer extends PureComponent {
   constructor() {
     super();
-    this.state = { dataLoadingStatus: "loading", chartData: [] };
+    this.state = { dataLoadingStatus: 'loading', chartData: [] };
   }
 
   async componentDidMount() {
-    const response = await VisualizersService.getTreemapData();
-    const headers = [["id", "parentId", "size", "color"]];
-    const jsonData = await response.json();
-    const chartData = headers.concat(
-      jsonData.map(e => [e.id, e.parentId, e.size, 0])
+    const response = await VisualizersService.getSkosScheme(
+      'http://linked.opendata.cz/resource/concept-scheme/cpv-2008'
     );
+    const headers = [['id', 'parentId', 'size', 'color']];
+    const jsonData = await response.json();
+    const chartData = headers.concat(transformData(jsonData));
     this.setState({
-      dataLoadingStatus: "ready",
-      chartData: chartData
+      dataLoadingStatus: 'ready',
+      chartData
     });
   }
 
   render() {
-    return this.state.dataLoadingStatus === "ready" ? (
+    const { classes } = this.props;
+    return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
-        width={"100%"}
-        height={"72vh"}
+        width={'100%'}
+        height={'72vh'}
         chartType="TreeMap"
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}
         options={{
-          minColor: "#33FF4A",
-          midColor: "#33FFEB",
-          maxColor: "#334AFF",
           headerHeight: 20,
-          fontColor: "black",
-          showScale: true
+          fontColor: 'black',
+          showScale: true,
+          maxDepth: 1,
+          highlightOnMouseOver: true,
+          minHighlightColor: '#8c6bb1',
+          midHighlightColor: '#9ebcda',
+          maxHighlightColor: '#edf8fb',
+          minColor: '#009688',
+          midColor: '#f7f7f7',
+          maxColor: '#ee8100'
         }}
       />
     ) : (
-      <div>Fetching data from API</div>
+      <CircularProgress className={classes.progress} />
     );
   }
 }
-
-// const TreemapVisualizer = ({ props, classes, getData }) => (
-//   <Chart
-//     width={"100%"}
-//     height={"72vh"}
-//     chartType="TreeMap"
-//     loader={<div>Loading Chart</div>}
-//     data={getData()}
-//     options={{
-//       minColor: "#33FF4A",
-//       midColor: "#33FFEB",
-//       maxColor: "#334AFF",
-//       headerHeight: 20,
-//       fontColor: "black",
-//       showScale: true
-//     }}
-//   />
-// );
+TreemapVisualizer.propTypes = {
+  classes: PropTypes.object.isRequired
+};
 
 export default withStyles(styles)(TreemapVisualizer);

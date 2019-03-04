@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
@@ -13,13 +14,6 @@ import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
 
 public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
-    private static final String SCHEMA_PREFIX = "s";
-    private static final String RDFS_PREFIX = "rdfs";
-    private static final String DCTERMS_PREFIX = "dcterms";
-    private static final String RDF_PREFIX = "rdf";
 
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
@@ -40,11 +34,11 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     @Override
     public SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.getURI())
-                .addPrefix(SCHEMA_PREFIX, Schema.uri)
-                .addPrefix(RDFS_PREFIX, RDFS.getURI())
-                .addPrefix(DCTERMS_PREFIX, DCTerms.getURI())
-                .addPrefix(RDF_PREFIX, RDF.getURI());
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.getURI())
+                .addPrefix(Prefixes.SCHEMA_PREFIX, Schema.uri)
+                .addPrefix(Prefixes.RDFS_PREFIX, RDFS.getURI())
+                .addPrefix(Prefixes.DCTERMS_PREFIX, DCTerms.getURI())
+                .addPrefix(Prefixes.RDF_PREFIX, RDF.getURI());
     }
 
     @NotNull

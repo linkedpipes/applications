@@ -88,11 +88,12 @@ public class ExecutorServiceComponent implements ExecutorService {
                     executionRepository.save(e);
                 }
 
+                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                 if (!executionStatus.status.isPollable()) {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
+                logger.error("Got exception when polling for ETL status.", e);
                 Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
@@ -104,8 +105,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                e.setStatus(EtlStatus.UNKNOWN);
-                executionRepository.save(e);
+                if (e.getStatus().isPollable()) {
+                    e.setStatus(EtlStatus.UNKNOWN);
+                    executionRepository.save(e);
+                }
             }
         };
 

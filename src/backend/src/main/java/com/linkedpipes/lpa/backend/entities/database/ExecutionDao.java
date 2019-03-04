@@ -14,7 +14,7 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private String executionIri;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private EtlStatus status;
 
