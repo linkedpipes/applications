@@ -1,6 +1,4 @@
 sudo: required
-language: java
-jdk: openjdk10
 os: "linux"
 
 stages:
@@ -12,6 +10,9 @@ stages:
 jobs:
   include:
     - stage: build
+      language: node_js
+      node_js:
+        - stable
       name: "Frontend"
       before_script:
         - cd src/frontend
@@ -26,6 +27,8 @@ jobs:
         - yarn run build
 
     - name: "Backend"
+      language: java
+      jdk: openjdk10
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -51,6 +54,8 @@ jobs:
         #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
         #   fi
     - stage: deploy
+      language: java
+      jdk: openjdk10
       name: "Deploying to DockerHub"
       services:
         - docker
