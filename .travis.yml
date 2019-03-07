@@ -94,7 +94,7 @@ jobs:
     #     - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
     - stage: deploy
-      name: "Deploying to DockerHub"
+      name: "Deploying Backend to DockerHub"
       sudo: required
       services:
         - docker
@@ -104,6 +104,13 @@ jobs:
         - cd src/backend
         - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
         # - docker push linkedpipes/applications:backend
+
+    - name: "Deploying Frontend to DockerHub"
+      sudo: required
+      services:
+        - docker
+      script:
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
         - cd ../frontend
         - docker build -t linkedpipes/applications:frontend .
