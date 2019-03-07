@@ -112,7 +112,7 @@ jobs:
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
-        - cd ../frontend
+        - cd src/frontend
         - docker build -t linkedpipes/applications:frontend .
         - docker push linkedpipes/applications:frontend
 
