@@ -1,6 +1,4 @@
 sudo: required
-services:
-  - docker
 matrix:
   include:
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
@@ -39,38 +37,34 @@ matrix:
       script:
         - ./gradlew assemble
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
+
+        - if [ branch = master OR commit_message =~ /(\[Travis-Integration\])/ ]; then
+
+          ./gradlew dockerRun;
+          ./gradlew assemble;
+          sleep 5;
+          ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
+
+          fi
+
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
     - # require the branch name to be master
       if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
-      language: java
-      jdk: openjdk10
-
-      before_cache:
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        directories:
-          - $HOME/.gradle/caches/
-          - $HOME/.gradle/wrapper/
       services:
-        - postgresql
-      before_script:
-        - psql -c "CREATE DATABASE lpa;" -U postgres
-        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+        - docker
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+
         - cd src/backend
-        - ./gradlew dockerRun
-        - ./gradlew assemble
-        - sleep 5
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
         - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
         - docker push linkedpipes/applications:backend
+
         - cd ../frontend
         - docker build -t linkedpipes/applications:frontend .
         - docker push linkedpipes/applications:frontend
+
         - docker build -t linkedpipes/applications:frontend-prod -f Dockerfile-prod .
         - docker push linkedpipes/applications:frontend-prod
 
