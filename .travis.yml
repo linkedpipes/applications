@@ -1,10 +1,10 @@
 sudo: required
-matrix:
+jobs:
   include:
+    - stage: Build
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: node_js
-      node_js:
-        - stable
+      node_js: stable
       before_script:
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
@@ -20,7 +20,6 @@ matrix:
     - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: java
       jdk: openjdk10
-
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -37,20 +36,15 @@ matrix:
       script:
         - ./gradlew assemble
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
-
-        - if [ branch = master OR commit_message =~ /(\[Travis-Integration\])/ ]; then
-
-          ./gradlew dockerRun;
-          ./gradlew assemble;
-          sleep 5;
-          ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
-
-          fi
-
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
-
-    - # require the branch name to be master
+        # - if [ branch = master OR commit_message =~ /(\[Travis-Integration\])/ ]; then
+        #   ./gradlew dockerRun;
+        #   ./gradlew assemble;
+        #   sleep 5;
+        #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
+        #   fi
+    - stage: Deploy
       if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       services:
         - docker
