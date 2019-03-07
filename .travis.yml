@@ -1,5 +1,5 @@
 sudo: required
-jobs:
+matrix:
   include:
     - stage: Build & Test Frontend
       if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
