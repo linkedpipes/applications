@@ -60,7 +60,7 @@ public class EtlServiceComponent implements EtlService {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
             ObjectMapper mapper = new ObjectMapper();
             Date started = format.parse(mapper.readTree(response).get("executionStarted").asText());
-            Date finished = format.parse(mapper.readTree(response).get("executionFinished").asText());
+            Date finished = mapper.readTree(response).get("executionFinished") == null ? null : format.parse(mapper.readTree(response).get("executionFinished").asText());
             EtlStatus status = EtlStatus.fromIri(mapper.readTree(response).get("status").get("@id").asText());
 
             logger.error("ETL status IRI: " + status.getStatusIri() + "(pollable: " + (status.isPollable() ? "Yes" : "No") + ")");
