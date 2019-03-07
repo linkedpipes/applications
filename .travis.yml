@@ -5,9 +5,9 @@ os: "linux"
 
 jobs:
   include:
-    - stage: "Build & Unit Test"
+    - stage: Build
+    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       name: "Frontend"
-      if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       before_script:
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
@@ -19,8 +19,8 @@ jobs:
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
-    - name: "Backend"
-      if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+      name: "Backend"
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -45,9 +45,9 @@ jobs:
         #   sleep 5;
         #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
         #   fi
-    - stage: "Deploy"
+    - stage: Deploy
+    - if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       name: "Deploying to DockerHub"
-      if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       services:
         - docker
       script:
