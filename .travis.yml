@@ -1,9 +1,12 @@
-sudo: required
 os: "linux"
 
 stages:
   - name: build
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+  - name: unit tests
+    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+  - name: integration tests
+    if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
   - name: deploy
     if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
 
@@ -44,19 +47,56 @@ jobs:
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew assemble
+
+    - stage: unit tests
+      name: "Backend"
+      language: java
+      jdk: openjdk10
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      services:
+        - postgresql
+        - docker
+      before_script:
+        - cd src/backend
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+      script:
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
-        # - if [ branch = master OR commit_message =~ /(\[Travis-Integration\])/ ]; then
-        #   ./gradlew dockerRun;
-        #   ./gradlew assemble;
-        #   sleep 5;
-        #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
-        #   fi
-    - stage: deploy
+
+    - stage: integration tests
+      name: "Backend"
       language: java
       jdk: openjdk10
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      services:
+        - postgresql
+        - docker
+      before_script:
+        - cd src/backend
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+      script:
+        - ./gradlew dockerRun
+        - ./gradlew assemble
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
+
+    - stage: deploy
       name: "Deploying to DockerHub"
+      sudo: required
       services:
         - docker
       script:
@@ -64,14 +104,14 @@ jobs:
 
         - cd src/backend
         - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
-        - docker push linkedpipes/applications:backend
+        # - docker push linkedpipes/applications:backend
 
         - cd ../frontend
         - docker build -t linkedpipes/applications:frontend .
-        - docker push linkedpipes/applications:frontend
+        # - docker push linkedpipes/applications:frontend
 
         - docker build -t linkedpipes/applications:frontend-prod -f Dockerfile-prod .
-        - docker push linkedpipes/applications:frontend-prod
+        # - docker push linkedpipes/applications:frontend-prod
 
 notifications:
   slack:
