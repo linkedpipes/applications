@@ -1,8 +1,8 @@
 sudo: required
 jobs:
   include:
-    - stage: Build
-    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    - stage: Build & Test Frontend
+      if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: node_js
       node_js: stable
       before_script:
@@ -17,7 +17,8 @@ jobs:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
 
-    - if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    - stage: Build & Test Backend
+      if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       language: java
       jdk: openjdk10
       before_cache:
@@ -44,6 +45,7 @@ jobs:
         #   sleep 5;
         #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
         #   fi
+
     - stage: Deploy
       if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       services:
