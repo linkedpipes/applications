@@ -1,10 +1,12 @@
 sudo: required
 language: java
 jdk: openjdk10
+os: "linux"
 
 jobs:
   include:
-    - stage: Build & Test Frontend
+    - stage: Build & Unit Test
+      name: Frontend
       if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       before_script:
         - cd src/frontend
@@ -17,8 +19,7 @@ jobs:
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
-
-    - stage: Build & Test Backend
+    - name: Backend
       if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -44,8 +45,8 @@ jobs:
         #   sleep 5;
         #   ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration;
         #   fi
-
     - stage: Deploy
+      name: Deploying to DockerHub
       if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
       services:
         - docker
