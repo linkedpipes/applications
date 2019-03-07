@@ -11,6 +11,8 @@ stages:
     if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
 
 jobs:
+  allow_failures:
+    - script: ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
   include:
     - stage: build
       language: node_js
@@ -91,7 +93,6 @@ jobs:
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew dockerRun
-        - ./gradlew assemble
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
     - stage: deploy
