@@ -49,7 +49,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         );
       })
       .catch(error => {
-        console.log(error.message);
+        Log.error(error.message, 'DiscoverPipelinesExecutorContianer');
         self.setState({
           loaderLabelText:
             'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
@@ -87,11 +87,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   executePipeline = (pipelineId, etlPipelineIri, webId, visualizerCode) => {
-    const { onAddSingleExecution, onSetEtlExecutionStatus } = this.props;
+    const { onAddSingleExecution } = this.props;
     const self = this;
-
-    // TODO : add custom logger
-    // console.log('Sending the execute pipeline request...');
 
     return ETLService.getExecutePipeline({
       etlPipelineIri,
@@ -170,7 +167,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
-  etlExecutionStatus: PropTypes.any,
   onAddSelectedResultGraphIriAction: PropTypes.any,
   onAddSingleExecution: PropTypes.any,
   onAddSingleExport: PropTypes.any,

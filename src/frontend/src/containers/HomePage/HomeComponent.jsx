@@ -26,13 +26,13 @@ const styles = theme => ({
   templatesBtn: {
     margin: theme.spacing.unit,
     width: '90%',
-    backgroundColor: '#305F7C',
+    backgroundColor: theme.palette.primary.dark,
     color: 'white'
   },
   createBtn: {
     margin: theme.spacing.unit,
     width: '90%',
-    backgroundColor: '#c9b088',
+    backgroundColor: theme.palette.secondary.main,
     color: 'white',
     textDecoration: 'none'
   }

@@ -1,25 +1,16 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
 import auth from 'solid-auth-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { withWebId } from '@inrupt/solid-react-components';
-import { AuthenticationService, Log } from '@utils';
+import { Log } from '@utils';
 
-class AuthorizationContainer extends PureComponent {
+class AuthorizationContainer extends Component {
   state = {
-    session: null,
-    idp: null,
     webIdFieldValue: '',
-    error: null
+    withWebIdStatus: false
   };
-
-  componentDidUpdate(prevProps, prevState) {
-    // Reset error state after user choose provider
-    if (prevProps.idp !== '' && prevProps.idp !== this.props.idp) {
-      this.setState({ error: null });
-    }
-  }
 
   isWebIdValid = webId => {
     const regex = new RegExp(
@@ -58,13 +49,23 @@ class AuthorizationContainer extends PureComponent {
     this.setState({ webIdFieldValue: value });
   };
 
+  onSetWithWebId = event => {
+    Log.info(event.target.value, 'AuthorizationContainer');
+    this.setState(prevState => ({
+      withWebIdStatus: !prevState.withWebIdStatus
+    }));
+  };
+
   render() {
-    const { handleSignIn, snackbarOpen, handleWebIdFieldChange } = this;
+    const { handleSignIn, handleWebIdFieldChange, onSetWithWebId } = this;
+    const { withWebIdStatus } = this.state;
     return (
       <div>
         <AuthorizationComponent
           onWebIdFieldChange={handleWebIdFieldChange}
           onSignInClick={handleSignIn}
+          onSetWithWebId={onSetWithWebId}
+          withWebIdStatus={withWebIdStatus}
         />
         <ToastContainer />
       </div>

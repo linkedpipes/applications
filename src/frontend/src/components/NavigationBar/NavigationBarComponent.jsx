@@ -109,6 +109,7 @@ const NavigationBarComponent = ({
       <Toolbar disableGutters={!drawerState} className={classes.toolbar}>
         <div className={classes.toolbarIcon}>
           <IconButton
+            color="inherit"
             aria-label="Open drawer"
             onClick={onHandleDrawerOpen}
             className={classNames(classes.menuButton, {
@@ -118,7 +119,12 @@ const NavigationBarComponent = ({
             <MenuIcon />
           </IconButton>
         </div>
-        <Typography variant="h6" className={classes.flex} noWrap>
+        <Typography
+          color="inherit"
+          variant="h6"
+          className={classes.flex}
+          noWrap
+        >
           Discovery API Assistant Demo
         </Typography>
         <UserProfileButton />

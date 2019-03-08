@@ -16,9 +16,10 @@
     "plugin:import/recommended",
     "airbnb",
     "prettier",
-    "prettier/react"
+    "prettier/react",
+    "prettier/flowtype"
   ],
-  "plugins": ["babel", "material-ui", "import"],
+  "plugins": ["babel", "material-ui", "import", "flowtype"],
   "rules": {
     // It's buggy
     "react/jsx-curly-brace-presence": "off",
@@ -80,7 +81,17 @@
   },
   "settings": {
     "import/resolver": {
-      "babel-module": {}
+      "babel-module": {
+        "root": ["./src"],
+        "alias": {
+          "@components": "./src/components",
+          "@containers": "./src/containers",
+          "@ducks": "./src/ducks",
+          "@utils": "./src/utils",
+          "@constants": "./src/constants",
+          "@layouts": "./src/layouts"
+        }
+      }
     }
   }
 }

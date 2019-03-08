@@ -3,16 +3,17 @@ import {
   withGoogleMap,
   GoogleMap,
   Marker
-} from "react-google-maps";
-import MarkerClusterer from "react-google-maps/lib/components/addons/MarkerClusterer";
-import React from "react";
-import { compose, withProps, lifecycle } from "recompose";
-import uuid from "uuid";
+} from 'react-google-maps';
+import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClusterer';
+import React from 'react';
+import { compose, withProps, lifecycle } from 'recompose';
+import { Log } from '@utils';
+import uuid from 'uuid';
 
 const GoogleMapsVisualizer = compose(
   withProps({
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=places",
+      'https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=places',
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `100%` }} />,
     mapElement: <div style={{ height: `100%` }} />
@@ -21,7 +22,7 @@ const GoogleMapsVisualizer = compose(
     componentDidMount() {
       this.setState({
         zoomToMarkers: map => {
-          console.log("Zoom to markers");
+          Log.info('Zoomed to markers', 'GoogleMapsVisualizer');
           const bounds = new window.google.maps.LatLngBounds();
           if (map !== null) {
             const childrenArray = map.props.children.props.children;
@@ -58,7 +59,9 @@ const GoogleMapsVisualizer = compose(
           <Marker
             key={uuid()}
             position={marker.coordinates}
-            onClick={() => console.log("clicked")}
+            onClick={() =>
+              Log.info('Clicked on cluster', 'GoogleMapsVisualizer')
+            }
             defaultAnimation={null}
           />
         ))}
