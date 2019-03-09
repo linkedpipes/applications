@@ -39,15 +39,28 @@ public class UserServiceComponent implements UserService {
             getUser(webId);
             throw new UserTakenException(webId);
         } catch (UserNotFoundException e) {
-            UserDao user = new UserDao();
-            user.setWebId(webId);
-            repository.save(user);
-            try {
-                return getUserProfile(webId);
-            } catch(UserNotFoundException f) {
-                logger.error("Failed to store user.");
-                throw new RuntimeException(f);
-            }
+            return addNewUser(webId);
+        }
+    }
+
+    private UserProfile addNewUser(String webId) {
+        UserDao user = new UserDao();
+        user.setWebId(webId);
+        repository.save(user);
+        try {
+            return getUserProfile(webId);
+        } catch(UserNotFoundException f) {
+            logger.error("Failed to store user.");
+            throw new RuntimeException(f);
+        }
+    }
+
+    @NotNull @Override
+    public UserProfile addUserIfNotPresent(String webId) {
+        try {
+            return getUserProfile(webId);
+        } catch (UserNotFoundException e) {
+            return addNewUser(webId);
         }
     }
 
