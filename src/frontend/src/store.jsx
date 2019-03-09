@@ -1,4 +1,4 @@
-import { applyMiddleware, combineReducers, compose } from 'redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import logger from 'redux-logger';
 import { discoverReducer } from '@containers';
 import Reactotron from './ReactotronConfig';
@@ -18,10 +18,13 @@ const composeEnhancers =
 
 const middlewares = [thunk, logger];
 
-const enhancer = composeEnhancers(applyMiddleware(...middlewares));
+const enhancer = composeEnhancers(
+  applyMiddleware(...middlewares),
+  Reactotron.createEnhancer
+);
 
 export default () => {
-  const store = Reactotron.createStore(
+  const store = createStore(
     combineReducers({
       user: userReducer,
       globals: globalReducer,
