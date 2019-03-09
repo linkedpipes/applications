@@ -41,7 +41,7 @@
     "prop-types": "15.7.2",
     "react": "16.8.3",
     "react-dom": "16.8.3",
-    "react-emoji-render": "0.5.0",
+    "react-emoji-render": "0.6.0",
     "react-error-boundary": "1.2.3",
     "react-filepond": "7.0.1",
     "react-google-charts": "3.0.11",
