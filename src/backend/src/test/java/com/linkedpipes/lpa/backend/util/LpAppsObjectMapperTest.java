@@ -42,7 +42,7 @@ class LpAppsObjectMapperTests {
                         "\"executionStarted\":\"2019-01-18T20:53:50.625+0000\"," +
                         "\"executionFinished\":\"2019-01-18T20:53:57.379+0000\"}", EtlStatus.FINISHED, false, false),
                 arguments("{\"status\":{\"@id\":\"http://etl.linkedpipes.com/resources/status/running\"}," +
-                        "\"executionStarted\":\"2019-01-18T20:53:50.625+0000\",", EtlStatus.RUNNING, false, true),
+                        "\"executionStarted\":\"2019-01-18T20:53:50.625+0000\"}", EtlStatus.RUNNING, false, true),
                 arguments("{\"status\":{\"@id\":\"http://etl.linkedpipes.com/resources/status/queued\"}}", EtlStatus.QUEUED, true, true)
         );
     }
