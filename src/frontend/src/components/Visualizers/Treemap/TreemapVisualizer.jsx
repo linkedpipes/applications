@@ -1,9 +1,20 @@
-import React, { PureComponent } from 'react';
+// @flow
+import * as React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
 import { CircularProgress } from '@material-ui/core';
-import PropTypes from 'prop-types';
+
+type Props = {
+  classes: {
+    progress: number
+  }
+};
+
+type State = {
+  dataLoadingStatus: string,
+  chartData: Array<Array<mixed>>
+};
 
 const styles = theme => ({
   root: {
@@ -30,7 +41,7 @@ const transformData = data => {
   });
 };
 
-class TreemapVisualizer extends PureComponent {
+class TreemapVisualizer extends React.PureComponent<Props, State> {
   constructor() {
     super();
     this.state = { dataLoadingStatus: 'loading', chartData: [] };
@@ -77,8 +88,5 @@ class TreemapVisualizer extends PureComponent {
     );
   }
 }
-TreemapVisualizer.propTypes = {
-  classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(TreemapVisualizer);
