@@ -7,6 +7,7 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
@@ -27,6 +28,7 @@ public class DiscoveryController {
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
+    @NotNull private final UserService userService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
@@ -36,6 +38,7 @@ public class DiscoveryController {
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         executorService = context.getBean(ExecutorService.class);
+        userService = context.getBean(UserService.class);
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
@@ -52,6 +55,7 @@ public class DiscoveryController {
         }
 
         try {
+            userService.addUserIfNotPresent(webId);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
             Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
             return ResponseEntity.ok(newDiscovery);
@@ -69,6 +73,7 @@ public class DiscoveryController {
         }
 
         try {
+            userService.addUserIfNotPresent(webId);
             Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
             return ResponseEntity.ok(newDiscovery);
         } catch (UserNotFoundException e) {
@@ -85,6 +90,7 @@ public class DiscoveryController {
         }
 
         try {
+            userService.addUserIfNotPresent(webId);
             Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
             return ResponseEntity.ok(newDiscovery);
         } catch (UserNotFoundException e) {
@@ -106,6 +112,7 @@ public class DiscoveryController {
         }
 
         try {
+            userService.addUserIfNotPresent(webId);
             String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
             return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId));
