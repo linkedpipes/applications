@@ -57,6 +57,9 @@ module.exports = () => {
       },
       historyApiFallback: true
     },
+    node: {
+      fs: 'empty'
+    },
     mode: dev ? 'development' : 'production',
     plugins,
     externals: {}
