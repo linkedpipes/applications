@@ -6,7 +6,7 @@ stages:
   - name: unit tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: integration tests
-    if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
+    if: branch = master OR commit_message =~ /(\[Travis-Integration\])/ OR commit_message =~ /(\[Travis-Deploy\])/
   - name: deploy
     if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
 
