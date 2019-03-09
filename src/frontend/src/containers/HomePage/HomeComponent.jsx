@@ -1,11 +1,21 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import Button from '@material-ui/core/Button/Button';
 import { withStyles } from '@material-ui/core/styles';
 import Link from 'react-router-dom/es/Link';
-import PropTypes from 'prop-types';
+
+type Props = {
+  classes: {
+    root: {},
+    paper: {},
+    button: {},
+    templatesBtn: {},
+    createBtn: {}
+  }
+};
 
 const styles = theme => ({
   root: {
@@ -38,7 +48,7 @@ const styles = theme => ({
   }
 });
 
-const HomeComponent = ({ classes }) => (
+const HomeComponent = ({ classes }: Props) => (
   <div className={classes.root}>
     <Grid container spacing={24}>
       <Grid item xs={4}>
@@ -85,9 +95,5 @@ const HomeComponent = ({ classes }) => (
     </Grid>
   </div>
 );
-
-HomeComponent.propTypes = {
-  classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(HomeComponent);
