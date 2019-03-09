@@ -1,16 +1,16 @@
 package com.linkedpipes.lpa.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.linkedpipes.lpa.backend.util.EtlStatusDeserializer;
-import com.linkedpipes.lpa.backend.util.EtlStatusSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@JsonSerialize(using = EtlStatusSerializer.class)
-@JsonDeserialize(using = EtlStatusDeserializer.class)
+import static com.fasterxml.jackson.annotation.JsonCreator.Mode.PROPERTIES;
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.OBJECT;
+
+@JsonFormat(shape = OBJECT)
 public enum EtlStatus {
     QUEUED("http://etl.linkedpipes.com/resources/status/queued", true),
     MAPPED("http://etl.linkedpipes.com/resources/status/mapped", true),
@@ -22,8 +22,11 @@ public enum EtlStatus {
     FAILED("http://etl.linkedpipes.com/resources/status/failed", false),
     UNKNOWN("http://etl.linkedpipes.com/resources/status/unknown", false);
 
-    @NotNull @JsonProperty("@id")
-    private String etlStatusIri;
+    public static final String SERIALIZED_FIELD_NAME = "@id";
+
+    @NotNull
+    @JsonProperty(SERIALIZED_FIELD_NAME)
+    private final String etlStatusIri;
 
     @JsonIgnore private boolean pollable;
 
@@ -41,8 +44,17 @@ public enum EtlStatus {
         return this.pollable;
     }
 
+    @Override
+    public String toString() {
+        return "EtlStatus{" +
+                "etlStatusIri='" + etlStatusIri + '\'' +
+                ", pollable=" + pollable +
+                '}';
+    }
+
     @NotNull
-    public static EtlStatus fromIri(@Nullable String iri) {
+    @JsonCreator(mode = PROPERTIES)
+    public static EtlStatus fromIri(@Nullable @JsonProperty(SERIALIZED_FIELD_NAME) String iri) {
         for (EtlStatus s : EtlStatus.values()) {
             if (s.etlStatusIri.equals(iri)) {
                 return s;

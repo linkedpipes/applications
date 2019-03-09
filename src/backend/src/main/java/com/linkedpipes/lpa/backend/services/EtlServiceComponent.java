@@ -1,9 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
-import com.linkedpipes.lpa.backend.entities.EtlStatus;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
@@ -15,13 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
  * Provides the functionality of ETL-related backend operations of the application.
@@ -53,26 +47,9 @@ public class EtlServiceComponent implements EtlService {
         String response = httpActions.getExecutionStatus(executionIri);
         logger.error("ETL status response: " + response);
 
-        //construct a subset of status we need
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            JsonNode tree = new ObjectMapper().readTree(response);
-            Date started = format.parse(tree.get("executionStarted").asText());
-            Date finished = tree.get("executionFinished") == null ? null : format.parse(tree.get("executionFinished").asText());
-            EtlStatus status = EtlStatus.fromIri(tree.get("status").get("@id").asText());
-
-            logger.error("ETL status IRI: " + status.getStatusIri() + "(pollable: " + (status.isPollable() ? "Yes" : "No") + ")");
-
-            ExecutionStatus executionStatus = new ExecutionStatus();
-            executionStatus.status = status;
-            executionStatus.started = started;
-            executionStatus.finished = finished;
-
-            return executionStatus;
-        } catch (IOException | ParseException e) {
-            logger.error("Failed to parse ETL status: " + response);
-            throw new LpAppsException(INTERNAL_SERVER_ERROR, "Failed to parse ETL status response", e);
-        }
+        ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
+        System.out.println("executionStatus = " + executionStatus);
+        return executionStatus;
     }
 
     @Override
