@@ -1,14 +1,13 @@
 package com.linkedpipes.lpa.backend.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.linkedpipes.lpa.backend.util.EtlStatusDeserializer;
+import com.linkedpipes.lpa.backend.util.EtlStatusSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.linkedpipes.lpa.backend.util.EtlStatusSerializer;
-import com.linkedpipes.lpa.backend.util.EtlStatusDeserializer;
 
 @JsonSerialize(using = EtlStatusSerializer.class)
 @JsonDeserialize(using = EtlStatusDeserializer.class)
@@ -28,7 +27,7 @@ public enum EtlStatus {
 
     @JsonIgnore private boolean pollable;
 
-    private EtlStatus(String statusIri, boolean isPollable) {
+    EtlStatus(@NotNull String statusIri, boolean isPollable) {
         this.etlStatusIri = statusIri;
         this.pollable = isPollable;
     }
@@ -42,13 +41,13 @@ public enum EtlStatus {
         return this.pollable;
     }
 
-    @Nullable
+    @NotNull
     public static EtlStatus fromIri(@Nullable String iri) {
         for (EtlStatus s : EtlStatus.values()) {
             if (s.etlStatusIri.equals(iri)) {
                 return s;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Unknown status IRI: " + iri);
     }
 }

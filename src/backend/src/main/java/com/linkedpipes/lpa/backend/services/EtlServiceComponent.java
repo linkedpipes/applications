@@ -1,25 +1,24 @@
 package com.linkedpipes.lpa.backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.entities.EtlStatus;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.entities.EtlStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.io.IOException;
-import java.text.ParseException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -46,8 +45,7 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public Execution executePipeline(String etlPipelineIri) throws LpAppsException {
         String response = httpActions.executePipeline(etlPipelineIri);
-        Execution execution = OBJECT_MAPPER.readValue(response, Execution.class);
-        return execution;
+        return OBJECT_MAPPER.readValue(response, Execution.class);
     }
 
     @Override
@@ -58,10 +56,10 @@ public class EtlServiceComponent implements EtlService {
         //construct a subset of status we need
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            ObjectMapper mapper = new ObjectMapper();
-            Date started = format.parse(mapper.readTree(response).get("executionStarted").asText());
-            Date finished = mapper.readTree(response).get("executionFinished") == null ? null : format.parse(mapper.readTree(response).get("executionFinished").asText());
-            EtlStatus status = EtlStatus.fromIri(mapper.readTree(response).get("status").get("@id").asText());
+            JsonNode tree = new ObjectMapper().readTree(response);
+            Date started = format.parse(tree.get("executionStarted").asText());
+            Date finished = tree.get("executionFinished") == null ? null : format.parse(tree.get("executionFinished").asText());
+            EtlStatus status = EtlStatus.fromIri(tree.get("status").get("@id").asText());
 
             logger.error("ETL status IRI: " + status.getStatusIri() + "(pollable: " + (status.isPollable() ? "Yes" : "No") + ")");
 
@@ -71,7 +69,7 @@ public class EtlServiceComponent implements EtlService {
             executionStatus.finished = finished;
 
             return executionStatus;
-        } catch(IOException | ParseException e) {
+        } catch (IOException | ParseException e) {
             logger.error("Failed to parse ETL status: " + response);
             throw new LpAppsException(INTERNAL_SERVER_ERROR, "Failed to parse ETL status response", e);
         }
