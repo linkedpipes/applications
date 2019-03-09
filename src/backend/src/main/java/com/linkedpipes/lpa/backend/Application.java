@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend;
 
+import com.corundumstudio.socketio.*;
 import com.typesafe.config.Config;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -9,12 +10,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.corundumstudio.socketio.listener.*;
-import com.corundumstudio.socketio.*;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Executors;
 
 import java.nio.charset.Charset;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.typesafe.config.ConfigFactory.*;
 
@@ -38,7 +37,7 @@ public class Application {
     }
 
     @NotNull
-    public static SocketIOServer getSocketIoServer() {
+    private static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();
         config.setPort(9092);
         SocketConfig socketConfig = new SocketConfig();
