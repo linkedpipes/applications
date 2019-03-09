@@ -23,7 +23,7 @@
   "dependencies": {
     "@babel/core": "7.3.4",
     "@babel/runtime": "7.3.4",
-    "@inrupt/solid-react-components": "^0.2.3",
+    "@inrupt/solid-react-components": "^0.3.0",
     "@material-ui/core": "3.9.2",
     "@material-ui/icons": "3.0.2",
     "@sentry/browser": "4.6.3",
