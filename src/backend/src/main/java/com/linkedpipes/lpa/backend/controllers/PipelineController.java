@@ -8,6 +8,7 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
@@ -34,11 +35,13 @@ public class PipelineController {
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
+    @NotNull private final UserService userService;
     private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         executorService = context.getBean(ExecutorService.class);
+        userService = context.getBean(UserService.class);
         methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
@@ -91,6 +94,7 @@ public class PipelineController {
                                                      @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
         try {
+            userService.addUserIfNotPresent(webId);
             Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {

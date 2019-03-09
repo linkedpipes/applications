@@ -3,6 +3,8 @@ package com.linkedpipes.lpa.backend.entities.database;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity(name="lpa_user")
 public class UserDao implements Serializable {
@@ -15,12 +17,15 @@ public class UserDao implements Serializable {
     private String webId;
 
     @OneToMany(mappedBy="user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<DiscoveryDao> discoveries;
 
     @OneToMany(mappedBy="user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<ExecutionDao> executions;
 
     @OneToMany(mappedBy="user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<ApplicationDao> applications;
 
     public void addDiscovery(DiscoveryDao discovery) {

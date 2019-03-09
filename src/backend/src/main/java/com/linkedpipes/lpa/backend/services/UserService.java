@@ -11,6 +11,7 @@ import java.util.List;
 public interface UserService {
     UserProfile addUser(String user) throws UserTakenException;
     UserProfile getUserProfile(String user) throws UserNotFoundException;
+    UserProfile addUserIfNotPresent(String user);
 
     UserProfile addApplication(String user, String solidIri) throws UserNotFoundException;
     UserProfile deleteApplication(String user, String solidIri) throws UserNotFoundException;
