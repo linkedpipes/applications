@@ -174,31 +174,37 @@ public class UserServiceComponent implements UserService {
     @NotNull @Override
     public UserProfile getUserProfile(@NotNull String username) throws UserNotFoundException {
         UserDao user = getUser(username);
+        if (user == null) throw new UserNotFoundException(username);
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
-
         profile.applications = new ArrayList<>();
-        for (ApplicationDao dba : user.getApplications()) {
-            Application app = new Application();
-            app.solidIri = dba.getSolidIri();
-            profile.applications.add(app);
+        if (user.getApplications() != null) {
+            for (ApplicationDao dba : user.getApplications()) {
+                Application app = new Application();
+                app.solidIri = dba.getSolidIri();
+                profile.applications.add(app);
+            }
         }
 
         profile.discoverySessions = new ArrayList<>();
-        for (DiscoveryDao d : user.getDiscoveries()) {
-            DiscoverySession session = new DiscoverySession();
-            session.id = d.getDiscoveryId();
-            session.finished = !d.getExecuting();
-            profile.discoverySessions.add(session);
+        if (user.getDiscoveries() != null) {
+            for (DiscoveryDao d : user.getDiscoveries()) {
+                DiscoverySession session = new DiscoverySession();
+                session.id = d.getDiscoveryId();
+                session.finished = !d.getExecuting();
+                profile.discoverySessions.add(session);
+            }
         }
 
         profile.pipelineExecutions = new ArrayList<>();
-        for (ExecutionDao e : user.getExecutions()) {
-            PipelineExecution exec = new PipelineExecution();
-            exec.status = e.getStatus();
-            exec.executionIri = e.getExecutionIri();
-            exec.selectedVisualiser = e.getSelectedVisualiser();
-            profile.pipelineExecutions.add(exec);
+        if (user.getExecutions() != null) {
+            for (ExecutionDao e : user.getExecutions()) {
+                PipelineExecution exec = new PipelineExecution();
+                exec.status = e.getStatus();
+                exec.executionIri = e.getExecutionIri();
+                exec.selectedVisualiser = e.getSelectedVisualiser();
+                profile.pipelineExecutions.add(exec);
+            }
         }
 
         return profile;
