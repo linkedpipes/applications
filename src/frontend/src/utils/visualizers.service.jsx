@@ -5,8 +5,7 @@ const GET_MARKERS_URL = `${BASE_URL}map/markers`;
 const GET_PROPERTIES_URL = `${BASE_URL}map/properties`;
 const SKOS_CONCEPTS_URL = `${BASE_URL}skos/concepts`;
 const SKOS_CONCEPTS_COUNT_URL = `${BASE_URL}skos/conceptsCounts`;
-const SKOS_SCHEME_URL = `${BASE_URL}skos/scheme`;
-const SKOS_SCHEMES_URL = `${BASE_URL}skos/schemes`;
+const SKOS_SCHEME_URL = `${BASE_URL}skos/schemeSubtree`;
 
 const VisualizersService = {
   getFilters: async () => {
@@ -23,17 +22,15 @@ const VisualizersService = {
     );
   },
 
-  getSkosScheme: async schemeUri => {
-    return rest(
-      `${SKOS_SCHEME_URL}?schemeUri=${schemeUri}`,
-      undefined,
-      'GET',
-      undefined
-    );
-  },
-
-  getSkosSchemes: async () => {
-    return rest(`${SKOS_SCHEMES_URL}`, undefined, 'GET', undefined);
+  getSkosScheme: async (
+    schemeUri,
+    resultGraphIri = null,
+    conceptUri = null
+  ) => {
+    let url = `${SKOS_SCHEME_URL}?schemeUri=${schemeUri}`;
+    if (conceptUri) url += `&conceptUri=${conceptUri}`;
+    if (resultGraphIri) url += `&resultGraphIri=${resultGraphIri}`;
+    return rest(url, undefined, 'GET', undefined);
   },
 
   getSKOSConcepts: async () => {
