@@ -45,6 +45,7 @@ class TreemapVisualizer extends PureComponent<Props, State> {
   constructor() {
     super();
     this.state = { dataLoadingStatus: 'loading', chartData: [] };
+    this.conceptsFetched = new Set();
   }
 
   async componentDidMount() {
