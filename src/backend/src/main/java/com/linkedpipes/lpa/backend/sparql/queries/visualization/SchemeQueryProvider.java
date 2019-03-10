@@ -4,6 +4,7 @@ import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.arq.querybuilder.WhereBuilder;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;

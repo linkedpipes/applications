@@ -66,7 +66,6 @@ public class HighLevelSchemeExtractor {
         String id = resource.getURI();
         LocalizedValue label = SparqlUtils.getCombinedLabel(resource, labelProperties);
 
-        //TODO get this size as the number of children
         double size = Optional.ofNullable(resource.getProperty(RDF.value))
                 .map(Statement::getDouble)
                 .orElse(1.0);

@@ -4,7 +4,12 @@ import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.arq.querybuilder.WhereBuilder;
+import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_OneOrMore1;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -23,6 +28,8 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
     private static final String VAR_CONCEPT_PREF_LABEL = var("c_spl");
     private static final String VAR_CONCEPT_RDFS_LABEL = var("c_lab");
     private static final String VAR_CONCEPT_DCTERMS_TITLE = var("c_dctt");
+    private static final String VAR_CONCEPT_SIZE_VALUE = var("c_val");
+    private static final String VAR_NARROWER_CONCEPT = var("l");
 
     public HighLevelSchemeQueryProvider(String schemeUri) {
         this.schemeUri = SparqlUtils.formatUri(schemeUri);
@@ -50,17 +57,41 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
                 .addConstruct(VAR_CONCEPT, SKOS.topConceptOf, schemeUri)
                 .addConstruct(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
                 .addConstruct(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
-                .addConstruct(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE);
+                .addConstruct(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
+                .addConstruct(VAR_CONCEPT, RDF.value, VAR_CONCEPT_SIZE_VALUE);
     }
 
     @NotNull
     @Override
-    protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
+    protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) throws ParseException{
+        //TODO what about concepts that have no child nodes (leaves) - we have to cater for that so the VAR_NARROWER_CONCEPTS_COUNT is 0, as right now leaf concepts are discarded
         return builder
                 .addWhere(schemeUri, RDF.type, SKOS.ConceptScheme)
-                .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
-                .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
-                .addWhere(VAR_CONCEPT, SKOS.topConceptOf, schemeUri);
+                //.addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
+                //.addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
+                //.addWhere(VAR_CONCEPT, SKOS.topConceptOf, schemeUri);
+                .addSubQuery(new SelectBuilder()
+                        .addVar(VAR_CONCEPT)
+                        .addVar(VAR_CONCEPT_PREF_LABEL)
+                        .addVar(VAR_CONCEPT_RDFS_LABEL)
+                        .addVar(VAR_CONCEPT_DCTERMS_TITLE)
+                        .addVar("count(" + VAR_NARROWER_CONCEPT + ")", VAR_CONCEPT_SIZE_VALUE)
+                        .addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
+                        .addWhere(VAR_CONCEPT, SKOS.inScheme, schemeUri)
+                        .addWhere(VAR_CONCEPT, SKOS.topConceptOf, schemeUri)
+                        .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                        .addOptional(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
+                        .addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
+                        .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
+                        .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
+                        .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CONCEPT)
+                        //.addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Alt(new P_Link(SKOS.broader.asNode()), new P_Link(SKOS.broaderTransitive.asNode()))), VAR_CONCEPT)
+                        //TODO possibly add FILTER NOT EXISTS { ?l skos:narrowerTransitive [] }
+                        .addGroupBy(VAR_CONCEPT)
+                        .addGroupBy(VAR_CONCEPT_PREF_LABEL)
+                        .addGroupBy(VAR_CONCEPT_RDFS_LABEL)
+                        .addGroupBy(VAR_CONCEPT_DCTERMS_TITLE)
+                );
     }
 
     @NotNull
@@ -69,10 +100,10 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
         return builder
                 .addOptional(schemeUri, SKOS.prefLabel, VAR_SCHEME_PREF_LABEL)
                 .addOptional(schemeUri, RDFS.label, VAR_SCHEME_RDFS_LABEL)
-                .addOptional(schemeUri, DCTerms.title, VAR_SCHEME_DCTERMS_TITLE)
-                .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
-                .addOptional(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
-                .addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE);
+                .addOptional(schemeUri, DCTerms.title, VAR_SCHEME_DCTERMS_TITLE);
+                //.addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
+                //.addOptional(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
+                //.addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE);
     }
 
 }

@@ -43,21 +43,21 @@ public class SchemeSubtreeExtractor {
         String id = resource.getURI();
         LocalizedValue label = SparqlUtils.getCombinedLabel(resource, labelProperties);
 
-        String parentId = getParent(resource)
+        /*String parentId = getParent(resource)
                 .map(Resource::getURI)
-                .orElse(null);
+                .orElse(null);*/
 
         double size = Optional.ofNullable(resource.getProperty(RDF.value))
                 .map(Statement::getDouble)
                 .orElse(1.0);
 
-        return new HierarchyNode(id, label, parentId, size);
+        return new HierarchyNode(id, label, conceptUri, size);
     }
 
     @NotNull
     private Optional<Resource> getParent(@NotNull Resource resource) {
-        if(resource.getURI().equals(conceptUri))
-            return Optional.empty();
+       // if(resource.getURI().equals(conceptUri))
+       //     return Optional.empty();
 
         Optional<Resource> parent = Optional.ofNullable(resource.getProperty(SKOS.broader))
                 .or(() -> Optional.ofNullable(resource.getProperty(SKOS.broaderTransitive)))
