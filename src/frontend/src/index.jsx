@@ -5,6 +5,9 @@ import * as Sentry from '@sentry/browser';
 import store from './store';
 import 'normalize.css/normalize.css';
 import AppRouter from './AppRouter';
+// #if process.env.NODE_ENV !== 'production'
+import './ReactotronConfig';
+// #endif
 
 const myStore = store();
 
