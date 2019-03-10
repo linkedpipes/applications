@@ -34,12 +34,8 @@ const VisualizerControllerHeaderComponent = (props: Props) => (
         <Labels
           title={props.headerParams.title}
           subtitle={props.headerParams.subtitle}
-          onTitleChange={props.onTitleChange}
         />
-        <Toolbox
-          onRefreshSwitchChange={props.onRefreshSwitchChange}
-          checkedRefresh={props.checkedRefresh}
-        />
+        <Toolbox />
       </Toolbar>
     </AppBar>
   </div>

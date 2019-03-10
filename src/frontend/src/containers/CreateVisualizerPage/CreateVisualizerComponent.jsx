@@ -32,9 +32,9 @@ const CreateVisualizerComponent = ({
   <div className={classes.root}>
     <VisualizerControllerHeader
       headerParams={headerParams}
-      onTitleChange=""
-      onRefreshSwitchChange=""
-      checkedRefresh=""
+      onTitleChange={() => {}}
+      onRefreshSwitchChange={() => {}}
+      checkedRefresh={() => {}}
     />
     <VisualizerContainer
       filters={filters}

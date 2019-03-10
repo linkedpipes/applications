@@ -1,5 +1,5 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
@@ -59,10 +59,11 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         eventName: 'select',
         callback: async ({ chartWrapper }) => {
           // The first row in the data is the headers row. Ignore if got chosen
+          console.log(chartWrapper.getChart().getSelection());
           const index = chartWrapper.getChart().getSelection()[0].row;
           if (!index) return;
-
-          const selectedItem = this.state.chartData[index];
+          const selectedItem = this.state.chartData[index + 1];
+          console.log(selectedItem);
           const iri = selectedItem[0].v;
 
           // If data for this conceptIri has been fetched, then return
@@ -85,13 +86,12 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
               };
             },
             () => {
-              // Set selection to where user was
+              // Set selection to where user was. Assuming concat keeps order
               chartWrapper.getChart().setSelection([{ row: index, col: null }]);
+              // Add the id the set of fetched items
+              this.conceptsFetched.add(iri);
             }
           );
-
-          // Add the id the set of fetched items
-          this.conceptsFetched.add(iri);
         }
       }
     ];
@@ -120,7 +120,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
         width={'100%'}
-        height={'72vh'}
+        height={'75vh'}
         chartType="TreeMap"
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}

@@ -27,7 +27,6 @@ const VisualizerControllerLabelsComponent = (props: Props) => (
       className={props.classes.textField}
       value={props.title}
       placeholder="Enter your app Title"
-      onChange={props.onTitleChange}
       margin="normal"
     />
   </div>

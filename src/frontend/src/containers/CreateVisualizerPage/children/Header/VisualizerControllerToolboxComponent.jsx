@@ -10,7 +10,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
-  checkedRefresh: boolean,
+  checkedRefresh?: boolean,
   classes: { button: {}, leftIcon: {}, root: {} }
 };
 
@@ -29,13 +29,7 @@ const styles = theme => ({
 const VisualizerControllerToolboxComponent = (props: Props) => (
   <div>
     <FormControlLabel
-      control={
-        <Switch
-          onChange={props.onRefreshSwitchChange}
-          checked={props.checkedRefresh}
-          value="checkedRefresh"
-        />
-      }
+      control={<Switch value="checkedRefresh" />}
       label={props.checkedRefresh ? 'Refresh' : 'Fixed'}
     />
     <Button
