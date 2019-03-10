@@ -29,7 +29,7 @@ public class SkosController {
                 .orElseThrow();
     }
 
-    @NotNull
+    /*@NotNull
     @GetMapping("/api/skos/scheme")
     public ResponseEntity<List<HierarchyNode>> getSkosScheme(@Nullable @RequestParam(value = "resultGraphIri", required = false) String resultGraphIri,
                                                              @NotNull @RequestParam("schemeUri") String schemeUri) {
@@ -38,7 +38,7 @@ public class SkosController {
                 .or(() -> Optional.of(visualizationService.getSkosScheme(schemeUri)))
                 .map(ResponseEntity::ok)
                 .orElseThrow();
-    }
+    }*/
 
     @NotNull
     @GetMapping("/api/skos/schemeSubtree")
