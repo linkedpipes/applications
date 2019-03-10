@@ -31,7 +31,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       onSetEtlExecutionStatus
     } = this.props;
 
-    onSetEtlExecutionStatus(false);
+    onSetEtlExecutionStatus('Queued');
 
     const visualizerCode =
       selectedVisualizer !== undefined
@@ -129,12 +129,13 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         });
       } else {
         const parsedData = JSON.parse(data);
-        const status = ETL_STATUS_MAP[parsedData.status.id];
+        let status = ETL_STATUS_MAP[parsedData.status.id];
 
         if (status === undefined) {
           self.setState({
             loaderLabelText: 'Unknown status for checking pipeline execution'
           });
+          status = 'Unknown';
         }
 
         self.setState({
@@ -147,7 +148,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
           status === ETL_STATUS_TYPE.Unknown ||
           status === ETL_STATUS_TYPE.Failed
         ) {
-          onSetEtlExecutionStatus(true);
+          onSetEtlExecutionStatus(status);
           socket.emit('leave', executionIri);
         }
       }
@@ -155,7 +156,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   render() {
-    const { etlExecutionStatus, loaderLabelText } = this.state;
+    const { loaderLabelText } = this.state;
+    const { etlExecutionStatus } = this.props;
     return (
       <DiscoverPipelinesExecutorComponent
         etlExecutionIsFinished={etlExecutionStatus}
@@ -167,6 +169,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
+  etlExecutionStatus: PropTypes.any,
   onAddSelectedResultGraphIriAction: PropTypes.any,
   onAddSingleExecution: PropTypes.any,
   onAddSingleExport: PropTypes.any,

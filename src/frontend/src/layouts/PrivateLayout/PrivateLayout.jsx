@@ -1,11 +1,14 @@
 import React, { Fragment } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
 import { withAuthorization } from '@inrupt/solid-react-components';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import PropTypes from 'prop-types';
+import { Log, AuthenticationService } from '@utils';
+import { userActions } from '@ducks/userDuck';
+import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';
+import lifecycle from 'react-pure-lifecycle';
 
 const styles = theme => ({
   root: {
@@ -31,7 +34,40 @@ const styles = theme => ({
   }
 });
 
-const PrivateLayout = ({ classes, component: Component, webId, ...rest }) => {
+const componentDidMount = props => {
+  const { webId, handleSetUserProfile } = props;
+  AuthenticationService.getUserProfile(webId)
+    .then(res => {
+      Log.info('Response from get user profile call:', 'AuthenticationService');
+      Log.info(res, 'AuthenticationService');
+      Log.info(res.data, 'AuthenticationService');
+
+      return res.json();
+    })
+    .then(jsonResponse => {
+      handleSetUserProfile(jsonResponse);
+    })
+    .catch(error => {
+      Log.error(error, 'HomeContainer');
+    });
+};
+
+const methods = {
+  componentDidMount
+};
+
+type Props = {
+  classes: any,
+  component: any,
+  webId: any
+};
+
+const PrivateLayout = ({
+  classes,
+  component: Component,
+  webId,
+  ...rest
+}: Props) => {
   return (
     <Route
       {...rest}
@@ -56,10 +92,17 @@ const PrivateLayout = ({ classes, component: Component, webId, ...rest }) => {
   );
 };
 
-PrivateLayout.propTypes = {
-  classes: PropTypes.any,
-  component: PropTypes.any,
-  webId: PropTypes.any
+const mapDispatchToProps = dispatch => {
+  const handleSetUserProfile = userProfile =>
+    dispatch(userActions.setUserProfile(userProfile));
+  return {
+    handleSetUserProfile
+  };
 };
 
-export default withAuthorization(withStyles(styles)(PrivateLayout));
+export default withAuthorization(
+  connect(
+    null,
+    mapDispatchToProps
+  )(lifecycle(methods)(withStyles(styles)(PrivateLayout)))
+);
