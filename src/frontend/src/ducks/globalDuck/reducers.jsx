@@ -23,7 +23,7 @@ const globalReducer = (state = INITIAL_STATE, action) => {
 
     case types.SET_SELECTED_DATASOURCES_EXAMPLE:
       switch (action.sample.type) {
-        case 'Simple': {
+        case 'simple': {
           const uris = action.sample.URIS;
           const value = uris.join(',\n');
           return {
@@ -34,7 +34,7 @@ const globalReducer = (state = INITIAL_STATE, action) => {
             namedGraph: ''
           };
         }
-        case 'Advanced': {
+        case 'advanced': {
           const {
             sparqlEndpointIri,
             dataSampleIri,
