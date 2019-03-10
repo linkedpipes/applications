@@ -1,12 +1,19 @@
-import React, { PureComponent } from 'react';
+// @flow
+import * as React from 'react';
 import HomeComponent from './HomeComponent';
 import { SocketContext, AuthenticationService, Log } from '@utils';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { userActions } from '@ducks/userDuck';
 import { withWebId } from '@inrupt/solid-react-components';
 
-class HomeContainer extends PureComponent {
+type Props = {
+  handleSetUserProfile: (userProfile: {}) => void,
+  // socket: any,
+  // userProfile: any,
+  webId: string
+};
+
+class HomeContainer extends React.PureComponent<Props> {
   componentDidMount = () => {
     const { webId } = this.props;
     const { handleLoadUserProfile } = this;
@@ -49,23 +56,17 @@ class HomeContainer extends PureComponent {
       });
   };
 
-  handleSetUserSockets = () => {
-    const { socket } = this.props;
-  };
+  // Does this do something?
+  // handleSetUserSockets = () => {
+  //   const { socket } = this.props;
+  // };
 
   render() {
-    return <HomeComponent classes={undefined} />;
+    return <HomeComponent />;
   }
 }
 
-HomeContainer.propTypes = {
-  handleSetUserProfile: PropTypes.any,
-  socket: PropTypes.any,
-  userProfile: PropTypes.any,
-  webId: PropTypes.any
-};
-
-const HomeContainerWithSocket = props => (
+const HomeContainerWithSocket = (props: Props) => (
   <SocketContext.Consumer>
     {socket => <HomeContainer {...props} socket={socket} />}
   </SocketContext.Consumer>
@@ -80,7 +81,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   const handleSetUserProfile = userProfile =>
     dispatch(userActions.setUserProfile(userProfile));
-
   return {
     handleSetUserProfile
   };

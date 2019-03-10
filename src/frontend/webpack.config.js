@@ -35,7 +35,15 @@ module.exports = () => {
       filename: 'bundle.js'
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.jsx']
+      extensions: ['.mjs', '.js', '.jsx'],
+      alias: {
+        '@components': path.resolve(__dirname, './src/components'),
+        '@containers': path.resolve(__dirname, './src/containers'),
+        '@ducks': path.resolve(__dirname, './src/ducks'),
+        '@utils': path.resolve(__dirname, './src/utils'),
+        '@constants': path.resolve(__dirname, './src/constants'),
+        '@layouts': path.resolve(__dirname, './src/layouts')
+      }
     },
     module: {
       rules: [
