@@ -1,9 +1,9 @@
+// @flow
 import React, { PureComponent } from 'react';
 import { BrowserRouter, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/es/Redirect';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
-import PropTypes from 'prop-types';
 import {
   DiscoverPage,
   HomePage,
@@ -15,9 +15,11 @@ import {
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
 import openSocket from 'socket.io-client';
-import { SOCKET_IO_ENDPOINT } from '@constants';
+import { SOCKET_IO_ENDPOINT, SOCKET_IO_RECONNECT } from '@constants';
 
-const socket = openSocket(SOCKET_IO_ENDPOINT);
+const socket = openSocket(SOCKET_IO_ENDPOINT, {
+  reconnecting: SOCKET_IO_RECONNECT
+});
 
 const styles = () => ({
   root: {
@@ -25,7 +27,11 @@ const styles = () => ({
   }
 });
 
-class AppRouter extends PureComponent {
+type Props = {
+  classes: any
+};
+
+class AppRouter extends PureComponent<Props> {
   componentDidMount() {
     socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
     socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
@@ -69,9 +75,5 @@ class AppRouter extends PureComponent {
     );
   }
 }
-
-AppRouter.propTypes = {
-  classes: PropTypes.any
-};
 
 export default withRoot(withStyles(styles)(AppRouter));

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +11,7 @@ import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
+import SolidProviderComponent from './children';
 
 const styles = theme => ({
   main: {
@@ -48,11 +48,25 @@ const styles = theme => ({
   }
 });
 
+type Props = {
+  classes: any,
+  onWebIdFieldChange: Function,
+  onSignInClick: Function,
+  onSetWithWebId: Function,
+  withWebIdStatus: Boolean,
+  handleProviderChange: Function,
+  providerTitle: String
+};
+
 const AuthorizationComponent = ({
   classes,
   onWebIdFieldChange,
-  onSignInClick
-}) => (
+  onSignInClick,
+  withWebIdStatus,
+  onSetWithWebId,
+  handleProviderChange,
+  providerTitle
+}: Props) => (
   <main className={classes.main}>
     <CssBaseline />
     <Paper className={classes.paper}>
@@ -63,19 +77,33 @@ const AuthorizationComponent = ({
         Authenticate
       </Typography>
       <form className={classes.form}>
-        <FormControl margin="normal" required fullWidth>
-          <InputLabel htmlFor="component-simple">Web ID</InputLabel>
-          <Input
-            id="webId"
-            name="webId"
-            autoComplete="webId"
-            autoFocus
-            onChange={onWebIdFieldChange}
+        {withWebIdStatus ? (
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel htmlFor="component-simple">Web ID</InputLabel>
+            <Input
+              id="webId"
+              name="webId"
+              autoComplete="webId"
+              autoFocus
+              onChange={onWebIdFieldChange}
+            />
+          </FormControl>
+        ) : (
+          <SolidProviderComponent
+            providerTitle={providerTitle}
+            handleChange={handleProviderChange}
           />
-        </FormControl>
+        )}
         <FormControlLabel
-          control={<Checkbox value="remember" color="primary" />}
-          label="Remember me"
+          control={
+            <Checkbox
+              name="withWebIdStatus"
+              checked={withWebIdStatus}
+              onChange={onSetWithWebId}
+              color="primary"
+            />
+          }
+          label="With WebID"
         />
         <Button
           type="submit"
@@ -91,9 +119,5 @@ const AuthorizationComponent = ({
     </Paper>
   </main>
 );
-
-AuthorizationComponent.propTypes = {
-  classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(AuthorizationComponent);

@@ -14,6 +14,7 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
+import { ETL_STATUS_TYPE } from '@utils';
 
 const styles = theme => ({
   root: {
@@ -101,7 +102,9 @@ const DiscoverComponent = ({
                           variant="contained"
                           color="primary"
                           className={classes.button}
-                          disabled={!etlExecutionStatus}
+                          disabled={
+                            etlExecutionStatus !== ETL_STATUS_TYPE.Finished
+                          }
                         >
                           Create App
                         </Button>

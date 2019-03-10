@@ -18,7 +18,7 @@ const UserProfileButtonComponent = ({
   onHandleLogoutClicked
 }) => (
   <div>
-    <IconButton onClick={onHandleMenuOpen}>
+    <IconButton color="inherit" onClick={onHandleMenuOpen}>
       <AccountCircle />
     </IconButton>
 
