@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
@@ -41,7 +41,7 @@ const transformData = data => {
   });
 };
 
-class TreemapVisualizer extends React.PureComponent<Props, State> {
+class TreemapVisualizer extends PureComponent<Props, State> {
   constructor() {
     super();
     this.state = { dataLoadingStatus: 'loading', chartData: [] };

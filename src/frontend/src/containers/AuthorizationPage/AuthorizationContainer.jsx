@@ -6,10 +6,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import { withWebId } from '@inrupt/solid-react-components';
 import { Log } from '@utils';
 
+const providers = {
+  Inrupt: 'https://inrupt.net/auth',
+  'Solid Community': 'https://solid.community',
+  '': ''
+};
+
 class AuthorizationContainer extends Component {
   state = {
     webIdFieldValue: '',
-    withWebIdStatus: false
+    withWebIdStatus: false,
+    // eslint-disable-next-line react/no-unused-state
+    session: null,
+    providerTitle: ''
   };
 
   isWebIdValid = webId => {
@@ -24,20 +33,31 @@ class AuthorizationContainer extends Component {
   // eslint-disable-next-line consistent-return
   handleSignIn = async event => {
     try {
+      const { withWebIdStatus, providerTitle, webIdFieldValue } = this.state;
       event.preventDefault();
-      const idp = 'https://inrupt.net/auth';
       const callbackUri = `${window.location.origin}/dashboard`;
-      const webIdValue = this.state.webIdFieldValue;
+      const webIdValue = webIdFieldValue;
+      const providerLink = providers[providerTitle];
 
-      if (!this.isWebIdValid(webIdValue)) {
-        toast.error('Error WebID is not valid! Try again...', {
+      if (
+        (withWebIdStatus && !this.isWebIdValid(webIdValue)) ||
+        (!withWebIdStatus && providerLink === '')
+      ) {
+        toast.error('Error WebID/Provider is not valid! Try again...', {
           position: toast.POSITION.BOTTOM_CENTER
         });
-      } else {
-        await auth.login(idp, {
-          callbackUri,
-          storage: localStorage
-        });
+      }
+
+      const ldp = withWebIdStatus ? webIdValue : providerLink;
+
+      const session = await auth.login(ldp, {
+        callbackUri,
+        storage: localStorage
+      });
+
+      if (session) {
+        // eslint-disable-next-line react/no-unused-state
+        return this.setState({ session });
       }
     } catch (error) {
       Log.error(error, 'AuthenticationService'); // eslint-disable-line no-console
@@ -56,9 +76,18 @@ class AuthorizationContainer extends Component {
     }));
   };
 
+  handleProviderChange = event => {
+    this.setState({ providerTitle: event.target.value });
+  };
+
   render() {
-    const { handleSignIn, handleWebIdFieldChange, onSetWithWebId } = this;
-    const { withWebIdStatus } = this.state;
+    const {
+      handleSignIn,
+      handleWebIdFieldChange,
+      onSetWithWebId,
+      handleProviderChange
+    } = this;
+    const { withWebIdStatus, providerTitle } = this.state;
     return (
       <div>
         <AuthorizationComponent
@@ -66,6 +95,8 @@ class AuthorizationContainer extends Component {
           onSignInClick={handleSignIn}
           onSetWithWebId={onSetWithWebId}
           withWebIdStatus={withWebIdStatus}
+          providerTitle={providerTitle}
+          handleProviderChange={handleProviderChange}
         />
         <ToastContainer />
       </div>

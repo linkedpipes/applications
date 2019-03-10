@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
 import auth from 'solid-auth-client';
+import { withRouter } from 'react-router-dom';
 import { Log } from '@utils';
 
 class UserProfileButtonContainer extends PureComponent {
@@ -13,9 +14,11 @@ class UserProfileButtonContainer extends PureComponent {
   };
 
   handleLogout = () => {
-    this.setState({ anchorElement: null });
+    const self = this;
+    self.setState({ anchorElement: null });
     auth.logout().then(() => {
       Log.info('Logout successfull', 'UserProfileButton');
+      self.props.history.push('/login');
     });
   };
 
@@ -40,4 +43,4 @@ class UserProfileButtonContainer extends PureComponent {
   }
 }
 
-export default UserProfileButtonContainer;
+export default withRouter(UserProfileButtonContainer);

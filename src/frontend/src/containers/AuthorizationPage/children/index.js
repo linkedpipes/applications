@@ -1,3 +1,3 @@
-import SolidProviderContainer from './SolidProviderContainer';
+import SolidProviderComponent from './SolidProviderComponent';
 
-export default SolidProviderContainer;
+export default SolidProviderComponent;

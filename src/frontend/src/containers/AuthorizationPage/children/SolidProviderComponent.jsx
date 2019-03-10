@@ -15,7 +15,6 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 2
   },
   formControl: {
-    margin: theme.spacing.unit,
     width: '100%',
     marginTop: theme.spacing.unit
   }
@@ -23,36 +22,26 @@ const styles = theme => ({
 
 type Props = {
   classes: any,
-  handleClose: Function,
-  handleOpen: Function,
   handleChange: Function,
-  provider: String,
-  open: Boolean
+  providerTitle: String
 };
 
 const SolidProviderComponent = ({
   classes,
-  handleClose,
-  handleOpen,
   handleChange,
-  provider,
-  open
+  providerTitle
 }: Props) => {
   return (
-    <FormControl className={classes.formControl}>
-      <InputLabel htmlFor="provider-select">Provider</InputLabel>
+    <FormControl className={classes.formControl} margin="normal" fullWidth>
+      <InputLabel htmlFor="providerTitle">Provider</InputLabel>
       <Select
-        open={open}
-        onClose={handleClose}
-        onOpen={handleOpen}
-        value={provider}
+        value={providerTitle}
         onChange={handleChange}
         inputProps={{
-          name: 'provider',
-          id: 'provider-select'
+          id: 'providerTitle'
         }}
       >
-        <MenuItem value="">
+        <MenuItem value={''}>
           <em>None</em>
         </MenuItem>
         <MenuItem value={'Inrupt'}>Inrupt</MenuItem>

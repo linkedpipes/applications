@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import HomeComponent from './HomeComponent';
 import { SocketContext, AuthenticationService, Log } from '@utils';
 import { connect } from 'react-redux';
@@ -13,7 +13,7 @@ type Props = {
   webId: string
 };
 
-class HomeContainer extends React.PureComponent<Props> {
+class HomeContainer extends PureComponent<Props> {
   componentDidMount = () => {
     const { webId } = this.props;
     const { handleLoadUserProfile } = this;

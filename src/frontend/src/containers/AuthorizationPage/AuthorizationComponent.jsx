@@ -11,7 +11,7 @@ import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
-import SolidProviderContainer from './children';
+import SolidProviderComponent from './children';
 
 const styles = theme => ({
   main: {
@@ -53,7 +53,9 @@ type Props = {
   onWebIdFieldChange: Function,
   onSignInClick: Function,
   onSetWithWebId: Function,
-  withWebIdStatus: Boolean
+  withWebIdStatus: Boolean,
+  handleProviderChange: Function,
+  providerTitle: String
 };
 
 const AuthorizationComponent = ({
@@ -61,7 +63,9 @@ const AuthorizationComponent = ({
   onWebIdFieldChange,
   onSignInClick,
   withWebIdStatus,
-  onSetWithWebId
+  onSetWithWebId,
+  handleProviderChange,
+  providerTitle
 }: Props) => (
   <main className={classes.main}>
     <CssBaseline />
@@ -85,13 +89,16 @@ const AuthorizationComponent = ({
             />
           </FormControl>
         ) : (
-          <SolidProviderContainer />
+          <SolidProviderComponent
+            providerTitle={providerTitle}
+            handleChange={handleProviderChange}
+          />
         )}
         <FormControlLabel
           control={
             <Checkbox
               name="withWebIdStatus"
-              value={withWebIdStatus}
+              checked={withWebIdStatus}
               onChange={onSetWithWebId}
               color="primary"
             />
