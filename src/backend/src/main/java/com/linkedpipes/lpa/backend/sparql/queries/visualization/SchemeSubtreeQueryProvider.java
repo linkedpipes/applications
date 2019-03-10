@@ -69,7 +69,6 @@ public class SchemeSubtreeQueryProvider extends ConstructSparqlQueryProvider {
     @NotNull
     @Override
     protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) throws ParseException {
-        //TODO what about concepts that have no child nodes (leaves) - we have to cater for that so the VAR_NARROWER_CONCEPTS_COUNT is 0, as right now leaf concepts are discarded
          return builder
             .addWhere(conceptUri, RDF.type, SKOS.Concept)
             .addWhere(conceptUri, SKOS.inScheme, schemeUri)
@@ -89,9 +88,10 @@ public class SchemeSubtreeQueryProvider extends ConstructSparqlQueryProvider {
                 .addOptional(VAR_CHILD_CONCEPT, SKOS.prefLabel, VAR_CHILD_CONCEPT_PREF_LABEL)
                 .addOptional(VAR_CHILD_CONCEPT, RDFS.label, VAR_CHILD_CONCEPT_RDFS_LABEL)
                 .addOptional(VAR_CHILD_CONCEPT, DCTerms.title, VAR_CHILD_CONCEPT_DCTERMS_TITLE)
-                .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
-                .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
-                .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CHILD_CONCEPT)
+                .addOptional(new WhereBuilder()
+                        .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
+                        .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
+                        .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CHILD_CONCEPT))
                 .addGroupBy(VAR_CHILD_CONCEPT)
                 .addGroupBy(VAR_CHILD_CONCEPT_PREF_LABEL)
                 .addGroupBy(VAR_CHILD_CONCEPT_RDFS_LABEL)

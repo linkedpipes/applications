@@ -64,7 +64,6 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
     @NotNull
     @Override
     protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) throws ParseException{
-        //TODO what about concepts that have no child nodes (leaves) - we have to cater for that so the VAR_NARROWER_CONCEPTS_COUNT is 0, as right now leaf concepts are discarded
         return builder
                 .addWhere(schemeUri, RDF.type, SKOS.ConceptScheme)
                 //.addWhere(VAR_CONCEPT, RDF.type, SKOS.Concept)
@@ -82,9 +81,10 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
                         .addOptional(VAR_CONCEPT, SKOS.prefLabel, VAR_CONCEPT_PREF_LABEL)
                         .addOptional(VAR_CONCEPT, RDFS.label, VAR_CONCEPT_RDFS_LABEL)
                         .addOptional(VAR_CONCEPT, DCTerms.title, VAR_CONCEPT_DCTERMS_TITLE)
-                        .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
-                        .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
-                        .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CONCEPT)
+                        .addOptional(new WhereBuilder()
+                                .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
+                                .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
+                                .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CONCEPT))
                         //.addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Alt(new P_Link(SKOS.broader.asNode()), new P_Link(SKOS.broaderTransitive.asNode()))), VAR_CONCEPT)
                         //TODO possibly add FILTER NOT EXISTS { ?l skos:narrowerTransitive [] }
                         .addGroupBy(VAR_CONCEPT)
