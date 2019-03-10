@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
@@ -7,6 +7,12 @@ import PreviewIcon from '@material-ui/icons/Wallpaper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+
+type Props = {
+  onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
+  checkedRefresh: boolean,
+  classes: { button: {}, leftIcon: {}, root: {} }
+};
 
 const styles = theme => ({
   root: {
@@ -20,35 +26,43 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerToolboxComponent = ({
-  classes,
-  handleChange,
-  checkedRefresh
-}) => (
+const VisualizerControllerToolboxComponent = (props: Props) => (
   <div>
     <FormControlLabel
-      control={<Switch checked={checkedRefresh} value="checkedRefresh" />}
-      label={checkedRefresh ? 'Refresh' : 'Fixed'}
+      control={
+        <Switch
+          onChange={props.onRefreshSwitchChange}
+          checked={props.checkedRefresh}
+          value="checkedRefresh"
+        />
+      }
+      label={props.checkedRefresh ? 'Refresh' : 'Fixed'}
     />
-    <Button variant="contained" color="default" className={classes.button}>
-      <CloudUploadIcon className={classes.leftIcon} />
+    <Button
+      variant="contained"
+      color="default"
+      className={props.classes.button}
+    >
+      <CloudUploadIcon className={props.classes.leftIcon} />
       Publish
     </Button>
-    <Button variant="contained" color="default" className={classes.button}>
-      <PreviewIcon className={classes.leftIcon} />
+    <Button
+      variant="contained"
+      color="default"
+      className={props.classes.button}
+    >
+      <PreviewIcon className={props.classes.leftIcon} />
       Embed
     </Button>
-    <Button variant="contained" color="default" className={classes.button}>
-      <KeyboardArrowDownIcon className={classes.leftIcon} />
+    <Button
+      variant="contained"
+      color="default"
+      className={props.classes.button}
+    >
+      <KeyboardArrowDownIcon className={props.classes.leftIcon} />
       More
     </Button>
   </div>
 );
-
-VisualizerControllerToolboxComponent.propTypes = {
-  checkedRefresh: PropTypes.bool.isRequired,
-  classes: PropTypes.object.isRequired,
-  handleChange: PropTypes.func.isRequired
-};
 
 export default withStyles(styles)(VisualizerControllerToolboxComponent);
