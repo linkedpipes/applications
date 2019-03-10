@@ -1,15 +1,21 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
+import com.github.jsonldjava.core.RDFDataset;
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.ExprFactory;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.arq.querybuilder.WhereBuilder;
+import org.apache.jena.arq.querybuilder.clauses.WhereClause;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.sparql.expr.E_NotExists;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.pfunction.library.blankNode;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -84,9 +90,10 @@ public class HighLevelSchemeQueryProvider extends ConstructSparqlQueryProvider {
                         .addOptional(new WhereBuilder()
                                 .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
                                 .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
-                                .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CONCEPT))
-                        //.addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Alt(new P_Link(SKOS.broader.asNode()), new P_Link(SKOS.broaderTransitive.asNode()))), VAR_CONCEPT)
-                        //TODO possibly add FILTER NOT EXISTS { ?l skos:narrowerTransitive [] }
+                                .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CONCEPT)
+                                .addFilter(new ExprFactory().notexists(new WhereBuilder().
+                                        addWhere(VAR_NARROWER_CONCEPT, new P_Alt(new P_Link(SKOS.narrower.asNode()), new P_Link(SKOS.narrowerTransitive.asNode())), NodeFactory.createBlankNode())
+                                        )))
                         .addGroupBy(VAR_CONCEPT)
                         .addGroupBy(VAR_CONCEPT_PREF_LABEL)
                         .addGroupBy(VAR_CONCEPT_RDFS_LABEL)

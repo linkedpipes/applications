@@ -4,8 +4,10 @@ import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.ExprFactory;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.arq.querybuilder.WhereBuilder;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
@@ -91,7 +93,10 @@ public class SchemeSubtreeQueryProvider extends ConstructSparqlQueryProvider {
                 .addOptional(new WhereBuilder()
                         .addWhere(VAR_NARROWER_CONCEPT, RDF.type, SKOS.Concept)
                         .addWhere(VAR_NARROWER_CONCEPT, SKOS.inScheme, schemeUri)
-                        .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CHILD_CONCEPT))
+                        .addWhere(VAR_NARROWER_CONCEPT, new P_OneOrMore1(new P_Link(SKOS.broaderTransitive.asNode())), VAR_CHILD_CONCEPT)
+                        .addFilter(new ExprFactory().notexists(new WhereBuilder().
+                                addWhere(VAR_NARROWER_CONCEPT, new P_Alt(new P_Link(SKOS.narrower.asNode()), new P_Link(SKOS.narrowerTransitive.asNode())), NodeFactory.createBlankNode())
+                        )))
                 .addGroupBy(VAR_CHILD_CONCEPT)
                 .addGroupBy(VAR_CHILD_CONCEPT_PREF_LABEL)
                 .addGroupBy(VAR_CHILD_CONCEPT_RDFS_LABEL)
