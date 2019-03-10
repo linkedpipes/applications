@@ -40,6 +40,17 @@ public class SkosController {
                 .orElseThrow();
     }
 
+    @NotNull
+    @GetMapping("/api/skos/schemeSubtree")
+    public ResponseEntity<List<HierarchyNode>> getSkosSchemeSubtree(@Nullable @RequestParam(value = "resultGraphIri", required = false) String resultGraphIri,
+                                                             @NotNull @RequestParam("schemeUri") String schemeUri, @Nullable @RequestParam(value = "conceptUri", required = false) String conceptUri) {
+        return Optional.ofNullable(resultGraphIri)
+                .map(iri -> visualizationService.getSkosSchemeSubtreeFromNamed(iri, schemeUri, conceptUri))
+                .or(() -> Optional.of(visualizationService.getSkosSchemeSubtree(schemeUri, conceptUri)))
+                .map(ResponseEntity::ok)
+                .orElseThrow();
+    }
+
     @GetMapping("/api/skos/concepts")
     public ResponseEntity<List<Concept>> getSkosConcepts(@RequestParam(value = "resultGraphIri", required = false) String graphIri) {
         return Optional.ofNullable(graphIri)
