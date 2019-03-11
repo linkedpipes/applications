@@ -12,7 +12,7 @@ const INITIAL_STATE = {
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case types.CHANGE_TAB: {
+    case types.TAB_CHANGED: {
       const { tabValue } = action;
       return { ...state, tabValue };
     }

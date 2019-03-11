@@ -4,19 +4,24 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
+import Typography from '@material-ui/core/Typography';
 import FiltersComponent from '../Filters';
 
 type Props = {
-  classes: { root: {}, filterSideBar: {} },
+  classes: { root: {}, filterSideBar: {}, containerView: {} },
   filters: any,
   visualizer: { visualizerCode: string },
   visualizerParams: any,
   selectedResultGraphIri: string
 };
 
-const styles = () => ({
+const styles = theme => ({
   root: {
     height: '100vh'
+  },
+  containerView: {
+    textAlign: 'center',
+    paddingTop: theme.spacing.unit * 20
   },
   filterSideBar: {
     overflowY: 'auto'
@@ -28,7 +33,8 @@ const styles = () => ({
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
-  visualizerParams = null
+  visualizerParams = null,
+  classes
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
@@ -45,6 +51,14 @@ const getVisualizer = (
       return (
         <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
       );
+    case VISUALIZER_TYPE.UNDEFINED:
+      return (
+        <div className={classes.containerView}>
+          <Typography variant="h2" gutterBottom>
+            No visualizers selected...
+          </Typography>
+        </div>
+      );
     default:
       return <div>No valid visualizer selected.</div>;
   }
@@ -59,7 +73,8 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
-        props.visualizerParams
+        props.visualizerParams,
+        props.classes
       )}
     </Grid>
   </Grid>
