@@ -14,7 +14,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +53,7 @@ public class SchemeSubtreeExtractor {
         return new HierarchyNode(id, label, conceptUri, size);
     }
 
-    @NotNull
+    /*@NotNull
     private Optional<Resource> getParent(@NotNull Resource resource) {
        // if(resource.getURI().equals(conceptUri))
        //     return Optional.empty();
@@ -68,6 +67,6 @@ public class SchemeSubtreeExtractor {
         }
 
         return parent;
-    }
+    }*/
 
 }

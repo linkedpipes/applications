@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
-import com.github.jsonldjava.core.RDFDataset;
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
@@ -8,14 +7,11 @@ import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.arq.querybuilder.ExprFactory;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.arq.querybuilder.WhereBuilder;
-import org.apache.jena.arq.querybuilder.clauses.WhereClause;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.sparql.expr.E_NotExists;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.P_OneOrMore1;
-import org.apache.jena.sparql.pfunction.library.blankNode;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;

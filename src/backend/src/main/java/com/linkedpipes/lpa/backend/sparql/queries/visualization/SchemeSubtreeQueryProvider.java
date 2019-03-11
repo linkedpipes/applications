@@ -12,7 +12,6 @@ import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.path.P_Alt;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.P_OneOrMore1;
-import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -25,9 +24,9 @@ public class SchemeSubtreeQueryProvider extends ConstructSparqlQueryProvider {
     private String conceptUri;
 
     // VARIABLES
-    private static final String VAR_CONCEPT_PREF_LABEL = var("s_spl");
-    private static final String VAR_CONCEPT_RDFS_LABEL = var("s_lab");
-    private static final String VAR_CONCEPT_DCTERMS_TITLE = var("s_dctt");
+    //private static final String VAR_CONCEPT_PREF_LABEL = var("s_spl");
+    //private static final String VAR_CONCEPT_RDFS_LABEL = var("s_lab");
+    //private static final String VAR_CONCEPT_DCTERMS_TITLE = var("s_dctt");
     private static final String VAR_CHILD_CONCEPT = var("c");
     private static final String VAR_CHILD_CONCEPT_PREF_LABEL = var("c_spl");
     private static final String VAR_CHILD_CONCEPT_RDFS_LABEL = var("c_lab");
