@@ -7,7 +7,7 @@ services:
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 9001:80 # port configure in lpapps server
+      - "9001:80" # port configure in lpapps server
     depends_on:
       - backend
       - frontend
@@ -17,7 +17,8 @@ services:
     container_name: lpa-backend
     restart: on-failure
     ports:
-      - 9005:9005 # port configure in lpapps server
+      - "9005:9005"
+      - "9092:9092"
     depends_on:
       - etl
       - discovery
@@ -37,9 +38,9 @@ services:
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
-      VIRT_SPARQL_ResultSetMaxRows: 100000
+      VIRT_SPARQL_ResultSetMaxRows: 1000000
     ports:
-      - 8890:8890
+      - "8890:8890"
     volumes:
       - ./data/virtuoso:/data
 
@@ -58,14 +59,14 @@ services:
       - db
       - etl
     ports:
-      - 9000:9000
+      - "9000:9000"
 
   etl:
-    image: linkedpipes/etl
+    image: linkedpipes/applications:etl_devel
     container_name: lpa-etl
     restart: on-failure
     ports:
-      - 8080:8080
+      - "8080:8080"
 
   postgres:
     image: postgres
@@ -78,4 +79,4 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
