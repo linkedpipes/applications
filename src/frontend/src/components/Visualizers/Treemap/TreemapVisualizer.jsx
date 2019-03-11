@@ -2,7 +2,7 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
+import { VisualizersService, Log } from '@utils';
 import { CircularProgress } from '@material-ui/core';
 
 type Props = {
@@ -27,7 +27,8 @@ const styles = theme => ({
   card: {},
   input: {},
   progress: {
-    margin: theme.spacing.unit * 2
+    margin: theme.spacing.unit * 2,
+    alignItems: 'center'
   }
 });
 
@@ -59,11 +60,11 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         eventName: 'select',
         callback: async ({ chartWrapper }) => {
           // The first row in the data is the headers row. Ignore if got chosen
-          console.log(chartWrapper.getChart().getSelection());
+          Log.info(chartWrapper.getChart().getSelection(), 'TreemapVisualizer');
           const index = chartWrapper.getChart().getSelection()[0].row;
           if (!index) return;
           const selectedItem = this.state.chartData[index + 1];
-          console.log(selectedItem);
+          Log.info(selectedItem, 'TreemapVisualizer');
           const iri = selectedItem[0].v;
 
           // If data for this conceptIri has been fetched, then return

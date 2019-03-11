@@ -17,9 +17,7 @@ import { SocketContext, Log } from '@utils';
 import openSocket from 'socket.io-client';
 import { SOCKET_IO_ENDPOINT, SOCKET_IO_RECONNECT } from '@constants';
 
-const socket = openSocket(SOCKET_IO_ENDPOINT, {
-  reconnecting: SOCKET_IO_RECONNECT
-});
+const socket = openSocket(SOCKET_IO_ENDPOINT);
 
 const styles = () => ({
   root: {

@@ -31,16 +31,10 @@ const addSelectedResultGraphIriAction = ({ data } = {}) => ({
   selectedResultGraphIri: data
 });
 
-const changeTabAction = ({ selectedTab } = {}) => ({
-  type: types.TAB_CHANGED,
-  selectedTab
-});
-
 export default {
   addDiscoveryIdAction,
   setPipelineIdAction,
   addSelectedVisualizerAction,
   setSelectedDatasourcesExample,
-  addSelectedResultGraphIriAction,
-  changeTabAction
+  addSelectedResultGraphIriAction
 };

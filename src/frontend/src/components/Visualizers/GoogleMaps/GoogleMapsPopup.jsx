@@ -113,16 +113,16 @@
 //     const self = this;
 //     const { resultGraphIri } = self.props;
 
-//     VisualizersService.getMarkers({ resultGraphIri: resultGraphIri })
+//     VisualizersService.getMarkers({ resultGraphIri })
 //       .then(
-//         function(response) {
+//         (response) => {
 //           return response.json();
 //         },
-//         function(err) {
+//         (err) => {
 //           console.log(err);
 //         }
 //       )
-//       .then(function(jsonResponse) {
+//       .then((jsonResponse) => {
 //         self.props.dispatch(
 //           visualizersActions.addMultipleMarkers({ markersList: jsonResponse })
 //         );
@@ -130,14 +130,14 @@
 
 //     VisualizersService.getFilters()
 //       .then(
-//         function(response) {
+//         (response) => {
 //           return response.json();
 //         },
-//         function(err) {
+//         (err) => {
 //           console.log(err);
 //         }
 //       )
-//       .then(function(filtersResponse) {
+//       .then((filtersResponse) => {
 //         VisualizersService.getSKOSConcepts().then(function(
 //           skosConceptsResponse
 //         ) {
@@ -148,7 +148,7 @@
 //           );
 //         });
 //       })
-//       .catch(function(error) {
+//       .catch((error) => {
 //         console.log(error.message);
 
 //         self.handleClose();
