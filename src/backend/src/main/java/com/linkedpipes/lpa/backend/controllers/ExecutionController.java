@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.EtlService;
 import org.springframework.context.ApplicationContext;
@@ -19,16 +18,6 @@ public class ExecutionController {
 
     public ExecutionController(ApplicationContext context) {
         etlService = context.getBean(EtlService.class);
-    }
-
-    @GetMapping("/api/execution/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
-        if(executionIri == null || executionIri.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Execution IRI not provided.");
-        }
-
-        ExecutionStatus status = etlService.getExecutionStatus(executionIri);
-        return ResponseEntity.ok(status);
     }
 
     @GetMapping("/api/execution/result")

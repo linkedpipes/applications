@@ -1,21 +1,13 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.Application;
-import com.linkedpipes.lpa.backend.entities.visualization.Concept;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCount;
-import com.linkedpipes.lpa.backend.entities.visualization.ConceptCountRequest;
-import com.linkedpipes.lpa.backend.entities.visualization.Scheme;
-import com.linkedpipes.lpa.backend.sparql.extractors.visualization.ConceptCountExtractor;
-import com.linkedpipes.lpa.backend.sparql.extractors.visualization.ConceptsExtractor;
-import com.linkedpipes.lpa.backend.sparql.extractors.visualization.SchemesExtractor;
+import com.linkedpipes.lpa.backend.entities.visualization.*;
+import com.linkedpipes.lpa.backend.sparql.extractors.visualization.*;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
-import com.linkedpipes.lpa.backend.sparql.queries.visualization.ConceptsCountsQueryProvider;
-import com.linkedpipes.lpa.backend.sparql.queries.visualization.ConceptsQueryProvider;
-import com.linkedpipes.lpa.backend.sparql.queries.visualization.SchemesQueryProvider;
+import com.linkedpipes.lpa.backend.sparql.queries.visualization.*;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -33,6 +25,41 @@ public class VisualizationServiceComponent implements VisualizationService {
     public List<Scheme> getSkosSchemesFromNamed(String graphIri) {
         ConstructSparqlQueryProvider provider = new SchemesQueryProvider();
         return new SchemesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
+    @Override
+    public List<HierarchyNode> getSkosScheme(String schemeUri) {
+        ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
+        return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+    }
+
+    @Override
+    public List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri) {
+        ConstructSparqlQueryProvider provider = new SchemeQueryProvider(schemeUri);
+        return new SchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+    }
+
+    //TODO combine duplicated code in below two methods due to named graph
+    @Override
+    public List<HierarchyNode> getSkosSchemeSubtree(String schemeUri, String conceptUri) {
+        if(conceptUri == null || conceptUri.isEmpty()) {
+            ConstructSparqlQueryProvider provider = new HighLevelSchemeQueryProvider(schemeUri);
+            return new HighLevelSchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+        }
+
+        ConstructSparqlQueryProvider provider = new SchemeSubtreeQueryProvider(schemeUri, conceptUri);
+        return new SchemeSubtreeExtractor(conceptUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+    }
+
+    @Override
+    public List<HierarchyNode> getSkosSchemeSubtreeFromNamed(String graphIri, String schemeUri, String conceptUri) {
+        if(conceptUri == null || conceptUri.isEmpty()) {
+            ConstructSparqlQueryProvider provider = new HighLevelSchemeQueryProvider(schemeUri);
+            return new HighLevelSchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+        }
+
+        ConstructSparqlQueryProvider provider = new SchemeSubtreeQueryProvider(schemeUri, conceptUri);
+        return new SchemeSubtreeExtractor(conceptUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
     }
 
     @Override

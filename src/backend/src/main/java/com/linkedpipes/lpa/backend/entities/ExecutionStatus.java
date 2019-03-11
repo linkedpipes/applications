@@ -15,4 +15,12 @@ public class ExecutionStatus {
     @JsonProperty("executionFinished")
     public Date finished;
 
+    @Override
+    public String toString() {
+        return "ExecutionStatus{" +
+                "status=" + status +
+                ", started=" + started +
+                ", finished=" + finished +
+                '}';
+    }
 }

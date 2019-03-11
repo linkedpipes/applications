@@ -8,11 +8,12 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
@@ -22,18 +23,11 @@ import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 @Service
 public class EtlServiceComponent implements EtlService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceComponent.class);
+
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
-
-    private static final Map<String, String> EXECUTION_STATUS = Map.of(
-            "http://etl.linkedpipes.com/resources/status/failed", "FAILED",
-            "http://etl.linkedpipes.com/resources/status/queued", "QUEUED",
-            "http://etl.linkedpipes.com/resources/status/running", "RUNNING",
-            "http://etl.linkedpipes.com/resources/status/finished", "FINISHED",
-            "http://etl.linkedpipes.com/resources/status/cancelled", "CANCELLED",
-            "http://etl.linkedpipes.com/resources/status/cancelling", "CANCELLING"
-    );
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -51,7 +45,11 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
         String response = httpActions.getExecutionStatus(executionIri);
-        return OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
+        logger.error("ETL status response: " + response);
+
+        ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
+        System.out.println("executionStatus = " + executionStatus);
+        return executionStatus;
     }
 
     @Override

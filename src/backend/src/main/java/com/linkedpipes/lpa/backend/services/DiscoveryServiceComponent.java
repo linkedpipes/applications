@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.Visualizers;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
@@ -19,6 +20,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RIOT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -39,37 +41,41 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
 
-    private final ApplicationContext context;
-    private final HttpActions httpActions = new HttpActions();
+    @NotNull private final ApplicationContext context;
+    @NotNull private final HttpActions httpActions = new HttpActions();
 
     public DiscoveryServiceComponent(ApplicationContext context) {
         this.context = context;
     }
 
-    @Override
-    public Discovery startDiscoveryFromInput(String discoveryConfig) throws LpAppsException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        return result;
     }
 
-    @Override
-    public Discovery startDiscoveryFromInputIri(String discoveryConfigIri) throws LpAppsException {
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        return OBJECT_MAPPER.readValue(response, Discovery.class);
+        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
+        return result;
     }
 
-    // TODO strongly type below method params (not simply string)
-    @Override
-    public String getDiscoveryStatus(String discoveryId) throws LpAppsException {
-        return httpActions.getStatus(discoveryId);
+    @NotNull @Override
+    public DiscoveryStatus getDiscoveryStatus(@NotNull String discoveryId) throws LpAppsException {
+        String status = httpActions.getStatus(discoveryId);
+        return OBJECT_MAPPER.readValue(status, DiscoveryStatus.class);
     }
 
     @Override
     public PipelineGroups getPipelineGroups(String discoveryId) throws LpAppsException {
+        logger.info("Get pipeline groups for discovery id: " + discoveryId);
         String response = httpActions.getPipelineGroups(discoveryId);
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
+        logger.error("Pipeline groups response: " + response);
         ObjectNode jsonObject = OBJECT_MAPPER.readValue(response, ObjectNode.class);
         ObjectNode pipelineGroupsJson = (ObjectNode) jsonObject.get("pipelineGroups");
         ArrayNode appGroups = (ArrayNode) pipelineGroupsJson.get("applicationGroups");
@@ -78,6 +84,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
             PipelineGroup pipelineGrp = new PipelineGroup();
             ObjectNode appGroupObj = (ObjectNode) appGroup;
             pipelineGrp.visualizer = OBJECT_MAPPER.convertValue(appGroupObj.get("applicationInstance"), ApplicationInstance.class);
+            pipelineGrp.visualizer.visualizerCode = Visualizers.map.getOrDefault(pipelineGrp.visualizer.iri, "");
 
             ArrayNode dataSourceGroups = (ArrayNode) appGroupObj.get("dataSourceGroups");
 

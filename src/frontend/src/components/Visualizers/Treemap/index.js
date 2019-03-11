@@ -1,1 +1,3 @@
-export { default as TreemapVisualizer } from "./TreemapVisualizer";
+import TreemapVisualizer from './TreemapVisualizer';
+
+export default TreemapVisualizer;

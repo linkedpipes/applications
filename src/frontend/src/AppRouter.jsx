@@ -1,66 +1,77 @@
-import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+// @flow
+import React, { PureComponent } from 'react';
+import { BrowserRouter, Switch } from 'react-router-dom';
+import Redirect from 'react-router-dom/es/Redirect';
+import { withStyles } from '@material-ui/core/styles';
+import withRoot from './withRoot';
+import {
+  DiscoverPage,
+  HomePage,
+  NotFoundPage,
+  AboutPage,
+  CreateVisualizerPage,
+  AuthorizationPage
+} from '@containers';
+import { PrivateLayout, PublicLayout } from '@layouts';
+import { SocketContext, Log } from '@utils';
+import openSocket from 'socket.io-client';
+import { SOCKET_IO_ENDPOINT, SOCKET_IO_RECONNECT } from '@constants';
 
-import NotFoundPage from "./containers/NotFoundPage";
-import { NavigationBar } from "./components/Navbar";
-import AboutPage from "./containers/AboutPage";
-import withRoot from "./withRoot";
-import Redirect from "react-router-dom/es/Redirect";
-import { Dashboard } from "./components/Dashboard/Dashboard";
-import StepperController from "./components/SelectSources/StepperController";
-import CreateApp from "./components/CreateApp/CreateApp";
-import Grid from "@material-ui/core/Grid";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { withStyles } from "@material-ui/core/styles";
+const socket = openSocket(SOCKET_IO_ENDPOINT);
 
-const styles = theme => ({
+const styles = () => ({
   root: {
-    display: "flex"
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: "100vh",
-    overflow: "auto"
-  },
-  devBar: {
-    fontSize: "1rem",
-    height: "2rem",
-    paddingBottom: "0.5rem",
-    paddingTop: "0.5rem",
-    fontWeight: "bold",
-    color: "#606060",
-    textAlign: "center",
-    verticalAlign: "middle",
-    background: "#ffdb4d",
-    width: "100%"
+    display: 'flex'
   }
 });
 
-const AppRouter = props => {
-  const { classes } = props;
-  return (
-    <BrowserRouter>
-      <div className={classes.root}>
-        <NavigationBar />
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <CssBaseline />
-          {process.env.NODE_ENV !== "production" && (
-            <div className={classes.devBar}>DEVELOPMENT MODE</div>
-          )}
-          <Switch>
-            <Route exact path="/dashboard" component={Dashboard} />
-            <Route exact path="/create-app" component={CreateApp} />
-            <Route exact path="/select-sources" component={StepperController} />
-            <Route path="/about" component={AboutPage} />
-            <Redirect from="/" to="/dashboard" />
-            <Route component={NotFoundPage} />
-          </Switch>
-        </main>
-      </div>
-    </BrowserRouter>
-  );
+type Props = {
+  classes: any
 };
+
+class AppRouter extends PureComponent<Props> {
+  componentDidMount() {
+    socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
+    socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
+  }
+
+  render() {
+    const { classes } = this.props;
+    return (
+      <div>
+        <BrowserRouter>
+          <div className={classes.root}>
+            <SocketContext.Provider value={socket}>
+              <Switch>
+                <PublicLayout
+                  component={AuthorizationPage}
+                  path="/login"
+                  exact
+                />
+
+                <PrivateLayout path="/dashboard" component={HomePage} exact />
+                <PrivateLayout
+                  path="/create-app"
+                  component={CreateVisualizerPage}
+                  exact
+                />
+                <PrivateLayout
+                  path="/discover"
+                  component={DiscoverPage}
+                  exact
+                />
+                <PrivateLayout path="/about" component={AboutPage} exact />
+
+                <PublicLayout path="/404" component={NotFoundPage} exact />
+                <Redirect from="/" to="/login" exact />
+                <Redirect to="/404" />
+              </Switch>
+            </SocketContext.Provider>
+          </div>
+        </BrowserRouter>
+      </div>
+    );
+  }
+}
 
 export default withRoot(withStyles(styles)(AppRouter));
