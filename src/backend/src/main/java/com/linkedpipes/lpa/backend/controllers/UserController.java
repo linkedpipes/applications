@@ -68,7 +68,7 @@ public class UserController {
     }
 
     @NotNull
-    @GetMapping("/api/user")
+    @PostMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {

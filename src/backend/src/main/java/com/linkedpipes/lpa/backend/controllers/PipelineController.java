@@ -89,7 +89,7 @@ public class PipelineController {
     }
 
     @NotNull
-    @GetMapping("/api/pipeline/execute")
+    @PostMapping("/api/pipeline/execute")
     public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
                                                      @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {

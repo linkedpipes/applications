@@ -82,7 +82,7 @@ public class DiscoveryController {
     }
 
     @NotNull
-    @GetMapping("/api/pipelines/discoverFromInputIri")
+    @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
                                                                 @Nullable @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
         if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
