@@ -59,16 +59,6 @@ public class UserController {
 
     @NotNull
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> addUser(@NotNull @RequestParam(value="webId", required=true) String user) throws LpAppsException {
-        try {
-            return ResponseEntity.ok(userService.addUser(user));
-        } catch (UserTakenException e) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
-        }
-    }
-
-    @NotNull
-    @PostMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
