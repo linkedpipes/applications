@@ -37,6 +37,11 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
+    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.discoveryPollingTimeoutMins");
+    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.etlPollingTimeoutMins");
+    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.discoveryPollingFrequencySecs");
+    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.etlPollingFrequencySecs");
+
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;
@@ -99,7 +104,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, ETL_POLLING_FREQUENCY_SECS, ETL_POLLING_FREQUENCY_SECS, SECONDS);
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
@@ -112,7 +117,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        Application.SCHEDULER.schedule(canceller, 1, HOURS);
+        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
@@ -136,7 +141,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, DISCOVERY_POLLING_FREQUENCY_SECS, DISCOVERY_POLLING_FREQUENCY_SECS, SECONDS);
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
@@ -147,6 +152,6 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        Application.SCHEDULER.schedule(canceller, 1, HOURS);
+        Application.SCHEDULER.schedule(canceller, DISCOVERY_TIMEOUT_MINS, MINUTES);
     }
 }
