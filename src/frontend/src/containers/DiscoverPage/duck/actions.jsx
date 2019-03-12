@@ -35,10 +35,16 @@ export const setEtlExecutionStatus = value => {
   };
 };
 
+const changeTabAction = tabValue => ({
+  type: types.TAB_CHANGED,
+  tabValue
+});
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
-  setEtlExecutionStatus
+  setEtlExecutionStatus,
+  changeTabAction
 };

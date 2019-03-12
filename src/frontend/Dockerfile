@@ -14,9 +14,8 @@ RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
 # Install packages
-RUN git --version
 WORKDIR /tmp
-RUN yarn install --pure-lockfile 
+RUN yarn install --frozen-lockfile
 
 # Create a symlink to node_modules
 RUN mkdir -p /app 

@@ -14,7 +14,8 @@ import { Log, VisualizersService } from '@utils';
 type Props = {
   classes: {
     progress: number
-  }
+  },
+  selectedResultGraphIri: string
 };
 
 type State = {
@@ -33,7 +34,7 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
 
   async componentDidMount() {
     const response = await VisualizersService.getMarkers({
-      resultGraphIri: null
+      resultGraphIri: this.props.selectedResultGraphIri
     });
     const jsonData = await response.json();
     this.setState({
