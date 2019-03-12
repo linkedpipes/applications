@@ -1,102 +1,80 @@
-import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import NotFoundPage from "./containers/NotFoundPage";
-import { NavigationBar } from "./components/Navbar";
-import AboutPage from "./containers/AboutPage";
-import withRoot from "./withRoot";
-import { Dashboard } from "./components/Dashboard/Dashboard";
-import StepperController from "./components/SelectSources/StepperController";
-import CreateApp from "./components/CreateApp/CreateApp";
-import StorageAppsBrowserContainer from "./components/SOLID/StorageAppsBrowserContainer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { withStyles } from "@material-ui/core/styles";
-import { AuthRoute, UnauthRoute } from "react-router-auth";
-import AuthenticationScreen from "./components/Authentication";
-import connect from "react-redux/lib/connect/connect";
-import { PrivateRoute } from "@inrupt/solid-react-components";
+// @flow
+import React, { PureComponent } from 'react';
+import { BrowserRouter, Switch } from 'react-router-dom';
+import Redirect from 'react-router-dom/es/Redirect';
+import { withStyles } from '@material-ui/core/styles';
+import withRoot from './withRoot';
+import {
+  DiscoverPage,
+  HomePage,
+  NotFoundPage,
+  AboutPage,
+  CreateVisualizerPage,
+  AuthorizationPage
+} from '@containers';
+import { PrivateLayout, PublicLayout } from '@layouts';
+import { SocketContext, Log } from '@utils';
+import openSocket from 'socket.io-client';
+import { SOCKET_IO_ENDPOINT, SOCKET_IO_RECONNECT } from '@constants';
 
-const styles = theme => ({
+const socket = openSocket(SOCKET_IO_ENDPOINT);
+
+const styles = () => ({
   root: {
-    display: "flex"
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: "100vh",
-    overflow: "auto"
-  },
-  devBar: {
-    fontSize: "1rem",
-    height: "2rem",
-    paddingBottom: "0.5rem",
-    paddingTop: "0.5rem",
-    fontWeight: "bold",
-    color: "#606060",
-    textAlign: "center",
-    verticalAlign: "middle",
-    background: "#ffdb4d",
-    width: "100%"
+    display: 'flex'
   }
 });
 
-const AppRouter = props => {
-  const { classes } = props;
-  return (
-    <BrowserRouter>
-      <div className={classes.root}>
-        <NavigationBar />
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <CssBaseline />
-          {process.env.NODE_ENV !== "production" && (
-            <div className={classes.devBar}>DEVELOPMENT MODE</div>
-          )}
-          <Switch>
-            <Route path="/login" component={AuthenticationScreen} />
-            <PrivateRoute
-              path="/dashboard"
-              component={Dashboard}
-              redirect="/login"
-            />
-            <PrivateRoute
-              path="/create-app"
-              component={CreateApp}
-              redirect="/login"
-            />
-            <PrivateRoute
-              path="/select-sources"
-              component={StepperController}
-              redirect="/login"
-            />
+type Props = {
+  classes: any
+};
 
-            <PrivateRoute
-              path="/storage"
-              component={StorageAppsBrowserContainer}
-              redirect="/login"
-            />
+class AppRouter extends PureComponent<Props> {
+  componentDidMount() {
+    socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
+    socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
+  }
 
-            <PrivateRoute
-              path="/about"
-              component={AboutPage}
-              redirect="/login"
-            />
+  render() {
+    const { classes } = this.props;
+    return (
+      <div>
+        <BrowserRouter>
+          <div className={classes.root}>
+            <SocketContext.Provider value={socket}>
+              <Switch>
+                <PublicLayout
+                  component={AuthorizationPage}
+                  path="/login"
+                  exact
+                />
 
-            <Route component={NotFoundPage} />
-          </Switch>
-        </main>
+                <PrivateLayout path="/dashboard" component={HomePage} exact />
+                <PrivateLayout
+                  path="/create-app"
+                  component={CreateVisualizerPage}
+                  exact
+                />
+                <PrivateLayout
+                  path="/discover"
+                  component={DiscoverPage}
+                  exact
+                />
+                <PrivateLayout path="/about" component={AboutPage} exact />
+
+                <PublicLayout path="/404" component={NotFoundPage} exact />
+                <Redirect from="/" to="/login" exact />
+                <Redirect to="/404" />
+              </Switch>
+            </SocketContext.Provider>
+          </div>
+        </BrowserRouter>
       </div>
-    </BrowserRouter>
-  );
-};
+    );
+  }
+}
 
-const mapStateToProps = state => {
-  return {
-    authenticationStatus:
-      state.globals.authenticationStatus !== undefined
-        ? state.globals.authenticationStatus
-        : false
-  };
-};
+export default withRoot(withStyles(styles)(AppRouter));
 
 export default connect(mapStateToProps)(
   withRoot(withStyles(styles)(AppRouter))

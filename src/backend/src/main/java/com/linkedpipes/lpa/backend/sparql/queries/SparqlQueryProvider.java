@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.sparql.queries;
 
 import org.apache.jena.arq.querybuilder.AbstractQueryBuilder;
 import org.apache.jena.query.Query;
+import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -24,7 +25,7 @@ public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> imp
     public abstract Query get();
 
     @NotNull
-    public abstract Query getForNamed(@NotNull String name);
+    public abstract Query getForNamed(@NotNull String name) throws ParseException;
 
     @NotNull
     protected B addPrefixes(@NotNull B builder) {
@@ -32,7 +33,7 @@ public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> imp
     }
 
     @NotNull
-    protected abstract B addWheres(@NotNull B builder);
+    protected abstract B addWheres(@NotNull B builder) throws ParseException;
 
     @NotNull
     protected B addOptionals(@NotNull B builder) {
@@ -43,4 +44,5 @@ public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> imp
     protected B addAdditional(@NotNull B builder) {
         return builder;
     }
+
 }

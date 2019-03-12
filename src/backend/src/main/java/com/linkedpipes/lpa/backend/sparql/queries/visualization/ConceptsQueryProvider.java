@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.vocabulary.RDF;
@@ -7,9 +8,6 @@ import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
 
 public class ConceptsQueryProvider extends ConstructSparqlQueryProvider {
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
-    private static final String RDF_PREFIX = "rdf";
 
     // VARIABLES
     public static final String VAR_CONCEPT = var("c");
@@ -24,8 +22,8 @@ public class ConceptsQueryProvider extends ConstructSparqlQueryProvider {
     @Override
     protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.uri)
-                .addPrefix(RDF_PREFIX, RDF.uri);
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.uri)
+                .addPrefix(Prefixes.RDF_PREFIX, RDF.uri);
     }
 
     @NotNull

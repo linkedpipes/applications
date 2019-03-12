@@ -1,23 +1,27 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.EtlService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
+import com.linkedpipes.lpa.backend.services.UserService;
+import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
+import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @RestController
@@ -27,14 +31,18 @@ public class PipelineController {
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
     private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/graph/";
 
-    public static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
+    private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
-    private final DiscoveryService discoveryService;
-    private final EtlService etlService;
+    @NotNull private final DiscoveryService discoveryService;
+    @NotNull private final ExecutorService executorService;
+    @NotNull private final UserService userService;
+    private final HandlerMethodIntrospector methodIntrospector;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
-        etlService = context.getBean(EtlService.class);
+        executorService = context.getBean(ExecutorService.class);
+        userService = context.getBean(UserService.class);
+        methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
     @GetMapping("/api/pipeline")
@@ -62,10 +70,10 @@ public class PipelineController {
 
     @NotNull
     private String getOurServiceDescriptionUri(@NotNull String graphId) {
-        String hostUri = Application.getConfig().getString("lpa.hostUrl");
-        return new DefaultUriBuilderFactory()
-                .uriString(hostUri + SERVICE_DESCRIPTION_PATH)
-                .queryParam("graphId", graphId)
+        Method serviceDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
+                PipelineController.class.getDeclaredMethod("serviceDescription", String.class));
+        return methodIntrospector.getHandlerMethodUri(PipelineController.class, serviceDescriptionMethod)
+                .requestParam("graphId", graphId)
                 .build()
                 .toString();
     }
@@ -80,10 +88,19 @@ public class PipelineController {
 
     }
 
+    @NotNull
     @GetMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@RequestParam(value = "etlPipelineIri") String etlPipelineIri) throws LpAppsException {
-        Execution response = etlService.executePipeline(etlPipelineIri);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
+                                                     @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
+                                                     @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
+        try {
+            userService.addUserIfNotPresent(webId);
+            Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser);
+            return ResponseEntity.ok(response);
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + webId);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
     }
 
 }

@@ -1,2 +1,2 @@
-import PrivateLayout from "./private.layout";
+import PrivateLayout from './PrivateLayout';
 export default PrivateLayout;

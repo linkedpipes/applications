@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
@@ -19,11 +20,6 @@ import java.util.Map;
 public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     private Map<String, List<ValueFilter>> filters;
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
-    private static final String SCHEMA_PREFIX = "s";
-    private static final String RDFS_PREFIX = "rdfs";
 
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
@@ -46,9 +42,9 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
     @Override
     protected SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.getURI())
-                .addPrefix(SCHEMA_PREFIX, Schema.uri)
-                .addPrefix(RDFS_PREFIX, RDFS.getURI());
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.getURI())
+                .addPrefix(Prefixes.SCHEMA_PREFIX, Schema.uri)
+                .addPrefix(Prefixes.RDFS_PREFIX, RDFS.getURI());
     }
 
     @NotNull

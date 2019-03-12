@@ -12,7 +12,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ public class SchemesExtractor {
     private final Property[] possibleLabels = {SKOS.prefLabel, DCTerms.title, RDFS.label};
 
     public List<Scheme> extract(QueryExecution queryExec){
-        List<Scheme> schemes = new ArrayList<>();
         Model model = queryExec.execConstruct();
         return model.listResourcesWithProperty(RDF.type, SKOS.ConceptScheme)
                 .toList()
@@ -46,7 +44,7 @@ public class SchemesExtractor {
                             .collect(toMap(Literal::getLanguage, Literal::getString));
                     LocalizedValue localizedLabel = map.isEmpty() ?
                             new LocalizedValue(Map.of(
-                                    "nolang",
+                                    LocalizedValue.noLanguageLabel,
                                     reversed(Arrays.stream(schemeResource.getURI().split("[/#]"))).findFirst().orElse(schemeResource.getURI()))) :
                             new LocalizedValue(map);
 
