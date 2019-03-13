@@ -155,6 +155,11 @@ public class ExecutorServiceComponent implements ExecutorService {
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+            try {
+                discoveryService.cancelDiscovery(discoveryId);
+            } catch (LpAppsException ex) {
+                logger.warn("Failed to cancel discovery " + discoveryId, ex);
+            }
             for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                 d.setExecuting(false);
                 discoveryRepository.save(d);
