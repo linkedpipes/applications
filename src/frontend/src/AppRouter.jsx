@@ -15,7 +15,9 @@ import {
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
 import openSocket from 'socket.io-client';
-import { SOCKET_IO_ENDPOINT, SOCKET_IO_RECONNECT } from '@constants';
+import { SOCKET_IO_ENDPOINT } from '@constants';
+import { ErrorBoundary } from 'react-error-boundary';
+import * as Sentry from '@sentry/browser';
 
 const socket = openSocket(SOCKET_IO_ENDPOINT);
 
@@ -29,6 +31,14 @@ type Props = {
   classes: any
 };
 
+const sentryFeedbackErrorHandler = (error: Error, componentStack: string) => {
+  Log.error(componentStack, 'AppRouter');
+  Sentry.withScope(() => {
+    Sentry.captureException(error);
+    Sentry.showReportDialog();
+  });
+};
+
 class AppRouter extends PureComponent<Props> {
   componentDidMount() {
     socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
@@ -39,36 +49,38 @@ class AppRouter extends PureComponent<Props> {
     const { classes } = this.props;
     return (
       <div>
-        <BrowserRouter>
-          <div className={classes.root}>
-            <SocketContext.Provider value={socket}>
-              <Switch>
-                <PublicLayout
-                  component={AuthorizationPage}
-                  path="/login"
-                  exact
-                />
+        <ErrorBoundary onError={sentryFeedbackErrorHandler}>
+          <BrowserRouter>
+            <div className={classes.root}>
+              <SocketContext.Provider value={socket}>
+                <Switch>
+                  <PublicLayout
+                    component={AuthorizationPage}
+                    path="/login"
+                    exact
+                  />
 
-                <PrivateLayout path="/dashboard" component={HomePage} exact />
-                <PrivateLayout
-                  path="/create-app"
-                  component={CreateVisualizerPage}
-                  exact
-                />
-                <PrivateLayout
-                  path="/discover"
-                  component={DiscoverPage}
-                  exact
-                />
-                <PrivateLayout path="/about" component={AboutPage} exact />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+                  <PrivateLayout
+                    path="/create-app"
+                    component={CreateVisualizerPage}
+                    exact
+                  />
+                  <PrivateLayout
+                    path="/discover"
+                    component={DiscoverPage}
+                    exact
+                  />
+                  <PrivateLayout path="/about" component={AboutPage} exact />
 
-                <PublicLayout path="/404" component={NotFoundPage} exact />
-                <Redirect from="/" to="/login" exact />
-                <Redirect to="/404" />
-              </Switch>
-            </SocketContext.Provider>
-          </div>
-        </BrowserRouter>
+                  <PublicLayout path="/404" component={NotFoundPage} exact />
+                  <Redirect from="/" to="/login" exact />
+                  <Redirect to="/404" />
+                </Switch>
+              </SocketContext.Provider>
+            </div>
+          </BrowserRouter>
+        </ErrorBoundary>
       </div>
     );
   }
