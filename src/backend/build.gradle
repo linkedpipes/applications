@@ -54,6 +54,8 @@ dependencies {
     compile 'org.postgresql:postgresql:42.2.5'
     runtime 'javax.xml.bind:jaxb-api:2.3.0'
 
+    compile 'io.sentry:sentry-spring:1.7.16'
+
     compile 'com.corundumstudio.socketio:netty-socketio:1.7.17'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'

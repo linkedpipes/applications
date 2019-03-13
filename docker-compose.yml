@@ -21,6 +21,8 @@ services:
       - "9005:9005"
       - "9092:9092"
     restart: on-failure
+    environment:
+      SENTRY_DSN: ""
     depends_on:
       - etl
       - discovery
