@@ -75,7 +75,6 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
-        logger.error("Pipeline groups response: " + response);
         ObjectNode jsonObject = OBJECT_MAPPER.readValue(response, ObjectNode.class);
         ObjectNode pipelineGroupsJson = (ObjectNode) jsonObject.get("pipelineGroups");
         ArrayNode appGroups = (ArrayNode) pipelineGroupsJson.get("applicationGroups");

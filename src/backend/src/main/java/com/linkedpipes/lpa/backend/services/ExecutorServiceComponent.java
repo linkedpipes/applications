@@ -108,16 +108,25 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
-            Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                if (e.getStatus().isPollable()) {
-                    e.setStatus(EtlStatus.UNKNOWN);
+                if (e.getStatus() != EtlStatus.FINISHED) {
+                    logger.info("Cancelling execution");
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
+                    try {
+                        etlService.cancelExecution(executionIri);
+                        e.setStatus(EtlStatus.CANCELLED);
+                        // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
+                    } catch (LpAppsException ex) {
+                        logger.warn("Failed to cancel execution " + executionIri, ex);
+                        e.setStatus(EtlStatus.UNKNOWN);
+                    }
                     executionRepository.save(e);
                 }
             }
         };
 
-        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
+        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " seconds.");
+        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, SECONDS);
     }
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
