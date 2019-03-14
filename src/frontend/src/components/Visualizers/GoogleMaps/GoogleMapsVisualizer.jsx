@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import {
   withScriptjs,
   withGoogleMap,
@@ -23,7 +23,7 @@ type State = {
   zoomToMarkers: any
 };
 
-class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
+class GoogleMapsVisualizer extends PureComponent<Props, State> {
   constructor() {
     super();
     this.state = {

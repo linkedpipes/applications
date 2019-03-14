@@ -1,37 +1,41 @@
-const FileClient = require("solid-file-client");
-var fs = require("fs");
-import stringHash from "string-hash";
+/* eslint-disable import/order */
+import stringHash from 'string-hash';
+import data from '@solid/query-ldflex';
+import { Log } from '@utils';
 
-import data from "@solid/query-ldflex";
+const FileClient = require('solid-file-client');
+const fs = require('fs');
 
-export const saveAppToSolid = configuration => {
-  console.log(configuration);
-  const url = "https://aorumbayev1.inrupt.net/public/lpapps";
+const saveAppToSolid = configuration => {
+  Log.info(configuration, 'StorageToolbox');
+  const url = 'https://aorumbayev1.inrupt.net/public/lpapps';
   const hash = stringHash(
     JSON.stringify(configuration.type, null, 2) +
       JSON.stringify(configuration.markers, null, 2)
   ).toString();
-  const fileUrl = url + "/" + "lpapp" + hash;
+  const fileUrl = `${url}/lpapp${hash}`;
 
   const file = JSON.stringify(configuration, null, 2);
 
   FileClient.readFolder(url).then(
     folder => {
-      console.log(`Read ${folder.name}, it has ${folder.files.length} files.`);
+      Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
     },
-    err => console.log(err)
+    err => Log.error(err, 'StorageToolbox')
   );
 
   FileClient.createFile(fileUrl).then(
     success => {
-      console.log(`Created file.`);
-      FileClient.updateFile(fileUrl, file, "text/plain").then(
+      Log.info(`Created file.`);
+      FileClient.updateFile(fileUrl, file, 'text/plain').then(
         success => {
-          console.log(`Updated file!`);
+          Log.info(`Updated file!`);
         },
-        err => console.log(err)
+        err => Log.info(err, 'StorageToolbox')
       );
     },
-    err => console.log(err)
+    err => Log.info(err, 'StorageToolbox')
   );
 };
+
+export default saveAppToSolid;

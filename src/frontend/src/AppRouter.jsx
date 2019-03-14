@@ -10,7 +10,8 @@ import {
   NotFoundPage,
   AboutPage,
   CreateVisualizerPage,
-  AuthorizationPage
+  AuthorizationPage,
+  StoragePage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
@@ -60,6 +61,7 @@ class AppRouter extends PureComponent<Props> {
                   component={DiscoverPage}
                   exact
                 />
+                <PrivateLayout path="/storage" component={StoragePage} exact />
                 <PrivateLayout path="/about" component={AboutPage} exact />
 
                 <PublicLayout path="/404" component={NotFoundPage} exact />
@@ -75,7 +77,3 @@ class AppRouter extends PureComponent<Props> {
 }
 
 export default withRoot(withStyles(styles)(AppRouter));
-
-export default connect(mapStateToProps)(
-  withRoot(withStyles(styles)(AppRouter))
-);
