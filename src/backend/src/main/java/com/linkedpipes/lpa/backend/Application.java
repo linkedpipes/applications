@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -34,6 +36,17 @@ public class Application {
                 registry.addMapping("/**").allowedOrigins("http://localhost:9001", "https://applications.linkedpipes.com");
             }
         };
+    }
+
+    @Bean
+    @SuppressWarnings("unused")
+    public ServletContextInitializer sentryServletContextInitializer() {
+        return new io.sentry.spring.SentryServletContextInitializer();
+    }
+
+    @Bean
+    public HandlerExceptionResolver sentryExceptionResolver() {
+        return new io.sentry.spring.SentryExceptionResolver();
     }
 
     @NotNull
