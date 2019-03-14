@@ -6,17 +6,17 @@ import uuid from 'uuid';
 const samples = [
   {
     id: uuid.v4(),
-    label: "Treemap Sample",
-    type: "advanced",
-    sparqlEndpointIri: "https://linked.opendata.cz/sparql",
+    label: 'Treemap Sample',
+    type: 'advanced',
+    sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     dataSampleIri:
-      "https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl",
-    namedGraph: "http://linked.opendata.cz/resource/dataset/cpv-2008"
+      'https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl',
+    namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008'
   },
   {
     id: uuid.v4(),
     label: 'DBPedia Earthquakes',
-    type: "simple",
+    type: 'simple',
     URIS: [
       'https://ldcp.opendata.cz/resource/dbpedia/datasource-templates/Earthquake',
       'https://discovery.linkedpipes.com/resource/lod/templates/http---commons.dbpedia.org-sparql'
@@ -25,7 +25,7 @@ const samples = [
   {
     id: uuid.v4(),
     label: 'Wikidata Timeline & Map',
-    type: "simple",
+    type: 'simple',
     URIS: [
       'https://discovery.linkedpipes.com/resource/discovery/wikidata-06/config',
       'https://discovery.linkedpipes.com/vocabulary/discovery/Input',
@@ -43,10 +43,11 @@ const samples = [
 
 class DiscoverExamplesContainer extends PureComponent {
   render() {
+    const { onInputExampleClicked } = this.props;
     return (
       <DiscoverExamplesComponent
         classes={undefined}
-        onHandleListItemClick={this.props.onInputExampleClicked}
+        onHandleListItemClick={onInputExampleClicked}
         samples={samples}
       />
     );

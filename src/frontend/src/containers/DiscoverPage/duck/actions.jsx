@@ -28,6 +28,12 @@ export const setSelectedInputExample = sample => {
   };
 };
 
+export const resetSelectedInputExample = () => {
+  return {
+    type: types.RESET_SELECTED_INPUT_EXAMPLE
+  };
+};
+
 export const setEtlExecutionStatus = value => {
   return {
     type: types.SET_ETL_EXECUTION_STATUS,
@@ -45,6 +51,7 @@ export default {
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
+  resetSelectedInputExample,
   setEtlExecutionStatus,
   changeTabAction
 };
