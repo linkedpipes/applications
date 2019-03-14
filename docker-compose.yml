@@ -47,7 +47,7 @@ services:
       - "8890:8890"
     restart: on-failure
     volumes:
-      - ./data/virtuoso:/data
+      - ./data/virtuoso:/var/lib/virtuoso/data
 
   discovery:
     image: linkedpipes/applications:discovery
