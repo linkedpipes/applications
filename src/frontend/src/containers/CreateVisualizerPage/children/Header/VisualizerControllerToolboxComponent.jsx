@@ -11,7 +11,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 type Props = {
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   checkedRefresh?: boolean,
-  classes: { button: {}, leftIcon: {}, root: {} }
+  classes: { button: {}, leftIcon: {}, root: {} },
+  handlePublishClicked: Function
 };
 
 const styles = theme => ({
@@ -26,34 +27,31 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerToolboxComponent = (props: Props) => (
+const VisualizerControllerToolboxComponent = ({
+  classes,
+  checkedRefresh,
+  handlePublishClicked
+}: Props) => (
   <div>
     <FormControlLabel
       control={<Switch value="checkedRefresh" />}
-      label={props.checkedRefresh ? 'Refresh' : 'Fixed'}
+      label={checkedRefresh ? 'Refresh' : 'Fixed'}
     />
     <Button
       variant="contained"
       color="default"
-      className={props.classes.button}
+      className={classes.button}
+      onClick={handlePublishClicked}
     >
-      <CloudUploadIcon className={props.classes.leftIcon} />
+      <CloudUploadIcon className={classes.leftIcon} />
       Publish
     </Button>
-    <Button
-      variant="contained"
-      color="default"
-      className={props.classes.button}
-    >
-      <PreviewIcon className={props.classes.leftIcon} />
+    <Button variant="contained" color="default" className={classes.button}>
+      <PreviewIcon className={classes.leftIcon} />
       Embed
     </Button>
-    <Button
-      variant="contained"
-      color="default"
-      className={props.classes.button}
-    >
-      <KeyboardArrowDownIcon className={props.classes.leftIcon} />
+    <Button variant="contained" color="default" className={classes.button}>
+      <KeyboardArrowDownIcon className={classes.leftIcon} />
       More
     </Button>
   </div>

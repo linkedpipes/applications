@@ -10,7 +10,8 @@ type Props = {
   selectedResultGraphIri: string,
   classes: {
     root: {}
-  }
+  },
+  handleSetCurrentApplicationData: Function
 };
 
 const styles = {
@@ -27,12 +28,12 @@ const CreateVisualizerComponent = ({
   selectedVisualizer,
   headerParams,
   filters,
-  selectedResultGraphIri
+  selectedResultGraphIri,
+  handleSetCurrentApplicationData
 }: Props) => (
   <div className={classes.root}>
     <VisualizerControllerHeader
       headerParams={headerParams}
-      onTitleChange={() => {}}
       onRefreshSwitchChange={() => {}}
       checkedRefresh={() => {}}
     />
@@ -40,6 +41,7 @@ const CreateVisualizerComponent = ({
       filters={filters}
       visualizer={selectedVisualizer.visualizer}
       selectedResultGraphIri={selectedResultGraphIri}
+      handleSetCurrentApplicationData={handleSetCurrentApplicationData}
     />
   </div>
 );

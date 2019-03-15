@@ -39,7 +39,7 @@ class UploadFilePopup extends React.Component {
   };
 
   loadData = url => {
-    return fetch(url).then(function(response) {
+    return fetch(url).then(response => {
       // console.log(url + " -> " + response.ok);
       if (response.ok) {
         return response.text();
@@ -52,7 +52,7 @@ class UploadFilePopup extends React.Component {
     e.preventDefault();
     const self = this;
 
-    self.loadData(this.state.textFieldValue).then(function(ttlFile) {
+    self.loadData(this.state.textFieldValue).then(ttlFile => {
       FileClient.createFile(
         'https://aorumbayev.solid.community/public/testtt/test.ttl'
       ).then(
@@ -91,7 +91,7 @@ class UploadFilePopup extends React.Component {
   };
 
   handleTextFieldChange = e => {
-    let rawText = e.target.value;
+    const rawText = e.target.value;
     this.setState({ textFieldValue: rawText });
   };
 

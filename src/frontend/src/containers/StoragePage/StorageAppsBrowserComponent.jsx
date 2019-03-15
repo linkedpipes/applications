@@ -21,8 +21,7 @@ const styles = theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    overflow: 'hidden',
-    backgroundColor: theme.palette.background.paper
+    overflow: 'hidden'
   },
   gridList: {
     width: 'auto',
@@ -48,7 +47,8 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
-      .spacing.unit * 3}px`
+      .spacing.unit * 3}px`,
+    backgroundColor: theme.palette.darkPaper.main
   },
   avatar: {
     margin: theme.spacing.unit,
@@ -91,7 +91,9 @@ function StorageAppsBrowserComponent(props: Props) {
         <form className={classes.form}>
           <GridList cellHeight={200} className={classes.gridList}>
             {Object.keys(tileData).map((keyName, i) => (
-              <StorageAppsBrowserCardComponent />
+              <StorageAppsBrowserCardComponent
+                singleTileData={tileData[keyName]}
+              />
             ))}
           </GridList>
         </form>

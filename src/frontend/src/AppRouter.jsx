@@ -1,7 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { BrowserRouter, Switch } from 'react-router-dom';
-import Redirect from 'react-router-dom/es/Redirect';
+import { Redirect, Route } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import {
@@ -11,7 +11,8 @@ import {
   AboutPage,
   CreateVisualizerPage,
   AuthorizationPage,
-  StoragePage
+  StoragePage,
+  ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
@@ -65,6 +66,7 @@ class AppRouter extends PureComponent<Props> {
                 <PrivateLayout path="/about" component={AboutPage} exact />
 
                 <PublicLayout path="/404" component={NotFoundPage} exact />
+                <Route path="/map" component={ApplicationPage} />
                 <Redirect from="/" to="/login" exact />
                 <Redirect to="/404" />
               </Switch>
