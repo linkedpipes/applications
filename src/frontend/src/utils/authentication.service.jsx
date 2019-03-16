@@ -12,12 +12,8 @@ const USER_URL_WITH_WEB_ID = webId => {
 };
 
 const AuthenticationService = {
-  authorizeUser(webIdValue) {
-    return rest(USER_URL_WITH_WEB_ID(webIdValue), undefined, 'POST', undefined);
-  },
-
   getUserProfile(webIdValue) {
-    return rest(USER_URL_WITH_WEB_ID(webIdValue), undefined, 'GET', undefined);
+    return rest(USER_URL_WITH_WEB_ID(webIdValue), undefined, 'POST', undefined);
   }
 };
 

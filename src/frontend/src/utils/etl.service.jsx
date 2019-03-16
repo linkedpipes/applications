@@ -56,7 +56,7 @@ export const ETLService = {
     return rest(
       EXECUTE_PIPELINE_URL(etlPipelineIri, webId, selectedVisualiser),
       undefined,
-      'GET',
+      'POST',
       undefined
     );
   },
