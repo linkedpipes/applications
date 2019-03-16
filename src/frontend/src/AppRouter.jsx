@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { BrowserRouter, Switch } from 'react-router-dom';
-import Redirect from 'react-router-dom/es/Redirect';
+import { BrowserRouter, Switch, Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import {
