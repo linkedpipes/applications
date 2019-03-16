@@ -33,7 +33,7 @@ class DiscoverSelectorContainer extends PureComponent {
       ttlFile: self.state.ttlFile,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -52,7 +52,7 @@ class DiscoverSelectorContainer extends PureComponent {
       datasourceUris: datasourcesForTTL,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -63,7 +63,7 @@ class DiscoverSelectorContainer extends PureComponent {
       namedGraph: this.props.namedGraph,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -158,7 +158,7 @@ class DiscoverSelectorContainer extends PureComponent {
 
     return DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(jsonResponse => {
         handleAddVisualizer(jsonResponse.pipelineGroups);

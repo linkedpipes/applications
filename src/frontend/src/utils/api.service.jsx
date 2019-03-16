@@ -1,33 +1,42 @@
-import 'whatwg-fetch';
+import axios from 'axios';
+import { Log } from '@utils';
 
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
+// {
+//   // `data` is the response that was provided by the server
+//   data: {},
+
+//   // `status` is the HTTP status code from the server response
+//   status: 200,
+
+//   // `statusText` is the HTTP status message from the server response
+//   statusText: 'OK',
+
+//   // `headers` the headers that the server responded with
+//   // All header names are lower cased
+//   headers: {},
+
+//   // `config` is the config that was provided to `axios` for the request
+//   config: {},
+
+//   // `request` is the request that generated this response
+//   // It is the last ClientRequest instance in node.js (in redirects)
+//   // and an XMLHttpRequest instance the browser
+//   request: {}
+// }
+
+axios.defaults.baseURL = process.env.BASE_BACKEND_URL || '/api';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.interceptors.response.use(
+  response => {
+    return response;
+  },
+  error => {
+    // handle error
+    if (error.response) {
+      Log.error(error.response.data.message);
+    }
   }
-  return response;
-}
+);
+const wrappedAxios = axios;
 
-export const rest = (
-  url,
-  body = '',
-  method = 'POST',
-  contentType = 'application/json'
-) => {
-  // console.log('Sending request:\n');
-  // console.log(`URL: ${url}\n`);
-  // console.log(`Body: ${JSON.stringify(body)}\n`);
-  // console.log(`Method: ${method}\n`);
-
-  return method === 'POST'
-    ? fetch(url, {
-        method,
-        body: body.constructor === File ? body : JSON.stringify(body),
-        headers: {
-          'Content-Type': contentType
-        },
-        credentials: 'same-origin'
-      }).then(handleErrors)
-    : fetch(url).then(handleErrors);
-};
-
-export const BASE_URL = process.env.BASE_BACKEND_URL;
+export default wrappedAxios;
