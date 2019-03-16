@@ -44,9 +44,6 @@ const errorHandler = userId => {
       scope.setUser({ id: userId || 'unidentified user' }); // How can we capture WEBID from here
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
-      // Object.keys(errorInfo).forEach(key => {
-      //   scope.setExtra(key, errorInfo[key]);
-      // });
       Sentry.captureException(error);
       Sentry.showReportDialog(); // Only if not production
     });
