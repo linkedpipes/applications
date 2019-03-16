@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/lib/connect/connect';
-import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesExecutorComponent from './DiscoverPipelinesExecutorComponent';
 import {
@@ -49,7 +48,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         );
       })
       .catch(error => {
-        Log.error(error.message, 'DiscoverPipelinesExecutorContianer');
+        Log.error(error.message, 'DiscoverPipelinesExecutorContainer');
         self.setState({
           loaderLabelText:
             'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
@@ -185,8 +184,8 @@ DiscoverPipelinesExecutorContainer.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    pipelineId: state.globals.pipelineId,
-    discoveryId: state.globals.discoveryId,
+    pipelineId: state.etl.pipelineId,
+    discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     etlExecutionStatus: state.discover.etlExecutionStatus
   };
@@ -207,7 +206,7 @@ const mapDispatchToProps = dispatch => {
 
   const onAddSelectedResultGraphIriAction = resultGraphIri =>
     dispatch(
-      globalActions.addSelectedResultGraphIriAction({
+      etlActions.addSelectedResultGraphIriAction({
         data: resultGraphIri
       })
     );

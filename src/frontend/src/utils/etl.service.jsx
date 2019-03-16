@@ -26,7 +26,7 @@ export const ETL_STATUS_TYPE = {
 
 export const ETLService = {
   async getExecutePipeline({ etlPipelineIri, webId, selectedVisualiser }) {
-    return axios.get('/pipeline/execute', {
+    return axios.post('/pipeline/execute', null, {
       params: {
         etlPipelineIri,
         webId,

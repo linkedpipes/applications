@@ -3,7 +3,7 @@ import DiscoverVisualizerPickerComponent from './DiscoverVisualizerPickerCompone
 
 const mapStateToProps = state => {
   return {
-    visualizers: state.visualizers
+    visualizers: state.discovery.pipelineGroups
   };
 };
 
