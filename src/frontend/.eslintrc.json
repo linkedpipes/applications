@@ -16,9 +16,10 @@
     "plugin:import/recommended",
     "airbnb",
     "prettier",
-    "prettier/react"
+    "prettier/react",
+    "prettier/flowtype"
   ],
-  "plugins": ["babel", "material-ui", "import"],
+  "plugins": ["babel", "material-ui", "import", "flowtype"],
   "rules": {
     // It's buggy
     "react/jsx-curly-brace-presence": "off",
@@ -80,6 +81,9 @@
   },
   "settings": {
     "import/resolver": {
+      "webpack": {
+        "config": "webpack.config.js"
+      },
       "babel-module": {}
     }
   }

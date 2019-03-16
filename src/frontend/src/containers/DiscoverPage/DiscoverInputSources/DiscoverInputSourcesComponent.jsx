@@ -36,7 +36,7 @@ const DiscoverInputSourcesComponent = ({
 DiscoverInputSourcesComponent.propTypes = {
   classes: PropTypes.object.isRequired,
   onInputExampleClicked: PropTypes.any,
-  onNextClicked: PropTypes.any,
+  onNextClicked: PropTypes.any
 };
 
 export default withStyles(styles)(DiscoverInputSourcesComponent);

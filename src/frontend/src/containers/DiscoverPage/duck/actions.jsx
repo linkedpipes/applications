@@ -28,10 +28,11 @@ export const setSelectedInputExample = sample => {
   };
 };
 
-export const changeTabAction = tabValue => ({
-  type: types.CHANGE_TAB,
-  tabValue
-});
+export const resetSelectedInputExample = () => {
+  return {
+    type: types.RESET_SELECTED_INPUT_EXAMPLE
+  };
+};
 
 export const setEtlExecutionStatus = value => {
   return {
@@ -40,11 +41,17 @@ export const setEtlExecutionStatus = value => {
   };
 };
 
+const changeTabAction = tabValue => ({
+  type: types.TAB_CHANGED,
+  tabValue
+});
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
-  changeTabAction,
-  setEtlExecutionStatus
+  resetSelectedInputExample,
+  setEtlExecutionStatus,
+  changeTabAction
 };

@@ -17,7 +17,12 @@ module.exports = () => {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.BASE_BACKEND_URL': JSON.stringify(
         process.env.BASE_BACKEND_URL
-      )
+      ),
+      'process.env.BASE_SOCKET_URL': JSON.stringify(
+        process.env.BASE_SOCKET_URL
+      ),
+      'process.env.SOCKET_RECONNECT':
+        JSON.stringify(process.env.SOCKET_RECONNECT) === 'true'
     })
   ];
 
@@ -30,7 +35,15 @@ module.exports = () => {
       filename: 'bundle.js'
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.jsx']
+      extensions: ['.mjs', '.js', '.jsx'],
+      alias: {
+        '@components': path.resolve(__dirname, './src/components'),
+        '@containers': path.resolve(__dirname, './src/containers'),
+        '@ducks': path.resolve(__dirname, './src/ducks'),
+        '@utils': path.resolve(__dirname, './src/utils'),
+        '@constants': path.resolve(__dirname, './src/constants'),
+        '@layouts': path.resolve(__dirname, './src/layouts')
+      }
     },
     module: {
       rules: [
@@ -41,7 +54,12 @@ module.exports = () => {
         },
         {
           test: /\.s?css$/,
-          use: ['style-loader', 'css-loader', 'sass-loader']
+          use: [
+            'style-loader',
+            'css-loader',
+            'sass-loader',
+            'webpack-conditional-loader'
+          ]
         }
       ]
     },

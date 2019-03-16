@@ -13,6 +13,10 @@ public interface VisualizationService {
 
     List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri);
 
+    List<HierarchyNode> getSkosSchemeSubtree(String schemeUri, String conceptUri);
+
+    List<HierarchyNode> getSkosSchemeSubtreeFromNamed(String graphIri, String schemeUri, String conceptUri);
+
     List<Concept> getSkosConcepts();
 
     List<Concept> getSkosConceptsFromNamed(String graphIri);

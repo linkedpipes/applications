@@ -33,6 +33,7 @@ public class UserController {
     public ResponseEntity<List<Discovery>> getUserDiscoveries(@NotNull @RequestParam(value="webId", required=true) String user)
                             throws LpAppsException {
         try {
+            userService.addUserIfNotPresent(user);
             return ResponseEntity.ok(userService.getUserDiscoveries(user));
         } catch (UserNotFoundException e) {
             logger.error("User not found: " + user);
@@ -71,6 +72,7 @@ public class UserController {
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
+            userService.addUserIfNotPresent(user);
             return ResponseEntity.ok(userService.getUserProfile(user));
         } catch(UserNotFoundException e) {
             logger.error("User not found: " + user);
@@ -84,7 +86,8 @@ public class UserController {
                                                       @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
                       throws LpAppsException {
         try {
-          return ResponseEntity.ok(userService.addApplication(user, solidIri));
+            userService.addUserIfNotPresent(user);
+            return ResponseEntity.ok(userService.addApplication(user, solidIri));
         } catch(UserNotFoundException e) {
           logger.error("User not found: " + user);
           throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
@@ -97,7 +100,8 @@ public class UserController {
                                                          @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
                      throws LpAppsException {
         try {
-          return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
+            userService.addUserIfNotPresent(user);
+            return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
         } catch(UserNotFoundException e) {
           logger.error("User not found: " + user);
           throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);

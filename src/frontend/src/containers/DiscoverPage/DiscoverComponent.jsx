@@ -14,6 +14,7 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
+import { ETL_STATUS_TYPE } from '@utils';
 
 const styles = theme => ({
   root: {
@@ -67,7 +68,6 @@ const DiscoverComponent = ({
   classes,
   activeStep,
   onBackClicked,
-  onResetClicked,
   etlExecutionStatus
 }) => (
   <div className={classes.root}>
@@ -101,7 +101,9 @@ const DiscoverComponent = ({
                           variant="contained"
                           color="primary"
                           className={classes.button}
-                          disabled={!etlExecutionStatus}
+                          disabled={
+                            etlExecutionStatus !== ETL_STATUS_TYPE.Finished
+                          }
                         >
                           Create App
                         </Button>
@@ -115,16 +117,6 @@ const DiscoverComponent = ({
         );
       })}
     </Stepper>
-    {activeStep === steps.length && (
-      <Paper square elevation={0} className={classes.resetContainer}>
-        <Typography>
-          <Emoji text="All steps completed - nice job 👍" />
-        </Typography>
-        <Button onClick={onResetClicked} className={classes.button}>
-          Reset
-        </Button>
-      </Paper>
-    )}
   </div>
 );
 

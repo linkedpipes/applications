@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.sparql.queries;
 import org.apache.jena.arq.querybuilder.AbstractQueryBuilder;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.query.Query;
+import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,11 +19,16 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
     public final Query get() {
         ConstructBuilder builder = new ConstructBuilder();
 
-        addPrefixes(builder);
-        addConstructs(builder);
-        addWheres(builder);
-        addOptionals(builder);
-        addAdditional(builder);
+        try {
+            addPrefixes(builder);
+            addConstructs(builder);
+            addWheres(builder);
+            addOptionals(builder);
+            addAdditional(builder);
+        } catch (
+        ParseException e) {
+            throw new RuntimeException(e);
+        }
 
         return builder.build();
     }
@@ -32,13 +38,18 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
     public final Query getForNamed(@NotNull String name) {
         ConstructBuilder builder = new ConstructBuilder();
 
-        addPrefixes(builder);
-        addConstructs(builder);
-        builder.fromNamed(name);
+        try{
+            addPrefixes(builder);
+            addConstructs(builder);
+            builder.fromNamed(name);
 
-        builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
+            builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
 
-        addAdditional(builder);
+            addAdditional(builder);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
         return builder.build();
     }
 

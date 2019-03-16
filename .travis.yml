@@ -3,10 +3,8 @@ os: "linux"
 stages:
   - name: build
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
-  - name: unit tests
+  - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
-  - name: integration tests
-    if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
   - name: deploy
     if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
 
@@ -48,8 +46,8 @@ jobs:
       script:
         - ./gradlew assemble
 
-    - stage: unit tests
-      name: "Backend"
+    - stage: tests
+      name: "Backend unit tests"
       language: java
       jdk: openjdk10
       before_cache:
@@ -71,8 +69,7 @@ jobs:
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
-    - stage: integration tests
-      name: "Backend"
+    - name: "Backend integration tests"
       language: java
       jdk: openjdk10
       before_cache:

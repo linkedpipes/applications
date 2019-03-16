@@ -1,13 +1,10 @@
 import types from './types';
 
 const INITIAL_STATE = {
-  sparqlEndpointIri: '',
-  dataSampleIri: '',
-  namedGraph: '',
-  selectedTab: 0,
   headerParams: {
     title: ''
-  }
+  },
+  selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } }
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -18,40 +15,6 @@ const globalReducer = (state = INITIAL_STATE, action) => {
     case types.SET_PIPELINE_ID:
       return { ...state, pipelineId: action.pipeline.id };
 
-    case types.TAB_CHANGED:
-      return { ...state, selectedTab: action.selectedTab };
-
-    case types.SET_SELECTED_DATASOURCES_EXAMPLE:
-      switch (action.sample.type) {
-        case 'Simple': {
-          const uris = action.sample.URIS;
-          const value = uris.join(',\n');
-          return {
-            ...state,
-            datasourcesValues: value,
-            sparqlEndpointIri: '',
-            dataSampleIri: '',
-            namedGraph: ''
-          };
-        }
-        case 'Advanced': {
-          const {
-            sparqlEndpointIri,
-            dataSampleIri,
-            namedGraph
-          } = action.sample;
-          return {
-            ...state,
-            datasourcesValues: null,
-            selectedResultGraphIri: null,
-            sparqlEndpointIri,
-            dataSampleIri,
-            namedGraph
-          };
-        }
-        default:
-          return { ...state };
-      }
     case types.SET_SELECTED_VISUALIZER:
       return Object.assign({}, state, {
         selectedVisualizer: action.selectedVisualizer

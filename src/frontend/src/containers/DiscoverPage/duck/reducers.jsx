@@ -12,24 +12,41 @@ const INITIAL_STATE = {
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case types.CHANGE_TAB: {
+    case types.TAB_CHANGED: {
       const { tabValue } = action;
       return { ...state, tabValue };
     }
     case types.INCREMENT_ACTIVE_STEP: {
       const { value } = action;
       const { activeStep } = state;
-      return { ...state, activeStep: activeStep + value };
+      return {
+        ...state,
+        activeStep: activeStep + value > 3 ? 3 : activeStep + value
+      };
     }
 
     case types.DECREMENT_ACTIVE_STEP: {
       const { value } = action;
       const { activeStep } = state;
-      return { ...state, activeStep: activeStep - value };
+      return {
+        ...state,
+        activeStep: activeStep - value < 0 ? 0 : activeStep - value
+      };
     }
 
     case types.RESET_ACTIVE_STEP: {
       return { ...state, activeStep: 0 };
+    }
+
+    case types.RESET_SELECTED_INPUT_EXAMPLE: {
+      return {
+        ...state,
+        dataSourcesUris: '',
+        sparqlEndpointIri: '',
+        dataSampleIri: '',
+        namedGraph: '',
+        tabValue: 0
+      };
     }
 
     case types.SET_SELECTED_INPUT_EXAMPLE: {

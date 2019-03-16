@@ -1,8 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 import MapIcon from '@material-ui/icons/Map';
+
+type Props = {
+  onTitleChange?: (event: {}) => void,
+  title: string,
+  classes: { root: {}, textField: {} }
+};
 
 const styles = {
   root: {
@@ -13,28 +19,17 @@ const styles = {
   }
 };
 
-const VisualizerControllerLabelsComponent = ({
-  classes,
-  title,
-  onTitleChange
-}) => (
-  <div className={classes.root}>
+const VisualizerControllerLabelsComponent = (props: Props) => (
+  <div className={props.classes.root}>
     <MapIcon style={{ fontSize: '70px' }} />
     <TextField
       label="App title"
-      className={classes.textField}
-      value={title}
+      className={props.classes.textField}
+      value={props.title}
       placeholder="Enter your app Title"
-      onChange={onTitleChange}
       margin="normal"
     />
   </div>
 );
-
-VisualizerControllerLabelsComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onTitleChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired
-};
 
 export default withStyles(styles)(VisualizerControllerLabelsComponent);
