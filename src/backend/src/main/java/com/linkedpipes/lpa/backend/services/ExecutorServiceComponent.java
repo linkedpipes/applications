@@ -93,7 +93,14 @@ public class ExecutorServiceComponent implements ExecutorService {
                     executionRepository.save(e);
                 }
 
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
+                EtlStatusReport report = new EtlStatusReport();
+                report.executionIri = executionIri;
+                report.status = executionStatus;
+                report.error = false;
+
+                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
+                    .sendEvent("executionStatus",
+                               OBJECT_MAPPER.writeValueAsString(report));
                 if (!executionStatus.status.isPollable()) {
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
@@ -136,7 +143,15 @@ public class ExecutorServiceComponent implements ExecutorService {
 
                 if (discoveryStatus.isFinished) {
                     logger.info("Reporting discovery finished in room " + discoveryId);
-                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(discoveryStatus));
+                    DiscoveryStatusReport report = new DiscoveryStatusReport();
+                    report.discoveryId = discoveryId;
+                    report.status = discoveryStatus;
+                    report.error = false;
+
+                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
+                        .sendEvent("discoveryStatus",
+                                   OBJECT_MAPPER.writeValueAsString(report));
+                    );
                     for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                         d.setExecuting(false);
                         discoveryRepository.save(d);
