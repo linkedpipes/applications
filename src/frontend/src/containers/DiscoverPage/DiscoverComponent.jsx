@@ -68,7 +68,6 @@ const DiscoverComponent = ({
   classes,
   activeStep,
   onBackClicked,
-  onResetClicked,
   etlExecutionStatus
 }) => (
   <div className={classes.root}>
@@ -118,16 +117,6 @@ const DiscoverComponent = ({
         );
       })}
     </Stepper>
-    {activeStep === steps.length && (
-      <Paper square elevation={0} className={classes.resetContainer}>
-        <Typography>
-          <Emoji text="All steps completed - nice job 👍" />
-        </Typography>
-        <Button onClick={onResetClicked} className={classes.button}>
-          Reset
-        </Button>
-      </Paper>
-    )}
   </div>
 );
 

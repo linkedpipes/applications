@@ -23,4 +23,6 @@ public interface DiscoveryService {
 
     String getVirtuosoServiceDescription(String graphName);
 
+    void cancelDiscovery(String discoveryId) throws LpAppsException;
+
 }

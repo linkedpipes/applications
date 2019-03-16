@@ -75,7 +75,6 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
         PipelineGroups pipelineGroups = new PipelineGroups();
 
-        logger.error("Pipeline groups response: " + response);
         ObjectNode jsonObject = OBJECT_MAPPER.readValue(response, ObjectNode.class);
         ObjectNode pipelineGroupsJson = (ObjectNode) jsonObject.get("pipelineGroups");
         ArrayNode appGroups = (ArrayNode) pipelineGroupsJson.get("applicationGroups");
@@ -156,6 +155,11 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         return serviceDescription;
     }
 
+    @Override
+    public void cancelDiscovery(String discoveryId) throws LpAppsException {
+        httpActions.stop(discoveryId);
+    }
+
     private class HttpActions {
 
         private final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
@@ -164,6 +168,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         private final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");
         private final String URL_GET_PIPELINE_GROUPS = urlFrom(URL_BASE, "discovery", "%s", "pipeline-groups");
         private final String URL_EXPORT_PIPELINE = urlFrom(URL_BASE, "discovery", "%s", "export", "%s");
+        private final String URL_STOP = urlFrom(URL_BASE, "discovery", "%s", "stop");
 
         private String startFromInput(String discoveryConfig) throws LpAppsException {
             return new HttpRequestSender(context).to(URL_START_FROM_INPUT)
@@ -206,6 +211,13 @@ public class DiscoveryServiceComponent implements DiscoveryService {
                     .contentType("application/json")
                     .acceptType("application/json")
                     .send();
+        }
+
+        private void stop(String discoveryId) throws LpAppsException {
+            logger.info("GET " + String.format(URL_STOP, discoveryId));
+            new HttpRequestSender(context).to(String.format(URL_STOP, discoveryId))
+                .method(HttpRequestSender.HttpMethod.GET)
+                .send();
         }
 
     }
