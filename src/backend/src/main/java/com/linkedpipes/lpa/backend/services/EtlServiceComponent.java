@@ -46,7 +46,6 @@ public class EtlServiceComponent implements EtlService {
     public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
         String response = httpActions.getExecutionStatus(executionIri);
         ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
-        System.out.println("executionStatus = " + executionStatus);
         return executionStatus;
     }
 
