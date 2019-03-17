@@ -1,9 +1,18 @@
-import PropTypes from 'prop-types';
+// @flow
 import React from 'react';
 import { Grid, TextField } from '@material-ui/core';
 import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import './styles';
+
+type Props = {
+  classes: { textField: {}, itemGrid: {} },
+  dataSourcesUris: any,
+  discoveryIsLoading: boolean,
+  handleSelectedFile: any => void,
+  handleValidateField: () => void,
+  textFieldValue: string
+};
 
 // Register the plugins
 registerPlugin(FilePondPluginFileValidateType);
@@ -15,7 +24,7 @@ const DiscoverSimpleSelectorComponent = ({
   textFieldValue,
   handleSelectedFile,
   handleValidateField
-}) => (
+}: Props) => (
   <Grid container spacing={16}>
     <Grid item xs={12} sm={12}>
       <TextField
@@ -24,11 +33,7 @@ const DiscoverSimpleSelectorComponent = ({
         disabled={discoveryIsLoading}
         className={classes.textField}
         multiline
-        value={
-          !dataSourcesUris
-            ? textFieldValue
-            : dataSourcesUris
-        }
+        value={!dataSourcesUris ? textFieldValue : dataSourcesUris}
         onChange={handleValidateField}
         placeholder="Input your sources..."
         fullWidth
@@ -60,14 +65,5 @@ const DiscoverSimpleSelectorComponent = ({
     </Grid>
   </Grid>
 );
-
-DiscoverSimpleSelectorComponent.propTypes = {
-  classes: PropTypes.any,
-  dataSourcesUris: PropTypes.any,
-  discoveryIsLoading: PropTypes.any,
-  handleSelectedFile: PropTypes.any,
-  handleValidateField: PropTypes.any,
-  textFieldValue: PropTypes.any
-};
 
 export default DiscoverSimpleSelectorComponent;
