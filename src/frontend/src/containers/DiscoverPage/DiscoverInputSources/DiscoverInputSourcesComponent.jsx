@@ -1,9 +1,15 @@
+// @flow
 import React from 'react';
 import DiscoverExamplesContainer from './DiscoverExamplesContainer';
 import DiscoverSelectorContainer from './DiscoverSelectorContainer';
-import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core';
+
+type Props = {
+  classes: { root: { width: string } },
+  onInputExampleClicked: any => void,
+  onNextClicked: () => void
+};
 
 const styles = () => ({
   root: {
@@ -15,7 +21,7 @@ const DiscoverInputSourcesComponent = ({
   classes,
   onInputExampleClicked,
   onNextClicked
-}) => (
+}: Props) => (
   <div className={classes.root}>
     <Grid container spacing={24}>
       <Grid item xs={8} sm={8}>
@@ -33,10 +39,6 @@ const DiscoverInputSourcesComponent = ({
   </div>
 );
 
-DiscoverInputSourcesComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onInputExampleClicked: PropTypes.any,
-  onNextClicked: PropTypes.any
-};
+DiscoverInputSourcesComponent.propTypes = {};
 
 export default withStyles(styles)(DiscoverInputSourcesComponent);
