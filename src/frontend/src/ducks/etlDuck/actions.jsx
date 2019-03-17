@@ -27,9 +27,23 @@ const removeSingleExport = ({ id } = {}) => ({
   id
 });
 
+const addSelectedResultGraphIriAction = ({ data } = {}) => ({
+  type: types.SET_SELECTED_RESULT_GRAPH_IRI,
+  selectedResultGraphIri: data
+});
+
+const setPipelineIdAction = ({ id } = {}) => ({
+  type: types.SET_PIPELINE_ID,
+  pipeline: {
+    id
+  }
+});
+
 export default {
   addSingleExecution,
   removeSingleExecution,
   addSingleExport,
-  removeSingleExport
+  removeSingleExport,
+  addSelectedResultGraphIriAction,
+  setPipelineIdAction
 };

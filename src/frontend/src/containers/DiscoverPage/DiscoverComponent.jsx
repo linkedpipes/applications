@@ -1,14 +1,11 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Emoji from 'react-emoji-render';
 import { Link } from 'react-router-dom';
 import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
@@ -61,15 +58,19 @@ const steps = [
   'Preview & create app'
 ];
 
-// 'Pick a source for execution',
-// 'Preview & create app'
+type Props = {
+  activeStep: number,
+  classes: any,
+  etlExecutionStatus: any,
+  onBackClicked: Function
+};
 
 const DiscoverComponent = ({
   classes,
   activeStep,
   onBackClicked,
   etlExecutionStatus
-}) => (
+}: Props) => (
   <div className={classes.root}>
     <Stepper
       activeStep={activeStep}
@@ -119,13 +120,5 @@ const DiscoverComponent = ({
     </Stepper>
   </div>
 );
-
-DiscoverComponent.propTypes = {
-  activeStep: PropTypes.number,
-  classes: PropTypes.object.isRequired,
-  etlExecutionStatus: PropTypes.any,
-  onBackClicked: PropTypes.func,
-  onResetClicked: PropTypes.func
-};
 
 export default withStyles(styles)(DiscoverComponent);
