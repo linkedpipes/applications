@@ -65,7 +65,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       pipelineId
     })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(json => {
         const response = json;
@@ -95,7 +95,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       selectedVisualiser: visualizerCode
     })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(json => {
         const executionIri = json.iri;
