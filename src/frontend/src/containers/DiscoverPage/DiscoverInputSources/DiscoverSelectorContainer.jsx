@@ -121,6 +121,7 @@ class DiscoverSelectorContainer extends PureComponent {
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
       socket.emit('leave', discoveryId);
+      socket.off('discoveryStatus')
 
       if (data === undefined) {
         self.setState({
