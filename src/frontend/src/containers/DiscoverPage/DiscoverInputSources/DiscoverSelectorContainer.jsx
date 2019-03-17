@@ -5,9 +5,7 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
-import { discoverySelectors } from '@ducks/discoveryDuck';
-import { visualizersActions } from '@ducks/visualizersDuck';
-import { globalActions } from '@ducks/globalDuck';
+import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
@@ -33,7 +31,7 @@ class DiscoverSelectorContainer extends PureComponent {
       ttlFile: self.state.ttlFile,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -52,7 +50,7 @@ class DiscoverSelectorContainer extends PureComponent {
       datasourceUris: datasourcesForTTL,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -63,7 +61,7 @@ class DiscoverSelectorContainer extends PureComponent {
       namedGraph: this.props.namedGraph,
       webId: this.props.webId
     }).then(response => {
-      return response.json();
+      return response.data;
     });
   };
 
@@ -116,12 +114,14 @@ class DiscoverSelectorContainer extends PureComponent {
       });
   };
 
-  startSocketListener = () => {
-    const { socket, discoveryId, onNextClicked } = this.props;
+  startSocketListener = discoveryId => {
+    const { socket, onNextClicked } = this.props;
     const self = this;
 
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
+      socket.emit('leave', discoveryId);
+
       if (data === undefined) {
         self.setState({
           discoveryIsLoading: false
@@ -145,7 +145,6 @@ class DiscoverSelectorContainer extends PureComponent {
           });
         }
       }
-      socket.emit('leave', discoveryId);
     });
   };
 
@@ -154,14 +153,14 @@ class DiscoverSelectorContainer extends PureComponent {
       discoveryLoadingLabel: 'Extracting the magical pipelines 🧙‍...'
     });
 
-    const { handleAddVisualizer } = this.props;
+    const { handleSetPipelineGroups } = this.props;
 
     return DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(jsonResponse => {
-        handleAddVisualizer(jsonResponse.pipelineGroups);
+        handleSetPipelineGroups(jsonResponse.pipelineGroups);
         return jsonResponse;
       });
   };
@@ -274,8 +273,8 @@ DiscoverSelectorContainer.propTypes = {
   dataSampleIri: PropTypes.string,
   dataSourcesUris: PropTypes.string,
   discoveryId: PropTypes.any,
-  handleAddVisualizer: PropTypes.any,
   handleSetDiscoveryId: PropTypes.any,
+  handleSetPipelineGroups: PropTypes.any,
   namedGraph: PropTypes.string,
   onNextClicked: PropTypes.any,
   socket: PropTypes.any,
@@ -292,8 +291,10 @@ const DiscoverSelectorContainerWithSocket = props => (
 
 const mapStateToProps = state => {
   return {
-    datasources: discoverySelectors.getDatasourcesArray(state.datasources),
-    discoveryId: state.globals.discoveryId,
+    datasources: discoverySelectors.getDatasourcesArray(
+      state.discovery.datasources
+    ),
+    discoveryId: state.discovery.discoveryId,
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
@@ -306,22 +307,18 @@ const mapDispatchToProps = dispatch => {
   const changeTab = index => dispatch(discoverActions.changeTabAction(index));
   const handleSetDiscoveryId = discoveryId =>
     dispatch(
-      globalActions.addDiscoveryIdAction({
+      discoveryActions.addDiscoveryIdAction({
         id: discoveryId
       })
     );
 
-  const handleAddVisualizer = pipelineGroups =>
-    dispatch(
-      visualizersActions.addVisualizer({
-        visualizersArray: pipelineGroups
-      })
-    );
+  const handleSetPipelineGroups = pipelineGroups =>
+    dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
 
   return {
     changeTab,
     handleSetDiscoveryId,
-    handleAddVisualizer
+    handleSetPipelineGroups
   };
 };
 

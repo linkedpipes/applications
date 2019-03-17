@@ -21,8 +21,10 @@ const jsx = (
   </Provider>
 );
 
-render(jsx, document.querySelector('#app'));
-
 Sentry.init({
-  dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419'
+  dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419',
+  environment: process.env.NODE_ENV,
+  debug: process.env.NODE_ENV !== 'production'
 });
+
+render(jsx, document.querySelector('#app'));
