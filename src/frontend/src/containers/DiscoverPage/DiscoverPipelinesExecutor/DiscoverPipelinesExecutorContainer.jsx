@@ -152,6 +152,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         ) {
           onSetEtlExecutionStatus(status);
           socket.emit('leave', executionIri);
+          socket.off('executionStatus');
         }
       }
     });
