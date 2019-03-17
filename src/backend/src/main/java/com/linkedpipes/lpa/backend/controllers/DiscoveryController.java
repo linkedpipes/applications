@@ -84,11 +84,7 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
-                                                                @Nullable @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
-        if (discoveryConfigIri == null || discoveryConfigIri.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Input IRI not provided");
-        }
-
+                                                                @NotNull @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
         try {
             userService.addUserIfNotPresent(webId);
             Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
@@ -135,7 +131,7 @@ public class DiscoveryController {
     }
 
     @GetMapping("/api/discovery/{id}/pipelineGroups")
-    public ResponseEntity<PipelineGroups> getPipelineGroups(@PathVariable("id") String discoveryId) throws LpAppsException {
+    public ResponseEntity<PipelineGroups> getPipelineGroups(@NotNull @PathVariable("id") String discoveryId) throws LpAppsException {
         PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);
 
         return ResponseEntity.ok(pipelineGroups);
