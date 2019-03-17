@@ -93,20 +93,25 @@ public class ExecutorServiceComponent implements ExecutorService {
                     executionRepository.save(e);
                 }
 
-                EtlStatusReport report = new EtlStatusReport();
-                report.executionIri = executionIri;
-                report.status = executionStatus;
-                report.error = false;
-
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
-                    .sendEvent("executionStatus",
-                               OBJECT_MAPPER.writeValueAsString(report));
                 if (!executionStatus.status.isPollable()) {
+                    EtlStatusReport report = new EtlStatusReport();
+                    report.status = executionStatus;
+                    report.error = false;
+                    report.timeout = false;
+
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
+                        .sendEvent("executionStatus",
+                                   OBJECT_MAPPER.writeValueAsString(report));
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
                 logger.error("Got exception when polling for ETL status.", e);
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Crashed");
+                EtlStatusReport report = new EtlStatusReport();
+                report.status = null;
+                report.error = true;
+                report.timeout = false;
+
+                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
@@ -118,7 +123,11 @@ public class ExecutorServiceComponent implements ExecutorService {
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                 if (e.getStatus() != EtlStatus.FINISHED) {
                     logger.info("Cancelling execution");
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
+                    EtlStatusReport report = new EtlStatusReport();
+                    report.status = null;
+                    report.error = true;
+                    report.timeout = true;
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                     try {
                         etlService.cancelExecution(executionIri);
                         e.setStatus(EtlStatus.CANCELLED);
@@ -132,8 +141,8 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " seconds.");
-        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, SECONDS);
+        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
+        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {

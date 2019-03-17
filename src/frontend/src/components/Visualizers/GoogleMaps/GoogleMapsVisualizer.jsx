@@ -36,7 +36,7 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
     const response = await VisualizersService.getMarkers({
       resultGraphIri: this.props.selectedResultGraphIri
     });
-    const jsonData = await response.json();
+    const jsonData = await response.data;
     this.setState({
       markers: jsonData,
       zoomToMarkers: map => {

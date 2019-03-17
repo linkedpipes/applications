@@ -42,7 +42,7 @@ const componentDidMount = props => {
       Log.info(res, 'AuthenticationService');
       Log.info(res.data, 'AuthenticationService');
 
-      return res.json();
+      return res.data;
     })
     .then(jsonResponse => {
       handleSetUserProfile(jsonResponse);

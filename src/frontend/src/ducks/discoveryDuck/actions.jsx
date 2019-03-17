@@ -1,25 +1,28 @@
 import types from './types';
 
-const addSingleSource = ({ name, url } = {}) => ({
-  type: types.ADD_SOURCE,
-  source: {
-    name,
-    url
+const addDiscoveryIdAction = ({ id } = {}) => ({
+  type: types.SET_DISCOVERY_ID,
+  discovery: {
+    id
   }
 });
 
-const addMultipleSources = ({ sourcesList } = {}) => ({
-  type: types.ADD_MULTIPLE_SOURCES,
-  source: sourcesList
-});
+const setPipelineGroupsAction = pipelineGroups => {
+  return {
+    type: types.SET_PIPELINE_GROUPS,
+    pipelineGroups
+  };
+};
 
-const removeSingleSource = ({ url } = {}) => ({
-  type: types.REMOVE_SOURCE,
-  url
-});
+const setSelectedPipelineGroupAction = ({ selectedPipelineGroup } = {}) => {
+  return {
+    type: types.SET_SELECTED_PIPELINE_GROUP,
+    selectedPipelineGroup
+  };
+};
 
 export default {
-  addSingleSource,
-  addMultipleSources,
-  removeSingleSource
+  addDiscoveryIdAction,
+  setPipelineGroupsAction,
+  setSelectedPipelineGroupAction
 };
