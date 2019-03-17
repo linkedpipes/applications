@@ -121,7 +121,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     socket.on('executionStatus', data => {
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
       const executionCrashed = data === 'Crashed';
-      if (!data || executionCrashed) {
+      const executionTimeout = data === 'Polling terminated';
+      if (!data || executionCrashed || executionTimeout) {
         self.setState({
           loaderLabelText:
             'There was an error during the pipeline execution. Please, try different sources.'
