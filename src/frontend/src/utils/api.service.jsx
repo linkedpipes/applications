@@ -4,6 +4,20 @@ import * as Sentry from '@sentry/browser';
 
 axios.defaults.baseURL = process.env.BASE_BACKEND_URL || '/api';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.interceptors.request.use(
+  config => {
+    // Do something before request is sent
+
+    Log.info(config, 'api.service');
+    return config;
+  },
+  error => {
+    // Do something with request error
+    Log.info(error, 'api.service');
+    return Promise.reject(error);
+  }
+);
+
 axios.interceptors.response.use(
   response => {
     Log.info(response, 'api.service');
