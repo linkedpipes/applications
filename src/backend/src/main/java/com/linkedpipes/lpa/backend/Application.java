@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend;
 
 import com.corundumstudio.socketio.*;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.typesafe.config.Config;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -10,9 +11,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,9 +48,29 @@ public class Application {
         return new io.sentry.spring.SentryServletContextInitializer();
     }
 
-    @Bean
+    /*@Bean
     public HandlerExceptionResolver sentryExceptionResolver() {
         return new io.sentry.spring.SentryExceptionResolver();
+    }*/
+
+    @Bean
+    public HandlerExceptionResolver sentryExceptionResolver() {
+        return new io.sentry.spring.SentryExceptionResolver() {
+            @Override
+            public ModelAndView resolveException(HttpServletRequest request,
+                                                 HttpServletResponse response,
+                                                 Object handler,
+                                                 Exception ex) {
+
+                    if (ex instanceof LpAppsException && ((LpAppsException) ex).getErrorStatus().is4xxClientError())
+                        return null;
+
+                    super.resolveException(request, response, handler, ex);
+
+                return null;
+            }
+
+        };
     }
 
     @NotNull
