@@ -6,7 +6,7 @@ stages:
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: deploy
-    if: branch = master OR commit_message =~ /(\[Travis-Deploy\])/
+    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
 
 jobs:
   include:
