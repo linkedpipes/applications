@@ -33,7 +33,7 @@ public class VisualizationServiceComponent implements VisualizationService {
     public List<HierarchyNode> getSkosSchemeSubtree(@Nullable String graphIri, @NotNull String schemeUri, @Nullable String conceptUri) {
         if(conceptUri == null || conceptUri.isEmpty()) {
             ConstructSparqlQueryProvider provider = new HighLevelSchemeQueryProvider(schemeUri);
-            return new HighLevelSchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService("https://linked.opendata.cz/sparql", provider.get(graphIri)));
+            return new HighLevelSchemeExtractor(schemeUri).extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
         }
 
         ConstructSparqlQueryProvider provider = new SchemeSubtreeQueryProvider(schemeUri, conceptUri);
