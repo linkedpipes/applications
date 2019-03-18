@@ -22,32 +22,18 @@ public class GeoService {
 
     private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
 
-    public static List<Marker> getMarkers(Map<String, List<ValueFilter>> filters) {
+    public static List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) {
         if (filters == null) {
             filters = Collections.emptyMap();
         }
 
         SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
-        return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+        return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public static List<Marker> getMarkersFromNamed(String graphIri, Map<String, List<ValueFilter>> filters) {
-        if (filters == null) {
-            filters = Collections.emptyMap();
-        }
-
-        SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
-        return MarkerExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
-    }
-
-    public static List<Property> getProperties() {
+    public static List<Property> getProperties(String graphIri) {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
-        return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
-    }
-
-    public static List<Property> getPropertiesFromNamed(String graphIri) {
-        SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
-        return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.getForNamed(graphIri)));
+        return new GeoPropertiesExtractor().extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
     public List<Polygon> getPolygons(){
