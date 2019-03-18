@@ -41,7 +41,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
         try {
             addPrefixes(builder);
             addVars(builder);
-            builder.fromNamed(name);
+            builder.from(name);
             addWheres(builder);
             addOptionals(builder);
             addFilters(builder);

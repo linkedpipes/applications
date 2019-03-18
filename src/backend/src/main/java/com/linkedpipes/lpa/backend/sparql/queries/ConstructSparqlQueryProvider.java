@@ -41,7 +41,7 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
         try{
             addPrefixes(builder);
             addConstructs(builder);
-            builder.fromNamed(name);
+            builder.from(name);
             addWheres(builder);
             addOptionals(builder);
             addAdditional(builder);
