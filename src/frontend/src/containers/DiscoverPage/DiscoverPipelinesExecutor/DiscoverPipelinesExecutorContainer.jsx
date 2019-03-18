@@ -56,6 +56,11 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       });
   };
 
+  componentWillUnmount = () => {
+    const { socket } = this.props;
+    socket.off('executionStatus');
+  };
+
   exportPipeline = (discoveryId, pipelineId) => {
     const { onAddSelectedResultGraphIriAction, onAddSingleExport } = this.props;
     const self = this;
@@ -165,6 +170,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       <DiscoverPipelinesExecutorComponent
         etlExecutionIsFinished={etlExecutionStatus}
         loaderLabelText={loaderLabelText}
+        ls
       />
     );
   }
