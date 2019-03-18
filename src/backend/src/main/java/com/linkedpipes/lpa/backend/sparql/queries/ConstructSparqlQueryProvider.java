@@ -42,9 +42,8 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
             addPrefixes(builder);
             addConstructs(builder);
             builder.fromNamed(name);
-
-            builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
-
+            addWheres(builder);
+            addOptionals(builder);
             addAdditional(builder);
         } catch (ParseException e) {
             throw new RuntimeException(e);
