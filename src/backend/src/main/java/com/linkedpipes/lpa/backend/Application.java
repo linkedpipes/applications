@@ -48,11 +48,6 @@ public class Application {
         return new io.sentry.spring.SentryServletContextInitializer();
     }
 
-    /*@Bean
-    public HandlerExceptionResolver sentryExceptionResolver() {
-        return new io.sentry.spring.SentryExceptionResolver();
-    }*/
-
     @Bean
     public HandlerExceptionResolver sentryExceptionResolver() {
         return new io.sentry.spring.SentryExceptionResolver() {
