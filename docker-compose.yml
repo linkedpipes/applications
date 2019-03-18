@@ -16,7 +16,7 @@ services:
     image: linkedpipes/applications:backend
     container_name: lpa-backend
     environment:
-        SENTRY_ENVIRONMENT: "development"
+      SENTRY_ENVIRONMENT: "development"
     build:
       context: src/backend/
     ports:
