@@ -39,12 +39,16 @@ services:
       - backend
 
   db:
-    image: tenforce/virtuoso:1.3.2-virtuoso7.2.2
+    image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
     container_name: lpa-virtuoso
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
       VIRT_SPARQL_ResultSetMaxRows: 1000000
+      VIRT_Parameters_NumberOfBuffers: 170000
+      VIRT_Parameters_MaxDirtyBuffers: 130000
+      VIRT_Parameters_ThreadCleanupInterval: 1
+      VIRT_Parameters_ResourcesCleanupInterval: 1
     ports:
       - "8890:8890"
     restart: on-failure

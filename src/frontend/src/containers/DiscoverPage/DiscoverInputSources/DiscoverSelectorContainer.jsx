@@ -52,54 +52,71 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
     namedTextFieldValue: ''
   };
 
-  postStartFromFile = async () => {
-    const self = this;
+  componentWillUnmount = () => {
+    const { socket } = this.props;
+    socket.off('discoveryStatus');
+  };
+
+  postStartFromFile = async instance => {
     return DiscoveryService.postDiscoverFromTtl({
-      ttlFile: self.state.ttlFile,
-      webId: this.props.webId
+      ttlFile: instance.state.ttlFile,
+      webId: instance.props.webId
     }).then(response => {
-      return response.data;
+      return response;
     });
   };
 
   // TODO: refactor later, move to separate class responsible for _services calls
-  postStartFromInputLinks = async () => {
-    const textContent = !this.props.dataSourcesUris
-      ? this.props.dataSourcesUris
-      : this.state.textFieldValue;
-
-    const splitFieldValue = textContent.split(',\n');
+  postStartFromInputLinks = async instance => {
+    let { dataSourcesUris } = instance.props;
+    const { textFieldIsValid } = instance.state;
+    if (!dataSourcesUris && !textFieldIsValid) {
+      toast.error(
+        'There was an error during the discovery. Please, try different sources.',
+        {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 2000
+        }
+      );
+      return undefined;
+    }
+    if (!dataSourcesUris && textFieldIsValid) {
+      dataSourcesUris = instance.props.textFieldValue;
+    }
+    const splitFieldValue = dataSourcesUris.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
       return { uri: source };
     });
 
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL,
-      webId: this.props.webId
+      webId: instance.props.webId
     }).then(response => {
-      return response.data;
+      return response;
     });
   };
 
-  postStartFromSparqlEndpoint = async () => {
+  postStartFromSparqlEndpoint = async instance => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.props.sparqlEndpointIri,
-      dataSampleIri: this.props.dataSampleIri,
-      namedGraph: this.props.namedGraph,
-      webId: this.props.webId
+      sparqlEndpointIri: instance.props.sparqlEndpointIri,
+      dataSampleIri: instance.props.dataSampleIri,
+      namedGraph: instance.props.namedGraph,
+      webId: instance.props.webId
     }).then(response => {
-      return response.data;
+      return response;
     });
   };
 
   handleDiscoveryInputCase = () => {
+    // eslint-disable-next-line consistent-this
+    const instance = this;
     if (this.props.tabValue === 1) {
-      return this.postStartFromSparqlEndpoint();
+      return this.postStartFromSparqlEndpoint(instance);
     }
     if (this.state.ttlFile) {
-      return this.postStartFromFile();
+      return this.postStartFromFile(instance);
     }
-    return this.postStartFromInputLinks();
+    return this.postStartFromInputLinks(instance);
   };
 
   handleProcessStartDiscovery = () => {
@@ -114,8 +131,9 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
 
     self
       .handleDiscoveryInputCase()
-      .then(discoveryResponse => {
-        if (discoveryResponse !== undefined) {
+      .then(response => {
+        if (response !== undefined) {
+          const discoveryResponse = response.data;
           const discoveryId = discoveryResponse.id;
           handleSetDiscoveryId(discoveryId);
           self.setState({ discoveryStatusPollingFinished: false });
@@ -148,7 +166,7 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
       socket.emit('leave', discoveryId);
-      socket.off('discoveryStatus')
+      socket.off('discoveryStatus');
 
       if (data === undefined) {
         self.setState({
