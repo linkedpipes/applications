@@ -1,6 +1,5 @@
-/* eslint-disable react/no-unused-state */
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import React from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,7 +9,35 @@ import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
 
-class DiscoverSelectorContainer extends PureComponent {
+type Props = {
+  changeTab: number => void,
+  dataSampleIri: string,
+  dataSourcesUris: string,
+  handleSetDiscoveryId: any,
+  handleSetPipelineGroups: any,
+  namedGraph: string,
+  onNextClicked: any,
+  socket: any,
+  sparqlEndpointIri: string,
+  tabValue: number,
+  webId: string
+};
+
+type State = {
+  ttlFile: any,
+  discoveryIsLoading: boolean,
+  textFieldValue: string,
+  textFieldIsValid: boolean,
+  discoveryStatusPolling: any,
+  discoveryStatusPollingFinished: boolean,
+  discoveryStatusPollingInterval: number,
+  discoveryLoadingLabel: string,
+  sparqlTextFieldValue: string,
+  dataSampleTextFieldValue: string,
+  namedTextFieldValue: string
+};
+
+class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
@@ -39,7 +66,7 @@ class DiscoverSelectorContainer extends PureComponent {
   postStartFromInputLinks = async () => {
     const textContent = !this.props.dataSourcesUris
       ? this.props.dataSourcesUris
-      : this.state.textFieldIsValid;
+      : this.state.textFieldValue;
 
     const splitFieldValue = textContent.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
@@ -121,6 +148,7 @@ class DiscoverSelectorContainer extends PureComponent {
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
       socket.emit('leave', discoveryId);
+      socket.off('discoveryStatus')
 
       if (data === undefined) {
         self.setState({
@@ -176,7 +204,6 @@ class DiscoverSelectorContainer extends PureComponent {
   handleValidation = rawText => {
     const matches = extractUrlGroups(rawText);
     let valid = false;
-
     if (matches instanceof Array) {
       rawText = matches.join(',\n');
       valid = true;
@@ -199,6 +226,8 @@ class DiscoverSelectorContainer extends PureComponent {
     this.handleValidation(rawText);
   };
 
+  // Handle when the text in the SPARQL
+  // endpoint textfields changes
   handleSetSparqlIri = e => {
     const rawText = e.target.value;
     this.setState({
@@ -267,21 +296,6 @@ class DiscoverSelectorContainer extends PureComponent {
     );
   }
 }
-
-DiscoverSelectorContainer.propTypes = {
-  changeTab: PropTypes.func,
-  dataSampleIri: PropTypes.string,
-  dataSourcesUris: PropTypes.string,
-  discoveryId: PropTypes.any,
-  handleSetDiscoveryId: PropTypes.any,
-  handleSetPipelineGroups: PropTypes.any,
-  namedGraph: PropTypes.string,
-  onNextClicked: PropTypes.any,
-  socket: PropTypes.any,
-  sparqlEndpointIri: PropTypes.string,
-  tabValue: PropTypes.number,
-  webId: PropTypes.any
-};
 
 const DiscoverSelectorContainerWithSocket = props => (
   <SocketContext.Consumer>

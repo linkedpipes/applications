@@ -93,8 +93,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                     executionRepository.save(e);
                 }
 
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                 if (!executionStatus.status.isPollable()) {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
@@ -125,8 +125,8 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " seconds.");
-        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, SECONDS);
+        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
+        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {

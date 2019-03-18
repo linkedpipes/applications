@@ -53,7 +53,7 @@ CreateAppCard.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    resultGraphIri: state.globals.selectedResultGraphIri,
+    resultGraphIri: state.etl.selectedResultGraphIri,
     filters: state.filters
   };
 };
