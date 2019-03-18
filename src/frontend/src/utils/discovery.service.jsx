@@ -21,11 +21,9 @@ const DiscoveryService = {
 
   // WebId should be sent in body itself
   async postDiscoverFromUriList({ datasourceUris, webId }) {
-    return axios.post(
-      '/pipelines/discover/',
-      { datasourceUris },
-      { params: { webId } }
-    );
+    return axios.post('/pipelines/discover/', datasourceUris, {
+      params: { webId }
+    });
   },
 
   async getDiscoveryStatus({ discoveryId }) {
