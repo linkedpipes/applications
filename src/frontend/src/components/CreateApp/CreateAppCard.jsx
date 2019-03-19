@@ -1,19 +1,19 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import connect from "react-redux/lib/connect/connect";
-import MapIcon from "@material-ui/icons/Map";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import { GoogleMapsPopup } from "../Visualizers";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import connect from 'react-redux/lib/connect/connect';
+import MapIcon from '@material-ui/icons/Map';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import { GoogleMapsPopup } from '../Visualizers';
 
 const styles = theme => ({
   root: {
-    justifyContent: "center",
+    justifyContent: 'center',
     flex: 1
   },
   card: {},
@@ -26,9 +26,9 @@ class CreateAppCard extends React.Component {
 
     return (
       <Grid container justify="center">
-        <Card className={classes.card} style={{ textAlign: "center" }}>
+        <Card className={classes.card} style={{ textAlign: 'center' }}>
           <CardActionArea>
-            <MapIcon style={{ fontSize: "80px" }} />
+            <MapIcon style={{ fontSize: '80px' }} />
             <CardContent>
               <Typography variant="h5" gutterBottom>
                 Google Maps App
@@ -53,7 +53,7 @@ CreateAppCard.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    resultGraphIri: state.globals.selectedResultGraphIri,
+    resultGraphIri: state.etl.selectedResultGraphIri,
     filters: state.filters
   };
 };

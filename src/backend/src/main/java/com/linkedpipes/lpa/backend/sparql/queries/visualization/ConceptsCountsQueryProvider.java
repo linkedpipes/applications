@@ -1,10 +1,12 @@
 package com.linkedpipes.lpa.backend.sparql.queries.visualization;
 
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.SKOS;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -13,9 +15,6 @@ public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
 
     private final String propertyUri;
     private final String[] conceptUris;
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
 
     // VARIABLES
     public static final String VAR_CONCEPT = var("concept");
@@ -29,28 +28,32 @@ public class ConceptsCountsQueryProvider extends SelectSparqlQueryProvider {
                 .toArray(String[]::new);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addPrefixes(SelectBuilder builder) {
+    protected SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.uri);
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.uri);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addVars(SelectBuilder builder) throws ParseException {
+    protected SelectBuilder addVars(@NotNull SelectBuilder builder) throws ParseException {
         return builder
                 .addVar(VAR_CONCEPT_URI)
                 .addVar("count(" + VAR_CONCEPT + ")", VAR_COUNT);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addWheres(SelectBuilder builder) {
+    protected SelectBuilder addWheres(@NotNull SelectBuilder builder) {
         return builder
                 .addWhereValueVar(VAR_CONCEPT_URI, (Object[]) conceptUris)
                 .addWhere(VAR_CONCEPT, propertyUri, VAR_CONCEPT_URI);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addAdditional(SelectBuilder builder) {
+    protected SelectBuilder addAdditional(@NotNull SelectBuilder builder) {
         return builder
                 .addGroupBy(VAR_CONCEPT_URI);
     }

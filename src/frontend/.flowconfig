@@ -1,0 +1,17 @@
+[ignore]
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper='@components' ->'<PROJECT_ROOT>/src/components'
+module.name_mapper='@containers' ->'<PROJECT_ROOT>/src/containers'
+module.name_mapper='@ducks' ->'<PROJECT_ROOT>/src/ducks'
+module.name_mapper='@utils' ->'<PROJECT_ROOT>/src/utils'
+module.name_mapper='@constants' ->'<PROJECT_ROOT>/src/constants'
+module.name_mapper='@layouts' ->'<PROJECT_ROOT>/src/layouts'
+
+[strict]

@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.sparql.queries.geo;
 
-import com.linkedpipes.lpa.backend.rdf.vocabulary.SCHEMA;
+import com.linkedpipes.lpa.backend.rdf.Prefixes;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
@@ -10,6 +11,7 @@ import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -18,11 +20,6 @@ import java.util.Map;
 public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     private Map<String, List<ValueFilter>> filters;
-
-    // PREFIXES
-    private static final String SKOS_PREFIX = "skos";
-    private static final String SCHEMA_PREFIX = "s";
-    private static final String RDFS_PREFIX = "rdfs";
 
     // VARIABLES
     public static final String VAR_SUBJECT = var("subject");
@@ -41,16 +38,18 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
         this.filters = filters;
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addPrefixes(SelectBuilder builder) {
+    protected SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
-                .addPrefix(SKOS_PREFIX, SKOS.getURI())
-                .addPrefix(SCHEMA_PREFIX, SCHEMA.uri)
-                .addPrefix(RDFS_PREFIX, RDFS.getURI());
+                .addPrefix(Prefixes.SKOS_PREFIX, SKOS.getURI())
+                .addPrefix(Prefixes.SCHEMA_PREFIX, Schema.uri)
+                .addPrefix(Prefixes.RDFS_PREFIX, RDFS.getURI());
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addVars(SelectBuilder builder) {
+    protected SelectBuilder addVars(@NotNull SelectBuilder builder) {
         return builder
                 .addVar(VAR_SUBJECT)
                 .addVar(VAR_LATITUDE)
@@ -62,26 +61,29 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
                 .addVar(VAR_DESCRIPTION);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addWheres(SelectBuilder builder) {
+    protected SelectBuilder addWheres(@NotNull SelectBuilder builder) {
         return builder
-                .addWhere(VAR_SUBJECT, SCHEMA.geo, VAR_GEO)
-                .addWhere(VAR_GEO, SCHEMA.latitude, VAR_LATITUDE)
-                .addWhere(VAR_GEO, SCHEMA.longitude, VAR_LONGITUDE);
+                .addWhere(VAR_SUBJECT, Schema.geo, VAR_GEO)
+                .addWhere(VAR_GEO, Schema.latitude, VAR_LATITUDE)
+                .addWhere(VAR_GEO, Schema.longitude, VAR_LONGITUDE);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addOptionals(SelectBuilder builder) {
+    protected SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
         return builder
                 .addOptional(VAR_SUBJECT, SKOS.prefLabel, VAR_PREF_LABEL)
                 .addOptional(VAR_SUBJECT, RDFS.label, VAR_LABEL)
                 .addOptional(VAR_SUBJECT, SKOS.notation, VAR_NOTATION)
-                .addOptional(VAR_SUBJECT, SCHEMA.name, VAR_NAME)
-                .addOptional(VAR_SUBJECT, SCHEMA.description, VAR_DESCRIPTION);
+                .addOptional(VAR_SUBJECT, Schema.name, VAR_NAME)
+                .addOptional(VAR_SUBJECT, Schema.description, VAR_DESCRIPTION);
     }
 
+    @NotNull
     @Override
-    protected SelectBuilder addFilters(SelectBuilder builder) throws ParseException {
+    protected SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
         VariableGenerator varGen = new VariableGenerator();
         for (Map.Entry<String, List<ValueFilter>> pair : filters.entrySet()) {
             String v = varGen.getVariable();

@@ -18,15 +18,12 @@ public class MapVisualizerController {
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                    @RequestBody(required = false) Map<String, List<ValueFilter>> filters) {
-        return Optional.ofNullable(graphIri)
-                .map(iri -> GeoService.getMarkersFromNamed(iri, filters))
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.ok(GeoService.getMarkers(filters)));
+        return ResponseEntity.ok(GeoService.getMarkers(graphIri, filters));
     }
 
     @GetMapping("/api/map/properties")
-    public ResponseEntity<List<Property>> getProperties() {
-        return ResponseEntity.ok(GeoService.getProperties());
+    public ResponseEntity<List<Property>> getProperties(@RequestParam(value = "resultGraphIri", required = false) String graphIri) {
+        return ResponseEntity.ok(GeoService.getProperties(graphIri));
     }
 
 }

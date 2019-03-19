@@ -1,64 +1,47 @@
 package com.linkedpipes.lpa.backend.sparql.queries;
 
+import org.apache.jena.arq.querybuilder.AbstractQueryBuilder;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.query.Query;
+import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link #addWheres(ConstructBuilder)}.
- * Its non-mandatory hooks are {@link #addPrefixes(ConstructBuilder)} and {@link #addOptionals(ConstructBuilder)}.
+ * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link
+ * #addWheres(AbstractQueryBuilder)}. Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link
+ * #addOptionals(AbstractQueryBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
  */
-public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider {
+public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<ConstructBuilder> {
 
+    @NotNull
     @Override
-    public final Query get() {
+    public final Query get(@Nullable String graphName) {
         ConstructBuilder builder = new ConstructBuilder();
 
-        addPrefixes(builder);
-        addConstructs(builder);
-        addWheres(builder);
-        addOptionals(builder);
-        addGroupBy(builder);
-        addLimit(builder);
-        addOffset(builder);
+        try {
+            addPrefixes(builder);
+            addConstructs(builder);
+
+            if(graphName != null && !graphName.isEmpty())
+                builder.from(graphName);
+
+            addWheres(builder);
+            addOptionals(builder);
+            addGroupBy(builder);
+            addLimit(builder);
+            addOffset(builder);
+            addAdditional(builder);
+        } catch (
+        ParseException e) {
+            throw new RuntimeException(e);
+        }
 
         return builder.build();
     }
 
-    @Override
-    public final Query getForNamed(String name) {
-        ConstructBuilder builder = new ConstructBuilder();
-
-        addPrefixes(builder);
-        addConstructs(builder);
-        builder.fromNamed(name);
-        builder.addGraph(VAR_GRAPH, addOptionals(addWheres(new ConstructBuilder())));
-
-        return builder.build();
-    }
-
-    protected ConstructBuilder addPrefixes(ConstructBuilder builder) {
-        return builder;
-    }
-
-    protected abstract ConstructBuilder addConstructs(ConstructBuilder builder);
-
-    protected abstract ConstructBuilder addWheres(ConstructBuilder builder);
-
-    protected ConstructBuilder addOptionals(ConstructBuilder builder) {
-        return builder;
-    }
-
-    protected ConstructBuilder addGroupBy(ConstructBuilder builder) {
-        return builder;
-    }
-
-    protected ConstructBuilder addLimit(ConstructBuilder builder) {
-        return builder;
-    }
-
-    protected ConstructBuilder addOffset(ConstructBuilder builder) {
-        return builder;
-    }
+    @NotNull
+    protected abstract ConstructBuilder addConstructs(@NotNull ConstructBuilder builder);
 
 }

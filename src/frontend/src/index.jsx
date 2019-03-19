@@ -1,20 +1,19 @@
-import React from "react";
-import { render } from "react-dom";
-import { Provider } from "react-redux";
-import store from "./store";
-import * as Sentry from "@sentry/browser";
-
-import "normalize.css/normalize.css";
-import "./_styles/styles.scss";
-import AppRouter from "./AppRouter";
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import * as Sentry from '@sentry/browser';
+import store from './store';
+import 'normalize.css/normalize.css';
+import AppRouter from './AppRouter';
+// #if process.env.NODE_ENV !== 'production'
+import './ReactotronConfig';
+// #endif
 
 const myStore = store();
 
-const checkDebugMode = () => {
-  if (process.env.NODE_ENV === "production") {
-    console.log = function() {};
-  }
-};
+if (process.env.NODE_ENV !== 'production') {
+  localStorage.setItem('debug', 'lpapps:*');
+}
 
 const jsx = (
   <Provider store={myStore}>
@@ -22,8 +21,10 @@ const jsx = (
   </Provider>
 );
 
-render(jsx, document.querySelector("#app"));
-
 Sentry.init({
-  dsn: "https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419"
+  dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419',
+  environment: process.env.NODE_ENV,
+  debug: process.env.NODE_ENV !== 'production'
 });
+
+render(jsx, document.querySelector('#app'));

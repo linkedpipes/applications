@@ -11,6 +11,7 @@
       <https://discovery.linkedpipes.com/resource/application/map/template>,
       <https://discovery.linkedpipes.com/resource/application/map-labeled-points/template>,
       <https://discovery.linkedpipes.com/resource/application/dcterms/template>,
+      <https://gist.githubusercontent.com/Ponsietta/fc490bc45c3a285b5faaa9816114bfca/raw/276f3d19c14e201d90b7c5f38b1f10ccdfc66ff0/treemap_template.ttl>,
 
 	  # Geo
       <https://discovery.linkedpipes.com/resource/transformer/wikidata-coordinate-location-to-schema-geocoordinates/template>,
@@ -51,7 +52,7 @@
 	  <https://ldcp.opendata.cz/resource/schema/transformer/schema-workLocation-to-schema-labelled-geocoordinates/template> ,
 
       # Labels
-	  <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-title/template>,
+#	  <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-title/template>,
       <https://discovery.linkedpipes.com/resource/transformer/foaf-name-to-dcterms-title/template>,
       <https://discovery.linkedpipes.com/resource/transformer/skos-preflabel-to-dcterms-title/template>,
       <https://discovery.linkedpipes.com/resource/transformer/schema-name-to-dcterms-title/template>,
@@ -61,7 +62,7 @@
       <https://discovery.linkedpipes.com/resource/transformer/foaf-givenname-familyname-to-foaf-name/template>,
 
       # Date instants
-	  <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-date/template>,
+#	  <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-available-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-created-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-dateaccepted-to-dcterms-date/template>,
@@ -154,7 +155,7 @@
       <https://discovery.linkedpipes.com/resource/transformer/foaf-name-to-dcterms-title/template>,
       <https://discovery.linkedpipes.com/resource/transformer/schema-name-to-dcterms-title/template>,
 	  <https://discovery.linkedpipes.com/resource/transformer/gr-name-to-dcterms-title/template>,
-      <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-title/template>,
+#      <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-title/template>,
       <https://discovery.linkedpipes.com/resource/transformer/skos-preflabel-to-dcterms-title/template>
     .
 
@@ -173,7 +174,7 @@
 
 <https://discovery.linkedpipes.com/resource/transformer-group/all-and-generated/date-instant> a <https://discovery.linkedpipes.com/vocabulary/discovery/TransformerGroup> ;
     <https://discovery.linkedpipes.com/vocabulary/discovery/hasTransformer>
-      <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-date/template>,
+#      <https://discovery.linkedpipes.com/resource/transformer/dce-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-available-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-created-to-dcterms-date/template>,
       <https://discovery.linkedpipes.com/resource/transformer/dcterms-dateaccepted-to-dcterms-date/template>,

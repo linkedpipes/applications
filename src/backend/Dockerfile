@@ -1,20 +1,21 @@
-# Using OpenJDK 10
-FROM gradle:jdk10 as builder
+# Using OpenJDK 11
+FROM gradle:5.2.1-jdk11 as builder
 
 # Tomcat will eventually create directories here
 VOLUME /tmp
 
 # copy files
-ADD --chown=gradle . /app
+COPY --chown=gradle . /app
 WORKDIR /app
 
 # build the app
 RUN gradle unpack
 
-FROM openjdk:10-jre-slim
+FROM openjdk:11-jre-slim
 
 # Expose port 8080
-EXPOSE 8080
+EXPOSE 9005
+EXPOSE 9092
 
 COPY --from=builder /app/build/dependency/BOOT-INF/lib /app/lib
 COPY --from=builder /app/build/dependency/META-INF /app/META-INF
