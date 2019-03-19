@@ -30,8 +30,7 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
             addWheres(builder);
             addOptionals(builder);
             addAdditional(builder);
-        } catch (
-        ParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
