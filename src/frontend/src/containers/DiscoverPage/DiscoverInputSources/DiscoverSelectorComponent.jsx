@@ -1,18 +1,13 @@
 // @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import 'react-toastify/dist/ReactToastify.css';
 import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
-import SwipeableViews from 'react-swipeable-views';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import { withStyles } from '@material-ui/core';
-import { DiscoverSimpleSelector, DiscoverAdvancedSelector } from './children';
+import DiscoverSelectorFields from './children';
 
 type Props = {
   classes: {
@@ -44,19 +39,14 @@ type Props = {
   discoveryLoadingLabel: string,
   namedGraph: string,
   namedTextFieldValue: string,
-  onHandleChangeIndex: PropTypes.func,
   onHandleProcessStartDiscovery: () => void,
-  onHandleSelectedFile: () => void,
   onHandleSetDataSampleIri: () => void,
   onHandleSetNamedGraph: () => void,
   onHandleSetSparqlIri: () => void,
-  onHandleTabChange: () => void,
-  onValidateField: () => void,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
   tabValue: number,
   textFieldIsValid: boolean,
-  textFieldValue: string,
   ttlFile: any
 };
 
@@ -89,15 +79,10 @@ const DiscoverSelectorComponent = ({
   discoveryLoadingLabel,
   tabValue,
   dataSourcesUris,
-  textFieldValue,
   ttlFile,
   textFieldIsValid,
   sparqlEndpointIri,
   dataSampleIri,
-  onHandleTabChange,
-  onHandleChangeIndex,
-  onHandleSelectedFile,
-  onValidateField,
   onHandleProcessStartDiscovery,
   onHandleSetNamedGraph,
   onHandleSetDataSampleIri,
@@ -115,48 +100,19 @@ const DiscoverSelectorComponent = ({
         <div className={classes.gridRoot}>
           <Grid container spacing={24}>
             <Grid item xs={12} sm={12}>
-              <AppBar position="static" color="default">
-                <Tabs
-                  value={tabValue}
-                  onChange={onHandleTabChange}
-                  indicatorColor="primary"
-                  textColor="primary"
-                  variant="fullWidth"
-                >
-                  <Tab label="Simple" />
-                  <Tab label="Advanced" />
-                </Tabs>
-              </AppBar>
-            </Grid>
-
-            <Grid item xs={12} sm={12}>
-              <SwipeableViews
-                axis="x"
-                index={tabValue}
-                onChangeIndex={onHandleChangeIndex}
-              >
-                <DiscoverSimpleSelector
-                  classes={classes}
-                  dataSourcesUris={dataSourcesUris}
-                  discoveryIsLoading={discoveryIsLoading}
-                  textFieldValue={textFieldValue}
-                  handleValidateField={onValidateField}
-                  handleSelectedFile={onHandleSelectedFile}
-                />
-                <DiscoverAdvancedSelector
-                  classes={classes}
-                  discoveryIsLoading={discoveryIsLoading}
-                  handleSparqlTextFieldChange={onHandleSetSparqlIri}
-                  handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                  handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
-                  sparqlEndpointIri={sparqlEndpointIri}
-                  dataSampleIri={dataSampleIri}
-                  namedGraph={namedGraph}
-                  sparqlTextFieldValue={sparqlTextFieldValue}
-                  namedTextFieldValue={namedTextFieldValue}
-                  dataSampleTextFieldValue={dataSampleTextFieldValue}
-                />
-              </SwipeableViews>
+              <DiscoverSelectorFields
+                classes={classes}
+                discoveryIsLoading={discoveryIsLoading}
+                handleSparqlTextFieldChange={onHandleSetSparqlIri}
+                handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+                sparqlEndpointIri={sparqlEndpointIri}
+                dataSampleIri={dataSampleIri}
+                namedGraph={namedGraph}
+                sparqlTextFieldValue={sparqlTextFieldValue}
+                namedTextFieldValue={namedTextFieldValue}
+                dataSampleTextFieldValue={dataSampleTextFieldValue}
+              />
             </Grid>
 
             <Grid item xs={12} sm={12}>

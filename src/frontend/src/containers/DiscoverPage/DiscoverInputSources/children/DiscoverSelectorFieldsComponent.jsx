@@ -16,7 +16,7 @@ type Props = {
   sparqlTextFieldValue: string
 };
 
-const DiscoverAdvancedSelectorComponent = ({
+const DiscoverSelectorComponent = ({
   classes,
   discoveryIsLoading,
   handleNamedGraphTextFieldChange,
@@ -44,6 +44,9 @@ const DiscoverAdvancedSelectorComponent = ({
         variant="outlined"
         value={!sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri}
       />
+    </Grid>
+
+    <Grid item xs={12} sm={12}>
       <TextField
         id="outlined-textarea"
         label="Data sample IRI"
@@ -57,6 +60,9 @@ const DiscoverAdvancedSelectorComponent = ({
         variant="outlined"
         value={!dataSampleIri ? dataSampleTextFieldValue : dataSampleIri}
       />
+    </Grid>
+
+    <Grid item xs={12} sm={12}>
       <TextField
         id="outlined-textarea"
         label="Named Graph IRI"
@@ -74,4 +80,4 @@ const DiscoverAdvancedSelectorComponent = ({
   </Grid>
 );
 
-export default DiscoverAdvancedSelectorComponent;
+export default DiscoverSelectorComponent;

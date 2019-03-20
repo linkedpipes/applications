@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,24 +28,18 @@ type State = {
   discoveryIsLoading: boolean,
   textFieldValue: string,
   textFieldIsValid: boolean,
-  discoveryStatusPolling: any,
-  discoveryStatusPollingFinished: boolean,
-  discoveryStatusPollingInterval: number,
   discoveryLoadingLabel: string,
   sparqlTextFieldValue: string,
   dataSampleTextFieldValue: string,
   namedTextFieldValue: string
 };
 
-class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
+class DiscoverSelectorContainer extends PureComponent<Props, State> {
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
     textFieldValue: '',
     textFieldIsValid: false,
-    discoveryStatusPolling: undefined,
-    discoveryStatusPollingFinished: false,
-    discoveryStatusPollingInterval: 2000,
     discoveryLoadingLabel: '',
     sparqlTextFieldValue: '',
     dataSampleTextFieldValue: '',
@@ -68,7 +62,7 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
 
   // TODO: refactor later, move to separate class responsible for _services calls
   postStartFromInputLinks = async instance => {
-    let { dataSourcesUris } = instance.props;
+    const { dataSourcesUris } = instance.props;
     const { textFieldIsValid } = instance.state;
     if (!dataSourcesUris && !textFieldIsValid) {
       toast.error(
@@ -79,9 +73,6 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
         }
       );
       return undefined;
-    }
-    if (!dataSourcesUris && textFieldIsValid) {
-      dataSourcesUris = instance.props.textFieldValue;
     }
     const splitFieldValue = dataSourcesUris.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
@@ -136,7 +127,6 @@ class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
           const discoveryResponse = response.data;
           const discoveryId = discoveryResponse.id;
           handleSetDiscoveryId(discoveryId);
-          self.setState({ discoveryStatusPollingFinished: false });
           self.startSocketListener(discoveryId);
         }
       })
