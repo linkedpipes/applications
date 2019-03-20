@@ -1770,7 +1770,7 @@
     "@sentry/types" "4.5.3"
     tslib "^1.9.3"
 
-"@sentry/webpack-plugin@^1.6.2":
+"@sentry/webpack-plugin@1.6.2":
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/@sentry/webpack-plugin/-/webpack-plugin-1.6.2.tgz#47b1a43f7e691c1c8dc45677f7380c5e1aa6596d"
   integrity sha512-OZ4ISH0xAP6dTHpQ3xFnIa35o+rVKZxcoCn0a41rfgM+XFdXMtw3yc+nsRHkuRpbzWzXUIisBqbBm5KcEark4A==
