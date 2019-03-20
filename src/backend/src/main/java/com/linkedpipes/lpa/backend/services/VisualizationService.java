@@ -5,23 +5,13 @@ import com.linkedpipes.lpa.backend.entities.visualization.*;
 import java.util.List;
 
 public interface VisualizationService {
-    List<Scheme> getSkosSchemes();
+    List<Scheme> getSkosSchemes(String graphIri);
 
-    List<Scheme> getSkosSchemesFromNamed(String graphIri);
+    List<HierarchyNode> getSkosScheme(String graphIri, String schemeUri);
 
-    List<HierarchyNode> getSkosScheme(String schemeUri);
+    List<HierarchyNode> getSkosSchemeSubtree(String graphIri, String schemeUri, String conceptUri);
 
-    List<HierarchyNode> getSkosSchemeFromNamed(String graphIri, String schemeUri);
+    List<Concept> getSkosConcepts(String graphIri);
 
-    List<HierarchyNode> getSkosSchemeSubtree(String schemeUri, String conceptUri);
-
-    List<HierarchyNode> getSkosSchemeSubtreeFromNamed(String graphIri, String schemeUri, String conceptUri);
-
-    List<Concept> getSkosConcepts();
-
-    List<Concept> getSkosConceptsFromNamed(String graphIri);
-
-    List<ConceptCount> getSkosConceptsCounts(ConceptCountRequest request);
-
-    List<ConceptCount> getSkosConceptsCountsFromNamed(String graphIri, ConceptCountRequest request);
+    List<ConceptCount> getSkosConceptsCounts(String graphIri, ConceptCountRequest request);
 }
