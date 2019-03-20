@@ -94,28 +94,28 @@ const DiscoverSelectorComponent = ({
 }: Props) => (
   <Card className={classes.card}>
     <CardContent>
-      {discoveryIsLoading ? (
-        <LinearLoader labelText={discoveryLoadingLabel} />
-      ) : (
-        <div className={classes.gridRoot}>
-          <Grid container spacing={24}>
-            <Grid item xs={12} sm={12}>
-              <DiscoverSelectorFields
-                classes={classes}
-                discoveryIsLoading={discoveryIsLoading}
-                handleSparqlTextFieldChange={onHandleSetSparqlIri}
-                handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
-                sparqlEndpointIri={sparqlEndpointIri}
-                dataSampleIri={dataSampleIri}
-                namedGraph={namedGraph}
-                sparqlTextFieldValue={sparqlTextFieldValue}
-                namedTextFieldValue={namedTextFieldValue}
-                dataSampleTextFieldValue={dataSampleTextFieldValue}
-              />
-            </Grid>
+      <div className={classes.gridRoot}>
+        <Grid container spacing={24}>
+          <Grid item xs={12} sm={12}>
+            <DiscoverSelectorFields
+              classes={classes}
+              discoveryIsLoading={discoveryIsLoading}
+              handleSparqlTextFieldChange={onHandleSetSparqlIri}
+              handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+              handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+              sparqlEndpointIri={sparqlEndpointIri}
+              dataSampleIri={dataSampleIri}
+              namedGraph={namedGraph}
+              sparqlTextFieldValue={sparqlTextFieldValue}
+              namedTextFieldValue={namedTextFieldValue}
+              dataSampleTextFieldValue={dataSampleTextFieldValue}
+            />
+          </Grid>
 
-            <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={12}>
+            {discoveryIsLoading ? (
+              <LinearLoader labelText={discoveryLoadingLabel} />
+            ) : (
               <Button
                 className={classes.itemGrid}
                 variant="contained"
@@ -131,10 +131,10 @@ const DiscoverSelectorComponent = ({
               >
                 Start Discovery
               </Button>
-            </Grid>
+            )}
           </Grid>
-        </div>
-      )}
+        </Grid>
+      </div>
     </CardContent>
   </Card>
 );

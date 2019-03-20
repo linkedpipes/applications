@@ -116,8 +116,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
     self.setState({
       discoveryIsLoading: true,
-      discoveryLoadingLabel:
-        'Please, hold on Discovery is casting spells 🧙‍...'
+      discoveryLoadingLabel: 'Please, hold on processing the request...'
     });
 
     self

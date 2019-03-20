@@ -108,8 +108,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         onAddSingleExecution(pipelineId, executionIri);
 
         self.setState({
-          loaderLabelText:
-            'Please, hold on ETL is chatting with Tim Berners-Lee 🕴...'
+          loaderLabelText: 'Please, hold on processing the pipeline...'
         });
 
         self.startSocketListener(executionIri);
