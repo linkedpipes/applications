@@ -25,8 +25,17 @@ const etlReducer = (state = INITIAL_STATE, action) => {
         }
       };
 
+    case types.SET_SELECTED_RESULT_GRAPH_IRI:
+      return {
+        ...state,
+        selectedResultGraphIri: action.selectedResultGraphIri
+      };
+
     case types.REMOVE_EXPORT:
       return state.filter(({ id }) => id !== action.id);
+
+    case types.SET_PIPELINE_ID:
+      return { ...state, pipelineId: action.pipeline.id };
 
     default:
       return state;

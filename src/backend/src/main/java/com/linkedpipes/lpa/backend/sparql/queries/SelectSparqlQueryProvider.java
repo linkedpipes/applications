@@ -41,11 +41,10 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
         try {
             addPrefixes(builder);
             addVars(builder);
-            builder.fromNamed(name);
-
-            SelectBuilder subQuery = addOptionals(addWheres(new SelectBuilder()));
-            addFilters(subQuery);
-            builder.addGraph(VAR_GRAPH, subQuery);
+            builder.from(name);
+            addWheres(builder);
+            addOptionals(builder);
+            addFilters(builder);
             addAdditional(builder);
         } catch (ParseException e) {
             throw new RuntimeException(e);

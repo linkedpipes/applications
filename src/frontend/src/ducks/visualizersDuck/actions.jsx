@@ -31,7 +31,7 @@ const toggleOption = option => ({
   payload: option
 });
 
-// ADD_EXPENSE
+// ADD_VISUALIZER
 const addVisualizer = ({ visualizersArray } = {}) => ({
   type: types.ADD_VISUALIZER,
   visualizers: {

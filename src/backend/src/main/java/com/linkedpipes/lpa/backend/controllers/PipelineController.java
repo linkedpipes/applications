@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,13 +54,13 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline/export")
-    public ResponseEntity<PipelineExportResult> exportPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
+    public ResponseEntity<PipelineExportResult> exportPipeline(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
         PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/pipeline/exportWithSD")
-    public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
+    public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
         String graphId = UUID.randomUUID().toString() + "-" + discoveryId;
         ServiceDescription serviceDescription = new ServiceDescription(getOurServiceDescriptionUri(graphId));
         PipelineExportResult response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
@@ -89,7 +90,7 @@ public class PipelineController {
     }
 
     @NotNull
-    @GetMapping("/api/pipeline/execute")
+    @PostMapping("/api/pipeline/execute")
     public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
                                                      @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {

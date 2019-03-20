@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@material-ui/core/Card';
@@ -12,6 +13,52 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { withStyles } from '@material-ui/core';
 import { DiscoverSimpleSelector, DiscoverAdvancedSelector } from './children';
+
+type Props = {
+  classes: {
+    root: {
+      textAlign: string,
+      paddingTop: number,
+      flex: number
+    },
+    gridRoot: {
+      flexGrow: number
+    },
+    itemGrid: {
+      height: string,
+      width: string,
+      margin: string
+    },
+    textField: {
+      margin: string,
+      width: string
+    },
+    card: {
+      flexGrow: number
+    }
+  },
+  dataSampleIri: string,
+  dataSampleTextFieldValue: string,
+  dataSourcesUris: string,
+  discoveryIsLoading: boolean,
+  discoveryLoadingLabel: string,
+  namedGraph: string,
+  namedTextFieldValue: string,
+  onHandleChangeIndex: PropTypes.func,
+  onHandleProcessStartDiscovery: () => void,
+  onHandleSelectedFile: () => void,
+  onHandleSetDataSampleIri: () => void,
+  onHandleSetNamedGraph: () => void,
+  onHandleSetSparqlIri: () => void,
+  onHandleTabChange: () => void,
+  onValidateField: () => void,
+  sparqlEndpointIri: string,
+  sparqlTextFieldValue: string,
+  tabValue: number,
+  textFieldIsValid: boolean,
+  textFieldValue: string,
+  ttlFile: any
+};
 
 const styles = theme => ({
   root: {
@@ -59,7 +106,7 @@ const DiscoverSelectorComponent = ({
   sparqlTextFieldValue,
   namedTextFieldValue,
   dataSampleTextFieldValue
-}) => (
+}: Props) => (
   <Card className={classes.card}>
     <CardContent>
       {discoveryIsLoading ? (
@@ -68,11 +115,7 @@ const DiscoverSelectorComponent = ({
         <div className={classes.gridRoot}>
           <Grid container spacing={24}>
             <Grid item xs={12} sm={12}>
-              <AppBar
-                position="static"
-                color="default"
-                className={classes.appBar}
-              >
+              <AppBar position="static" color="default">
                 <Tabs
                   value={tabValue}
                   onChange={onHandleTabChange}
@@ -97,7 +140,7 @@ const DiscoverSelectorComponent = ({
                   dataSourcesUris={dataSourcesUris}
                   discoveryIsLoading={discoveryIsLoading}
                   textFieldValue={textFieldValue}
-                  validateField={onValidateField}
+                  handleValidateField={onValidateField}
                   handleSelectedFile={onHandleSelectedFile}
                 />
                 <DiscoverAdvancedSelector
@@ -112,7 +155,6 @@ const DiscoverSelectorComponent = ({
                   sparqlTextFieldValue={sparqlTextFieldValue}
                   namedTextFieldValue={namedTextFieldValue}
                   dataSampleTextFieldValue={dataSampleTextFieldValue}
-
                 />
               </SwipeableViews>
             </Grid>
@@ -125,9 +167,7 @@ const DiscoverSelectorComponent = ({
                 color="secondary"
                 disabled={
                   tabValue === 0
-                    ? !ttlFile &&
-                      !textFieldIsValid &&
-                      dataSourcesUris === ''
+                    ? !ttlFile && !textFieldIsValid && dataSourcesUris === ''
                     : sparqlEndpointIri === '' || dataSampleIri === ''
                 }
                 onClick={onHandleProcessStartDiscovery}
@@ -142,30 +182,5 @@ const DiscoverSelectorComponent = ({
     </CardContent>
   </Card>
 );
-
-DiscoverSelectorComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  dataSampleIri: PropTypes.any,
-  dataSampleTextFieldValue: PropTypes.string,
-  dataSourcesUris: PropTypes.string,
-  discoveryIsLoading: PropTypes.any,
-  discoveryLoadingLabel: PropTypes.string,
-  namedGraph: PropTypes.string,
-  namedTextFieldValue: PropTypes.string,
-  onHandleChangeIndex: PropTypes.func,
-  onHandleProcessStartDiscovery: PropTypes.any,
-  onHandleSelectedFile: PropTypes.any,
-  onHandleSetDataSampleIri: PropTypes.any,
-  onHandleSetNamedGraph: PropTypes.any,
-  onHandleSetSparqlIri: PropTypes.any,
-  onHandleTabChange: PropTypes.any,
-  onValidateField: PropTypes.any,
-  sparqlEndpointIri: PropTypes.any,
-  sparqlTextFieldValue: PropTypes.string,
-  tabValue: PropTypes.number,
-  textFieldIsValid: PropTypes.any,
-  textFieldValue: PropTypes.any,
-  ttlFile: PropTypes.any
-};
 
 export default withStyles(styles)(DiscoverSelectorComponent);

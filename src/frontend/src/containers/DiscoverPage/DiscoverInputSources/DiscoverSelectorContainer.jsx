@@ -1,18 +1,43 @@
-/* eslint-disable react/no-unused-state */
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import React from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
-import { discoverySelectors } from '@ducks/discoveryDuck';
-import { visualizersActions } from '@ducks/visualizersDuck';
-import { globalActions } from '@ducks/globalDuck';
+import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
 
-class DiscoverSelectorContainer extends PureComponent {
+type Props = {
+  changeTab: number => void,
+  dataSampleIri: string,
+  dataSourcesUris: string,
+  handleSetDiscoveryId: any,
+  handleSetPipelineGroups: any,
+  namedGraph: string,
+  onNextClicked: any,
+  socket: any,
+  sparqlEndpointIri: string,
+  tabValue: number,
+  webId: string
+};
+
+type State = {
+  ttlFile: any,
+  discoveryIsLoading: boolean,
+  textFieldValue: string,
+  textFieldIsValid: boolean,
+  discoveryStatusPolling: any,
+  discoveryStatusPollingFinished: boolean,
+  discoveryStatusPollingInterval: number,
+  discoveryLoadingLabel: string,
+  sparqlTextFieldValue: string,
+  dataSampleTextFieldValue: string,
+  namedTextFieldValue: string
+};
+
+class DiscoverSelectorContainer extends React.PureComponent<Props, State> {
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
@@ -27,54 +52,71 @@ class DiscoverSelectorContainer extends PureComponent {
     namedTextFieldValue: ''
   };
 
-  postStartFromFile = async () => {
-    const self = this;
+  componentWillUnmount = () => {
+    const { socket } = this.props;
+    socket.off('discoveryStatus');
+  };
+
+  postStartFromFile = async instance => {
     return DiscoveryService.postDiscoverFromTtl({
-      ttlFile: self.state.ttlFile,
-      webId: this.props.webId
+      ttlFile: instance.state.ttlFile,
+      webId: instance.props.webId
     }).then(response => {
-      return response.json();
+      return response;
     });
   };
 
   // TODO: refactor later, move to separate class responsible for _services calls
-  postStartFromInputLinks = async () => {
-    const textContent = !this.props.dataSourcesUris
-      ? this.props.dataSourcesUris
-      : this.state.textFieldIsValid;
-
-    const splitFieldValue = textContent.split(',\n');
+  postStartFromInputLinks = async instance => {
+    let { dataSourcesUris } = instance.props;
+    const { textFieldIsValid } = instance.state;
+    if (!dataSourcesUris && !textFieldIsValid) {
+      toast.error(
+        'There was an error during the discovery. Please, try different sources.',
+        {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 2000
+        }
+      );
+      return undefined;
+    }
+    if (!dataSourcesUris && textFieldIsValid) {
+      dataSourcesUris = instance.props.textFieldValue;
+    }
+    const splitFieldValue = dataSourcesUris.split(',\n');
     const datasourcesForTTL = splitFieldValue.map(source => {
       return { uri: source };
     });
 
     return DiscoveryService.postDiscoverFromUriList({
       datasourceUris: datasourcesForTTL,
-      webId: this.props.webId
+      webId: instance.props.webId
     }).then(response => {
-      return response.json();
+      return response;
     });
   };
 
-  postStartFromSparqlEndpoint = async () => {
+  postStartFromSparqlEndpoint = async instance => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: this.props.sparqlEndpointIri,
-      dataSampleIri: this.props.dataSampleIri,
-      namedGraph: this.props.namedGraph,
-      webId: this.props.webId
+      sparqlEndpointIri: instance.props.sparqlEndpointIri,
+      dataSampleIri: instance.props.dataSampleIri,
+      namedGraph: instance.props.namedGraph,
+      webId: instance.props.webId
     }).then(response => {
-      return response.json();
+      return response;
     });
   };
 
   handleDiscoveryInputCase = () => {
+    // eslint-disable-next-line consistent-this
+    const instance = this;
     if (this.props.tabValue === 1) {
-      return this.postStartFromSparqlEndpoint();
+      return this.postStartFromSparqlEndpoint(instance);
     }
     if (this.state.ttlFile) {
-      return this.postStartFromFile();
+      return this.postStartFromFile(instance);
     }
-    return this.postStartFromInputLinks();
+    return this.postStartFromInputLinks(instance);
   };
 
   handleProcessStartDiscovery = () => {
@@ -89,8 +131,9 @@ class DiscoverSelectorContainer extends PureComponent {
 
     self
       .handleDiscoveryInputCase()
-      .then(discoveryResponse => {
-        if (discoveryResponse !== undefined) {
+      .then(response => {
+        if (response !== undefined) {
+          const discoveryResponse = response.data;
           const discoveryId = discoveryResponse.id;
           handleSetDiscoveryId(discoveryId);
           self.setState({ discoveryStatusPollingFinished: false });
@@ -116,12 +159,15 @@ class DiscoverSelectorContainer extends PureComponent {
       });
   };
 
-  startSocketListener = () => {
-    const { socket, discoveryId, onNextClicked } = this.props;
+  startSocketListener = discoveryId => {
+    const { socket, onNextClicked } = this.props;
     const self = this;
 
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
+      socket.emit('leave', discoveryId);
+      socket.off('discoveryStatus');
+
       if (data === undefined) {
         self.setState({
           discoveryIsLoading: false
@@ -145,7 +191,6 @@ class DiscoverSelectorContainer extends PureComponent {
           });
         }
       }
-      socket.emit('leave', discoveryId);
     });
   };
 
@@ -154,14 +199,14 @@ class DiscoverSelectorContainer extends PureComponent {
       discoveryLoadingLabel: 'Extracting the magical pipelines 🧙‍...'
     });
 
-    const { handleAddVisualizer } = this.props;
+    const { handleSetPipelineGroups } = this.props;
 
     return DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(jsonResponse => {
-        handleAddVisualizer(jsonResponse.pipelineGroups);
+        handleSetPipelineGroups(jsonResponse.pipelineGroups);
         return jsonResponse;
       });
   };
@@ -177,7 +222,6 @@ class DiscoverSelectorContainer extends PureComponent {
   handleValidation = rawText => {
     const matches = extractUrlGroups(rawText);
     let valid = false;
-
     if (matches instanceof Array) {
       rawText = matches.join(',\n');
       valid = true;
@@ -200,6 +244,8 @@ class DiscoverSelectorContainer extends PureComponent {
     this.handleValidation(rawText);
   };
 
+  // Handle when the text in the SPARQL
+  // endpoint textfields changes
   handleSetSparqlIri = e => {
     const rawText = e.target.value;
     this.setState({
@@ -269,21 +315,6 @@ class DiscoverSelectorContainer extends PureComponent {
   }
 }
 
-DiscoverSelectorContainer.propTypes = {
-  changeTab: PropTypes.func,
-  dataSampleIri: PropTypes.string,
-  dataSourcesUris: PropTypes.string,
-  discoveryId: PropTypes.any,
-  handleAddVisualizer: PropTypes.any,
-  handleSetDiscoveryId: PropTypes.any,
-  namedGraph: PropTypes.string,
-  onNextClicked: PropTypes.any,
-  socket: PropTypes.any,
-  sparqlEndpointIri: PropTypes.string,
-  tabValue: PropTypes.number,
-  webId: PropTypes.any
-};
-
 const DiscoverSelectorContainerWithSocket = props => (
   <SocketContext.Consumer>
     {socket => <DiscoverSelectorContainer {...props} socket={socket} />}
@@ -292,8 +323,10 @@ const DiscoverSelectorContainerWithSocket = props => (
 
 const mapStateToProps = state => {
   return {
-    datasources: discoverySelectors.getDatasourcesArray(state.datasources),
-    discoveryId: state.globals.discoveryId,
+    datasources: discoverySelectors.getDatasourcesArray(
+      state.discovery.datasources
+    ),
+    discoveryId: state.discovery.discoveryId,
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
@@ -306,22 +339,18 @@ const mapDispatchToProps = dispatch => {
   const changeTab = index => dispatch(discoverActions.changeTabAction(index));
   const handleSetDiscoveryId = discoveryId =>
     dispatch(
-      globalActions.addDiscoveryIdAction({
+      discoveryActions.addDiscoveryIdAction({
         id: discoveryId
       })
     );
 
-  const handleAddVisualizer = pipelineGroups =>
-    dispatch(
-      visualizersActions.addVisualizer({
-        visualizersArray: pipelineGroups
-      })
-    );
+  const handleSetPipelineGroups = pipelineGroups =>
+    dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
 
   return {
     changeTab,
     handleSetDiscoveryId,
-    handleAddVisualizer
+    handleSetPipelineGroups
   };
 };
 

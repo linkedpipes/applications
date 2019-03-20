@@ -1,6 +1,20 @@
-import * as PropTypes from 'prop-types';
+// @flow
 import React from 'react';
 import { Grid, TextField } from '@material-ui/core';
+
+type Props = {
+  classes: { textField: {} },
+  dataSampleIri: string,
+  dataSampleTextFieldValue: string,
+  discoveryIsLoading: boolean,
+  handleDataSampleTextFieldChange: () => void,
+  handleNamedGraphTextFieldChange: () => void,
+  handleSparqlTextFieldChange: () => void,
+  namedGraph: string,
+  namedTextFieldValue: string,
+  sparqlEndpointIri: string,
+  sparqlTextFieldValue: string
+};
 
 const DiscoverAdvancedSelectorComponent = ({
   classes,
@@ -14,7 +28,7 @@ const DiscoverAdvancedSelectorComponent = ({
   sparqlTextFieldValue,
   dataSampleTextFieldValue,
   namedTextFieldValue
-}) => (
+}: Props) => (
   <Grid container spacing={16}>
     <Grid item xs={12} sm={12}>
       <TextField
@@ -28,9 +42,7 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={
-          !sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri
-        }
+        value={!sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri}
       />
       <TextField
         id="outlined-textarea"
@@ -61,19 +73,5 @@ const DiscoverAdvancedSelectorComponent = ({
     </Grid>
   </Grid>
 );
-
-DiscoverAdvancedSelectorComponent.propTypes = {
-  classes: PropTypes.any,
-  dataSampleIri: PropTypes.string,
-  dataSampleTextFieldValue: PropTypes.string,
-  discoveryIsLoading: PropTypes.any,
-  handleDataSampleTextFieldChange: PropTypes.func,
-  handleNamedGraphTextFieldChange: PropTypes.func,
-  handleSparqlTextFieldChange: PropTypes.func,
-  namedGraph: PropTypes.string,
-  namedTextFieldValue: PropTypes.string,
-  sparqlEndpointIri: PropTypes.string,
-  sparqlTextFieldValue: PropTypes.string
-};
 
 export default DiscoverAdvancedSelectorComponent;

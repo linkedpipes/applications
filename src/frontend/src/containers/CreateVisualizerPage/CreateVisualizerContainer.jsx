@@ -6,7 +6,7 @@ const mapStateToProps = state => {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
     filters: state.visualizers.filters,
-    selectedResultGraphIri: state.globals.selectedResultGraphIri
+    selectedResultGraphIri: state.etl.selectedResultGraphIri
   };
 };
 

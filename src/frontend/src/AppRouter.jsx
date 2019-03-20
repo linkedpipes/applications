@@ -1,5 +1,6 @@
 // @flow
-import React, { PureComponent } from 'react';
+import * as React from 'react';
+import { connect } from 'react-redux';
 import { BrowserRouter, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/es/Redirect';
 import { withStyles } from '@material-ui/core/styles';
@@ -15,11 +16,15 @@ import {
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
 import openSocket from 'socket.io-client';
-import { SOCKET_IO_ENDPOINT } from '@constants';
-import { ErrorBoundary } from 'react-error-boundary';
 import * as Sentry from '@sentry/browser';
+import ErrorBoundary from 'react-error-boundary';
 
-const socket = openSocket(SOCKET_IO_ENDPOINT);
+// Socket URL defaults to window.location
+// and default path is /socket.io in case
+// BASE_SOCKET_URL is not set
+const socket = process.env.BASE_SOCKET_URL
+  ? openSocket(process.env.BASE_SOCKET_URL)
+  : openSocket();
 
 const styles = () => ({
   root: {
@@ -28,28 +33,34 @@ const styles = () => ({
 });
 
 type Props = {
-  classes: any
+  classes: any,
+  userId: ?string
 };
 
-const sentryFeedbackErrorHandler = (error: Error, componentStack: string) => {
-  Log.error(componentStack, 'AppRouter');
-  Sentry.withScope(() => {
-    Sentry.captureException(error);
-    Sentry.showReportDialog();
-  });
+const errorHandler = userId => {
+  return (error: Error, componentStack: string) => {
+    Log.error(componentStack, 'AppRouter');
+    Sentry.withScope(scope => {
+      scope.setUser({ id: userId || 'unidentified user' }); // How can we capture WEBID from here
+      scope.setLevel('error');
+      scope.setExtra('component-stack', componentStack);
+      Sentry.captureException(error);
+      Sentry.showReportDialog(); // Only if not production
+    });
+  };
 };
 
-class AppRouter extends PureComponent<Props> {
+class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
     socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
     socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, userId } = this.props;
     return (
       <div>
-        <ErrorBoundary onError={sentryFeedbackErrorHandler}>
+        <ErrorBoundary onError={errorHandler(userId)}>
           <BrowserRouter>
             <div className={classes.root}>
               <SocketContext.Provider value={socket}>
@@ -59,7 +70,6 @@ class AppRouter extends PureComponent<Props> {
                     path="/login"
                     exact
                   />
-
                   <PrivateLayout path="/dashboard" component={HomePage} exact />
                   <PrivateLayout
                     path="/create-app"
@@ -86,4 +96,12 @@ class AppRouter extends PureComponent<Props> {
   }
 }
 
-export default withRoot(withStyles(styles)(AppRouter));
+const mapStateToProps = state => {
+  return {
+    userId: state.user.webId
+  };
+};
+
+export default connect(mapStateToProps)(
+  withRoot(withStyles(styles)(AppRouter))
+);
