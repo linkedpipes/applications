@@ -24,7 +24,7 @@ import ErrorBoundary from 'react-error-boundary';
 // BASE_SOCKET_URL is not set
 const socket = process.env.BASE_SOCKET_URL
   ? openSocket(process.env.BASE_SOCKET_URL)
-  : openSocket();
+  : openSocket(window.location.origin);
 
 const styles = () => ({
   root: {
