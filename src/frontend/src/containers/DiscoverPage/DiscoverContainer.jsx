@@ -4,9 +4,9 @@ import { discoverActions } from './duck';
 import lifecycle from 'react-pure-lifecycle';
 
 const componentWillUnmount = props => {
-  const { onResetClicked, onResetSelectedTab } = props;
+  const { onResetClicked, onResetSelectedInput } = props;
   onResetClicked();
-  onResetSelectedTab();
+  onResetSelectedInput();
 };
 
 const methods = {
@@ -17,13 +17,13 @@ const mapDispatchToProps = dispatch => {
   // '1' is the number by which you want to increment the count
   const onBackClicked = () => dispatch(discoverActions.decrementActiveStep(1));
   const onResetClicked = () => dispatch(discoverActions.resetActiveStep());
-  const onResetSelectedTab = () =>
+  const onResetSelectedInput = () =>
     dispatch(discoverActions.resetSelectedInputExample());
 
   return {
     onBackClicked,
     onResetClicked,
-    onResetSelectedTab
+    onResetSelectedInput
   };
 };
 

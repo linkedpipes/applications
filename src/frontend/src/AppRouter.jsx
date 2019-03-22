@@ -15,16 +15,21 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
-import openSocket from 'socket.io-client';
+import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import ErrorBoundary from 'react-error-boundary';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
 // BASE_SOCKET_URL is not set
-const socket = process.env.BASE_SOCKET_URL
-  ? openSocket(process.env.BASE_SOCKET_URL)
-  : openSocket(window.location.origin);
+const socket = io.connect(
+  process.env.BASE_SOCKET_URL ? process.env.BASE_SOCKET_URL : undefined,
+  {
+    reconnection: process.env.SOCKET_RECONNECT
+      ? process.env.SOCKET_RECONNECT
+      : false
+  }
+);
 
 const styles = () => ({
   root: {
@@ -52,8 +57,21 @@ const errorHandler = userId => {
 
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
-    socket.on('connect', () => Log.info('Client connected', 'AppRouter'));
-    socket.on('disconnect', () => Log.info('Client disconnected', 'AppRouter'));
+    socket.on('connect', data => {
+      Log.warn('Client connected', 'AppRouter');
+      Log.warn(data, 'AppRouter');
+      Log.warn(socket.id, 'AppRouter');
+    });
+    socket.on('disconnect', data => {
+      Log.warn('Client disconnected', 'AppRouter');
+      Log.warn(data, 'AppRouter');
+      Log.warn(socket.id, 'AppRouter');
+    });
+    socket.on('reconnect', data => {
+      Log.warn('Client reconnected', 'AppRouter');
+      Log.warn(data, 'AppRouter');
+      Log.warn(socket.id, 'AppRouter');
+    });
   }
 
   render() {
