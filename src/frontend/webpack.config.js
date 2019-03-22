@@ -21,8 +21,7 @@ module.exports = () => {
       'process.env.BASE_SOCKET_URL': JSON.stringify(
         process.env.BASE_SOCKET_URL
       ),
-      'process.env.SOCKET_RECONNECT':
-        JSON.stringify(process.env.SOCKET_RECONNECT) === 'true'
+      'process.env.SOCKET_RECONNECT': process.env.SOCKET_RECONNECT === 'true'
     })
   ];
 

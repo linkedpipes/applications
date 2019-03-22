@@ -45,8 +45,6 @@ type Props = {
   onHandleSetSparqlIri: () => void,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
-  tabValue: number,
-  textFieldIsValid: boolean,
   ttlFile: any
 };
 
@@ -77,10 +75,8 @@ const DiscoverSelectorComponent = ({
   classes,
   discoveryIsLoading,
   discoveryLoadingLabel,
-  tabValue,
   dataSourcesUris,
   ttlFile,
-  textFieldIsValid,
   sparqlEndpointIri,
   dataSampleIri,
   onHandleProcessStartDiscovery,
@@ -122,9 +118,11 @@ const DiscoverSelectorComponent = ({
                 component="span"
                 color="secondary"
                 disabled={
-                  tabValue === 0
-                    ? !ttlFile && !textFieldIsValid && dataSourcesUris === ''
-                    : sparqlEndpointIri === '' || dataSampleIri === ''
+                  !ttlFile &&
+                  !dataSourcesUris &&
+                  sparqlEndpointIri === '' &&
+                  dataSampleIri === '' &&
+                  namedGraph === ''
                 }
                 onClick={onHandleProcessStartDiscovery}
                 size="small"

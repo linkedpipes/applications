@@ -5,10 +5,10 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
-    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=false webpack-dev-server",
+    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server",
     "startLocalDevSockets": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server",
-    "startDockerDev": "cross-env NODE_ENV=development webpack-dev-server",
-    "build": "cross-env NODE_ENV=production webpack"
+    "startDockerDev": "cross-env NODE_ENV=development SOCKET_RECONNECT=true webpack-dev-server",
+    "build": "cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack"
   },
   "precommit": [
     "NODE_ENV=development lint-staged",

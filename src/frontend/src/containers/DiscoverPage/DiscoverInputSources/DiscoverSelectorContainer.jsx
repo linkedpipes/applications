@@ -5,12 +5,10 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
-import { discoverActions } from '../duck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
 
 type Props = {
-  changeTab: number => void,
   dataSampleIri: string,
   dataSourcesUris: string,
   handleSetDiscoveryId: any,
@@ -19,7 +17,6 @@ type Props = {
   onNextClicked: any,
   socket: any,
   sparqlEndpointIri: string,
-  tabValue: number,
   webId: string
 };
 
@@ -101,13 +98,16 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   handleDiscoveryInputCase = () => {
     // eslint-disable-next-line consistent-this
     const instance = this;
-    if (this.props.tabValue === 1) {
-      return this.postStartFromSparqlEndpoint(instance);
+
+    if (this.props.dataSourcesUris) {
+      return DiscoveryService.postDiscoverFromTtl({
+        ttlFile: this.props.dataSourcesUris,
+        webId: instance.props.webId
+      }).then(response => {
+        return response;
+      });
     }
-    if (this.state.ttlFile) {
-      return this.postStartFromFile(instance);
-    }
-    return this.postStartFromInputLinks(instance);
+    return this.postStartFromSparqlEndpoint(instance);
   };
 
   handleProcessStartDiscovery = () => {
@@ -200,14 +200,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       });
   };
 
-  handleTabChange = (event, newValue) => {
-    this.props.changeTab(newValue);
-  };
-
-  handleChangeIndex = index => {
-    this.props.changeTab(index);
-  };
-
   handleValidation = rawText => {
     const matches = extractUrlGroups(rawText);
     let valid = false;
@@ -261,8 +253,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
-      namedGraph,
-      tabValue
+      namedGraph
     } = this.props;
 
     const {
@@ -280,8 +271,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       <DiscoverSelectorComponent
         discoveryIsLoading={discoveryIsLoading}
         discoveryLoadingLabel={discoveryLoadingLabel}
-        tabValue={tabValue}
-        onHandleTabChange={this.handleTabChange}
         dataSourcesUris={dataSourcesUris}
         textFieldValue={textFieldValue}
         onHandleSelectedFile={this.handleSelectedFile}
@@ -295,7 +284,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
         namedGraph={namedGraph}
-        onHandleChangeIndex={this.handleChangeIndex}
         sparqlTextFieldValue={sparqlTextFieldValue}
         namedTextFieldValue={namedTextFieldValue}
         dataSampleTextFieldValue={dataSampleTextFieldValue}
@@ -319,13 +307,11 @@ const mapStateToProps = state => {
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
-    namedGraph: state.discover.namedGraph,
-    tabValue: state.discover.tabValue
+    namedGraph: state.discover.namedGraph
   };
 };
 
 const mapDispatchToProps = dispatch => {
-  const changeTab = index => dispatch(discoverActions.changeTabAction(index));
   const handleSetDiscoveryId = discoveryId =>
     dispatch(
       discoveryActions.addDiscoveryIdAction({
@@ -337,7 +323,6 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
 
   return {
-    changeTab,
     handleSetDiscoveryId,
     handleSetPipelineGroups
   };
