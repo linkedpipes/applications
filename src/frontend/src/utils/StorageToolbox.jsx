@@ -62,14 +62,14 @@ const saveAppToSolid = (appData, appTitle, webId) => {
 
   return new Promise((resolve, reject) => {
     FileClient.updateFile(fileUrl, file).then(
-      success => {
+      () => {
         Log.info(`Updated file!`);
         resolve(fileUrl);
       },
       err => {
         Log.info(err, 'StorageToolbox');
         FileClient.createFile(fileUrl).then(
-          success => {
+          () => {
             Log.info(`Created file!`);
             resolve(fileUrl);
           },

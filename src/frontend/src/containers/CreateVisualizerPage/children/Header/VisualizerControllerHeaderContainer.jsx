@@ -13,7 +13,7 @@ type Props = {
   selectedApplicationTitle: any,
   handleAppTitleChanged: any,
   webId: string,
-  checkedRefresh?: boolean,
+  checkedPublished?: boolean,
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
   history: any
@@ -62,7 +62,11 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { headerParams, onRefreshSwitchChange, checkedRefresh } = this.props;
+    const {
+      headerParams,
+      onRefreshSwitchChange,
+      checkedPublished
+    } = this.props;
     const {
       handlePublishClicked,
       onHandleAppTitleChanged,
@@ -75,7 +79,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
         handleAppTitleChanged={onHandleAppTitleChanged}
         handlePublishClicked={handlePublishClicked}
         headerParams={headerParams}
-        checkedRefresh={checkedRefresh}
+        checkedPublished={checkedPublished}
         onRefreshSwitchChange={onRefreshSwitchChange}
         publishDialogOpen={publishDialogOpen}
         handleClosePublishDialog={handleClosePublishDialog}

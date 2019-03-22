@@ -50,7 +50,12 @@ type Props = {
   }
 };
 
-class StorageAppsBrowserCard extends PureComponent<Props> {
+type State = {
+  open: boolean,
+  textValue: string
+};
+
+class StorageAppsBrowserCard extends PureComponent<Props, State> {
   state = {
     open: false,
     textValue: ''
@@ -79,7 +84,6 @@ class StorageAppsBrowserCard extends PureComponent<Props> {
 
   render() {
     const { classes, singleTileData } = this.props;
-    const self = this;
     return (
       <GridListTile>
         <Card className={classes.card}>

@@ -71,19 +71,17 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
               axios
                 .get(element.url)
                 .then(({ data }) => {
-                  axios
-                .get(element.url)
-                .then(({ data }) => {
-              
-                  const tileData = Object.assign({}, self.state.tileData); // creating copy of object
-                  tileData[element.label] = {
-                    img:
-                      'https://www.iosicongallery.com/icons/google-maps-2014-11-12/512.png',
-                    author: 'Altynbek',
-                    applicationIri: element.url,
-                    applicationTitle: data.applicationTitle
-                  };
-                  self.setState({ tileData });
+                  axios.get(element.url).then(({ newData }) => {
+                    const tileData = Object.assign({}, self.state.tileData); // creating copy of object
+                    tileData[element.label] = {
+                      img:
+                        'https://www.iosicongallery.com/icons/google-maps-2014-11-12/512.png',
+                      author: 'Altynbek',
+                      applicationIri: element.url,
+                      applicationTitle: newData.applicationTitle
+                    };
+                    self.setState({ tileData });
+                  });
                 })
                 .catch(err => {
                   Log.error(err, 'StorageAppsBrowserContainer');

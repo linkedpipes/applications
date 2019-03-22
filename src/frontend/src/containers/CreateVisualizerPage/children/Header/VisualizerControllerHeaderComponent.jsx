@@ -14,7 +14,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 type Props = {
-  checkedRefresh?: boolean,
+  checkedPublished?: boolean,
   classes: { root: {}, header: {} },
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
