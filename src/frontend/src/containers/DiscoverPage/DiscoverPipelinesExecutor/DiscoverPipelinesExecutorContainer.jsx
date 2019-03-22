@@ -146,7 +146,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         }
 
         self.setState({
-          loaderLabelText: `ETL responded with status : ${status}`
+          loaderLabelText: `Pipeline execution status : ${status}`
         });
 
         if (
