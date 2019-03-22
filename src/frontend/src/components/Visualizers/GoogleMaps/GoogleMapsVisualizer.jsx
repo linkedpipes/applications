@@ -7,7 +7,7 @@ import {
   Marker
 } from 'react-google-maps';
 import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClusterer';
-import { compose, withProps } from 'recompose';
+import { compose, withProps, type HOC } from 'recompose';
 import uuid from 'uuid';
 import { Log, VisualizersService } from '@utils';
 
@@ -86,7 +86,14 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const GoogleMapsVisualizerWithProps = compose(
+type GoogleMapsVisualizerProps = {
+  googleMapURL?: string,
+  loadingElement: Object,
+  containerElement: Object,
+  mapElement: Object
+};
+
+const enhance: HOC<*, GoogleMapsVisualizerProps> = compose(
   withProps({
     googleMapURL:
       'https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=places',
@@ -96,6 +103,6 @@ const GoogleMapsVisualizerWithProps = compose(
   }),
   withScriptjs,
   withGoogleMap
-)(props => <GoogleMapsVisualizer {...props} />);
+);
 
-export default GoogleMapsVisualizerWithProps;
+export default enhance(GoogleMapsVisualizer);

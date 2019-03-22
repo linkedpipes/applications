@@ -1,6 +1,3 @@
-export {
-  default as DiscoverSimpleSelector
-} from './DiscoverSimpleSelectorComponent';
-export {
-  default as DiscoverAdvancedSelector
-} from './DiscoverAdvancedSelectorComponent';
+import DiscoverSelectorFields from './DiscoverSelectorFieldsComponent';
+
+export default DiscoverSelectorFields;

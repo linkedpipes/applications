@@ -2,12 +2,14 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
+import axios from 'axios';
+import { Log } from '@utils';
 
 const samples = [
   {
     id: uuid.v4(),
+    type: 'sparqlEndpoint',
     label: 'Treemap Sample',
-    type: 'advanced',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     dataSampleIri:
       'https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl',
@@ -15,39 +17,39 @@ const samples = [
   },
   {
     id: uuid.v4(),
-    label: 'DBPedia Earthquakes',
-    type: 'simple',
-    URIS: [
-      'https://ldcp.opendata.cz/resource/dbpedia/datasource-templates/Earthquake',
-      'https://discovery.linkedpipes.com/resource/lod/templates/http---commons.dbpedia.org-sparql'
-    ]
-  },
-  {
-    id: uuid.v4(),
-    label: 'Wikidata Timeline & Map',
-    type: 'simple',
-    URIS: [
-      'https://discovery.linkedpipes.com/resource/discovery/wikidata-06/config',
-      'https://discovery.linkedpipes.com/vocabulary/discovery/Input',
-      'https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate',
-      'https://discovery.linkedpipes.com/resource/application/map-labeled-points/template',
-      'https://discovery.linkedpipes.com/resource/application/map/template',
-      'https://discovery.linkedpipes.com/resource/application/timeline-periods/template',
-      'https://discovery.linkedpipes.com/resource/application/timeline/template',
-      'https://discovery.linkedpipes.com/resource/transformer/schema-enddate-to-dcterms-date/template',
-      'https://discovery.linkedpipes.com/resource/transformer/schema-name-to-dcterms-title/template',
-      'https://discovery.linkedpipes.com/resource/transformer/schema-startdate-to-dcterms-date/template'
-    ]
+    type: 'ttlFile',
+    label: 'GoogleMaps Sample',
+    fileUrl:
+      'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
   }
 ];
 
 class DiscoverExamplesContainer extends PureComponent {
-  render() {
+  handleListItemClicked = item => {
     const { onInputExampleClicked } = this.props;
+    const inputExample = item;
+    if (item.type === 'ttlFile') {
+      axios
+        .get(item.fileUrl)
+        .then(response => {
+          inputExample.dataSourcesUris = response.data;
+          onInputExampleClicked(inputExample);
+        })
+        .catch(error => {
+          // handle error
+          Log.error(error, 'DiscoverExamplesContainer');
+        });
+    } else {
+      onInputExampleClicked(inputExample);
+    }
+  };
+
+  render() {
+    const { handleListItemClicked } = this;
     return (
       <DiscoverExamplesComponent
         classes={undefined}
-        onHandleListItemClick={onInputExampleClicked}
+        onHandleListItemClick={handleListItemClicked}
         samples={samples}
       />
     );
