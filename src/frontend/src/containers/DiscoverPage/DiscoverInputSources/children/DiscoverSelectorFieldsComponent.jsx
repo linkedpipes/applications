@@ -5,15 +5,12 @@ import { Grid, TextField } from '@material-ui/core';
 type Props = {
   classes: { textField: {} },
   dataSampleIri: string,
-  dataSampleTextFieldValue: string,
   discoveryIsLoading: boolean,
   handleDataSampleTextFieldChange: () => void,
   handleNamedGraphTextFieldChange: () => void,
   handleSparqlTextFieldChange: () => void,
   namedGraph: string,
-  namedTextFieldValue: string,
-  sparqlEndpointIri: string,
-  sparqlTextFieldValue: string
+  sparqlEndpointIri: string
 };
 
 const DiscoverSelectorComponent = ({
@@ -24,10 +21,7 @@ const DiscoverSelectorComponent = ({
   handleSparqlTextFieldChange,
   sparqlEndpointIri,
   dataSampleIri,
-  namedGraph,
-  sparqlTextFieldValue,
-  dataSampleTextFieldValue,
-  namedTextFieldValue
+  namedGraph
 }: Props) => (
   <Grid container spacing={16}>
     <Grid item xs={12} sm={12}>
@@ -42,7 +36,7 @@ const DiscoverSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri}
+        value={sparqlEndpointIri}
       />
     </Grid>
 
@@ -58,7 +52,7 @@ const DiscoverSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!dataSampleIri ? dataSampleTextFieldValue : dataSampleIri}
+        value={dataSampleIri}
       />
     </Grid>
 
@@ -74,7 +68,7 @@ const DiscoverSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!namedGraph ? namedTextFieldValue : namedGraph}
+        value={namedGraph}
       />
     </Grid>
   </Grid>

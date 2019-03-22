@@ -1,5 +1,4 @@
 import types from './types';
-import axios from 'axios';
 
 const INITIAL_STATE = {
   activeStep: 0,
@@ -77,6 +76,30 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, {
         ...state,
         etlExecutionStatus: value
+      });
+    }
+
+    case types.SET_DATA_SAMPLE_IRI: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        dataSampleIri: value
+      });
+    }
+
+    case types.SET_SPARQL_ENDPOINT_IRI: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        sparqlEndpointIri: value
+      });
+    }
+
+    case types.SET_NAMED_GRAPH: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        namedGraph: value
       });
     }
 

@@ -7,6 +7,7 @@ import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { withWebId } from '@inrupt/solid-react-components';
+import { discoverActions } from '../duck';
 
 type Props = {
   dataSampleIri: string,
@@ -17,30 +18,25 @@ type Props = {
   onNextClicked: any,
   socket: any,
   sparqlEndpointIri: string,
+  handleSetSparqlIriFieldValue: Function,
+  handleSetNamedGraphFieldValue: Function,
+  handleSetDataSampleIriFieldValue: Function,
+  resetFieldsAndExamples: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
   webId: string
 };
 
 type State = {
   ttlFile: any,
   discoveryIsLoading: boolean,
-  textFieldValue: string,
-  textFieldIsValid: boolean,
-  discoveryLoadingLabel: string,
-  sparqlTextFieldValue: string,
-  dataSampleTextFieldValue: string,
-  namedTextFieldValue: string
+  discoveryLoadingLabel: string
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
-    textFieldValue: '',
-    textFieldIsValid: false,
-    discoveryLoadingLabel: '',
-    sparqlTextFieldValue: '',
-    dataSampleTextFieldValue: '',
-    namedTextFieldValue: ''
+    discoveryLoadingLabel: ''
   };
 
   componentWillUnmount = () => {
@@ -51,33 +47,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   postStartFromFile = async instance => {
     return DiscoveryService.postDiscoverFromTtl({
       ttlFile: instance.state.ttlFile,
-      webId: instance.props.webId
-    }).then(response => {
-      return response;
-    });
-  };
-
-  // TODO: refactor later, move to separate class responsible for _services calls
-  postStartFromInputLinks = async instance => {
-    const { dataSourcesUris } = instance.props;
-    const { textFieldIsValid } = instance.state;
-    if (!dataSourcesUris && !textFieldIsValid) {
-      toast.error(
-        'There was an error during the discovery. Please, try different sources.',
-        {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 2000
-        }
-      );
-      return undefined;
-    }
-    const splitFieldValue = dataSourcesUris.split(',\n');
-    const datasourcesForTTL = splitFieldValue.map(source => {
-      return { uri: source };
-    });
-
-    return DiscoveryService.postDiscoverFromUriList({
-      datasourceUris: datasourcesForTTL,
       webId: instance.props.webId
     }).then(response => {
       return response;
@@ -133,9 +102,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         // Enable the fields
         Log.error(error, 'DiscoverSelectorContainer');
         self.setState({
-          discoveryIsLoading: false,
-          textFieldValue: '',
-          textFieldIsValid: true
+          discoveryIsLoading: false
         });
 
         toast.error(
@@ -202,16 +169,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   handleValidation = rawText => {
     const matches = extractUrlGroups(rawText);
-    let valid = false;
     if (matches instanceof Array) {
       rawText = matches.join(',\n');
-      valid = true;
     }
-
-    this.setState({
-      textFieldValue: rawText,
-      textFieldIsValid: valid
-    });
   };
 
   handleSelectedFile = fileItems => {
@@ -220,32 +180,27 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     });
   };
 
-  handleValidateField = e => {
-    const rawText = e.target.value;
-    this.handleValidation(rawText);
-  };
-
   // Handle when the text in the SPARQL
   // endpoint textfields changes
   handleSetSparqlIri = e => {
     const rawText = e.target.value;
-    this.setState({
-      sparqlTextFieldValue: rawText
-    });
+    this.props.handleSetSparqlIriFieldValue(rawText);
   };
 
   handleSetDataSampleIri = e => {
     const rawText = e.target.value;
-    this.setState({
-      dataSampleTextFieldValue: rawText
-    });
+    this.props.handleSetDataSampleIriFieldValue(rawText);
   };
 
   handleSetNamedGraph = e => {
     const rawText = e.target.value;
-    this.setState({
-      namedTextFieldValue: rawText
-    });
+    Log.info('Named graph field changed', 'DiscoverSelectorContainer');
+    Log.info(rawText, 'DiscoverSelectorContainer');
+    this.props.handleSetNamedGraphFieldValue(rawText);
+  };
+
+  handleClearInputsClicked = () => {
+    this.props.resetFieldsAndExamples();
   };
 
   render() {
@@ -256,37 +211,23 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph
     } = this.props;
 
-    const {
-      discoveryIsLoading,
-      textFieldValue,
-      textFieldIsValid,
-      ttlFile,
-      discoveryLoadingLabel,
-      sparqlTextFieldValue,
-      namedTextFieldValue,
-      dataSampleTextFieldValue
-    } = this.state;
+    const { discoveryIsLoading, ttlFile, discoveryLoadingLabel } = this.state;
 
     return (
       <DiscoverSelectorComponent
         discoveryIsLoading={discoveryIsLoading}
         discoveryLoadingLabel={discoveryLoadingLabel}
         dataSourcesUris={dataSourcesUris}
-        textFieldValue={textFieldValue}
         onHandleSelectedFile={this.handleSelectedFile}
-        onValidateField={this.handleValidateField}
         ttlFile={ttlFile}
-        textFieldIsValid={textFieldIsValid}
         sparqlEndpointIri={sparqlEndpointIri}
+        onHandleClearInputsClicked={this.handleClearInputsClicked}
         dataSampleIri={dataSampleIri}
         onHandleProcessStartDiscovery={this.handleProcessStartDiscovery}
         onHandleSetNamedGraph={this.handleSetNamedGraph}
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
         namedGraph={namedGraph}
-        sparqlTextFieldValue={sparqlTextFieldValue}
-        namedTextFieldValue={namedTextFieldValue}
-        dataSampleTextFieldValue={dataSampleTextFieldValue}
       />
     );
   }
@@ -322,9 +263,26 @@ const mapDispatchToProps = dispatch => {
   const handleSetPipelineGroups = pipelineGroups =>
     dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
 
+  const handleSetSparqlIriFieldValue = sparqlIri =>
+    dispatch(discoverActions.setSparqlEndpointIri(sparqlIri));
+
+  const handleSetNamedGraphFieldValue = namedGraph =>
+    dispatch(discoverActions.setNamedGraph(namedGraph));
+
+  const handleSetDataSampleIriFieldValue = dataSampleIri =>
+    dispatch(discoverActions.setDataSampleIri(dataSampleIri));
+
+  const resetFieldsAndExamples = () => {
+    dispatch(discoverActions.resetSelectedInputExample());
+  };
+
   return {
     handleSetDiscoveryId,
-    handleSetPipelineGroups
+    handleSetPipelineGroups,
+    handleSetDataSampleIriFieldValue,
+    handleSetNamedGraphFieldValue,
+    handleSetSparqlIriFieldValue,
+    resetFieldsAndExamples
   };
 };
 

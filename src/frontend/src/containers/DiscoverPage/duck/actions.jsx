@@ -41,11 +41,35 @@ export const setEtlExecutionStatus = value => {
   };
 };
 
+export const setNamedGraph = namedGraph => {
+  return {
+    type: types.SET_NAMED_GRAPH,
+    namedGraph
+  };
+};
+
+export const setSparqlEndpointIri = sparqlEndpointIri => {
+  return {
+    type: types.SET_SPARQL_ENDPOINT_IRI,
+    sparqlEndpointIri
+  };
+};
+
+export const setDataSampleIri = dataSampleIri => {
+  return {
+    type: types.SET_DATA_SAMPLE_IRI,
+    dataSampleIri
+  };
+};
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
   resetSelectedInputExample,
-  setEtlExecutionStatus
+  setEtlExecutionStatus,
+  setNamedGraph,
+  setSparqlEndpointIri,
+  setDataSampleIri
 };

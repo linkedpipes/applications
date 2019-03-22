@@ -43,6 +43,7 @@ type Props = {
   onHandleSetDataSampleIri: () => void,
   onHandleSetNamedGraph: () => void,
   onHandleSetSparqlIri: () => void,
+  onHandleClearInputsClicked(): Function,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
   ttlFile: any
@@ -80,6 +81,7 @@ const DiscoverSelectorComponent = ({
   sparqlEndpointIri,
   dataSampleIri,
   onHandleProcessStartDiscovery,
+  onHandleClearInputsClicked,
   onHandleSetNamedGraph,
   onHandleSetDataSampleIri,
   onHandleSetSparqlIri,
@@ -112,23 +114,46 @@ const DiscoverSelectorComponent = ({
             {discoveryIsLoading ? (
               <LinearLoader labelText={discoveryLoadingLabel} />
             ) : (
-              <Button
-                className={classes.itemGrid}
-                variant="contained"
-                component="span"
-                color="secondary"
-                disabled={
-                  !ttlFile &&
-                  !dataSourcesUris &&
-                  sparqlEndpointIri === '' &&
-                  dataSampleIri === '' &&
-                  namedGraph === ''
-                }
-                onClick={onHandleProcessStartDiscovery}
-                size="small"
-              >
-                Start Discovery
-              </Button>
+              <Grid container spacing={16}>
+                <Grid item xs={6} sm={6}>
+                  <Button
+                    className={classes.itemGrid}
+                    variant="contained"
+                    component="span"
+                    color="primary"
+                    disabled={
+                      !ttlFile &&
+                      sparqlEndpointIri === '' &&
+                      dataSampleIri === '' &&
+                      namedGraph === ''
+                    }
+                    onClick={onHandleClearInputsClicked}
+                    size="small"
+                  >
+                    Clear inputs
+                  </Button>
+                </Grid>
+
+                <Grid item xs={6} sm={6}>
+                  <Button
+                    className={classes.itemGrid}
+                    variant="contained"
+                    component="span"
+                    color="secondary"
+                    disabled={
+                      !ttlFile &&
+                      !dataSourcesUris &&
+                      sparqlEndpointIri === '' &&
+                      dataSampleIri === '' &&
+                      namedGraph === ''
+                    }
+                    onClick={onHandleProcessStartDiscovery}
+                    size="small"
+                  >
+                    Start Discovery
+                  </Button>
+                </Grid>
+              </Grid>
             )}
           </Grid>
         </Grid>
