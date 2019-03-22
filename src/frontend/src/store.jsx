@@ -34,7 +34,7 @@ const store = createStore(
     user: userReducer,
     globals: globalReducer,
     discover: discoverReducer,
-    datasources: discoveryReducer,
+    discovery: discoveryReducer,
     visualizers: visualizersReducer,
     etl: etlReducer,
     application: applicationReducer

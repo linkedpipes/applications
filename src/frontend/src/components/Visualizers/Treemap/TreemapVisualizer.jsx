@@ -14,7 +14,7 @@ type Props = {
 
 type State = {
   dataLoadingStatus: string,
-  chartData: Array<Array<mixed>>
+  chartData: Array<Array<any>>
 };
 
 const styles = theme => ({
@@ -76,7 +76,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
             this.props.selectedResultGraphIri,
             iri
           );
-          const jsonData = await response.json();
+          const jsonData = await response.data;
 
           // Update state
           this.setState(
@@ -101,7 +101,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       this.props.selectedResultGraphIri
     );
     const headers = [['id', 'parentId', 'size', 'color']];
-    const jsonData = await response.json();
+    const jsonData = await response.data;
     const chartData = headers.concat(transformData(jsonData));
     this.setState({
       dataLoadingStatus: 'ready',
@@ -113,7 +113,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
   chartEvents: Array<{
     eventName: string,
-    callback: ({ chartWrapper: any }) => void
+    callback: ({ chartWrapper: any }) => Function
   }>;
 
   render() {

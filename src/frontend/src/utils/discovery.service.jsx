@@ -1,68 +1,37 @@
-import { BASE_URL, rest } from './api.service';
-import { getQueryString } from './global.utils';
-
-const PIPELINES_URL = `${BASE_URL}pipelines/`;
-const DISCOVERY_URL = `${BASE_URL}discovery/`;
-const DISCOVERY_STATUS_URL = discoveryId => {
-  return `${DISCOVERY_URL + discoveryId}/status`;
-};
-
-const DISCOVER_FROM_INPUT_URL = webId => {
-  return `${PIPELINES_URL}discoverFromInput?${getQueryString({
-    webId
-  })}`;
-};
-const DISCOVER_FROM_ENDPOINT = `${PIPELINES_URL}discoverFromEndpoint`;
-
-const DISCOVER_FROM_URI_LIST_URL = webId => {
-  return `${PIPELINES_URL}discover?${getQueryString({
-    webId
-  })}`;
-};
-
-const PIPELINE_GROUPS_URL = discoveryId => {
-  return `${DISCOVERY_URL + discoveryId}/pipelineGroups`;
-};
+import axios from './api.service';
 
 const DiscoveryService = {
   async postDiscoverFromTtl({ ttlFile, webId }) {
-    return rest(DISCOVER_FROM_INPUT_URL(webId), ttlFile, 'POST', undefined);
+    return axios.post('/pipelines/discoverFromInput', ttlFile, {
+      params: { webId }
+    });
   },
 
+  // Params should be sent in body, coordinate with backend guys
   async postDiscoverFromEndpoint({
     sparqlEndpointIri,
     dataSampleIri,
     namedGraph,
     webId
   }) {
-    return rest(
-      `${DISCOVER_FROM_ENDPOINT}?${getQueryString({
-        sparqlEndpointIri,
-        dataSampleIri,
-        namedGraph,
-        webId
-      })}`,
-      undefined,
-      'POST',
-      undefined
-    );
+    return axios.post('/pipelines/discoverFromEndpoint', null, {
+      params: { sparqlEndpointIri, dataSampleIri, namedGraph, webId }
+    });
   },
 
+  // WebId should be sent in body itself
   async postDiscoverFromUriList({ datasourceUris, webId }) {
-    return rest(
-      DISCOVER_FROM_URI_LIST_URL(webId),
-      datasourceUris,
-      'POST',
-      undefined
-    );
+    return axios.post('/pipelines/discover/', datasourceUris, {
+      params: { webId }
+    });
   },
 
   async getDiscoveryStatus({ discoveryId }) {
-    return rest(DISCOVERY_STATUS_URL(discoveryId), undefined, 'GET', undefined);
+    return axios.get(`/discovery/${discoveryId}/status`);
   },
 
   async getPipelineGroups({ discoveryId }) {
-    return rest(PIPELINE_GROUPS_URL(discoveryId), undefined, 'GET', undefined);
+    return axios.get(`/discovery/${discoveryId}/pipelineGroups`);
   }
 };
 

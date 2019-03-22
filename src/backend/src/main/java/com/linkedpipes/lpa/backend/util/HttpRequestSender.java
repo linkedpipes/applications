@@ -210,7 +210,7 @@ public class HttpRequestSender {
     }
 
     public enum HttpMethod {
-        GET, POST
+        GET, POST, DELETE
     }
 
 }

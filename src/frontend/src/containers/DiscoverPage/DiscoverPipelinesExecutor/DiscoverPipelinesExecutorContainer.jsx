@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/lib/connect/connect';
-import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesExecutorComponent from './DiscoverPipelinesExecutorComponent';
 import {
@@ -49,12 +48,17 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         );
       })
       .catch(error => {
-        Log.error(error.message, 'DiscoverPipelinesExecutorContianer');
+        Log.error(error.message, 'DiscoverPipelinesExecutorContainer');
         self.setState({
           loaderLabelText:
             'Sorry, the ETL is unable to execute the pipeline, try selecting different source...'
         });
       });
+  };
+
+  componentWillUnmount = () => {
+    const { socket } = this.props;
+    socket.off('executionStatus');
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -66,7 +70,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       pipelineId
     })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(json => {
         const response = json;
@@ -96,7 +100,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       selectedVisualiser: visualizerCode
     })
       .then(response => {
-        return response.json();
+        return response.data;
       })
       .then(json => {
         const executionIri = json.iri;
@@ -104,8 +108,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         onAddSingleExecution(pipelineId, executionIri);
 
         self.setState({
-          loaderLabelText:
-            'Please, hold on ETL is chatting with Tim Berners-Lee 🕴...'
+          loaderLabelText: 'Please, hold on processing the pipeline...'
         });
 
         self.startSocketListener(executionIri);
@@ -122,7 +125,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     socket.on('executionStatus', data => {
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
       const executionCrashed = data === 'Crashed';
-      if (!data || executionCrashed) {
+      const executionTimeout = data === 'Polling terminated';
+      if (!data || executionCrashed || executionTimeout) {
         self.setState({
           loaderLabelText:
             'There was an error during the pipeline execution. Please, try different sources.'
@@ -142,7 +146,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         }
 
         self.setState({
-          loaderLabelText: `ETL responded with status : ${status}`
+          loaderLabelText: `Pipeline execution status : ${status}`
         });
 
         if (
@@ -153,6 +157,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         ) {
           onSetEtlExecutionStatus(status);
           socket.emit('leave', executionIri);
+          socket.off('executionStatus');
         }
       }
     });
@@ -165,6 +170,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       <DiscoverPipelinesExecutorComponent
         etlExecutionIsFinished={etlExecutionStatus}
         loaderLabelText={loaderLabelText}
+        ls
       />
     );
   }
@@ -185,8 +191,8 @@ DiscoverPipelinesExecutorContainer.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    pipelineId: state.globals.pipelineId,
-    discoveryId: state.globals.discoveryId,
+    pipelineId: state.etl.pipelineId,
+    discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     etlExecutionStatus: state.discover.etlExecutionStatus
   };
@@ -207,7 +213,7 @@ const mapDispatchToProps = dispatch => {
 
   const onAddSelectedResultGraphIriAction = resultGraphIri =>
     dispatch(
-      globalActions.addSelectedResultGraphIriAction({
+      etlActions.addSelectedResultGraphIriAction({
         data: resultGraphIri
       })
     );

@@ -126,7 +126,7 @@ const NavigationBarComponent = ({
           className={classes.flex}
           noWrap
         >
-          Discovery API Assistant Demo
+          LinkedPipes Applications
         </Typography>
         <UserProfileButton />
       </Toolbar>

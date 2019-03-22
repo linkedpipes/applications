@@ -37,6 +37,11 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
+    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.discoveryPollingTimeoutMins");
+    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.etlPollingTimeoutMins");
+    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.discoveryPollingFrequencySecs");
+    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.etlPollingFrequencySecs");
+
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;
@@ -88,8 +93,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                     executionRepository.save(e);
                 }
 
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                 if (!executionStatus.status.isPollable()) {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(executionStatus));
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
@@ -99,20 +104,29 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, ETL_POLLING_FREQUENCY_SECS, ETL_POLLING_FREQUENCY_SECS, SECONDS);
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
-            Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                if (e.getStatus().isPollable()) {
-                    e.setStatus(EtlStatus.UNKNOWN);
+                if (e.getStatus() != EtlStatus.FINISHED) {
+                    logger.info("Cancelling execution");
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", "Polling terminated");
+                    try {
+                        etlService.cancelExecution(executionIri);
+                        e.setStatus(EtlStatus.CANCELLED);
+                        // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
+                    } catch (LpAppsException ex) {
+                        logger.warn("Failed to cancel execution " + executionIri, ex);
+                        e.setStatus(EtlStatus.UNKNOWN);
+                    }
                     executionRepository.save(e);
                 }
             }
         };
 
-        Application.SCHEDULER.schedule(canceller, 1, HOURS);
+        logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
+        Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
@@ -136,17 +150,22 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
         };
 
-        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, 10, 10, SECONDS);
+        ScheduledFuture<?> checkerHandle = Application.SCHEDULER.scheduleAtFixedRate(checker, DISCOVERY_POLLING_FREQUENCY_SECS, DISCOVERY_POLLING_FREQUENCY_SECS, SECONDS);
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
             Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+            try {
+                discoveryService.cancelDiscovery(discoveryId);
+            } catch (LpAppsException ex) {
+                logger.warn("Failed to cancel discovery " + discoveryId, ex);
+            }
             for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                 d.setExecuting(false);
                 discoveryRepository.save(d);
             }
         };
 
-        Application.SCHEDULER.schedule(canceller, 1, HOURS);
+        Application.SCHEDULER.schedule(canceller, DISCOVERY_TIMEOUT_MINS, MINUTES);
     }
 }

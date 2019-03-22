@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import Button from '@material-ui/core/Button/Button';
 import { withStyles } from '@material-ui/core/styles';
-import Link from 'react-router-dom/es/Link';
+import { Link } from 'react-router-dom';
 
 type Props = {
   classes: {

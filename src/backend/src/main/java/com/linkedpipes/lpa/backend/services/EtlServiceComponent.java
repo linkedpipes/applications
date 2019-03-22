@@ -45,16 +45,18 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException {
         String response = httpActions.getExecutionStatus(executionIri);
-        logger.error("ETL status response: " + response);
-
         ExecutionStatus executionStatus = OBJECT_MAPPER.readValue(response, ExecutionStatus.class);
-        System.out.println("executionStatus = " + executionStatus);
         return executionStatus;
     }
 
     @Override
     public String getExecutionResult(String executionIri) throws LpAppsException {
         return httpActions.getExecutionResult(executionIri);
+    }
+
+    @Override
+    public void cancelExecution(String executionIri) throws LpAppsException {
+        httpActions.cancelExecution(executionIri);
     }
 
     private class HttpActions {
@@ -84,9 +86,20 @@ public class EtlServiceComponent implements EtlService {
                     .send();
         }
 
-        // the below method is used as a hack to change localhost reference to the name
+        private void cancelExecution(String executionIri) throws LpAppsException {
+            //This is not 100% ideal, but simple cancel doesn't work
+            new HttpRequestSender(context).to(formatCancelExecutionIri(executionIri))
+                .method(HttpRequestSender.HttpMethod.DELETE).send();
+        }
+
+        // the below methods are used as a hack to change localhost reference to the name
         // of the etl container in docker
         private String formatExecutionIri(String executionIri) {
+            String executionId = StringUtils.substringAfterLast(executionIri, "/");
+            return URL_BASE + "/executions/" + executionId;
+        }
+
+        private String formatCancelExecutionIri(String executionIri) {
             String executionId = StringUtils.substringAfterLast(executionIri, "/");
             return URL_BASE + "/executions/" + executionId;
         }

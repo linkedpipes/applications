@@ -4,7 +4,6 @@ import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.services.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -59,16 +58,6 @@ public class UserController {
 
     @NotNull
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> addUser(@NotNull @RequestParam(value="webId", required=true) String user) throws LpAppsException {
-        try {
-            return ResponseEntity.ok(userService.addUser(user));
-        } catch (UserTakenException e) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Username already taken", e);
-        }
-    }
-
-    @NotNull
-    @GetMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
