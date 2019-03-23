@@ -13,9 +13,12 @@ import com.linkedpipes.lpa.backend.sparql.queries.rgml.EdgesQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.rgml.GraphQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.rgml.NodesQueryProvider;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class RgmlService {
     //TODO
     private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
@@ -26,20 +29,29 @@ public class RgmlService {
      * reason, only one graph should exist in the data set.
      *
      */
-    public static Graph getGraph() {
+    public Graph getGraph(@Nullable String graphIri) {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
-        return GraphExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+        System.out.println(provider.get(graphIri));
+        return GraphExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
     /** Get all edges (resources of type rgml:Edge). */
-    public static List<Edge> getEdges() {
+    public List<Edge> getEdges(@Nullable String graphIri) {
         ConstructSparqlQueryProvider provider = new EdgesQueryProvider();
-        return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+        System.out.println(provider.get(graphIri));
+        return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public static List<Node> getNodes(Integer limit, Integer offset) {
+    public List<Node> getNodes(@Nullable String graphIri, Integer limit, Integer offset) {
         ConstructSparqlQueryProvider provider = new NodesQueryProvider(limit, offset);
-        return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get()));
+        System.out.println(provider.get(graphIri));
+        return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+    }
+
+    public List<Node> getNodesByUris(@Nullable String graphIri, List<String> nodeUris) {
+        ConstructSparqlQueryProvider provider = new NodesQueryProvider(nodeUris);
+        System.out.println(provider.get(graphIri));
+        return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
 }
