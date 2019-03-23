@@ -100,9 +100,13 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.timeout = false;
                     report.executionIri = executionIri;
 
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
-                        .sendEvent("executionStatus",
-                                   OBJECT_MAPPER.writeValueAsString(report));
+                    try {
+                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
+                            .sendEvent("executionStatus",
+                                       OBJECT_MAPPER.writeValueAsString(report));
+                    } catch (LpAppsException ex) {
+                        logger.error("Failed to report execution status: " + executionIri, ex);
+                    }
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
@@ -113,7 +117,11 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.timeout = false;
                 report.executionIri = executionIri;
 
-                Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+                try {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+                } catch (LpAppsException ex) {
+                    logger.error("Failed to report execution status: " + executionIri, ex);
+                }
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
@@ -130,8 +138,12 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.error = true;
                     report.timeout = true;
                     report.executionIri = executionIri;
-                    
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+
+                    try {
+                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+                    } catch (LpAppsException ex) {
+                        logger.error("Failed to report execution status: " + executionIri, ex);
+                    }
                     try {
                         etlService.cancelExecution(executionIri);
                         e.setStatus(EtlStatus.CANCELLED);
@@ -160,11 +172,15 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.discoveryId = discoveryId;
                     report.status = discoveryStatus;
                     report.error = false;
+                    report.timeout = false;
 
-                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
-                        .sendEvent("discoveryStatus",
+                    try {
+                        Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
+                            .sendEvent("discoveryStatus",
                                    OBJECT_MAPPER.writeValueAsString(report));
-                    );
+                    } catch (LpAppsException ex) {
+                        logger.error("Failed to report discovery status: " + discoveryId, ex);
+                    }
                     for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                         d.setExecuting(false);
                         discoveryRepository.save(d);
@@ -173,7 +189,16 @@ public class ExecutorServiceComponent implements ExecutorService {
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
-                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Crashed");
+                DiscoveryStatusReport report = new DiscoveryStatusReport();
+                report.discoveryId = discoveryId;
+                report.status = null;
+                report.error = true;
+                report.timeout = false;
+                try {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
+                } catch (LpAppsException ex) {
+                    logger.error("Failed to report discovery status: " + discoveryId, ex);
+                }
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
@@ -182,7 +207,16 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
-            Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", "Polling terminated");
+            DiscoveryStatusReport report = new DiscoveryStatusReport();
+            report.discoveryId = discoveryId;
+            report.status = null;
+            report.error = false;
+            report.timeout = true;
+            try {
+                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
+            } catch (LpAppsException ex) {
+                logger.error("Failed to report discovery status: " + discoveryId, ex);
+            }
             try {
                 discoveryService.cancelDiscovery(discoveryId);
             } catch (LpAppsException ex) {
