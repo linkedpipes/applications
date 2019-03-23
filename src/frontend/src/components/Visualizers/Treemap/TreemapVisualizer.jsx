@@ -14,7 +14,7 @@ type Props = {
 
 type State = {
   dataLoadingStatus: string,
-  chartData: Array<Array<mixed>>
+  chartData: Array<Array<any>>
 };
 
 const styles = theme => ({
@@ -113,7 +113,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
   chartEvents: Array<{
     eventName: string,
-    callback: ({ chartWrapper: any }) => void
+    callback: ({ chartWrapper: any }) => Function
   }>;
 
   render() {

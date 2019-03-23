@@ -5,6 +5,7 @@ import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
@@ -16,36 +17,19 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
 
     @NotNull
     @Override
-    public final Query get() {
+    public final Query get(@Nullable String graphName) {
         SelectBuilder builder = new SelectBuilder();
 
         try {
             addPrefixes(builder);
             addVars(builder);
+
+            if(graphName != null && !graphName.isEmpty())
+                builder.from(graphName);
+
             addWheres(builder);
             addOptionals(builder);
             addFilters(builder);
-            addAdditional(builder);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        return builder.build();
-    }
-
-    @NotNull
-    @Override
-    public final Query getForNamed(@NotNull String name) {
-        SelectBuilder builder = new SelectBuilder();
-
-        try {
-            addPrefixes(builder);
-            addVars(builder);
-            builder.fromNamed(name);
-
-            SelectBuilder subQuery = addOptionals(addWheres(new SelectBuilder()));
-            addFilters(subQuery);
-            builder.addGraph(VAR_GRAPH, subQuery);
             addAdditional(builder);
         } catch (ParseException e) {
             throw new RuntimeException(e);
