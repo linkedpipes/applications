@@ -139,7 +139,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         if (parsedData.discoveryId !== discoveryId) {
           return;
         }
-        if (parsedData.isFinished) {
+        if (parsedData.status.isFinished) {
           socket.emit('leave', discoveryId);
           socket.removeListener('discoveryStatus');
           self.loadPipelineGroups(discoveryId).then(() => {

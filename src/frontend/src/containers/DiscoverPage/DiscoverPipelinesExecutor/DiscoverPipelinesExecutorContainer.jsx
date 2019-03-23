@@ -145,9 +145,10 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
         socket.removeListener('executionStatus');
       } else {
         Log.info(parsedData, 'DiscoverPipelinesExecutorContainer');
-        let status = ETL_STATUS_MAP[parsedData.status.statusIri]
-          ? ETL_STATUS_MAP[parsedData.status.statusIri]
-          : ETL_STATUS_MAP[parsedData.status['@id']];
+        const parsedStatus = parsedData.status.status;
+        let status = ETL_STATUS_MAP[parsedStatus.statusIri]
+          ? ETL_STATUS_MAP[parsedStatus.statusIri]
+          : ETL_STATUS_MAP[parsedStatus['@id']];
 
         if (status === undefined) {
           self.setState({
