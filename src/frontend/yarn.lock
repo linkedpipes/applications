@@ -1810,7 +1810,18 @@
     text-encoding "^0.6.4"
     whatwg-url "^6.4.1"
 
-"@solid/query-ldflex@2.4.0", "@solid/query-ldflex@^2.0.0", "@solid/query-ldflex@^2.4.0":
+"@solid/query-ldflex@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@solid/query-ldflex/-/query-ldflex-2.5.1.tgz#f6b180be666493ee167f799b9243d38345d556a1"
+  integrity sha512-IjcxlH1zXl4gLZq5EfPhXSPs2atac9iheoE4YziGtVtKpbSRlnMZKxx1Ky426LA/sGjuJp6P6WYISRwKWCRJoQ==
+  dependencies:
+    "@rdfjs/data-model" "^1.1.1"
+    ldflex "^2.2.0"
+    ldflex-comunica "^3.0.0"
+    solid-auth-client "^2.2.14"
+    uuid "^3.3.2"
+
+"@solid/query-ldflex@^2.0.0", "@solid/query-ldflex@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@solid/query-ldflex/-/query-ldflex-2.4.0.tgz#621e3d8a511359a65fad92c1fc2714d4b0b9716b"
   integrity sha512-vKZSHwMnn1LqPGWWvAux2TNvulxe9CXu1aTVUjjrmnUKfyLpJi1PuumT/ChZ9UlUwJK3GBi+cncWAdi0DusjGA==
@@ -6314,10 +6325,28 @@ ldflex-comunica@^2.4.0:
     "@comunica/actor-init-sparql" "^1.6.0"
     "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-source" "^1.6.0"
 
+ldflex-comunica@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ldflex-comunica/-/ldflex-comunica-3.0.0.tgz#3f63c08b926f8a01398a5956b2b30aa57cade072"
+  integrity sha512-Vwu09hZ9EkhQA+YQSP7CRyAKDxyeuTjvdJ8sA+7dL+AwwhjWgVR8hkYbV1NWTGiEQjdheEv5WIWM7nx8kljbkQ==
+  dependencies:
+    "@comunica/actor-http-solid-auth-fetch" "^1.0.0"
+    "@comunica/actor-init-sparql" "^1.6.0"
+    "@comunica/actor-rdf-resolve-quad-pattern-rdfjs-source" "^1.6.0"
+
 ldflex@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ldflex/-/ldflex-2.1.0.tgz#8edfe48be0a96c8e0ab37a2d60a6de9e3ed2b28f"
   integrity sha512-IceMLWv9JJ9yA664F6NM0OafUjIi1Cy4ByQAMYenQfUvJLjqsjJNOs6A4G9g8EaRJzwx5Vp17BWJN7QkuIUXSA==
+  dependencies:
+    "@babel/runtime" "^7.1.5"
+    "@rdfjs/data-model" "^1.1.1"
+    jsonld-context-parser "^1.1.1"
+
+ldflex@^2.2.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/ldflex/-/ldflex-2.2.1.tgz#5368f354f391c67f5fdcfd0e9d4eb3010c5080ab"
+  integrity sha512-e96zCSGRyOIpgDIcQe6mFb/H5uu1E6yNghm7OetQdvbdyxCmbNvxZDoY1+of+g/GNlwvn/cnQ58jhy8TObL14g==
   dependencies:
     "@babel/runtime" "^7.1.5"
     "@rdfjs/data-model" "^1.1.1"
