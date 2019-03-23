@@ -98,6 +98,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.status = executionStatus;
                     report.error = false;
                     report.timeout = false;
+                    report.executionIri = executionIri;
 
                     Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
                         .sendEvent("executionStatus",
@@ -110,6 +111,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.status = null;
                 report.error = true;
                 report.timeout = false;
+                report.executionIri = executionIri;
 
                 Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 throw new PollingCompletedException(e); //this cancels the scheduler
@@ -127,6 +129,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.status = null;
                     report.error = true;
                     report.timeout = true;
+                    report.executionIri = executionIri;
+                    
                     Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                     try {
                         etlService.cancelExecution(executionIri);
