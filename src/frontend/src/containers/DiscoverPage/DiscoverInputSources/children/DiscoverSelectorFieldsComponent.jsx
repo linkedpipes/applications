@@ -5,18 +5,15 @@ import { Grid, TextField } from '@material-ui/core';
 type Props = {
   classes: { textField: {} },
   dataSampleIri: string,
-  dataSampleTextFieldValue: string,
   discoveryIsLoading: boolean,
   handleDataSampleTextFieldChange: () => void,
   handleNamedGraphTextFieldChange: () => void,
   handleSparqlTextFieldChange: () => void,
   namedGraph: string,
-  namedTextFieldValue: string,
-  sparqlEndpointIri: string,
-  sparqlTextFieldValue: string
+  sparqlEndpointIri: string
 };
 
-const DiscoverAdvancedSelectorComponent = ({
+const DiscoverSelectorComponent = ({
   classes,
   discoveryIsLoading,
   handleNamedGraphTextFieldChange,
@@ -24,10 +21,7 @@ const DiscoverAdvancedSelectorComponent = ({
   handleSparqlTextFieldChange,
   sparqlEndpointIri,
   dataSampleIri,
-  namedGraph,
-  sparqlTextFieldValue,
-  dataSampleTextFieldValue,
-  namedTextFieldValue
+  namedGraph
 }: Props) => (
   <Grid container spacing={16}>
     <Grid item xs={12} sm={12}>
@@ -42,8 +36,11 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!sparqlEndpointIri ? sparqlTextFieldValue : sparqlEndpointIri}
+        value={sparqlEndpointIri}
       />
+    </Grid>
+
+    <Grid item xs={12} sm={12}>
       <TextField
         id="outlined-textarea"
         label="Data sample IRI"
@@ -55,8 +52,11 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!dataSampleIri ? dataSampleTextFieldValue : dataSampleIri}
+        value={dataSampleIri}
       />
+    </Grid>
+
+    <Grid item xs={12} sm={12}>
       <TextField
         id="outlined-textarea"
         label="Named Graph IRI"
@@ -68,10 +68,10 @@ const DiscoverAdvancedSelectorComponent = ({
         fullWidth
         margin="normal"
         variant="outlined"
-        value={!namedGraph ? namedTextFieldValue : namedGraph}
+        value={namedGraph}
       />
     </Grid>
   </Grid>
 );
 
-export default DiscoverAdvancedSelectorComponent;
+export default DiscoverSelectorComponent;

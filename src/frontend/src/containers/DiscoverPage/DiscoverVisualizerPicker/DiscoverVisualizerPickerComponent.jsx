@@ -55,7 +55,7 @@ const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
                 align="center"
                 gutterBottom
               >
-                <Emoji text="No visualizers available, try providing different sources ☹️" />
+                <Emoji text="No visualizers available, try providing different input ☹️" />
               </Typography>
             </Card>
           </Grid>
