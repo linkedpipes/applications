@@ -12,7 +12,7 @@
       <https://discovery.linkedpipes.com/resource/application/map-labeled-points/template>,
       #<https://discovery.linkedpipes.com/resource/application/dcterms/template>,
       <https://gist.githubusercontent.com/Ponsietta/fc490bc45c3a285b5faaa9816114bfca/raw/276f3d19c14e201d90b7c5f38b1f10ccdfc66ff0/treemap_template.ttl>,
-      <https://gist.githubusercontent.com/Ponsietta/cb48f2e556257234cfe1c4e1bb2814b1/raw/cfb820328d3a95b32a61b6dbc3513d4ecfb93df8/chord_template.ttl>
+      <https://gist.githubusercontent.com/ivan-lattak/b483b9a92c5141b7a126fb073b878565/raw/969504830ae06dd7a23b90cdc8ab9c9847baa3de/chord_template.ttl>
 
 	  # Geo
       <https://discovery.linkedpipes.com/resource/transformer/wikidata-coordinate-location-to-schema-geocoordinates/template>,
