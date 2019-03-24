@@ -9,6 +9,7 @@ import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.jetbrains.annotations.NotNull;
 
 public class IncidentEdgesQueryProvider extends ConstructSparqlQueryProvider {
     private String nodeUri;
@@ -20,21 +21,23 @@ public class IncidentEdgesQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_TARGET = var("target");
     public static final String VAR_WEIGHT = var("weight");
 
-    public IncidentEdgesQueryProvider(String nodeUri, EdgeDirection direction){
+    public IncidentEdgesQueryProvider(String nodeUri, EdgeDirection direction) {
         this.nodeUri = nodeUri;
         this.direction = direction;
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addPrefixes(ConstructBuilder builder) {
+    public ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
                 .addPrefix(Prefixes.RGML_PREFIX, RGML.uri)
                 .addPrefix(Prefixes.RDF_PREFIX, RDF.getURI())
                 .addPrefix(Prefixes.RDFS_PREFIX, RDFS.getURI());
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addConstructs(ConstructBuilder builder) {
+    protected ConstructBuilder addConstructs(@NotNull ConstructBuilder builder) {
         return builder
                 .addConstruct(VAR_EDGE, RDF.type, SparqlUtils.formatUri(RGML.Edge.getURI()))
                 .addConstruct(VAR_EDGE, RGML.source, VAR_SOURCE)
@@ -42,8 +45,9 @@ public class IncidentEdgesQueryProvider extends ConstructSparqlQueryProvider {
                 .addConstruct(VAR_EDGE, RGML.weight, VAR_WEIGHT);
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addWheres(ConstructBuilder builder) {
+    public ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
         SelectBuilder subquery = new SelectBuilder()
                 .addVar(VAR_EDGE)
                 .addVar(VAR_SOURCE)

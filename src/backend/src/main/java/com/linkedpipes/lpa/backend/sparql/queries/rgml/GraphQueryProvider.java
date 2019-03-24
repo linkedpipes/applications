@@ -5,9 +5,9 @@ import com.linkedpipes.lpa.backend.rdf.vocabulary.RGML;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.RDF;
+import org.jetbrains.annotations.NotNull;
 
 public class GraphQueryProvider extends SelectSparqlQueryProvider {
 
@@ -20,15 +20,17 @@ public class GraphQueryProvider extends SelectSparqlQueryProvider {
     public static final String VAR_EDGE = var("edge");
 
 
+    @NotNull
     @Override
-    public SelectBuilder addPrefixes(SelectBuilder builder) {
+    public SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
                 .addPrefix(Prefixes.RGML_PREFIX, RGML.uri)
                 .addPrefix(Prefixes.RDF_PREFIX, RDF.getURI());
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addVars(SelectBuilder builder) {
+    public SelectBuilder addVars(@NotNull SelectBuilder builder) {
         return builder
                 .setDistinct(true)
                 .addVar(VAR_DIRECTED)
@@ -36,21 +38,23 @@ public class GraphQueryProvider extends SelectSparqlQueryProvider {
                 .addVar(VAR_EDGE_COUNT);
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addWheres(SelectBuilder builder) throws ParseException {
+    public SelectBuilder addWheres(@NotNull SelectBuilder builder) throws ParseException {
         return builder
                 .addWhere(VAR_GRAPH, RDF.type, RGML.Graph)
                 .addWhere(VAR_GRAPH, RGML.directed, VAR_DIRECTED)
                 .addSubQuery(new SelectBuilder()
-                                .addVar("count(*)", VAR_NODE_COUNT)
-                                .addWhere(VAR_NODE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI())))
+                        .addVar("count(*)", VAR_NODE_COUNT)
+                        .addWhere(VAR_NODE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI())))
                 .addSubQuery(new SelectBuilder()
-                                .addVar("count(*)", VAR_EDGE_COUNT)
-                                .addWhere(VAR_EDGE, RDF.type, SparqlUtils.formatUri(RGML.Edge.getURI())));
+                        .addVar("count(*)", VAR_EDGE_COUNT)
+                        .addWhere(VAR_EDGE, RDF.type, SparqlUtils.formatUri(RGML.Edge.getURI())));
     }
 
+    @NotNull
     @Override
-    public SelectBuilder addAdditional(SelectBuilder builder) {
+    public SelectBuilder addAdditional(@NotNull SelectBuilder builder) {
         return builder.setLimit(1);
     }
 }
