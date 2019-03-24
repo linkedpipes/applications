@@ -5,7 +5,7 @@ import uuid from 'uuid';
 import axios from 'axios';
 import { Log } from '@utils';
 
-const samples = [
+export const samples = [
   {
     id: uuid.v4(),
     type: 'sparqlEndpoint',

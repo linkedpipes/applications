@@ -6,6 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 type Props = {
   applicationsList: Array<{ id: string, iri: string }>
@@ -32,7 +33,6 @@ const ApplicationsTableComponent = ({ applicationsList }: Props) => (
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Title</TableCell>
               <TableCell align="right">Visualizer</TableCell>
               <TableCell align="right">Published</TableCell>
               <TableCell align="right">Link</TableCell>
@@ -46,15 +46,17 @@ const ApplicationsTableComponent = ({ applicationsList }: Props) => (
                 </TableCell>
                 <TableCell align="right">{row.calories}</TableCell>
                 <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Paper>
     ) : (
-      <Paper>No applications found</Paper>
+      <Paper>
+        <Typography variant="body1" gutterBottom>
+          No applications found
+        </Typography>
+      </Paper>
     )}
   </div>
 );

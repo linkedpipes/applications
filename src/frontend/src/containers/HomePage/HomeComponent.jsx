@@ -11,6 +11,10 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import DiscoveriesTableComponent from './children/DiscoveriesTableComponent';
 import ApplicationsTableComponent from './children/ApplicationsTableComponent';
+import PipelinesTableComponent from './children/PipelinesTableComponent';
+import { Log, AuthenticationService } from '@utils';
+import { samples } from '../DiscoverPage/DiscoverInputSources/DiscoverExamplesContainer';
+import axios from 'axios';
 
 type Props = {
   classes: {
@@ -20,8 +24,18 @@ type Props = {
     templatesBtn: {},
     createBtn: {}
   },
-  discoveriesList: Array<{}>,
-  applicationsList: Array<{}>
+  history: { push: any },
+  webId: string,
+  handleSetUserProfile: any,
+  discoveriesList: Array<{ id: string, finished: boolean }>,
+  applicationsList: Array<{}>,
+  pipelinesList: Array<{
+    executionIri: string,
+    selectedVisualiser: string,
+    status: { '@id'?: string, status?: string },
+    webId: string
+  }>,
+  onInputExampleClicked: (sample: {}) => void
 };
 
 type State = {
@@ -64,12 +78,61 @@ class HomeComponent extends React.PureComponent<Props, State> {
     tabIndex: 0
   };
 
+  componentDidMount() {
+    const { webId, handleSetUserProfile } = this.props;
+    AuthenticationService.getUserProfile(webId)
+      .then(res => {
+        Log.info(
+          'Response from get user profile call:',
+          'AuthenticationService'
+        );
+        Log.info(res, 'AuthenticationService');
+        Log.info(res.data, 'AuthenticationService');
+
+        return res.data;
+      })
+      .then(jsonResponse => {
+        handleSetUserProfile(jsonResponse);
+      })
+      .catch(error => {
+        Log.error(error, 'HomeContainer');
+      });
+  }
+
+  componentWillUnmount() {}
+
   handleChange = (event, tabIndex) => {
     this.setState({ tabIndex });
   };
 
+  handleSampleClick = sample => {
+    return () => {
+      if (sample.type === 'ttlFile') {
+        axios
+          .get(sample.fileUrl)
+          .then(response => {
+            const sampleWithUris = sample;
+            sampleWithUris.dataSourcesUris = response.data;
+            this.props.onInputExampleClicked(sampleWithUris);
+          })
+          .catch(error => {
+            // handle error
+            Log.error(error, 'DiscoverExamplesContainer');
+          });
+      } else {
+        this.props.onInputExampleClicked(sample);
+      }
+      this.props.history.push('/discover');
+    };
+  };
+
   render() {
-    const { classes, discoveriesList, applicationsList } = this.props;
+    const {
+      classes,
+      discoveriesList,
+      applicationsList,
+      pipelinesList
+    } = this.props;
     const { tabIndex } = this.state;
     return (
       <div className={classes.root}>
@@ -93,61 +156,37 @@ class HomeComponent extends React.PureComponent<Props, State> {
               </Link>
               <br />
               <Typography variant="subtitle1" gutterBottom>
-                Or try one of predefined examples
+                Or try one of our predefined examples
               </Typography>
-              <Link
-                style={{ textDecoration: 'none', color: 'transparent' }}
-                to="/discover"
-              >
+              {samples.map(sample => (
                 <Button
                   variant="contained"
                   size="large"
                   className={classes.templatesBtn}
+                  onClick={this.handleSampleClick(sample)}
                 >
-                  Treemap
+                  {sample.label}
                 </Button>
-              </Link>
-              <Link
-                style={{ textDecoration: 'none', color: 'transparent' }}
-                to="/discover"
-              >
-                <Button
-                  variant="contained"
-                  size="large"
-                  className={classes.templatesBtn}
-                >
-                  Google Maps
-                </Button>
-              </Link>
-              <Link
-                style={{ textDecoration: 'none', color: 'transparent' }}
-                to="/discover"
-              >
-                <Button
-                  variant="contained"
-                  size="large"
-                  className={classes.templatesBtn}
-                >
-                  Chord Diagram
-                </Button>
-              </Link>
+              ))}
             </Paper>
           </Grid>
           <Grid item xs={8}>
             <AppBar position="static" color="secondary">
               <Tabs value={tabIndex} onChange={this.handleChange} centered>
                 <Tab label="Discoveries" />
+                <Tab label="Pipelines" />
                 <Tab label="My Applications" />
               </Tabs>
             </AppBar>
             {tabIndex === 0 && (
-              <DiscoveriesTableComponent discoveriesList={[]} />
+              <DiscoveriesTableComponent discoveriesList={discoveriesList} />
             )}
             {tabIndex === 1 && (
-              <ApplicationsTableComponent applicationsList={[]} />
+              <PipelinesTableComponent pipelinesList={pipelinesList} />
             )}
-            {/* {1 === 0 && <div>Item One</div>}
-        {2 === 1 && <div>Item Two</div>} */}
+            {tabIndex === 2 && (
+              <ApplicationsTableComponent applicationsList={applicationsList} />
+            )}
           </Grid>
         </Grid>
       </div>
