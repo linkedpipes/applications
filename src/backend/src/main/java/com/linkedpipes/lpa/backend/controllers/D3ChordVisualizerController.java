@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.rgml.RgmlService;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,15 @@ public class D3ChordVisualizerController {
     @GetMapping("/api/chord/edges")
     public ResponseEntity<List<Edge>> getEdges(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) {
         return ResponseEntity.ok(rgmlService.getEdges(graphIri));
+    }
+
+    @PostMapping("/api/chord/matrix")
+    public ResponseEntity<double[][]> getMatrix(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
+                                                @NotNull @RequestParam("useWeights") boolean useWeights,
+                                                @Nullable @RequestBody List<String> nodeUris) {
+        if(nodeUris == null || nodeUris.isEmpty())
+            return ResponseEntity.ok(new double[0][0]);
+
+        return ResponseEntity.ok(rgmlService.getMatrix(graphIri, useWeights, nodeUris));
     }
 }
