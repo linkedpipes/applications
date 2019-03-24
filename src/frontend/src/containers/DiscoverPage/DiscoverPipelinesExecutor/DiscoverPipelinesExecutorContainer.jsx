@@ -126,6 +126,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       if (data === undefined) {
         socket.emit('leave', executionIri);
         socket.removeListener('executionStatus');
+        return;
       }
 
       const parsedData = JSON.parse(data);
@@ -135,14 +136,14 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       }
 
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
+      socket.emit('leave', executionIri);
+      socket.removeListener('executionStatus');
 
       if (parsedData.error || parsedData.timeout) {
         self.setState({
           loaderLabelText:
             'There was an error during the pipeline execution. Please, try different sources.'
         });
-        socket.emit('leave', executionIri);
-        socket.removeListener('executionStatus');
       } else {
         Log.info(parsedData, 'DiscoverPipelinesExecutorContainer');
         const parsedStatus = parsedData.status.status;
@@ -168,8 +169,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
           status === ETL_STATUS_TYPE.Failed
         ) {
           onSetEtlExecutionStatus(status);
-          socket.emit('leave', executionIri);
-          socket.removeListener('executionStatus');
         }
       }
     });
