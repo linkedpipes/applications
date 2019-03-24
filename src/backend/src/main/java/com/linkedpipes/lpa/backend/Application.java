@@ -72,6 +72,7 @@ public class Application {
     private static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();
         config.setPort(9092);
+        config.setRandomSession(true);  //default is false
         SocketConfig socketConfig = new SocketConfig();
         socketConfig.setReuseAddress(true);
         config.setSocketConfig(socketConfig);
@@ -80,12 +81,12 @@ public class Application {
         SocketIOServer server = new SocketIOServer(config);
 
         server.addEventListener("join", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
-                logger.info("Client joined room: " + roomName);
+                logger.info("Client " + socketIOClient.getSessionId() + " joined room: " + roomName);
                 socketIOClient.joinRoom(roomName);
             });
 
         server.addEventListener("leave", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
-                logger.info("Client left room: " + roomName);
+                logger.info("Client " + socketIOClient.getSessionId() + " left room: " + roomName);
                 socketIOClient.leaveRoom(roomName);
             });
 
