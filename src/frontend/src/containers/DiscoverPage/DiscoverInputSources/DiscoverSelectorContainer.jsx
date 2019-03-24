@@ -41,7 +41,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   componentWillUnmount = () => {
     const { socket } = this.props;
-    socket.off('discoveryStatus');
+    socket.removeListener('discoveryStatus');
   };
 
   postStartFromFile = async instance => {
@@ -121,10 +121,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
     socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
-      socket.emit('leave', discoveryId);
-      socket.off('discoveryStatus');
-
       if (data === undefined) {
+        socket.emit('leave', discoveryId);
+        socket.removeListener('discoveryStatus');
         self.setState({
           discoveryIsLoading: false
         });
@@ -137,7 +136,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         );
       } else {
         const parsedData = JSON.parse(data);
-        if (parsedData.isFinished) {
+        if (parsedData.discoveryId !== discoveryId) {
+          return;
+        }
+        if (parsedData.status.isFinished) {
+          socket.emit('leave', discoveryId);
+          socket.removeListener('discoveryStatus');
           self.loadPipelineGroups(discoveryId).then(() => {
             self.setState({
               discoveryIsLoading: false
