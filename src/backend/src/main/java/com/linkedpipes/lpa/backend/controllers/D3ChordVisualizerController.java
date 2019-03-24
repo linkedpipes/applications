@@ -28,10 +28,17 @@ public class D3ChordVisualizerController {
         return ResponseEntity.ok(rgmlService.getGraph(graphIri));
     }
 
-    @PostMapping("/api/chord/nodes")
+    @PostMapping("/api/chord/nodesByUris")
     public ResponseEntity<List<Node>> getNodesByUris(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                      @Nullable @RequestBody List<String> nodeUrisList) {
         return ResponseEntity.ok(rgmlService.getNodesByUris(graphIri, nodeUrisList));
+    }
+
+    @GetMapping("/api/chord/nodes")
+    public ResponseEntity<List<Node>> getNodes(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
+                                               @Nullable @RequestParam(value = "limit", required = false) Integer limit,
+                                               @Nullable @RequestParam(value = "offset", required = false) Integer offset) {
+        return ResponseEntity.ok(rgmlService.getNodes(graphIri, limit, offset));
     }
 
     @GetMapping("/api/chord/edges")
