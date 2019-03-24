@@ -4,19 +4,19 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
-import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public class PipelineController {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
-    private static final String GRAPH_NAME_PREFIX = "https://lpapps.com/graph/";
+    private static final String GRAPH_NAME_PREFIX = "https://applications.linkedpipes.com/graph/";
 
     private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 

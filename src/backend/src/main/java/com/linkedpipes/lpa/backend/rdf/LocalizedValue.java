@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,6 +36,10 @@ public class LocalizedValue {
 
     public LocalizedValue(Literal literal){
         put(literal.getLanguage(), literal.getString());
+    }
+
+    public LocalizedValue(Resource resource, Property property){
+        Lists.reverse(resource.listProperties(property).toList()).forEach(l -> put(l.getLanguage(), l.getString()));
     }
 
     public LocalizedValue(List<Literal> literals) {
