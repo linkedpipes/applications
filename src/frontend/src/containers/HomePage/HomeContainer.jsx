@@ -1,25 +1,32 @@
 import HomeComponent from './HomeComponent';
 import { connect } from 'react-redux';
 import { userActions } from '@ducks/userDuck';
-import { withWebId } from '@inrupt/solid-react-components';
+import { withWebId, withAuthorization } from '@inrupt/solid-react-components';
+import { discoverActions } from '../DiscoverPage/duck';
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user
+    userProfile: state.user,
+    discoveriesList: state.user.discoverySessions,
+    pipelinesList: state.user.pipelineExecutions,
+    applicationsList: state.user.applications
   };
 };
 
 const mapDispatchToProps = dispatch => {
+  const onInputExampleClicked = sample =>
+    dispatch(discoverActions.setSelectedInputExample(sample));
   const handleSetUserProfile = userProfile =>
     dispatch(userActions.setUserProfile(userProfile));
   return {
-    handleSetUserProfile
+    handleSetUserProfile,
+    onInputExampleClicked
   };
 };
 
-const HomeContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withWebId(HomeComponent));
-
-export default HomeContainer;
+export default withAuthorization(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withWebId(HomeComponent))
+);
