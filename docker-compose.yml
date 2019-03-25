@@ -49,8 +49,8 @@ services:
       VIRT_SPARQL_ResultSetMaxRows: 1000000
       VIRT_Parameters_NumberOfBuffers: 170000
       VIRT_Parameters_MaxDirtyBuffers: 130000
-      VIRT_Parameters_ThreadCleanupInterval: 0
-      VIRT_Parameters_ResourcesCleanupInterval: 0
+      VIRT_Parameters_ThreadCleanupInterval: 1
+      VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
       VIRT_Parameters_CheckpointInterval: 1
     ports:
