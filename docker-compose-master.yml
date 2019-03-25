@@ -33,6 +33,8 @@ services:
     depends_on:
       - backend
 
+  # Refer to http://vos.openlinksw.com/owiki/wiki/VOS/VirtRDFPerformanceTuning
+  # For adjusting the NumberOfButters and MaxDirtyBuffers according to your RAM size
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
     container_name: lpa-virtuoso
@@ -41,8 +43,8 @@ services:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
       VIRT_SPARQL_ResultSetMaxRows: 1000000
-      VIRT_Parameters_NumberOfBuffers: 680000
-      VIRT_Parameters_MaxDirtyBuffers: 500000
+      VIRT_Parameters_NumberOfBuffers: 340000
+      VIRT_Parameters_MaxDirtyBuffers: 250000
       VIRT_Parameters_ThreadCleanupInterval: 0
       VIRT_Parameters_ResourcesCleanupInterval: 0
       VIRT_Parameters_MaxCheckpointRemap: 150000
