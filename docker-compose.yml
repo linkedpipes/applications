@@ -45,10 +45,13 @@ services:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
       VIRT_SPARQL_ResultSetMaxRows: 1000000
-      VIRT_Parameters_NumberOfBuffers: 170000
-      VIRT_Parameters_MaxDirtyBuffers: 130000
-      VIRT_Parameters_ThreadCleanupInterval: 1
-      VIRT_Parameters_ResourcesCleanupInterval: 1
+      VIRT_Parameters_NumberOfBuffers: 680000
+      VIRT_Parameters_MaxDirtyBuffers: 500000
+      VIRT_Parameters_ThreadCleanupInterval: 0
+      VIRT_Parameters_ResourcesCleanupInterval: 0
+      VIRT_Parameters_MaxCheckpointRemap: 150000
+      VIRT_Parameters_CheckpointInterval: 1
+      VIRT_Parameters_ThreadThreshold: 0
     ports:
       - "8890:8890"
     restart: on-failure
