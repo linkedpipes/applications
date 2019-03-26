@@ -6,8 +6,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { ETL_STATUS_MAP } from '@utils';
 import Typography from '@material-ui/core/Typography';
+import { ETL_STATUS_MAP } from '@utils';
+import uuid from 'uuid';
 
 type Props = {
   pipelinesList: Array<{
@@ -24,7 +25,7 @@ const PipelinesTableComponent = ({ pipelinesList }: Props) => (
       <Paper>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow key={uuid()}>
               <TableCell align="left"> Execution IRI </TableCell>
               <TableCell align="left"> Visualizer </TableCell>
               <TableCell align="left"> Status </TableCell>
@@ -32,7 +33,7 @@ const PipelinesTableComponent = ({ pipelinesList }: Props) => (
           </TableHead>
           <TableBody>
             {pipelinesList.map(pipeline => (
-              <TableRow key={pipeline.executionIri}>
+              <TableRow key={uuid()}>
                 <TableCell align="left">{pipeline.executionIri}</TableCell>
                 <TableCell align="left">
                   {pipeline.selectedVisualiser}

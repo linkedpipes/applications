@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
@@ -12,9 +12,8 @@ import Tab from '@material-ui/core/Tab';
 import DiscoveriesTableComponent from './children/DiscoveriesTableComponent';
 import ApplicationsTableComponent from './children/ApplicationsTableComponent';
 import PipelinesTableComponent from './children/PipelinesTableComponent';
-import { Log, AuthenticationService } from '@utils';
 import { samples } from '../DiscoverPage/DiscoverInputSources/DiscoverExamplesContainer';
-import axios from 'axios';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -25,29 +24,26 @@ type Props = {
     createBtn: {}
   },
   history: { push: any },
-  webId: string,
-  handleSetUserProfile: any,
   discoveriesList: Array<{ id: string, finished: boolean }>,
-  applicationsList: Array<{}>,
+  applicationsList: Array<any>,
   pipelinesList: Array<{
     executionIri: string,
     selectedVisualiser: string,
     status: { '@id'?: string, status?: string },
     webId: string
   }>,
-  onInputExampleClicked: (sample: {}) => void
-};
-
-type State = {
-  tabIndex: number
+  onHandleTabChange: Function,
+  onHandleSelectDiscoveryClick: Function,
+  onHandleSampleClick: Function,
+  tabIndex: Number
 };
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
     marginTop: '2rem',
-    marginLeft: '10%',
-    marginRight: '10%'
+    marginLeft: '4%',
+    marginRight: '4%'
   },
   paper: {
     padding: theme.spacing.unit * 2,
@@ -62,7 +58,8 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: '90%',
     backgroundColor: theme.palette.primary.dark,
-    color: 'white'
+    color: 'white',
+    textTransform: 'none'
   },
   createBtn: {
     margin: theme.spacing.unit,
@@ -73,67 +70,18 @@ const styles = theme => ({
   }
 });
 
-class HomeComponent extends React.PureComponent<Props, State> {
-  state = {
-    tabIndex: 0
-  };
-
-  componentDidMount() {
-    const { webId, handleSetUserProfile } = this.props;
-    AuthenticationService.getUserProfile(webId)
-      .then(res => {
-        Log.info(
-          'Response from get user profile call:',
-          'AuthenticationService'
-        );
-        Log.info(res, 'AuthenticationService');
-        Log.info(res.data, 'AuthenticationService');
-
-        return res.data;
-      })
-      .then(jsonResponse => {
-        handleSetUserProfile(jsonResponse);
-      })
-      .catch(error => {
-        Log.error(error, 'HomeContainer');
-      });
-  }
-
-  componentWillUnmount() {}
-
-  handleChange = (event, tabIndex) => {
-    this.setState({ tabIndex });
-  };
-
-  handleSampleClick = sample => {
-    return () => {
-      if (sample.type === 'ttlFile') {
-        axios
-          .get(sample.fileUrl)
-          .then(response => {
-            const sampleWithUris = sample;
-            sampleWithUris.dataSourcesUris = response.data;
-            this.props.onInputExampleClicked(sampleWithUris);
-          })
-          .catch(error => {
-            // handle error
-            Log.error(error, 'DiscoverExamplesContainer');
-          });
-      } else {
-        this.props.onInputExampleClicked(sample);
-      }
-      this.props.history.push('/discover');
-    };
-  };
-
+class HomeComponent extends PureComponent<Props> {
   render() {
     const {
       classes,
       discoveriesList,
       applicationsList,
-      pipelinesList
+      pipelinesList,
+      onHandleTabChange,
+      onHandleSampleClick,
+      onHandleSelectDiscoveryClick,
+      tabIndex
     } = this.props;
-    const { tabIndex } = this.state;
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
@@ -160,10 +108,11 @@ class HomeComponent extends React.PureComponent<Props, State> {
               </Typography>
               {samples.map(sample => (
                 <Button
+                  key={uuid()}
                   variant="contained"
                   size="large"
                   className={classes.templatesBtn}
-                  onClick={this.handleSampleClick(sample)}
+                  onClick={onHandleSampleClick(sample)}
                 >
                   {sample.label}
                 </Button>
@@ -172,21 +121,33 @@ class HomeComponent extends React.PureComponent<Props, State> {
           </Grid>
           <Grid item xs={8}>
             <AppBar position="static" color="secondary">
-              <Tabs value={tabIndex} onChange={this.handleChange} centered>
+              <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
                 <Tab label="Discoveries" />
                 <Tab label="Pipelines" />
                 <Tab label="My Applications" />
               </Tabs>
             </AppBar>
-            {tabIndex === 0 && (
-              <DiscoveriesTableComponent discoveriesList={discoveriesList} />
-            )}
-            {tabIndex === 1 && (
-              <PipelinesTableComponent pipelinesList={pipelinesList} />
-            )}
-            {tabIndex === 2 && (
-              <ApplicationsTableComponent applicationsList={applicationsList} />
-            )}
+            <div
+              style={{
+                flex: 1,
+                textAlign: 'center'
+              }}
+            >
+              {tabIndex === 0 && (
+                <DiscoveriesTableComponent
+                  discoveriesList={discoveriesList}
+                  onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
+                />
+              )}
+              {tabIndex === 1 && (
+                <PipelinesTableComponent pipelinesList={pipelinesList} />
+              )}
+              {tabIndex === 2 && (
+                <ApplicationsTableComponent
+                  applicationsList={applicationsList}
+                />
+              )}
+            </div>
           </Grid>
         </Grid>
       </div>
