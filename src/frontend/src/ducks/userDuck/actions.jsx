@@ -5,6 +5,15 @@ const setUserProfile = profile => ({
   profile
 });
 
+const setUserProfileAsync = profile => {
+  return dispatch =>
+    new Promise(resolve => {
+      dispatch(setUserProfile(profile));
+      resolve();
+    });
+};
+
 export default {
-  setUserProfile
+  setUserProfile,
+  setUserProfileAsync
 };
