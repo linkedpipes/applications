@@ -104,9 +104,10 @@ public class RgmlService {
             }
         });
 
-        Stream<String> nodeUrisStream = nodeUris.stream();
-        return nodeUrisStream.map(source ->
-                nodeUrisStream.map(target ->
+
+        // Let's remove the uris and create a pure matrix of doubles (2d array). We must be careful to maintain the order.
+        return nodeUris.stream().map(source ->
+                nodeUris.stream().map(target ->
                     matrix.getOrDefault(source, new HashMap<>()).getOrDefault(target, 0.0))
         ).toArray(double[][]::new);
     }
