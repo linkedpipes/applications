@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { BrowserRouter, Switch } from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
 import {
@@ -11,7 +10,9 @@ import {
   NotFoundPage,
   AboutPage,
   CreateVisualizerPage,
-  AuthorizationPage
+  AuthorizationPage,
+  StoragePage,
+  ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log } from '@utils';
@@ -101,7 +102,26 @@ class AppRouter extends React.PureComponent<Props> {
                   />
                   <PrivateLayout path="/about" component={AboutPage} exact />
 
+                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+                  <PrivateLayout
+                    path="/create-app"
+                    component={CreateVisualizerPage}
+                    exact
+                  />
+                  <PrivateLayout
+                    path="/discover"
+                    component={DiscoverPage}
+                    exact
+                  />
+                  <PrivateLayout
+                    path="/storage"
+                    component={StoragePage}
+                    exact
+                  />
+                  <PrivateLayout path="/about" component={AboutPage} exact />
+
                   <PublicLayout path="/404" component={NotFoundPage} exact />
+                  <Route path="/map" component={ApplicationPage} />
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>

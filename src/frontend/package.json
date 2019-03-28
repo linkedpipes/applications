@@ -37,8 +37,9 @@
     "immutable": "4.0.0-rc.12",
     "normalize.css": "8.0.1",
     "prop-types": "15.7.2",
-    "react": "16.8.5",
     "react-dom": "16.8.5",
+    "react": "16.8.5",
+    "query-string": "^6.4.0",
     "react-emoji-render": "0.6.0",
     "react-error-boundary": "1.2.3",
     "react-google-charts": "3.0.11",
@@ -56,6 +57,7 @@
     "redux-thunk": "2.3.0",
     "socket.io-client": "2.2.0",
     "styled-components": "4.2.0",
+    "string-hash": "^1.1.3",
     "uuid": "3.3.2"
   },
   "devDependencies": {

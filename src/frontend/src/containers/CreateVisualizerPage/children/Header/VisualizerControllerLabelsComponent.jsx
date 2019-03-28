@@ -5,9 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import MapIcon from '@material-ui/icons/Map';
 
 type Props = {
-  onTitleChange?: (event: {}) => void,
-  title: string,
-  classes: { root: {}, textField: {} }
+  classes: { root: {}, textField: {} },
+  handleAppTitleChanged: Function
 };
 
 const styles = {
@@ -19,14 +18,17 @@ const styles = {
   }
 };
 
-const VisualizerControllerLabelsComponent = (props: Props) => (
-  <div className={props.classes.root}>
+const VisualizerControllerLabelsComponent = ({
+  classes,
+  handleAppTitleChanged
+}: Props) => (
+  <div className={classes.root}>
     <MapIcon style={{ fontSize: '70px' }} />
     <TextField
       label="App title"
-      className={props.classes.textField}
-      value={props.title}
+      className={classes.textField}
       placeholder="Enter your app Title"
+      onChange={handleAppTitleChanged}
       margin="normal"
     />
   </div>

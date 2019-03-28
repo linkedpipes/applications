@@ -12,7 +12,8 @@ type Props = {
   filters: any,
   visualizer: { visualizerCode: string },
   visualizerParams: any,
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function
 };
 
 const styles = theme => ({
@@ -34,7 +35,8 @@ const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
   visualizerParams = null,
-  classes
+  classes,
+  handleSetCurrentApplicationData
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
@@ -44,6 +46,7 @@ const getVisualizer = (
         <GoogleMapsVisualizer
           markers={markers}
           selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
     }
@@ -53,11 +56,16 @@ const getVisualizer = (
       );
     case VISUALIZER_TYPE.UNDEFINED:
       return (
-        <div className={classes.containerView}>
-          <Typography variant="h2" gutterBottom>
-            No visualizers selected...
-          </Typography>
-        </div>
+        // <div className={classes.containerView}>
+        //   <Typography variant="h2" gutterBottom>
+        //     No visualizers selected...
+        //   </Typography>
+        // </div>
+        <GoogleMapsVisualizer
+          markers={[]}
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
       );
     default:
       return <div>No valid visualizer selected.</div>;
@@ -74,7 +82,8 @@ const VisualizerControllerContainer = (props: Props) => (
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
         props.visualizerParams,
-        props.classes
+        props.classes,
+        props.handleSetCurrentApplicationData
       )}
     </Grid>
   </Grid>

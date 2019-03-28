@@ -4,6 +4,8 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 const dev = process.env.NODE_ENV !== 'production';
 
+const externalAssets = ["./public/popup.html"];
+
 module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
     template: path.join(__dirname, './src/index.html'),

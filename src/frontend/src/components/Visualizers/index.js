@@ -1,4 +1,4 @@
-import { GoogleMapsVisualizer, GoogleMapsPopup } from './GoogleMaps';
+import { GoogleMapsVisualizer } from './GoogleMaps';
 import TreemapVisualizer from './Treemap';
 
-export { GoogleMapsVisualizer, GoogleMapsPopup, TreemapVisualizer };
+export { GoogleMapsVisualizer, TreemapVisualizer };

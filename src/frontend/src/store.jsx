@@ -6,6 +6,7 @@ import { globalReducer } from '@ducks/globalDuck';
 import { etlReducer } from '@ducks/etlDuck';
 import { userReducer } from '@ducks/userDuck';
 import { visualizersReducer } from '@ducks/visualizersDuck';
+import { applicationReducer } from '@ducks/applicationDuck';
 import thunk from 'redux-thunk';
 import Reactotron from './ReactotronConfig';
 
@@ -35,7 +36,8 @@ const store = createStore(
     discover: discoverReducer,
     discovery: discoveryReducer,
     visualizers: visualizersReducer,
-    etl: etlReducer
+    etl: etlReducer,
+    application: applicationReducer
   }),
   enhancer
 );
