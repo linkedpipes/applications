@@ -117,7 +117,7 @@ public class RgmlService {
      * reason, only one graph should exist in the data set.
      *
      */
-    public Graph getGraph(@Nullable String graphIri) {
+    public Graph getGraph(@NotNull String graphIri) {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
         System.out.println(provider.get(graphIri));
         return GraphExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
@@ -130,15 +130,16 @@ public class RgmlService {
         return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public List<Edge> getIncidentEdges(@Nullable String graphIri, String nodeUri, EdgeDirection direction) {
-        if(direction == null)
+    public List<Edge> getIncidentEdges(@NotNull String graphIri, String nodeUri, EdgeDirection direction) {
+        if (direction == null)
             return fetchAllEdges(graphIri, nodeUri);
 
         //TODO possibly pass graph directly to this function instead of re-calling it here
         Graph graph = getGraph(graphIri);
 
-        if(graph.directed)
+        if (graph.directed) {
             return fetchEdges(graphIri, nodeUri, direction);
+        }
 
         return fetchAllEdges(graphIri, nodeUri);
     }
@@ -167,7 +168,7 @@ public class RgmlService {
         return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public double[][] getMatrix(@Nullable String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
+    public double[][] getMatrix(@NotNull String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
         Graph graph = getGraph(graphIri);
 
         List<Edge> edges = nodeUris.stream().map(uri -> getIncidentEdges(graphIri, uri, null))
