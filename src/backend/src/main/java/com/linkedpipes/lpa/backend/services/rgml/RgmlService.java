@@ -31,8 +31,9 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.DoubleStream;
 
 @Service
 public class RgmlService {
@@ -117,7 +118,7 @@ public class RgmlService {
      * reason, only one graph should exist in the data set.
      *
      */
-    public Graph getGraph(@NotNull String graphIri) {
+    public Graph getGraph(@Nullable String graphIri) {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
         System.out.println(provider.get(graphIri));
         return GraphExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
@@ -130,12 +131,9 @@ public class RgmlService {
         return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public List<Edge> getIncidentEdges(@NotNull String graphIri, String nodeUri, EdgeDirection direction) {
+    public List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) {
         if (direction == null)
             return fetchAllEdges(graphIri, nodeUri);
-
-        //TODO possibly pass graph directly to this function instead of re-calling it here
-        Graph graph = getGraph(graphIri);
 
         if (graph.directed) {
             return fetchEdges(graphIri, nodeUri, direction);
@@ -168,12 +166,12 @@ public class RgmlService {
         return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public double[][] getMatrix(@NotNull String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
+    public double[][] getMatrix(@Nullable String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
         Graph graph = getGraph(graphIri);
 
-        List<Edge> edges = nodeUris.stream().map(uri -> getIncidentEdges(graphIri, uri, null))
-                .reduce((result, e) -> Stream.of(result, e).flatMap(Collection::stream)
-                        .collect(Collectors.toList())).orElse(new ArrayList<>());
+        List<Edge> edges = nodeUris.stream()
+                .map(uri -> getIncidentEdges(graphIri, graph, uri, null))
+                .collect(joiningLists());
 
         Map<String, Map<String, Double>> matrix = new HashMap<>();
 
@@ -187,17 +185,25 @@ public class RgmlService {
             }
         });
 
-
         // Let's remove the uris and create a pure matrix of doubles (2d array). We must be careful to maintain the order.
-        return nodeUris.stream().map(source ->
-                nodeUris.stream().map(target ->
-                    matrix.getOrDefault(source, new HashMap<>()).getOrDefault(target, 0.0))
-        ).toArray(double[][]::new);
+        return nodeUris.stream()
+                .map(source -> nodeUris.stream()
+                        .mapToDouble(target -> matrix.getOrDefault(source, Collections.emptyMap())
+                                .getOrDefault(target, 0.0)))
+                .map(DoubleStream::toArray)
+                .toArray(double[][]::new);
+    }
+
+    private <E> Collector<List<E>, ?, List<E>> joiningLists() {
+        return Collector.of(ArrayList::new, List::addAll, (l1, l2) -> {
+            l1.addAll(l2);
+            return l1;
+        });
     }
 
     private void addEdgeToMatrix(Map<String, Map<String, Double>> matrix, String source, String target, boolean useWeights, Double weight){
             var counts = matrix.getOrDefault(source, new HashMap<>());
-            if(!useWeights)
+        if (!useWeights)
                 weight = 1.0;
             counts.put(target, (counts.getOrDefault(target, 0.0) + weight));
             matrix.put(source, counts);
