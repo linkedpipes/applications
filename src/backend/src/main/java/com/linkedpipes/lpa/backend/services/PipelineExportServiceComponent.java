@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 @Profile("!disableDB")
@@ -70,13 +71,15 @@ public class PipelineExportServiceComponent implements PipelineExportService {
     }
 
     public PipelineExportResult retrievePipelineExport(String pipelineId) throws PipelineNotFoundException {
-        for (PipelineInformationDao dao : repository.findByPipelineId(pipelineId)) {
+        List<PipelineInformationDao> lst = repository.findByPipelineId(pipelineId);
+        if (lst.size() == 0)  throw new PipelineNotFoundException(pipelineId);
+        else {
+            PipelineInformationDao dao = lst.get(0);
             PipelineExportResult result = new PipelineExportResult();
             result.pipelineId = dao.getPipelineId();
             result.etlPipelineIri = dao.getEtlPipelineIri();
             result.resultGraphIri = dao.getResultGraphIri();
             return result;
         }
-        throw new PipelineNotFoundException(pipelineId);
     }
 }
