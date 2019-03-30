@@ -41,4 +41,8 @@ public class PipelineInformationDao implements Serializable {
     public String getResultGraphIri() {
         return this.resultGraphIri;
     }
+
+    public long getId() {
+        return this.id;
+    }
 }
