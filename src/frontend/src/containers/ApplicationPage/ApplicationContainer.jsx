@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react';
 import { VISUALIZER_TYPE } from '@constants';
-import { GoogleMapsVisualizer } from '@components';
+import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
 import { withRouter } from 'react-router-dom';
 import { Log } from '@utils';
 import axios from 'axios';
+// eslint-disable-next-line import/order
 import Typography from '@material-ui/core/Typography';
+
 const queryString = require('query-string');
 
 class ApplicationContainer extends PureComponent {
@@ -51,6 +53,12 @@ class ApplicationContainer extends PureComponent {
         const markers = applicationData.markers;
         return (
           <GoogleMapsVisualizer markers={markers} selectedResultGraphIri={''} />
+        );
+      }
+      case VISUALIZER_TYPE.TREEMAP: {
+        const selectedResultGraphIri = applicationData.selectedResultGraphIri;
+        return (
+          <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
         );
       }
       default:

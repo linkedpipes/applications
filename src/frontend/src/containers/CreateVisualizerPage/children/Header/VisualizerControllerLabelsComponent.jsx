@@ -11,7 +11,9 @@ type Props = {
 
 const styles = {
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    display: 'inline-block',
+    margin: 'auto'
   },
   textField: {
     flexGrow: 1
@@ -27,6 +29,7 @@ const VisualizerControllerLabelsComponent = ({
     <TextField
       label="App title"
       className={classes.textField}
+      variant="outlined"
       placeholder="Enter your app Title"
       onChange={handleAppTitleChanged}
       margin="normal"

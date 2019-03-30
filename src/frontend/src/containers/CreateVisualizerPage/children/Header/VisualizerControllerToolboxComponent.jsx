@@ -9,7 +9,6 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
-  onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   classes: { button: {}, leftIcon: {}, root: {} },
   handlePublishClicked: Function
 };

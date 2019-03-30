@@ -3,6 +3,8 @@
 import stringHash from 'string-hash';
 import { Log, getLocation } from '@utils';
 
+const os = require('os');
+
 const FileClient = require('solid-file-client');
 
 const shareApp = (appIri, webId) => {
@@ -53,11 +55,14 @@ const saveAppToSolid = (appData, appTitle, webId, path) => {
   const url = `${getLocation(webId).origin}/${path}`;
 
   const hash = stringHash(JSON.stringify(appTitle, null, 2)).toString();
+  const portSpecifier =
+    process.env.BASE_SERVER_PORT === ''
+      ? ''
+      : `:${process.env.BASE_SERVER_PORT}`;
   const fileUrl = `${url}/lpapp${hash}.json`;
-  const hostName = require('os')
-    .hostname()
-    .toLowerCase();
-  const publishedUrl = `${hostName}:9001/map?applicationIri=${url}`;
+  const hostName = os.hostname().toLowerCase();
+  const applicationEndpoint = appData.applicationEndpoint;
+  const publishedUrl = `${hostName}${portSpecifier}/${applicationEndpoint}?applicationIri=${fileUrl}`;
 
   const file = JSON.stringify({
     applicationData: appData,
@@ -82,6 +87,20 @@ const saveAppToSolid = (appData, appTitle, webId, path) => {
             Log.info(errCreate, 'StorageToolbox');
           }
         );
+      }
+    );
+  });
+};
+
+const removeAppFromStorage = fileUrl => {
+  return new Promise((resolve, reject) => {
+    FileClient.deleteFile(fileUrl).then(
+      () => {
+        Log.info(`Removed file!`);
+        resolve();
+      },
+      err => {
+        reject(err);
       }
     );
   });
@@ -120,5 +139,6 @@ export default {
   saveAppToSolid,
   loadAppFromSolid,
   shareApp,
-  createOrUpdateFolder
+  createOrUpdateFolder,
+  removeAppFromStorage
 };

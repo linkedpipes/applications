@@ -5,6 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import GridListTile from '@material-ui/core/GridListTile';
 import Typography from '@material-ui/core/Typography';
@@ -17,7 +18,12 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import { Link } from 'react-router-dom';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { StorageToolbox } from '@utils';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { toast } from 'react-toastify';
 
 const styles = {
   root: {
@@ -52,13 +58,15 @@ type Props = {
 
 type State = {
   open: boolean,
-  textValue: string
+  textValue: string,
+  anchorEl: any
 };
 
 class StorageAppsBrowserCard extends PureComponent<Props, State> {
   state = {
     open: false,
-    textValue: ''
+    textValue: '',
+    anchorEl: undefined
   };
 
   handleClickOpen = () => {
@@ -74,6 +82,32 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     this.setState({ textValue });
   };
 
+  handleMenuClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleDeleteApp = () => {
+    const applicationIri = this.props.singleTileData.applicationIri;
+    StorageToolbox.removeAppFromStorage(applicationIri).then(error => {
+      if (!error) {
+        this.setState({ anchorEl: null });
+        toast.success('Deleted application!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 2000
+        });
+      } else {
+        toast.error('Error! Unable to delete published application!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 2000
+        });
+      }
+    });
+  };
+
+  handleMenuClose = () => {
+    this.setState({ anchorEl: null });
+  };
+
   handleShare = () => {
     this.setState({ open: false });
     StorageToolbox.shareApp(
@@ -84,9 +118,32 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
 
   render() {
     const { classes, singleTileData } = this.props;
+    const { anchorEl } = this.state;
+    const { handleMenuClick, handleMenuClose, handleDeleteApp } = this;
     return (
       <GridListTile>
         <Card className={classes.card}>
+          <CardHeader
+            action={
+              <IconButton
+                aria-owns={anchorEl ? 'simple-menu' : undefined}
+                aria-haspopup="true"
+                onClick={handleMenuClick}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            }
+          />
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={this.handleMenuClose}
+          >
+            <MenuItem onClick={handleMenuClose}>Share</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Rename</MenuItem>
+            <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
+          </Menu>
           <CardActionArea style={{ textAlign: 'center' }}>
             <VisualizerIcon
               visualizerType={VISUALIZER_TYPE.MAP}
@@ -99,21 +156,6 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
               <Typography component="p">{singleTileData.author}</Typography>
             </CardContent>
           </CardActionArea>
-          <CardActions classes={{ root: classes.root }}>
-            <Link
-              to={{
-                pathname: `/map?applicationIri=${singleTileData.applicationIri}`
-              }}
-              target="_blank"
-            >
-              <Button size="small" color="primary">
-                Open
-              </Button>
-            </Link>
-            <Button size="small" color="primary" onClick={this.handleClickOpen}>
-              Share
-            </Button>
-          </CardActions>
         </Card>
         <Dialog
           open={this.state.open}

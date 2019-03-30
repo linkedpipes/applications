@@ -14,10 +14,11 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CssBaseline } from '@material-ui/core';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
-  onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
   onTitleChange?: (event: {}) => void,
   handlePublishClicked: Function,
@@ -26,7 +27,8 @@ type Props = {
   handleClosePublishDialog: Function,
   handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
-  fullScreen: any
+  fullScreen: any,
+  appIri: string
 };
 
 const styles = () => ({
@@ -76,25 +78,30 @@ const VisualizerControllerHeaderComponent = ({
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">
-        {'Your Application has been published!'}
+        {'Your Application has been Published!'}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Click `Browse` to proceed to Application Browser, edit and share your
-          applications.
+          Click `Browse Published Apps` to proceed to Application Browser, edit
+          and share your applications. Click on the field with link to copy the
+          public view URL to your clipboard.
         </DialogContentText>
-        <Button
-          onClick={handleCopyLinkClicked}
-          color="primary"
-          variant="outlined"
-          fullWidth
-          autoFocus
-          style={{
-            textDecoration: 'none'
-          }}
-        >
-          {appIri}
-        </Button>
+      </DialogContent>
+      <DialogContent>
+        <CopyToClipboard text={appIri} onCopy={handleCopyLinkClicked}>
+          <TextField
+            color="primary"
+            label="Click to copy"
+            variant="outlined"
+            fullWidth
+            onChange={{}}
+            value={appIri}
+            autoFocus
+            style={{
+              textDecoration: 'none'
+            }}
+          />
+        </CopyToClipboard>
       </DialogContent>
       <DialogActions>
         <Button

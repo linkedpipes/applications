@@ -9,7 +9,8 @@ type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function
 };
 
 type State = {
@@ -50,6 +51,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
+    const { handleSetCurrentApplicationData } = this;
     this.conceptsFetched = new Set();
     // Add the root to the list of fetched data
     this.conceptsFetched.add(
@@ -106,6 +108,12 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     this.setState({
       dataLoadingStatus: 'ready',
       chartData
+    });
+
+    handleSetCurrentApplicationData({
+      applicationEndpoint: 'treemap',
+      conceptIri: 'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+      selectedResultGraphIri: this.props.selectedResultGraphIri
     });
   }
 

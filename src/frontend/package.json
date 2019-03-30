@@ -5,9 +5,9 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
-    "startLocalDev": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server",
-    "startLocalDevSockets": "cross-env NODE_ENV=development BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server",
-    "startDockerDev": "cross-env NODE_ENV=development SOCKET_RECONNECT=true webpack-dev-server",
+    "startLocalDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server",
+    "startLocalDevSockets": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server",
+    "startDockerDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 SOCKET_RECONNECT=true webpack-dev-server",
     "build": "cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack"
   },
   "precommit": [
@@ -39,6 +39,7 @@
     "prop-types": "15.7.2",
     "query-string": "^6.4.0",
     "react": "16.8.6",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "16.8.6",
     "react-emoji-render": "0.6.0",
     "react-error-boundary": "1.2.5",
