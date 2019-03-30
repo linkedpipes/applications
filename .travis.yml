@@ -11,7 +11,7 @@ before_install:
   - sudo /etc/init.d/postgresql restart
 env:
   global:
-    - PGPORT=5432
+    - PGPORT=5433
 
 stages:
   - name: build
@@ -79,7 +79,7 @@ jobs:
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
         - ./gradlew flywayClean flywayMigrate
       script:
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
@@ -103,7 +103,7 @@ jobs:
         - ./gradlew flywayClean flywayMigrate
       script:
         - ./gradlew dockerRun
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
     - stage: deploy
       name: "Deploying Backend to DockerHub"
