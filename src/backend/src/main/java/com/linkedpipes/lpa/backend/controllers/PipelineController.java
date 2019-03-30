@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.UserService;
@@ -43,10 +44,12 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline")
-    public ResponseEntity<Pipeline> getPipeline(@RequestParam(value = "pipelineUri") String pipelineUri) {
-        Pipeline testPipeline = new Pipeline();
-        testPipeline.id = pipelineUri;
-        return ResponseEntity.ok(testPipeline);
+    public ResponseEntity<PipelineExportResult> getPipeline(@RequestParam(value = "pipelineId") String pipelineId) throws LpAppsException {
+        try {
+            return ResponseEntity.ok(pipelineExportService.retrievePipelineExport(pipelineId));
+        } catch (PipelineNotFoundException e) {
+            throw new LpAppsException(HttpStatus.NOT_FOUND, "Pipeline not found: " + pipelineId, e);
+        }
     }
 
     @GetMapping("/api/pipeline/export")

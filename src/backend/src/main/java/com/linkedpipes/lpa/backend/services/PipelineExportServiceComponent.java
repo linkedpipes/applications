@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.entities.database.PipelineInformationRepository;
 import com.linkedpipes.lpa.backend.entities.database.PipelineInformationDao;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.controllers.PipelineController;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
@@ -45,6 +46,10 @@ public class PipelineExportServiceComponent implements PipelineExportService {
         logger.debug("resultGraphIri = " + response.resultGraphIri);
         response.resultGraphIri = PipelineController.GRAPH_NAME_PREFIX + graphId;
 
+        for (PipelineInformationDao dao : repository.findByPipelineId(response.pipelineId)) {
+            repository.delete(dao);
+        }
+
         PipelineInformationDao dao = new PipelineInformationDao();
         dao.setPipelineId(response.pipelineId);
         dao.setEtlPipelineIri(response.etlPipelineIri);
@@ -62,5 +67,16 @@ public class PipelineExportServiceComponent implements PipelineExportService {
                 .requestParam("graphId", graphId)
                 .build()
                 .toString();
+    }
+
+    public PipelineExportResult retrievePipelineExport(String pipelineId) throws PipelineNotFoundException {
+        for (PipelineInformationDao dao : repository.findByPipelineId(pipelineId)) {
+            PipelineExportResult result = new PipelineExportResult();
+            result.pipelineId = dao.getPipelineId();
+            result.etlPipelineIri = dao.getEtlPipelineIri();
+            result.resultGraphIri = dao.getResultGraphIri();
+            return result;
+        }
+        throw new PipelineNotFoundException(pipelineId);
     }
 }
