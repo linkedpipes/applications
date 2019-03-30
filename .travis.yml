@@ -50,6 +50,8 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
+      before_script:
+        - cd src/backend
       script:
         - ./gradlew assemble
 
