@@ -151,8 +151,8 @@ public class TtlGenerator {
                 Resource edge = model.createResource(
                         LPA.Generated.uri + String.format("edge/%s/%s", edgeSource, edgeTarget));
                 model.add(edge, RDF.type, RGML.Edge);
-                model.add(edge, RGML.source, LPA.Generated.uri + "node/" + edgeSource);
-                model.add(edge, RGML.target, LPA.Generated.uri + "node/" + edgeTarget);
+                model.add(edge, RGML.source, model.createResource(LPA.Generated.uri + "node/" + edgeSource));
+                model.add(edge, RGML.target, model.createResource(LPA.Generated.uri + "node/" + edgeTarget));
                 model.addLiteral(edge, RGML.weight, edgeWeight);
             }
         }

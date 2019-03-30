@@ -37,7 +37,8 @@ public class Application {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:9001", "https://applications.linkedpipes.com");
+                registry.addMapping("/**")
+                        .allowedOrigins(getConfig().getStringList("lpa.allowedOrigins").toArray(new String[0]));
             }
         };
     }

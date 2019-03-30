@@ -3,15 +3,12 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
-import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.rgml.RgmlService;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -48,9 +45,9 @@ public class D3ChordVisualizerController {
 
     @PostMapping("/api/chord/matrix")
     public ResponseEntity<double[][]> getMatrix(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
-                                                @NotNull @RequestParam("useWeights") boolean useWeights,
+                                                @RequestParam("useWeights") boolean useWeights,
                                                 @Nullable @RequestBody List<String> nodeUris) {
-        if(nodeUris == null || nodeUris.isEmpty())
+        if (nodeUris == null || nodeUris.isEmpty())
             return ResponseEntity.ok(new double[0][0]);
 
         return ResponseEntity.ok(rgmlService.getMatrix(graphIri, useWeights, nodeUris));

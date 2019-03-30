@@ -22,7 +22,7 @@ public class IncidentEdgesQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_WEIGHT = var("weight");
 
     public IncidentEdgesQueryProvider(String nodeUri, EdgeDirection direction) {
-        this.nodeUri = nodeUri;
+        this.nodeUri = SparqlUtils.formatUri(nodeUri);
         this.direction = direction;
     }
 
@@ -53,14 +53,20 @@ public class IncidentEdgesQueryProvider extends ConstructSparqlQueryProvider {
                 .addVar(VAR_SOURCE)
                 .addVar(VAR_TARGET)
                 .addVar(VAR_WEIGHT)
-                .addWhere(VAR_EDGE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI()))
-                .addWhere(VAR_EDGE, RGML.source, VAR_SOURCE)
-                .addWhere(VAR_EDGE, RGML.target, VAR_TARGET)
-                .addWhere(VAR_EDGE, RGML.weight, VAR_WEIGHT);
+                .addWhere(VAR_EDGE, RDF.type, RGML.Edge)
+                .addOptional(VAR_EDGE, RGML.source, VAR_SOURCE)
+                .addOptional(VAR_EDGE, RGML.target, VAR_TARGET)
+                .addOptional(VAR_EDGE, RGML.weight, VAR_WEIGHT);
 
         switch(direction){
-            case INCOMING: subquery.addWhere(VAR_EDGE, RGML.target, nodeUri);
-            case OUTGOING: subquery.addWhere(VAR_EDGE, RGML.source, nodeUri);
+            case INCOMING:
+                subquery.addWhere(VAR_EDGE, RGML.target, nodeUri);
+                break;
+            case OUTGOING:
+                subquery.addWhere(VAR_EDGE, RGML.source, nodeUri);
+                break;
+            default:
+                throw new IllegalStateException("EdgeDirection definition has changed");
         }
 
         return builder.addSubQuery(subquery);
