@@ -4,17 +4,20 @@ import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
 import { CircularProgress } from '@material-ui/core';
 import ChordDiagram from 'react-chord-diagram';
+import palette from 'google-palette';
 
 type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri: string
+  selectedResultGraphIri?: string
 };
 
 type State = {
   dataLoadingStatus: string,
-  matrix: Array<Array<any>>
+  matrix: Array<Array<any>>,
+  groupColors: Array<string>,
+  groupLabels: Array<string>
 };
 
 const styles = theme => ({
@@ -33,19 +36,42 @@ const styles = theme => ({
 });
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
+  static defaultProps = {
+    selectedResultGraphIri:
+      'https://applications.linkedpipes.com/generated-data/'
+  };
+
   constructor(props: Props) {
     super(props);
-    this.state = { dataLoadingStatus: 'loading', matrix: [] };
+    this.state = {
+      dataLoadingStatus: 'loading',
+      matrix: [],
+      groupColors: [],
+      groupLabels: []
+    };
   }
 
   async componentDidMount() {
-    const response = await VisualizersService.getChordData(
-      'https://applications.linkedpipes.com/generated-data/'
+    const nodesRequest = await VisualizersService.getChordNodes(
+      this.props.selectedResultGraphIri
     );
-    const jsonData = await response.data;
+    const nodeUris = await nodesRequest.data;
+
+    const matrixRequest = await VisualizersService.getChordData(
+      this.props.selectedResultGraphIri,
+      nodeUris
+    );
+    const matrixData = await matrixRequest.data;
+
+    const colors = palette('sol-accent', nodeUris.length).map(
+      color => `#${color}`
+    );
+
     this.setState({
       dataLoadingStatus: 'ready',
-      matrix: jsonData
+      matrix: matrixData,
+      groupColors: colors,
+      groupLabels: nodeUris
     });
   }
 
@@ -53,12 +79,14 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
     ) : (
-      <ChordDiagram matrix={this.state.matrix} componentId={1} />
+      <ChordDiagram
+        groupLabels={this.state.groupLabels}
+        groupColors={this.state.groupColors}
+        matrix={this.state.matrix}
+        componentId={1}
+      />
     );
   }
 }
-
-// groupLabels={['Black', 'Yellow', 'Brown', 'Orange']}
-// groupColors={['#000000', '#FFDD89', '#957244', '#F26223']}
 
 export default withStyles(styles)(ChordVisualizer);
