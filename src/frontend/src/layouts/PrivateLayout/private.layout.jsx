@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
-import { withAuthorization } from "@inrupt/solid-react-components";
+import React, { Fragment } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import { withAuthorization } from '@inrupt/solid-react-components';
 
 const PrivateLayout = ({ routes, ...rest }) => {
   return (
