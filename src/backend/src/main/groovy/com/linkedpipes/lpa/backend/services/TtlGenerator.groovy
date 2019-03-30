@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.rdf.Prefixes
 import com.linkedpipes.lpa.backend.rdf.vocabulary.*
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider
+import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.Property
@@ -72,7 +73,7 @@ class TtlGenerator {
                                                      @NotNull String extractorQuery, @NotNull String configurationQuery,
                                                      @Nullable String namedGraph) {
         ModelBuilder.create {
-            prefixes (
+            namespaces(
                     dataset: LPA.Dataset.uri,
                     lpd: LPD.uri,
                     (Prefixes.DCTERMS_PREFIX): DCTerms.getURI(),
@@ -80,36 +81,32 @@ class TtlGenerator {
                     sd: SD.uri
             )
 
-            resource (LPA.Dataset.uri + "template") {
-                props (
+            resource(LPA.Dataset.uri + "template") {
+                props(
                         (RDF.type): LPD.DataSourceTemplate,
-                        (LPD.outputTemplate): resource (LPA.Dataset.uri + "output") {
-                            props (
-                                    (RDF.type): LPD.OutputDataPortTemplate,
-                                    (DCTerms.title): DATASET_OUTPUT_TITLE,
-                                    (LPD.outputDataSample): resource(dataSampleIri)
-                            )
-                        },
-                        (LPD.componentConfigurationTemplate): resource (LPA.Dataset.uri + "defaultConfiguration") {
-                            props (
-                                    (RDF.type): LPDSparql.SparqlEndpointDataSourceConfiguration,
-                                    (DCTerms.title): DATASET_CONFIG_TITLE,
-                                    (LPD.query): extractorQuery,
-                                    (LPD.configurationQuery): configurationQuery,
-                                    (LPD.service): resource (LPA.Dataset.uri + "defaultService") {
-                                        props (
-                                                (RDF.type): SD.Service,
-                                                (SD.endpoint): resource(sparqlEndpointIri)
-                                        )
+                        (LPD.outputTemplate): resource(LPA.Dataset.uri + "output", [
+                                (RDF.type)            : LPD.OutputDataPortTemplate,
+                                (DCTerms.title)       : DATASET_OUTPUT_TITLE,
+                                (LPD.outputDataSample): resource(dataSampleIri)
+                        ]),
+                        (LPD.componentConfigurationTemplate): resource(LPA.Dataset.uri + "defaultConfiguration", [
+                                (RDF.type)              : LPDSparql.SparqlEndpointDataSourceConfiguration,
+                                (DCTerms.title)         : DATASET_CONFIG_TITLE,
+                                (LPD.query)             : extractorQuery,
+                                (LPD.configurationQuery): configurationQuery,
+                                (LPD.service)           : resource(LPA.Dataset.uri + "defaultService") {
+                                    props(
+                                            (RDF.type): SD.Service,
+                                            (SD.endpoint): resource(sparqlEndpointIri)
+                                    )
 
-                                        if (namedGraph != null && !namedGraph.isEmpty()) {
-                                            prop SD.namedGraph, resource {
-                                                prop SD.name, namedGraph
-                                            }
+                                    if (namedGraph != null && !namedGraph.isEmpty()) {
+                                        prop SD.namedGraph, resource {
+                                            prop SD.name, namedGraph
                                         }
                                     }
-                            )
-                        }
+                                }
+                        ])
                 )
                 prop DCTerms.title, DATASET_TEMPLATE_TITLE, "en"
             }
