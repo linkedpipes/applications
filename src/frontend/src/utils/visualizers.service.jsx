@@ -1,5 +1,8 @@
 import axios from './api.service';
 
+// Note that axios will remove from the request params
+// the params that are null or undefined
+
 const VisualizersService = {
   getFilters: async () => {
     return axios.get('/map/properties');
@@ -10,13 +13,27 @@ const VisualizersService = {
     return axios.post('/map/markers', filters, { params: { resultGraphIri } });
   },
 
+  getChordNodes: async (resultGraphIri, limit, offset) => {
+    return axios.get('/chord/nodes', {
+      params: { resultGraphIri, limit, offset }
+    });
+  },
+
+  getChordData: async (resultGraphIri, nodeUris, useWeights = false) => {
+    return axios.post(
+      '/chord/matrix',
+      ['value1', 'value2', 'value3', 'value4'],
+      {
+        params: { resultGraphIri, useWeights }
+      }
+    );
+  },
+
   getSkosScheme: async (
     schemeUri,
     resultGraphIri = null,
     conceptUri = null
   ) => {
-    // Note that axios will remove from the request params
-    // the params that are null or undefined
     return axios.get('/skos/schemeSubtree', {
       params: { schemeUri, resultGraphIri, conceptUri }
     });
