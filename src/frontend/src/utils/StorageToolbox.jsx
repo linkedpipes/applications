@@ -42,7 +42,7 @@ const shareApp = (appIri, webId) => {
   });
 };
 
-const saveAppToSolid = (appData, appTitle, webId) => {
+const saveAppToSolid = (appData, appTitle, webId, path) => {
   Log.info(appData, 'StorageToolbox');
 
   if (!webId) {
@@ -50,10 +50,14 @@ const saveAppToSolid = (appData, appTitle, webId) => {
     return;
   }
 
-  const url = `${getLocation(webId).origin}/public/lpapps`;
+  const url = `${getLocation(webId).origin}/${path}`;
 
   const hash = stringHash(JSON.stringify(appTitle, null, 2)).toString();
   const fileUrl = `${url}/lpapp${hash}.json`;
+  const hostName = require('os')
+    .hostname()
+    .toLowerCase();
+  const publishedUrl = `${hostName}:9001/map?applicationIri=${url}`;
 
   const file = JSON.stringify({
     applicationData: appData,
@@ -64,14 +68,14 @@ const saveAppToSolid = (appData, appTitle, webId) => {
     FileClient.updateFile(fileUrl, file).then(
       () => {
         Log.info(`Updated file!`);
-        resolve(fileUrl);
+        resolve(publishedUrl);
       },
       err => {
         Log.info(err, 'StorageToolbox');
         FileClient.createFile(fileUrl).then(
           () => {
             Log.info(`Created file!`);
-            resolve(fileUrl);
+            resolve(publishedUrl);
           },
           errCreate => {
             reject(errCreate);
@@ -93,4 +97,28 @@ const loadAppFromSolid = appIri => {
   );
 };
 
-export default { saveAppToSolid, loadAppFromSolid, shareApp };
+const createOrUpdateFolder = (webId, path) => {
+  const folderPath = `${getLocation(webId).origin}/${path}`;
+
+  FileClient.readFolder(folderPath).then(
+    folder => {
+      Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
+    },
+    err => {
+      FileClient.createFolder(folderPath).then(
+        body => {
+          Log.info(`File content is : ${body}.`, 'StorageToolbox');
+          return body;
+        },
+        errCreate => Log.error(errCreate, 'StorageToolbox')
+      );
+    }
+  );
+};
+
+export default {
+  saveAppToSolid,
+  loadAppFromSolid,
+  shareApp,
+  createOrUpdateFolder
+};

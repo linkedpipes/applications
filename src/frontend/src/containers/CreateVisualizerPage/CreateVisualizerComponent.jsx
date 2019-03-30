@@ -35,7 +35,6 @@ const CreateVisualizerComponent = ({
     <VisualizerControllerHeader
       headerParams={headerParams}
       onRefreshSwitchChange={() => {}}
-      checkedPublished={() => {}}
     />
     <VisualizerContainer
       filters={filters}

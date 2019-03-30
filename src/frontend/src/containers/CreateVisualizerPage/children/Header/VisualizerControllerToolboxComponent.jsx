@@ -10,7 +10,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
-  checkedPublished?: boolean,
   classes: { button: {}, leftIcon: {}, root: {} },
   handlePublishClicked: Function
 };
@@ -29,14 +28,9 @@ const styles = theme => ({
 
 const VisualizerControllerToolboxComponent = ({
   classes,
-  checkedPublished,
   handlePublishClicked
 }: Props) => (
   <div>
-    <FormControlLabel
-      control={<Switch value="checkedPublished" />}
-      label={checkedPublished ? 'Unpublished' : 'Published'}
-    />
     <Button
       variant="contained"
       color="default"
@@ -44,11 +38,7 @@ const VisualizerControllerToolboxComponent = ({
       onClick={handlePublishClicked}
     >
       <CloudUploadIcon className={classes.leftIcon} />
-      Get public link
-    </Button>
-    <Button variant="contained" color="default" className={classes.button}>
-      <PreviewIcon className={classes.leftIcon} />
-      Get embed link
+      Publish
     </Button>
   </div>
 );

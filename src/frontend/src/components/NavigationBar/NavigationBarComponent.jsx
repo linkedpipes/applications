@@ -166,14 +166,14 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link>
 
-        {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
+        <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
             <ListItemIcon>
               <ViewModuleIcon />
             </ListItemIcon>
             <ListItemText primary="Applications" />
           </ListItem>
-        </Link> */}
+        </Link>
 
         <Link style={{ textDecoration: 'none' }} to="/storage">
           <ListItem button>

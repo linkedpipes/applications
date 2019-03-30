@@ -10,12 +10,13 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 type Props = {
-  checkedPublished?: boolean,
-  classes: { root: {}, header: {} },
+  classes: { root: {}, header: {}, textField: {} },
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
   onTitleChange?: (event: {}) => void,
@@ -24,6 +25,7 @@ type Props = {
   publishDialogOpen: boolean,
   handleClosePublishDialog: Function,
   handleProceedToApplicationClicked: Function,
+  handleCopyLinkClicked: Function,
   fullScreen: any
 };
 
@@ -37,6 +39,10 @@ const styles = () => ({
     marginLeft: '1rem',
     marginTop: '1rem',
     right: '-1rem'
+  },
+
+  textField: {
+    flexGrow: 1
   }
 });
 
@@ -48,7 +54,9 @@ const VisualizerControllerHeaderComponent = ({
   publishDialogOpen,
   handleClosePublishDialog,
   handleProceedToApplicationClicked,
-  fullScreen
+  handleCopyLinkClicked,
+  fullScreen,
+  appIri
 }: Props) => (
   <div className={classes.root}>
     <AppBar className={classes.header} position="static" color="default">
@@ -75,6 +83,18 @@ const VisualizerControllerHeaderComponent = ({
           Click `Browse` to proceed to Application Browser, edit and share your
           applications.
         </DialogContentText>
+        <Button
+          onClick={handleCopyLinkClicked}
+          color="primary"
+          variant="outlined"
+          fullWidth
+          autoFocus
+          style={{
+            textDecoration: 'none'
+          }}
+        >
+          {appIri}
+        </Button>
       </DialogContent>
       <DialogActions>
         <Button
@@ -82,7 +102,7 @@ const VisualizerControllerHeaderComponent = ({
           color="primary"
           autoFocus
         >
-          Proceed
+          Browse Published Apps
         </Button>
       </DialogActions>
     </Dialog>

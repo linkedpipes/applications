@@ -4,7 +4,7 @@ import { NavigationBar } from '@components';
 import { withAuthorization } from '@inrupt/solid-react-components';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { Log, AuthenticationService, SolidAPIHandler } from '@utils';
+import { Log, AuthenticationService, StorageToolbox } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';
@@ -51,9 +51,7 @@ const componentDidMount = props => {
       Log.error(error, 'HomeContainer');
     });
 
-  SolidAPIHandler.getItemList('/public').then(itemList => {
-    Log.info(itemList);
-  });
+  StorageToolbox.createOrUpdateFolder(webId, 'public/lpapps');
 };
 
 const methods = {
