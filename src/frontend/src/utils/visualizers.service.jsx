@@ -19,14 +19,10 @@ const VisualizersService = {
     });
   },
 
-  getChordData: async (resultGraphIri, nodeUris, useWeights = false) => {
-    return axios.post(
-      '/chord/matrix',
-      ['value1', 'value2', 'value3', 'value4'],
-      {
-        params: { resultGraphIri, useWeights }
-      }
-    );
+  getChordData: async (resultGraphIri, nodeUris, useWeights = true) => {
+    return axios.post('/chord/matrix', nodeUris, {
+      params: { resultGraphIri, useWeights }
+    });
   },
 
   getSkosScheme: async (

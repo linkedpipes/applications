@@ -52,15 +52,11 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const nodesRequest = await VisualizersService.getChordNodes(
-      this.props.selectedResultGraphIri
-    );
-    const nodeUris = await nodesRequest.data;
+    const nodesRequest = await VisualizersService.getChordNodes();
+    const nodesResponse = await nodesRequest.data;
+    const nodeUris = nodesResponse.map(node => node.uri);
 
-    const matrixRequest = await VisualizersService.getChordData(
-      this.props.selectedResultGraphIri,
-      nodeUris
-    );
+    const matrixRequest = await VisualizersService.getChordData(null, nodeUris);
     const matrixData = await matrixRequest.data;
 
     const colors = palette('sol-accent', nodeUris.length).map(
@@ -84,6 +80,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         groupColors={this.state.groupColors}
         matrix={this.state.matrix}
         componentId={1}
+        style={{ color: 'white' }}
       />
     );
   }
