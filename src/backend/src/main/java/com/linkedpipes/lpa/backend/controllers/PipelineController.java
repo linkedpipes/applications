@@ -1,9 +1,7 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.Execution;
-import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
-import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;

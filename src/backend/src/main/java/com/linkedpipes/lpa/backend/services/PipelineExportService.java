@@ -1,7 +1,6 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
-import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 

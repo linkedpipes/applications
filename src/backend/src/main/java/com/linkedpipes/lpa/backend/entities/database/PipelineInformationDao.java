@@ -2,7 +2,6 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity(name="pipelineInformation")
 public class PipelineInformationDao implements Serializable {
