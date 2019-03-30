@@ -24,7 +24,7 @@ services:
     depends_on:
       - etl
       - discovery
-      - postgres
+      - flyway
 
   frontend:
     image: linkedpipes/applications:frontend-prod
@@ -90,3 +90,11 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  flyway:
+    image: boxfuse/flyway
+    command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
+    volumes:
+      - ./src/backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      - postgres
