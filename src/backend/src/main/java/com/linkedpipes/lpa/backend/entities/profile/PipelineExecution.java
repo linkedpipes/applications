@@ -5,4 +5,5 @@ public class PipelineExecution {
     public EtlStatus status;
     public String executionIri;
     public String selectedVisualiser;
+    public Date start, stop;
 }

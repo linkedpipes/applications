@@ -17,6 +17,9 @@ public class DiscoveryDao implements Serializable {
     @Column(nullable = false)
     private Date started;
 
+    @Column(nullable = true)
+    private Date finished;
+
     @Column(nullable = false)
     private boolean executing;
 
@@ -45,8 +48,12 @@ public class DiscoveryDao implements Serializable {
         return discoveryId;
     }
 
-    public Date getDateStarted() {
+    public Date getStarted() {
         return started;
+    }
+
+    public Date getFinished() {
+        return finished;
     }
 
     public long getId() {
@@ -59,5 +66,9 @@ public class DiscoveryDao implements Serializable {
 
     public void setExecuting(boolean executing) {
         this.executing = executing;
+    }
+
+    public void setFinished(Date finished) {
+        this.finished = finished;
     }
 }

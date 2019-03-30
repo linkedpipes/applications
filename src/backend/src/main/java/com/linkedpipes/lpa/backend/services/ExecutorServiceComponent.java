@@ -90,6 +90,9 @@ public class ExecutorServiceComponent implements ExecutorService {
                 //persist status in DB
                 for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                     e.setStatus(executionStatus.status);
+                    if (!executionStatus.status.isPollable()) {
+                        e.setFinished(executionStatus.finished);
+                    }
                     executionRepository.save(e);
                 }
 
@@ -118,7 +121,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.executionIri = executionIri;
 
                 try {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
                     logger.error("Failed to report execution status: " + executionIri, ex);
                 }
@@ -183,6 +186,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     }
                     for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                         d.setExecuting(false);
+                        d.setFinished(new Date());
                         discoveryRepository.save(d);
                     }
 
@@ -224,6 +228,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
             for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
                 d.setExecuting(false);
+                d.setFinished(new Date());
                 discoveryRepository.save(d);
             }
         };

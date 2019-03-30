@@ -21,6 +21,12 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private String selectedVisualiser;
 
+    @Column(nullable = false)
+    private Date started;
+
+    @Column(nullable = true)
+    private Date finished;
+
     @ManyToOne
     private UserDao user;
 
@@ -62,5 +68,21 @@ public class ExecutionDao implements Serializable {
 
     public String getSelectedVisualiser() {
         return this.selectedVisualiser;
+    }
+
+    public void setStarted(Date started) {
+        this.started = started;
+    }
+
+    public Date getStarted() {
+        return this.started;
+    }
+
+    public void setFinished(Date finished) {
+        this.finished = finished;
+    }
+
+    public Date getFinished() {
+        return this.finished;
     }
 }

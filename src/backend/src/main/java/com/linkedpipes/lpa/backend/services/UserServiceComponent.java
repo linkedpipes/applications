@@ -134,6 +134,7 @@ public class UserServiceComponent implements UserService {
         ExecutionDao e = new ExecutionDao();
         e.setExecutionStarted(executionIri);
         e.setSelectedVisualiser(selectedVisualiser);
+        e.setStarted(new Date());
         user.addExecution(e);
         executionRepository.save(e);
         repository.save(user);
@@ -192,6 +193,8 @@ public class UserServiceComponent implements UserService {
                 DiscoverySession session = new DiscoverySession();
                 session.id = d.getDiscoveryId();
                 session.finished = !d.getExecuting();
+                session.start = d.getStarted();
+                session.stop = d.getFinished();
                 profile.discoverySessions.add(session);
             }
         }
@@ -203,6 +206,8 @@ public class UserServiceComponent implements UserService {
                 exec.status = e.getStatus();
                 exec.executionIri = e.getExecutionIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
+                exec.start = e.getStarted();
+                exec.stop = e.getFinished();
                 profile.pipelineExecutions.add(exec);
             }
         }
