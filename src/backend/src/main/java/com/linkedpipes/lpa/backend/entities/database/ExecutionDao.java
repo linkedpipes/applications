@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.Date;
 import com.linkedpipes.lpa.backend.entities.EtlStatus;
 
 @Entity(name="execution")
