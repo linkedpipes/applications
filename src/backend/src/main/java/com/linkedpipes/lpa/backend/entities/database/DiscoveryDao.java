@@ -23,6 +23,15 @@ public class DiscoveryDao implements Serializable {
     @Column(nullable = false)
     private boolean executing;
 
+    @Column(nullable = true)
+    private String sparqlEndpointIri;
+
+    @Column(nullable = true)
+    private String dataSampleIri;
+
+    @Column(nullable = true)
+    private String namedGraph;
+
     @ManyToOne
     private UserDao user;
 
@@ -70,5 +79,29 @@ public class DiscoveryDao implements Serializable {
 
     public void setFinished(Date finished) {
         this.finished = finished;
+    }
+
+    public void setSparqlEndpointIri(String sparqlEndpointIri) {
+        this.sparqlEndpointIri = sparqlEndpointIri;
+    }
+
+    public String getSparqlEndpointIri() {
+        return this.sparqlEndpointIri;
+    }
+
+    public void setDataSampleIri(String dataSampleIri) {
+        this.dataSampleIri = dataSampleIri;
+    }
+
+    public String getDataSampleIri() {
+        return this.dataSampleIri;
+    }
+
+    public void setNamedGraph(String namedGraph) {
+        this.namedGraph = namedGraph;
+    }
+
+    public String getNamedGraph() {
+        return this.namedGraph;
     }
 }

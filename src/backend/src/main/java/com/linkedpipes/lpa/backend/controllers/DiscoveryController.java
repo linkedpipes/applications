@@ -111,7 +111,7 @@ public class DiscoveryController {
             userService.addUserIfNotPresent(webId);
             String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId, sparqlEndpointIri, dataSampleIri, namedGraph));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }

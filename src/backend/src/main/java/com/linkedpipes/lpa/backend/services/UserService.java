@@ -16,7 +16,7 @@ public interface UserService {
     UserProfile addApplication(String user, String solidIri) throws UserNotFoundException;
     UserProfile deleteApplication(String user, String solidIri) throws UserNotFoundException;
 
-    void setUserDiscovery(String user, String discovery) throws UserNotFoundException;
+    void setUserDiscovery(String user, String discovery, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws UserNotFoundException;
     List<Discovery> getUserDiscoveries(String user) throws UserNotFoundException;
     void deleteUserDiscovery(String user, String discovery);
 

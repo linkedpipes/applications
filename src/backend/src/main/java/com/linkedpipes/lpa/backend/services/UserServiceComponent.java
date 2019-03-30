@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +66,13 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override
-    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId) throws UserNotFoundException {
+    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
+        d.setSparqlEndpointIri(sparqlEndpointIri);
+        d.setDataSampleIri(dataSampleIri);
+        d.setNamedGraph(namedGraph);
         user.addDiscovery(d);
         discoveryRepository.save(d);
         repository.save(user);
@@ -195,6 +199,9 @@ public class UserServiceComponent implements UserService {
                 session.finished = !d.getExecuting();
                 session.start = d.getStarted();
                 session.stop = d.getFinished();
+                session.sparqlEndpointIri = d.getSparqlEndpointIri();
+                session.dataSampleIri = d.getDataSampleIri();
+                session.namedGraph = d.getNamedGraph();
                 profile.discoverySessions.add(session);
             }
         }

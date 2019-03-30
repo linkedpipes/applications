@@ -11,6 +11,7 @@ import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,13 @@ public class ExecutorServiceComponent implements ExecutorService {
 
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+        return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
+    }
+
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
+        this.userService.setUserDiscovery(userId, discovery.id, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
@@ -70,7 +76,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
+        this.userService.setUserDiscovery(userId, discovery.id, null, null, null);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
