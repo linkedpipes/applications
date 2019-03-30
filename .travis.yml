@@ -86,6 +86,7 @@ jobs:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+        - ./gradlew flywayClean flywayMigrate
       script:
         - ./gradlew dockerRun
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
