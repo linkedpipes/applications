@@ -1,7 +1,7 @@
 os: "linux"
 
 addons:
-  postgresql: "10"
+  postgresql: "10.7"
 
 stages:
   - name: build
