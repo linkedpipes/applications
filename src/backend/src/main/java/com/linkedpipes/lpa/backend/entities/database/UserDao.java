@@ -13,7 +13,7 @@ public class UserDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String webId;
 
     @OneToMany(mappedBy="user")
