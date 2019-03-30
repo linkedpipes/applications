@@ -86,8 +86,4 @@ public class ExecutionDao implements Serializable {
     public Date getFinished() {
         return this.finished;
     }
-
-    public long getId() {
-        return this.id;
-    }
 }
