@@ -1,5 +1,8 @@
 os: "linux"
 
+addons:
+  postgresql: "10"
+
 stages:
   - name: build
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
@@ -64,6 +67,7 @@ jobs:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+        - ./gradlew flywayClean flywayMigrate
       script:
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
         - ./gradlew jacocoTestReport
