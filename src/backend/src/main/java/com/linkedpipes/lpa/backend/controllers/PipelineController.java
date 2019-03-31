@@ -46,7 +46,7 @@ public class PipelineController {
         try {
             return ResponseEntity.ok(pipelineExportService.retrievePipelineExport(pipelineIri));
         } catch (PipelineNotFoundException e) {
-            throw new LpAppsException(HttpStatus.NOT_FOUND, "Pipeline not found: " + pipelineId, e);
+            throw new LpAppsException(HttpStatus.NOT_FOUND, "Pipeline not found: " + pipelineIri, e);
         }
     }
 
