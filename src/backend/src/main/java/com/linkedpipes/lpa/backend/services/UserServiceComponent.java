@@ -203,8 +203,8 @@ public class UserServiceComponent implements UserService {
                 DiscoverySession session = new DiscoverySession();
                 session.id = d.getDiscoveryId();
                 session.finished = !d.getExecuting();
-                session.start = d.getStarted();
-                session.stop = d.getFinished();
+                session.start = d.getStarted().getTime() / 1000L;
+                session.stop = d.getFinished().getTime() / 1000L;
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
                 session.namedGraph = d.getNamedGraph();
@@ -219,8 +219,8 @@ public class UserServiceComponent implements UserService {
                 exec.status = e.getStatus();
                 exec.executionIri = e.getExecutionIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
-                exec.start = e.getStarted();
-                exec.stop = e.getFinished();
+                exec.start = e.getStarted().getTime() / 1000L;
+                exec.stop = e.getFinished().getTime() / 1000L;
                 profile.pipelineExecutions.add(exec);
             }
         }

@@ -3,5 +3,5 @@ import java.util.Date;
 public class DiscoverySession {
     public String id, sparqlEndpointIri, dataSampleIri, namedGraph;
     public boolean finished;
-    public Date start, stop;
+    public long start, stop;
 }
