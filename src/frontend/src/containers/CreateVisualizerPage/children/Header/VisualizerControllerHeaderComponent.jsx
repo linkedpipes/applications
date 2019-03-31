@@ -1,26 +1,30 @@
 // @flow
 import * as React from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import Labels from './VisualizerControllerLabelsComponent';
 import Toolbox from './VisualizerControllerToolboxComponent';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Dialog from '@material-ui/core/Dialog';
-import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
+import {
+  AppBar,
+  Toolbar,
+  Dialog,
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Grid,
+  TextField,
+  DialogTitle,
+  Paper,
+  withMobileDialog,
+  CssBaseline,
+  InputBase,
+  Typography,
+  withStyles
+} from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { CssBaseline } from '@material-ui/core';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
   headerParams: { title: string, subtitle?: string },
-  onTitleChange?: (event: {}) => void,
   handlePublishClicked: Function,
   handleAppTitleChanged: Function,
   publishDialogOpen: boolean,
@@ -31,20 +35,23 @@ type Props = {
   appIri: string
 };
 
-const styles = () => ({
+const styles = theme => ({
   root: {
-    flex: 1,
     flexGrow: 1
   },
   header: {
     marginBottom: '1rem',
-    marginLeft: '1rem',
     marginTop: '1rem',
-    right: '-1rem'
+    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
+      .spacing.unit * 3}px`
   },
-
   textField: {
-    flexGrow: 1
+    flexGrow: 1,
+    width: '100%',
+    fontSize: 30
+  },
+  button: {
+    margin: theme.spacing.unit
   }
 });
 
@@ -61,16 +68,63 @@ const VisualizerControllerHeaderComponent = ({
   appIri
 }: Props) => (
   <div className={classes.root}>
-    <AppBar className={classes.header} position="static" color="default">
-      <Toolbar>
-        <Labels
-          title={headerParams.title}
-          subtitle={headerParams.subtitle}
-          handleAppTitleChanged={handleAppTitleChanged}
-        />
-        <Toolbox handlePublishClicked={handlePublishClicked} />
-      </Toolbar>
-    </AppBar>
+    <Paper className={classes.header} position="static" color="default">
+      <Grid
+        container
+        direction="column"
+        spacing={16}
+        justify="center"
+        alignItems="center"
+      >
+        <Grid
+          item
+          xs={12}
+          container
+          direction="column"
+          justify="center"
+          alignItems="stretch"
+        >
+          <Grid item xs>
+            <InputBase
+              label="App title"
+              inputProps={{
+                style: { textAlign: 'center' }
+              }}
+              className={classes.textField}
+              variant="outlined"
+              placeholder="Enter your application title..."
+              onChange={handleAppTitleChanged}
+              margin="normal"
+            />
+          </Grid>
+          <Grid item>
+            <Typography align="center" variant="h6">
+              Google Maps Visualizer
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container spacing={16} justify="center">
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePublishClicked}
+            >
+              Publish
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handlePublishClicked}
+            >
+              Embed
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Paper>
     <Dialog
       fullScreen={fullScreen}
       open={publishDialogOpen}
@@ -94,7 +148,6 @@ const VisualizerControllerHeaderComponent = ({
             label="Click to copy"
             variant="outlined"
             fullWidth
-            onChange={{}}
             value={appIri}
             autoFocus
             style={{

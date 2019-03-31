@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, Grid } from '@material-ui/core';
 import { VisualizerControllerHeader, VisualizerContainer } from './children';
 
 type Props = {

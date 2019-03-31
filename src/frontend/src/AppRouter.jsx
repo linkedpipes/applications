@@ -89,7 +89,7 @@ class AppRouter extends React.PureComponent<Props> {
                     path="/login"
                     exact
                   />
-                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact/>
                   <PrivateLayout
                     path="/create-app"
                     component={CreateVisualizerPage}
@@ -100,9 +100,9 @@ class AppRouter extends React.PureComponent<Props> {
                     component={DiscoverPage}
                     exact
                   />
-                  <PrivateLayout path="/about" component={AboutPage} exact />
+                  <PrivateLayout path="/about" component={AboutPage} exact/>
 
-                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact/>
                   <PrivateLayout
                     path="/create-app"
                     component={CreateVisualizerPage}
@@ -118,13 +118,13 @@ class AppRouter extends React.PureComponent<Props> {
                     component={StoragePage}
                     exact
                   />
-                  <PrivateLayout path="/about" component={AboutPage} exact />
+                  <PrivateLayout path="/about" component={AboutPage} exact/>
 
-                  <PublicLayout path="/404" component={NotFoundPage} exact />
-                  <Route path="/map" component={ApplicationPage} />
-                  <Route path="/treemap" component={ApplicationPage} />
-                  <Redirect from="/" to="/login" exact />
-                  <Redirect to="/404" />
+                  <PublicLayout path="/404" component={NotFoundPage} exact/>
+                  <Route path="/map" component={ApplicationPage}/>
+                  <Route path="/treemap" component={ApplicationPage}/>
+                  <Redirect from="/" to="/login" exact/>
+                  <Redirect to="/404"/>
                 </Switch>
               </SocketContext.Provider>
             </div>
