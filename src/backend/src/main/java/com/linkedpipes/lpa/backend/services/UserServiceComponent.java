@@ -204,7 +204,11 @@ public class UserServiceComponent implements UserService {
                 session.id = d.getDiscoveryId();
                 session.finished = !d.getExecuting();
                 session.start = d.getStarted().getTime() / 1000L;
-                session.stop = d.getFinished().getTime() / 1000L;
+                if (d.getFinished() != null) {
+                    session.stop = d.getFinished().getTime() / 1000L;
+                } else {
+                    session.stop = -1;
+                }
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
                 session.namedGraph = d.getNamedGraph();
