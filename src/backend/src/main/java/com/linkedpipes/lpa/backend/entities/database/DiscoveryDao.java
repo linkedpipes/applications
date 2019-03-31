@@ -3,7 +3,6 @@ package com.linkedpipes.lpa.backend.entities.database;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @Entity(name="discovery")
 public class DiscoveryDao implements Serializable {
@@ -12,8 +11,8 @@ public class DiscoveryDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
-    private UUID discoveryId;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String discoveryId;
 
     @Column(nullable = false)
     private Date started;
@@ -37,13 +36,13 @@ public class DiscoveryDao implements Serializable {
     }
 
     public void setDiscoveryStarted(String discoveryId, Date started) {
-        this.discoveryId = UUID.fromString(discoveryId);
+        this.discoveryId = discoveryId;
         this.started = started;
         this.executing = true;
     }
 
     public String getDiscoveryId() {
-        return discoveryId.toString();
+        return discoveryId;
     }
 
     public Date getDateStarted() {
