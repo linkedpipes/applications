@@ -9,7 +9,8 @@ import {
   urlDomain,
   getQueryString,
   replaceAll,
-  extractUrlGroups
+  extractUrlGroups,
+  unixTimeConverter
 } from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
@@ -27,5 +28,6 @@ export {
   replaceAll,
   extractUrlGroups,
   getBeautifiedVisualizerTitle,
-  Log
+  Log,
+  unixTimeConverter
 };

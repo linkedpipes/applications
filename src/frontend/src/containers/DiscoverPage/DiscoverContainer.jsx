@@ -6,10 +6,17 @@ import lifecycle from 'react-pure-lifecycle';
 import { discoveryActions } from '@ducks/discoveryDuck';
 
 const componentDidMount = props => {
-  const { location, handleSetPipelineGroups, onNextClicked, history } = props;
+  const {
+    location,
+    handleSetPipelineGroups,
+    handleSetDiscoveryId,
+    onNextClicked,
+    history
+  } = props;
   if (location.state && location.state.discoveryId) {
     Log.info(`Just received ${location.state.discoveryId}`);
     const discoveryId = location.state.discoveryId;
+    handleSetDiscoveryId(discoveryId);
     DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
         return response.data;
@@ -39,6 +46,12 @@ const methods = {
 
 const mapDispatchToProps = dispatch => {
   // '1' is the number by which you want to increment the count
+  const handleSetDiscoveryId = discoveryId =>
+    dispatch(
+      discoveryActions.addDiscoveryIdAction({
+        id: discoveryId
+      })
+    );
   const onBackClicked = () => dispatch(discoverActions.decrementActiveStep(1));
   const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
   const onResetClicked = () => dispatch(discoverActions.resetActiveStep());
@@ -48,6 +61,7 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
 
   return {
+    handleSetDiscoveryId,
     onBackClicked,
     onResetClicked,
     onResetSelectedInput,

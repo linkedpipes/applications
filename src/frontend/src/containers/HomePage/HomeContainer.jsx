@@ -132,11 +132,25 @@ class HomeContainer extends PureComponent<Props, State> {
     });
   };
 
+  onHandleSelectPipelineExecutionClick = pipelineExecution => {
+    const { history } = this.props;
+    Log.info(`About to push with id ${pipelineExecution}`);
+    // const selectedResultGraphIri = pipelineExecution.selectedResultGraphIri;
+    // const selectedVisualizer = {
+    //   visualizer: { visualizerCode: pipelineExecution.selectedVisualiser }
+    // };
+    // history.push({
+    //   pathname: '/create-app',
+    //   state: { discoveryId }
+    // });
+  };
+
   render() {
     const {
       handleChange,
       handleSampleClick,
-      handleSelectDiscoveryClick
+      handleSelectDiscoveryClick,
+      onHandleSelectPipelineExecutionClick
     } = this;
     const { discoveriesList, pipelinesList, applicationsList } = this.props;
     const { tabIndex } = this.state;
@@ -147,6 +161,9 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandleTabChange={handleChange}
           onHandleSampleClick={handleSampleClick}
           onHandleSelectDiscoveryClick={handleSelectDiscoveryClick}
+          onHandleSelectPipelineExecutionClick={
+            onHandleSelectPipelineExecutionClick
+          }
           applicationsList={applicationsList}
           pipelinesList={pipelinesList}
           discoveriesList={discoveriesList}
