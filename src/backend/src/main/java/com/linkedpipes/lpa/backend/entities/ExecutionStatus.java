@@ -9,19 +9,17 @@ public class ExecutionStatus {
     @JsonProperty("status")
     public EtlStatus status;
 
+    public Date started, finished;
+
     @JsonProperty("executionStarted")
     public long getStarted() {
         return started.getTime() / 1000L;
     }
 
-    public Date started;
-
     @JsonProperty("executionFinished")
     public long getFinished() {
         return finished.getTime() / 1000L;
     }
-
-    public Date finished;
 
     @Override
     public String toString() {
