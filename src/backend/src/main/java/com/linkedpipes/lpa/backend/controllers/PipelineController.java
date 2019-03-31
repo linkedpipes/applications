@@ -42,9 +42,9 @@ public class PipelineController {
     }
 
     @GetMapping("/api/pipeline")
-    public ResponseEntity<PipelineExportResult> getPipeline(@RequestParam(value = "pipelineId") String pipelineId) throws LpAppsException {
+    public ResponseEntity<PipelineExportResult> getPipeline(@RequestParam(value = "pipelineIri") String pipelineIri) throws LpAppsException {
         try {
-            return ResponseEntity.ok(pipelineExportService.retrievePipelineExport(pipelineId));
+            return ResponseEntity.ok(pipelineExportService.retrievePipelineExport(pipelineIri));
         } catch (PipelineNotFoundException e) {
             throw new LpAppsException(HttpStatus.NOT_FOUND, "Pipeline not found: " + pipelineId, e);
         }
