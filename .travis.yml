@@ -2,7 +2,6 @@ os: "linux"
 
 stages:
   - name: build
-    if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: deploy
