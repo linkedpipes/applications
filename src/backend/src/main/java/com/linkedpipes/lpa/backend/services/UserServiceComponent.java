@@ -224,7 +224,11 @@ public class UserServiceComponent implements UserService {
                 exec.executionIri = e.getExecutionIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
                 exec.start = e.getStarted().getTime() / 1000L;
-                exec.stop = e.getFinished().getTime() / 1000L;
+                if (e.getFinished() != null) {
+                    exec.stop = e.getFinished().getTime() / 1000L;
+                } else {
+                    exec.stop = -1;
+                }
                 profile.pipelineExecutions.add(exec);
             }
         }
