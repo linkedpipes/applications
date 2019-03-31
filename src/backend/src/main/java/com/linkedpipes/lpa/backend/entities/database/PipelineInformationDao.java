@@ -12,7 +12,7 @@ public class PipelineInformationDao implements Serializable {
     private long id;
 
     @Column(nullable = false, columnDefinition = "uuid")
-    private UUID pipelineId;
+    private String pipelineId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String etlPipelineIri;
@@ -21,7 +21,7 @@ public class PipelineInformationDao implements Serializable {
     private String resultGraphIri;
 
     public void setPipelineId(String id) {
-        this.pipelineId = UUID.fromString(id);
+        this.pipelineId = id;
     }
 
     public String getPipelineId() {

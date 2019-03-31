@@ -95,12 +95,18 @@ public class UserServiceComponent implements UserService {
     }
 
     private UserDao getUser(String username) throws UserNotFoundException {
+        logger.info("Find " + username + " by web ID");
         List<UserDao> users = repository.findByWebId(username);
         UserDao user;
-        if (users.size() == 0) throw new UserNotFoundException(username);
+        if (users.size() == 0) {
+            logger.info("Not found");
+            throw new UserNotFoundException(username);
+        }
         if (users.size() > 1) {
             logger.warn("Got multiple users with username: " + username);
         }
+
+        logger.info("Got him");
         user = users.get(0);
         return user;
     }
