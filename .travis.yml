@@ -3,9 +3,7 @@ os: "linux"
 stages:
   - name: build
     if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
-  - name: partial_tests
-    if: type = push OR commit_message =~ /(\[Travis\])/
-  - name: full_tests
+  - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: deploy
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
@@ -48,30 +46,7 @@ jobs:
       script:
         - ./gradlew assemble
 
-    - stage: partial_tests
-      name: "Backend unit tests"
-      language: java
-      jdk: openjdk11
-      before_cache:
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        directories:
-          - $HOME/.gradle/caches/
-          - $HOME/.gradle/wrapper/
-      services:
-        - postgresql
-        - docker
-      before_script:
-        - cd src/backend
-        - psql -c "CREATE DATABASE lpa;" -U postgres
-        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
-      script:
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
-        - ./gradlew jacocoTestReport
-        - ./gradlew sendCoverageToCodacy
-
-    - stage: full_tests
+    - stage: tests
       name: "Backend unit tests"
       language: java
       jdk: openjdk11
