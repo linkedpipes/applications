@@ -10,7 +10,7 @@ public class PipelineInformationDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String pipelineId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
