@@ -23,13 +23,13 @@ public class DiscoveryDao implements Serializable {
     @Column(nullable = false)
     private boolean executing;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String sparqlEndpointIri;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String dataSampleIri;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String namedGraph;
 
     @ManyToOne
