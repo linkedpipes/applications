@@ -11,7 +11,7 @@ public class DiscoveryDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String discoveryId;
 
     @Column(nullable = false)
