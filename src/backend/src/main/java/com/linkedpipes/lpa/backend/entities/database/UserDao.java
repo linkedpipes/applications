@@ -10,7 +10,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 public class UserDao implements Serializable {
 
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String webId;
 
     @OneToMany(mappedBy="user")
