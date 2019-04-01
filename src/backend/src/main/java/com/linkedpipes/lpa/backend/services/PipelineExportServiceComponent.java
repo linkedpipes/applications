@@ -47,7 +47,7 @@ public class PipelineExportServiceComponent implements PipelineExportService {
         logger.debug("resultGraphIri = " + response.resultGraphIri);
         response.resultGraphIri = PipelineController.GRAPH_NAME_PREFIX + graphId;
 
-        for (PipelineInformationDao dao : repository.findByPipelineIri(response.etlPipelineIri)) {
+        for (PipelineInformationDao dao : repository.findByEtlPipelineIri(response.etlPipelineIri)) {
             repository.delete(dao);
         }
 
@@ -71,7 +71,7 @@ public class PipelineExportServiceComponent implements PipelineExportService {
     }
 
     public PipelineExportResult retrievePipelineExport(String pipelineIri) throws PipelineNotFoundException {
-        List<PipelineInformationDao> lst = repository.findByPipelineIri(pipelineIri);
+        List<PipelineInformationDao> lst = repository.findByEtlPipelineIri(pipelineIri);
         if (lst.size() == 0)  throw new PipelineNotFoundException(pipelineIri);
         else {
             PipelineInformationDao dao = lst.get(0);
