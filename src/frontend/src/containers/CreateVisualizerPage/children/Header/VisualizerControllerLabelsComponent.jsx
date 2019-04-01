@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import MapIcon from '@material-ui/icons/Map';
 
 type Props = {
-  onTitleChange?: (event: {}) => void,
   title: string,
   classes: { root: {}, textField: {} }
 };
