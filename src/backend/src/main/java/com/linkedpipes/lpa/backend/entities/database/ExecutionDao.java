@@ -15,7 +15,7 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String executionIri;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String etlPipelineIri;
 
     @Column(nullable = true)
