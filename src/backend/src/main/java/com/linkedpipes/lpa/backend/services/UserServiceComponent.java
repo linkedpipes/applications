@@ -139,10 +139,11 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override
-    public void setUserExecution(@NotNull String username, @NotNull String executionIri, String selectedVisualiser) throws UserNotFoundException {
+    public void setUserExecution(@NotNull String username, @NotNull String executionIri, @NotNull String etlPipelineIri, String selectedVisualiser) throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao e = new ExecutionDao();
         e.setExecutionStarted(executionIri);
+        e.setEtlPipelineIri(etlPipelineIri);
         e.setSelectedVisualiser(selectedVisualiser);
         e.setStarted(new Date());
         user.addExecution(e);
@@ -222,6 +223,7 @@ public class UserServiceComponent implements UserService {
                 PipelineExecution exec = new PipelineExecution();
                 exec.status = e.getStatus();
                 exec.executionIri = e.getExecutionIri();
+                exec.etlPipelineIri = e.getEtlPipelineIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
                 exec.start = e.getStarted().getTime() / 1000L;
                 if (e.getFinished() != null) {

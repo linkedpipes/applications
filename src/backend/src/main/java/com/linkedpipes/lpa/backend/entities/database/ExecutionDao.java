@@ -15,6 +15,9 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String executionIri;
 
+    @Column(nullable = false)
+    private String etlPipelineIri;
+
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private EtlStatus status;
@@ -86,4 +89,8 @@ public class ExecutionDao implements Serializable {
     public Date getFinished() {
         return this.finished;
     }
+
+    public String getEtlPipelineIri() { return etlPipelineIri; }
+
+    public void setEtlPipelineIri(String etlPipelineIri) { this.etlPipelineIri = etlPipelineIri; }
 }
