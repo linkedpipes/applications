@@ -68,7 +68,7 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
-        props.visualizerParams
+        props.classes
       )}
     </Grid>
   </Grid>
