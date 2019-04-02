@@ -58,15 +58,16 @@ const getVisualizer = (
     case VISUALIZER_TYPE.CHORD:
       return <ChordVisualizer />;
     case VISUALIZER_TYPE.UNDEFINED:
-      return (
-        <div className={classes.containerView}>
-          <Typography variant="h2" gutterBottom>
-            No visualizers selected...
-          </Typography>
-        </div>
-      );
+      return <ChordVisualizer />;
+    // return (
+    //   <div className={classes.containerView}>
+    //     <Typography variant="h2" gutterBottom>
+    //       No visualizers selected...
+    //     </Typography>
+    //   </div>
+    // );
     default:
-      return <div>No valid visualizer selected.</div>;
+      return <ChordVisualizer />;
   }
 };
 
