@@ -5,43 +5,85 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import { ETL_STATUS_MAP } from '@utils';
+import { withStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import { ETL_STATUS_MAP, unixTimeConverter } from '@utils';
+import uuid from 'uuid';
 
 type Props = {
   pipelinesList: Array<{
     executionIri: string,
     selectedVisualiser: string,
-    status: { '@id'?: string, status?: string },
-    webId: string
+    status: { '@id'?: string, status?: string, start: number, stop: number },
+    webId: string,
+    classes: Object,
+    onHandleSelectPipelineExecutionClick: Function
   }>
 };
 
-const PipelinesTableComponent = ({ pipelinesList }: Props) => (
+const styles = () => ({
+  root: {
+    overflowX: 'auto'
+  }
+});
+
+const PipelinesTableComponent = ({
+  onHandleSelectPipelineExecutionClick,
+  pipelinesList,
+  classes
+}: Props) => (
   <div>
     {(pipelinesList && pipelinesList.length) > 0 ? (
-      <Paper>
+      <Paper classes={classes}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell align="left"> Execution IRI </TableCell>
-              <TableCell align="left"> Visualizer </TableCell>
-              <TableCell align="left"> Status </TableCell>
+            <TableRow key={uuid()}>
+              <TableCell align="center">Action</TableCell>
+              <TableCell align="center">Execution IRI</TableCell>
+              <TableCell align="center">Visualizer Type</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="center">Started at</TableCell>
+              <TableCell align="center">Finished at</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {pipelinesList.map(pipeline => (
-              <TableRow key={pipeline.executionIri}>
-                <TableCell align="left">{pipeline.executionIri}</TableCell>
-                <TableCell align="left">
+              <TableRow key={uuid()}>
+                <TableCell align="center">
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      onHandleSelectPipelineExecutionClick(pipeline);
+                    }}
+                    disabled={
+                      !(
+                        pipeline.status &&
+                        ETL_STATUS_MAP[pipeline.status['@id']] === 'Finished'
+                      )
+                    }
+                    variant="contained"
+                    color="secondary"
+                  >
+                    Create App
+                  </Button>
+                </TableCell>
+                <TableCell align="center">{pipeline.executionIri}</TableCell>
+                <TableCell align="center">
                   {pipeline.selectedVisualiser}
                 </TableCell>
-                <TableCell align="left">
+                <TableCell align="center">
                   {(pipeline.status &&
                     ETL_STATUS_MAP[pipeline.status['@id']]) ||
                     (pipeline.status && pipeline.status.status) ||
                     'N/A'}
+                </TableCell>
+                <TableCell align="center">
+                  {unixTimeConverter(pipeline.start)}
+                </TableCell>
+                <TableCell align="center">
+                  {unixTimeConverter(pipeline.stop)}
                 </TableCell>
               </TableRow>
             ))}
@@ -58,4 +100,4 @@ const PipelinesTableComponent = ({ pipelinesList }: Props) => (
   </div>
 );
 
-export default PipelinesTableComponent;
+export default withStyles(styles)(PipelinesTableComponent);

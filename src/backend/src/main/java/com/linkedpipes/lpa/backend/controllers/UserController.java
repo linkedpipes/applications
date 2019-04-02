@@ -60,13 +60,7 @@ public class UserController {
     @PostMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
-        try {
-            userService.addUserIfNotPresent(user);
-            return ResponseEntity.ok(userService.getUserProfile(user));
-        } catch(UserNotFoundException e) {
-            logger.error("User not found: " + user);
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
-        }
+        return ResponseEntity.ok(userService.addUserIfNotPresent(user));
     }
 
     @NotNull

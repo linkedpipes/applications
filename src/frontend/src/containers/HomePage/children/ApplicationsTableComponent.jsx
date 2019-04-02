@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import uuid from 'uuid';
 
 type Props = {
   applicationsList: Array<{ id: string, iri: string }>
@@ -32,7 +33,7 @@ const ApplicationsTableComponent = ({ applicationsList }: Props) => (
       <Paper>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow key={uuid()}>
               <TableCell align="right">Visualizer</TableCell>
               <TableCell align="right">Published</TableCell>
               <TableCell align="right">Link</TableCell>
@@ -40,7 +41,7 @@ const ApplicationsTableComponent = ({ applicationsList }: Props) => (
           </TableHead>
           <TableBody>
             {rows.map(row => (
-              <TableRow key={row.id}>
+              <TableRow key={uuid()}>
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>

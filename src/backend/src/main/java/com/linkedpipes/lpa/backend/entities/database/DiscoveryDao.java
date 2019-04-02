@@ -11,14 +11,26 @@ public class DiscoveryDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String discoveryId;
 
     @Column(nullable = false)
     private Date started;
 
+    @Column(nullable = true)
+    private Date finished;
+
     @Column(nullable = false)
     private boolean executing;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String sparqlEndpointIri;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String dataSampleIri;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String namedGraph;
 
     @ManyToOne
     private UserDao user;
@@ -45,8 +57,12 @@ public class DiscoveryDao implements Serializable {
         return discoveryId;
     }
 
-    public Date getDateStarted() {
+    public Date getStarted() {
         return started;
+    }
+
+    public Date getFinished() {
+        return finished;
     }
 
     public long getId() {
@@ -59,5 +75,33 @@ public class DiscoveryDao implements Serializable {
 
     public void setExecuting(boolean executing) {
         this.executing = executing;
+    }
+
+    public void setFinished(Date finished) {
+        this.finished = finished;
+    }
+
+    public void setSparqlEndpointIri(String sparqlEndpointIri) {
+        this.sparqlEndpointIri = sparqlEndpointIri;
+    }
+
+    public String getSparqlEndpointIri() {
+        return this.sparqlEndpointIri;
+    }
+
+    public void setDataSampleIri(String dataSampleIri) {
+        this.dataSampleIri = dataSampleIri;
+    }
+
+    public String getDataSampleIri() {
+        return this.dataSampleIri;
+    }
+
+    public void setNamedGraph(String namedGraph) {
+        this.namedGraph = namedGraph;
+    }
+
+    public String getNamedGraph() {
+        return this.namedGraph;
     }
 }

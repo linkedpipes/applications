@@ -1,16 +1,14 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.Execution;
-import com.linkedpipes.lpa.backend.entities.Pipeline;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
-import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
-import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.services.UserService;
-import com.linkedpipes.lpa.backend.util.ThrowableUtils;
+import com.linkedpipes.lpa.backend.services.PipelineExportService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,35 +20,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.Method;
-import java.util.UUID;
-
 @RestController
 @SuppressWarnings("unused")
 public class PipelineController {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
-    private static final String GRAPH_NAME_PREFIX = "https://applications.linkedpipes.com/graph/";
+    public static final String GRAPH_NAME_PREFIX = "https://lpapps.com/graph/";
 
     private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
     @NotNull private final UserService userService;
-    private final HandlerMethodIntrospector methodIntrospector;
+    @NotNull private final PipelineExportService pipelineExportService;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         executorService = context.getBean(ExecutorService.class);
         userService = context.getBean(UserService.class);
-        methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
+        pipelineExportService = context.getBean(PipelineExportService.class);
     }
 
     @GetMapping("/api/pipeline")
-    public ResponseEntity<Pipeline> getPipeline(@RequestParam(value = "pipelineUri") String pipelineUri) {
-        Pipeline testPipeline = new Pipeline();
-        testPipeline.id = pipelineUri;
-        return ResponseEntity.ok(testPipeline);
+    public ResponseEntity<PipelineExportResult> getPipeline(@RequestParam(value = "pipelineIri") String pipelineIri) throws LpAppsException {
+        try {
+            return ResponseEntity.ok(pipelineExportService.retrievePipelineExport(pipelineIri));
+        } catch (PipelineNotFoundException e) {
+            throw new LpAppsException(HttpStatus.NOT_FOUND, "Pipeline not found: " + pipelineIri, e);
+        }
     }
 
     @GetMapping("/api/pipeline/export")
@@ -61,22 +58,7 @@ public class PipelineController {
 
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
-        String graphId = UUID.randomUUID().toString() + "-" + discoveryId;
-        ServiceDescription serviceDescription = new ServiceDescription(getOurServiceDescriptionUri(graphId));
-        PipelineExportResult response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
-        logger.debug("resultGraphIri = " + response.resultGraphIri);
-        response.resultGraphIri = GRAPH_NAME_PREFIX + graphId;
-        return ResponseEntity.ok(response);
-    }
-
-    @NotNull
-    private String getOurServiceDescriptionUri(@NotNull String graphId) {
-        Method serviceDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
-                PipelineController.class.getDeclaredMethod("serviceDescription", String.class));
-        return methodIntrospector.getHandlerMethodUri(PipelineController.class, serviceDescriptionMethod)
-                .requestParam("graphId", graphId)
-                .build()
-                .toString();
+        return ResponseEntity.ok(pipelineExportService.exportPipeline(discoveryId, pipelineUri));
     }
 
     @GetMapping(SERVICE_DESCRIPTION_PATH)

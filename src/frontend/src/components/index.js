@@ -4,7 +4,8 @@ import UserProfileButton from './UserProfile';
 import {
   TreemapVisualizer,
   GoogleMapsVisualizer,
-  GoogleMapsPopup
+  GoogleMapsPopup,
+  ChordVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
 
@@ -15,5 +16,6 @@ export {
   TreemapVisualizer,
   GoogleMapsVisualizer,
   GoogleMapsPopup,
-  VisualizerIcon
+  VisualizerIcon,
+  ChordVisualizer
 };

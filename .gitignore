@@ -72,6 +72,7 @@ chrome-user-data
 #Database
 data/virtuoso/
 data/postgres/
+src/backend/create.sql
 
 src/frontend/public/
 

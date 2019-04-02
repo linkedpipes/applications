@@ -50,5 +50,13 @@ export const ETLService = {
         executionIri
       }
     });
+  },
+
+  async getPipeline({ pipelineIri }) {
+    return axios.get('/pipeline', {
+      params: {
+        pipelineIri
+      }
+    });
   }
 };

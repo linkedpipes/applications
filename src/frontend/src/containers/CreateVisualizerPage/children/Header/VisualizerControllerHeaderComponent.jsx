@@ -7,11 +7,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 
 type Props = {
-  checkedRefresh?: boolean,
   classes: { root: {}, header: {} },
-  onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
-  headerParams: { title: string, subtitle?: string },
-  onTitleChange?: (event: {}) => void
+  headerParams: { title: string, subtitle?: string }
 };
 
 const styles = () => ({
