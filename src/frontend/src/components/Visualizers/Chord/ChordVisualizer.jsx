@@ -80,7 +80,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         groupColors={this.state.groupColors}
         matrix={this.state.matrix}
         componentId={1}
-        style={{ color: 'white' }}
+        labelColors={this.state.groupLabels.map(() => 'whitesmoke')}
       />
     );
   }
