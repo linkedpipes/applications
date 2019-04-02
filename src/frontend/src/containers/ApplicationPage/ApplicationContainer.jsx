@@ -33,7 +33,7 @@ class ApplicationContainer extends PureComponent {
       .get(applicationIri)
       .then(({ data }) => {
         const applicationData = data.applicationData;
-        const applicationType = 'MAP';
+        const applicationType = applicationData.visualizerCode;
         self.setState({ applicationType, applicationData });
       })
       .catch(err => {

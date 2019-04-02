@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import { StorageToolbox } from '@utils';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import uuid from 'uuid';
 
 type Props = {
   selectedApplication: any,
@@ -16,7 +15,8 @@ type Props = {
   webId: string,
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
-  history: any
+  history: any,
+  selectedVisualizer: Object
 };
 
 type State = {
@@ -42,7 +42,6 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       return;
     }
 
-    selectedApplication.id = uuid.v4();
     StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
@@ -85,7 +84,11 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { headerParams, onRefreshSwitchChange } = this.props;
+    const {
+      headerParams,
+      onRefreshSwitchChange,
+      selectedVisualizer
+    } = this.props;
     const {
       handlePublishClicked,
       onHandleAppTitleChanged,
@@ -104,6 +107,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
         handleClosePublishDialog={handleClosePublishDialog}
         handleProceedToApplicationClicked={handleProceedToApplicationClicked}
         handleCopyLinkClicked={handleCopyLinkClicked}
+        selectedVisualizer={selectedVisualizer}
         appIri={appIri}
       />
     );

@@ -31,7 +31,12 @@ const styles = theme => ({
   input: {}
 });
 
-const getVisualizer = (visualizerCode, selectedResultGraphIri, classes) => {
+const getVisualizer = (
+  visualizerCode,
+  selectedResultGraphIri,
+  handleSetCurrentApplicationData,
+  classes
+) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
@@ -46,20 +51,18 @@ const getVisualizer = (visualizerCode, selectedResultGraphIri, classes) => {
     }
     case VISUALIZER_TYPE.TREEMAP:
       return (
-        <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
-      );
-    case VISUALIZER_TYPE.UNDEFINED:
-      return (
-        // <div className={classes.containerView}>
-        //   <Typography variant="h2" gutterBottom>
-        //     No visualizers selected...
-        //   </Typography>
-        // </div>
-        <GoogleMapsVisualizer
-          markers={[]}
+        <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
+      );
+    case VISUALIZER_TYPE.UNDEFINED:
+      return (
+        <div className={classes.containerView}>
+          <Typography variant="h2" gutterBottom>
+            No visualizers selected...
+          </Typography>
+        </div>
       );
     default:
       return <div>No valid visualizer selected.</div>;
@@ -75,6 +78,7 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
+        props.handleSetCurrentApplicationData,
         props.classes
       )}
     </Grid>

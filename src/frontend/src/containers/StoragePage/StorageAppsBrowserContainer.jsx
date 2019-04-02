@@ -40,48 +40,11 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
                 .then(({ data }) => {
                   const tileData = Object.assign({}, self.state.tileData); // creating copy of object
                   tileData[element.label] = {
-                    img:
-                      'https://www.iosicongallery.com/icons/google-maps-2014-11-12/512.png',
-                    author: 'Altynbek',
-                    applicationIri: element.url,
-                    applicationTitle: data.applicationTitle
+                    applicationIri: data.publishedUrl,
+                    applicationTitle: data.applicationTitle,
+                    applicationData: data.applicationData
                   };
                   self.setState({ tileData });
-                })
-                .catch(err => {
-                  Log.error(err, 'StorageAppsBrowserContainer');
-                });
-            }
-          });
-          self.forceUpdate();
-        },
-        err => Log.error(err, 'StorageAppsBrowserContainer')
-      );
-
-      const sharedUrl = `${getLocation(webId).origin}/inbox/lpapps`;
-
-      FileClient.readFolder(sharedUrl).then(
-        folder => {
-          Log.info(
-            `Read ${folder.name}, it has ${folder.files.length} files.`,
-            'StorageAppsBrowserContainer'
-          );
-          folder.files.forEach(element => {
-            if (!(element.label in self.state.tileData)) {
-              axios
-                .get(element.url)
-                .then(({ data }) => {
-                  axios.get(element.url).then(({ newData }) => {
-                    const tileData = Object.assign({}, self.state.tileData); // creating copy of object
-                    tileData[element.label] = {
-                      img:
-                        'https://www.iosicongallery.com/icons/google-maps-2014-11-12/512.png',
-                      author: 'Altynbek',
-                      applicationIri: element.url,
-                      applicationTitle: newData.applicationTitle
-                    };
-                    self.setState({ tileData });
-                  });
                 })
                 .catch(err => {
                   Log.error(err, 'StorageAppsBrowserContainer');

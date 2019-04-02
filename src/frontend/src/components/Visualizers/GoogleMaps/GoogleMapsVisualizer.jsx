@@ -62,8 +62,10 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
             map.fitBounds(bounds);
 
             handleSetCurrentApplicationData({
+              id: uuid.v4(),
               applicationEndpoint: 'map',
-              markers: markersToUse
+              markers: markersToUse,
+              visualizerCode: 'MAP'
             });
           }
         }

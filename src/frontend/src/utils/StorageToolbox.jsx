@@ -54,7 +54,8 @@ const saveAppToSolid = (appData, appTitle, webId, path) => {
 
   const url = `${getLocation(webId).origin}/${path}`;
 
-  const hash = stringHash(JSON.stringify(appTitle, null, 2)).toString();
+  const formattedTitle = appTitle.trim().toLowerCase();
+  const hash = stringHash(JSON.stringify(formattedTitle, null, 2)).toString();
   const portSpecifier =
     process.env.BASE_SERVER_PORT === ''
       ? ''
@@ -66,6 +67,7 @@ const saveAppToSolid = (appData, appTitle, webId, path) => {
 
   const file = JSON.stringify({
     applicationData: appData,
+    publishedUrl,
     applicationTitle: appTitle
   });
 

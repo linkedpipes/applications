@@ -21,6 +21,7 @@ import {
   withStyles
 } from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { getBeautifiedVisualizerTitle } from '@utils';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
@@ -32,7 +33,8 @@ type Props = {
   handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
   fullScreen: any,
-  appIri: string
+  appIri: string,
+  selectedVisualizer: Object
 };
 
 const styles = theme => ({
@@ -65,6 +67,7 @@ const VisualizerControllerHeaderComponent = ({
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
   fullScreen,
+  selectedVisualizer,
   appIri
 }: Props) => (
   <div className={classes.root}>
@@ -99,7 +102,11 @@ const VisualizerControllerHeaderComponent = ({
           </Grid>
           <Grid item>
             <Typography align="center" variant="h6">
-              Google Maps Visualizer
+              {selectedVisualizer
+                ? getBeautifiedVisualizerTitle(
+                    selectedVisualizer.visualizer.visualizerCode
+                  )
+                : 'Unkown visualizer type'}
             </Typography>
           </Grid>
         </Grid>

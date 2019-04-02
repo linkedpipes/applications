@@ -4,6 +4,7 @@ import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService, Log } from '@utils';
 import { CircularProgress } from '@material-ui/core';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -51,7 +52,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData } = this;
+    const { handleSetCurrentApplicationData } = this.props;
     this.conceptsFetched = new Set();
     // Add the root to the list of fetched data
     this.conceptsFetched.add(
@@ -111,9 +112,11 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     });
 
     handleSetCurrentApplicationData({
+      id: uuid.v4(),
       applicationEndpoint: 'treemap',
       conceptIri: 'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
-      selectedResultGraphIri: this.props.selectedResultGraphIri
+      selectedResultGraphIri: this.props.selectedResultGraphIri,
+      visualizerCode: 'TREEMAP'
     });
   }
 

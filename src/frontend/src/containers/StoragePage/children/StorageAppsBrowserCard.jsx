@@ -17,13 +17,17 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
-import { Link } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { StorageToolbox } from '@utils';
+import { StorageToolbox, getBeautifiedVisualizerTitle } from '@utils';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
+import { connect } from 'react-redux';
+import { globalActions } from '@ducks/globalDuck';
+import { etlActions } from '@ducks/etlDuck';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const styles = {
   root: {
@@ -31,6 +35,7 @@ const styles = {
   },
   card: {
     height: '100%',
+    width: '200px',
     display: 'flex',
     flexDirection: 'column'
   },
@@ -52,8 +57,11 @@ type Props = {
   singleTileData: {
     applicationTitle: string,
     applicationIri: string,
-    author: {}
-  }
+    applicationData: Object
+  },
+  handleSetResultPipelineIri: Function,
+  handleSetSelectedVisualizer: Function,
+  history: Object
 };
 
 type State = {
@@ -108,18 +116,49 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     this.setState({ anchorEl: null });
   };
 
-  handleShare = () => {
-    this.setState({ open: false });
-    StorageToolbox.shareApp(
-      this.props.singleTileData.applicationIri,
-      this.state.textValue
-    );
+  handleShareApp = () => {
+    this.setState({ open: true });
+  };
+
+  handleCopyLinkClicked = () => {
+    toast.success('Copied link to clipboard!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 2000
+    });
+  };
+
+  handleApplicationClicked = () => {
+    const {
+      handleSetSelectedVisualizer,
+      handleSetResultPipelineIri,
+      singleTileData,
+      history
+    } = this.props;
+    const applicationData = singleTileData.applicationData;
+    const resultGraphIri = applicationData.selectedResultGraphIri;
+    const selectedVisualiser = {
+      visualizer: { visualizerCode: applicationData.visualizerCode }
+    };
+
+    handleSetResultPipelineIri(resultGraphIri);
+    handleSetSelectedVisualizer(selectedVisualiser);
+
+    history.push({
+      pathname: '/create-app'
+    });
   };
 
   render() {
     const { classes, singleTileData } = this.props;
     const { anchorEl } = this.state;
-    const { handleMenuClick, handleMenuClose, handleDeleteApp } = this;
+    const {
+      handleMenuClick,
+      handleMenuClose,
+      handleDeleteApp,
+      handleShareApp,
+      handleApplicationClicked,
+      handleCopyLinkClicked
+    } = this;
     return (
       <GridListTile>
         <Card className={classes.card}>
@@ -140,20 +179,26 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
             open={Boolean(anchorEl)}
             onClose={this.handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Share</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Rename</MenuItem>
+            <MenuItem onClick={handleShareApp}>Share</MenuItem>
             <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
           </Menu>
-          <CardActionArea style={{ textAlign: 'center' }}>
+          <CardActionArea
+            onClick={handleApplicationClicked}
+            style={{ textAlign: 'center' }}
+          >
             <VisualizerIcon
               visualizerType={VISUALIZER_TYPE.MAP}
-              style={{ color: 'white', fontSize: '75px' }}
+              style={{ color: 'white', fontSize: '85px' }}
             />
             <CardContent className={classes.cardContent}>
               <Typography gutterBottom variant="h5" component="h2">
                 {singleTileData.applicationTitle}
               </Typography>
-              <Typography component="p">{singleTileData.author}</Typography>
+              <Typography gutterBottom variant="h6" component="h2">
+                {getBeautifiedVisualizerTitle(
+                  singleTileData.applicationData.visualizerCode
+                )}
+              </Typography>
             </CardContent>
           </CardActionArea>
         </Card>
@@ -162,27 +207,31 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+          <DialogTitle id="form-dialog-title">
+            Share the Application URL
+          </DialogTitle>
+
           <DialogContent>
-            <DialogContentText>
-              To share the application with someone, you need to provide his
-              WebID.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              onChange={this.handleChange}
-              id="name"
-              label="WebID"
-              fullWidth
-            />
+            <CopyToClipboard
+              text={singleTileData.applicationIri}
+              onCopy={handleCopyLinkClicked}
+            >
+              <TextField
+                color="primary"
+                label="Click to copy"
+                variant="outlined"
+                fullWidth
+                value={singleTileData.applicationIri}
+                autoFocus
+                style={{
+                  textDecoration: 'none'
+                }}
+              />
+            </CopyToClipboard>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleShare} color="primary">
-              Share
+              Close
             </Button>
           </DialogActions>
         </Dialog>
@@ -191,4 +240,30 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
   }
 }
 
-export default withStyles(styles)(StorageAppsBrowserCard);
+const mapDispatchToProps = dispatch => {
+  const handleSetResultPipelineIri = resultGraphIri =>
+    dispatch(
+      etlActions.addSelectedResultGraphIriAction({
+        data: resultGraphIri
+      })
+    );
+
+  const handleSetSelectedVisualizer = visualizerData =>
+    dispatch(
+      globalActions.addSelectedVisualizerAction({
+        data: visualizerData
+      })
+    );
+
+  return {
+    handleSetResultPipelineIri,
+    handleSetSelectedVisualizer
+  };
+};
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(withStyles(styles)(StorageAppsBrowserCard))
+);
