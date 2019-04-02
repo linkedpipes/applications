@@ -37,20 +37,8 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private PipelineInformationRepository pipelineRepository;
 
-    @NotNull @Override
-    public UserProfile addUser(@NotNull String webId) throws UserTakenException {
-        try {
-            getUser(webId);
-            throw new UserTakenException(webId);
-        } catch (UserNotFoundException e) {
-            return addNewUser(webId);
-        }
-    }
-
     private UserProfile addNewUser(String webId) {
-        UserDao user = new UserDao();
-        user.setWebId(webId);
-        repository.save(user);
+
         try {
             return getUserProfile(webId);
         } catch(UserNotFoundException f) {
@@ -62,9 +50,16 @@ public class UserServiceComponent implements UserService {
     @NotNull @Override
     public UserProfile addUserIfNotPresent(String webId) {
         try {
-            return getUserProfile(webId);
-        } catch (UserNotFoundException e) {
-            return addNewUser(webId);
+            UserDao user = new UserDao();
+            user.setWebId(webId);
+            repository.save(user);
+            return transformUserProfile(user);
+        } catch (Exception e) {
+            try {
+                return getUserProfile(webId);
+            } catch (UserNotFoundException f) {
+                throw new RuntimeException(f);
+            }
         }
     }
 
@@ -195,6 +190,10 @@ public class UserServiceComponent implements UserService {
     public UserProfile getUserProfile(@NotNull String username) throws UserNotFoundException {
         UserDao user = getUser(username);
         if (user == null) throw new UserNotFoundException(username);
+        return transformUserProfile(user);
+    }
+
+    private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
         profile.applications = new ArrayList<>();

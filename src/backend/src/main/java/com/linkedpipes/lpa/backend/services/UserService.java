@@ -9,7 +9,6 @@ import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import java.util.List;
 
 public interface UserService {
-    UserProfile addUser(String user) throws UserTakenException;
     UserProfile getUserProfile(String user) throws UserNotFoundException;
     UserProfile addUserIfNotPresent(String user);
 
