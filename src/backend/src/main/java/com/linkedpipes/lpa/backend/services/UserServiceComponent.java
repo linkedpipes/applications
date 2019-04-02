@@ -37,16 +37,6 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private PipelineInformationRepository pipelineRepository;
 
-    private UserProfile addNewUser(String webId) {
-
-        try {
-            return getUserProfile(webId);
-        } catch(UserNotFoundException f) {
-            logger.error("Failed to store user.");
-            throw new RuntimeException(f);
-        }
-    }
-
     @NotNull @Override
     public UserProfile addUserIfNotPresent(String webId) {
         try {
