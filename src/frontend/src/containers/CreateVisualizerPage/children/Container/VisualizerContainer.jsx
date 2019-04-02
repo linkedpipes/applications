@@ -30,12 +30,7 @@ const styles = theme => ({
   input: {}
 });
 
-const getVisualizer = (
-  visualizerCode,
-  selectedResultGraphIri,
-  visualizerParams = null,
-  classes
-) => {
+const getVisualizer = (visualizerCode, selectedResultGraphIri, classes) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
@@ -73,7 +68,6 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
-        props.visualizerParams,
         props.classes
       )}
     </Grid>
