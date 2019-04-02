@@ -9,9 +9,11 @@ import { Link } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import DiscoveriesTableComponent from './children/DiscoveriesTableComponent';
-import ApplicationsTableComponent from './children/ApplicationsTableComponent';
-import PipelinesTableComponent from './children/PipelinesTableComponent';
+import {
+  DiscoveriesTable,
+  ApplicationsTable,
+  PipelinesTable
+} from './children';
 import { samples } from '../DiscoverPage/DiscoverInputSources/DiscoverExamplesContainer';
 import uuid from 'uuid';
 
@@ -35,6 +37,7 @@ type Props = {
   onHandleTabChange: Function,
   onHandleSelectDiscoveryClick: Function,
   onHandleSampleClick: Function,
+  onHandleSelectPipelineExecutionClick: Function,
   tabIndex: Number
 };
 
@@ -80,6 +83,7 @@ class HomeComponent extends PureComponent<Props> {
       onHandleTabChange,
       onHandleSampleClick,
       onHandleSelectDiscoveryClick,
+      onHandleSelectPipelineExecutionClick,
       tabIndex
     } = this.props;
     return (
@@ -129,23 +133,25 @@ class HomeComponent extends PureComponent<Props> {
             </AppBar>
             <div
               style={{
-                flex: 1,
                 textAlign: 'center'
               }}
             >
               {tabIndex === 0 && (
-                <DiscoveriesTableComponent
+                <DiscoveriesTable
                   discoveriesList={discoveriesList}
                   onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
                 />
               )}
               {tabIndex === 1 && (
-                <PipelinesTableComponent pipelinesList={pipelinesList} />
+                <PipelinesTable
+                  pipelinesList={pipelinesList}
+                  onHandleSelectPipelineExecutionClick={
+                    onHandleSelectPipelineExecutionClick
+                  }
+                />
               )}
               {tabIndex === 2 && (
-                <ApplicationsTableComponent
-                  applicationsList={applicationsList}
-                />
+                <ApplicationsTable applicationsList={applicationsList} />
               )}
             </div>
           </Grid>

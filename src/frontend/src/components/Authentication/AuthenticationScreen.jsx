@@ -42,7 +42,7 @@ const styles = theme => ({
 });
 
 function AuthenticationScreen(props) {
-  const { classes, webId } = props;
+  const { classes } = props;
   return (
     <main className={classes.main}>
       <CssBaseline />

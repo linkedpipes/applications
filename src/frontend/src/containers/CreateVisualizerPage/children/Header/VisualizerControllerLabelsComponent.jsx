@@ -6,6 +6,7 @@ import MapIcon from '@material-ui/icons/Map';
 type Props = {
   classes: { root: {}, textField: {}, textFieldFontSize: {} },
   handleAppTitleChanged: Function
+  title: string,
 };
 
 const styles = {

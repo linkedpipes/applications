@@ -10,9 +10,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 public class UserDao implements Serializable {
 
     @Id
-    @GeneratedValue
-    private long id;
-
     @Column(nullable = false, columnDefinition = "TEXT")
     private String webId;
 
@@ -69,7 +66,4 @@ public class UserDao implements Serializable {
         this.webId = webId;
     }
 
-    public long getId() {
-        return id;
-    }
 }
