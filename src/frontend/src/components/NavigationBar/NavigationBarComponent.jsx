@@ -94,12 +94,12 @@ const styles = theme => ({
 });
 
 const NavigationBarComponent = ({
-                                  classes,
-                                  theme,
-                                  drawerState,
-                                  onHandleDrawerClose,
-                                  onHandleDrawerOpen
-                                }) => (
+  classes,
+  theme,
+  drawerState,
+  onHandleDrawerClose,
+  onHandleDrawerOpen
+}) => (
   <div>
     <AppBar
       position="absolute"
@@ -117,7 +117,7 @@ const NavigationBarComponent = ({
               [classes.hide]: drawerState
             })}
           >
-            <MenuIcon/>
+            <MenuIcon />
           </IconButton>
         </div>
         <Typography
@@ -128,9 +128,9 @@ const NavigationBarComponent = ({
         >
           LinkedPipes Applications
         </Typography>
-        <UserProfileButton/>
+        <UserProfileButton />
       </Toolbar>
-      <ToastContainer className="toast-container"/>
+      <ToastContainer className="toast-container" />
     </AppBar>
     <Drawer
       variant="permanent"
@@ -149,47 +149,47 @@ const NavigationBarComponent = ({
       <div className={classNames(classes.toolbar, classes.chevronWrapper)}>
         <IconButton className={classes.chevron} onClick={onHandleDrawerClose}>
           {theme.direction === 'rtl' ? (
-            <ChevronRightIcon/>
+            <ChevronRightIcon />
           ) : (
-            <ChevronLeftIcon/>
+            <ChevronLeftIcon />
           )}
         </IconButton>
       </div>
-      <Divider/>
+      <Divider />
       <List>
         <Link style={{ textDecoration: 'none' }} to="/dashboard">
           <ListItem button>
             <ListItemIcon>
-              <HomeIcon/>
+              <HomeIcon />
             </ListItemIcon>
-            <ListItemText primary="Dashboard"/>
+            <ListItemText primary="Dashboard" />
           </ListItem>
         </Link>
 
-        <Link style={{ textDecoration: 'none' }} to="/create-app">
+        {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
             <ListItemIcon>
               <ViewModuleIcon/>
             </ListItemIcon>
             <ListItemText primary="Applications"/>
           </ListItem>
-        </Link>
+        </Link> */}
 
         <Link style={{ textDecoration: 'none' }} to="/storage">
           <ListItem button>
             <ListItemIcon>
-              <StorageIcon/>
+              <StorageIcon />
             </ListItemIcon>
-            <ListItemText primary="Storage"/>
+            <ListItemText primary="Storage" />
           </ListItem>
         </Link>
 
         <Link style={{ textDecoration: 'none' }} to="/about">
           <ListItem button>
             <ListItemIcon>
-              <HelpIcon/>
+              <HelpIcon />
             </ListItemIcon>
-            <ListItemText primary="About"/>
+            <ListItemText primary="About" />
           </ListItem>
         </Link>
       </List>

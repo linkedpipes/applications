@@ -10,7 +10,7 @@ import {
   getQueryString,
   replaceAll,
   extractUrlGroups,
-  unixTimeConverter
+  unixTimeConverter,
   getLocation
 } from './global.utils';
 import SocketContext from './socket.service';
@@ -30,7 +30,8 @@ export {
   replaceAll,
   extractUrlGroups,
   getBeautifiedVisualizerTitle,
-  unixTimeConverter
+  unixTimeConverter,
   Log,
-  getLocation
+  getLocation,
+  StorageToolbox
 };
