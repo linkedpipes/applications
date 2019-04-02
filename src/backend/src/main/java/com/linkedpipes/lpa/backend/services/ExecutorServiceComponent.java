@@ -112,6 +112,9 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.error = false;
                     report.timeout = false;
                     report.executionIri = executionIri;
+                    report.started = executionStatus.getStarted();
+                    report.finished = executionStatus.getFinished();
+
                     if (pipeline != null) {
                         report.pipeline = new PipelineExportResult();
                         report.pipeline.pipelineId = pipeline.getPipelineId();
@@ -137,6 +140,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.error = true;
                 report.timeout = false;
                 report.executionIri = executionIri;
+                report.started = -1;
+                report.finished = -1;
                 if (pipeline != null) {
                     report.pipeline = new PipelineExportResult();
                     report.pipeline.pipelineId = pipeline.getPipelineId();
@@ -167,6 +172,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.error = true;
                     report.timeout = true;
                     report.executionIri = executionIri;
+                    report.started = -1;
+                    report.finished = -1;
                     PipelineInformationDao pipeline = e.getPipeline();
                     if (pipeline != null) {
                         report.pipeline = new PipelineExportResult();
