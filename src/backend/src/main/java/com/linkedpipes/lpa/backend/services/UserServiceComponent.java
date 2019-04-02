@@ -150,7 +150,7 @@ public class UserServiceComponent implements UserService {
         if (pipelines.size() > 0) {
             e.setPipeline(pipelines.get(0));
         } else {
-            logger.error("Pipeline information not found: " + etlPipelineIri)
+            logger.error("Pipeline information not found: " + etlPipelineIri);
         }
         e.setSelectedVisualiser(selectedVisualiser);
         e.setStarted(new Date());
