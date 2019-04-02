@@ -2,6 +2,9 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity(name="pipelineInformation")
 public class PipelineInformationDao implements Serializable {
@@ -18,6 +21,10 @@ public class PipelineInformationDao implements Serializable {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String resultGraphIri;
+
+    @OneToMany(mappedBy="pipeline")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<ExecutionDao> executions;
 
     public void setPipelineId(String id) {
         this.pipelineId = id;
@@ -45,5 +52,16 @@ public class PipelineInformationDao implements Serializable {
 
     public long getId() {
         return this.id;
+    }
+
+    public void addExecution(ExecutionDao execution) {
+        this.executions.add(execution);
+        if (execution.getPipeline() != this) {
+            execution.setPipeline(this);
+        }
+    }
+
+    public List<ExecutionDao> getExecutions() {
+        return this.executions;
     }
 }

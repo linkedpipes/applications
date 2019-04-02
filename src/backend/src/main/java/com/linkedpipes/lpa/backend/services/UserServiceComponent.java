@@ -34,6 +34,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private ApplicationRepository applicationRepository;
 
+    @Autowired
+    private PipelineInformationRepository pipelineRepository;
+
     @NotNull @Override
     public UserProfile addUser(@NotNull String webId) throws UserTakenException {
         try {
@@ -141,9 +144,14 @@ public class UserServiceComponent implements UserService {
     @NotNull @Override
     public void setUserExecution(@NotNull String username, @NotNull String executionIri, @NotNull String etlPipelineIri, String selectedVisualiser) throws UserNotFoundException {
         UserDao user = getUser(username);
+        List<PipelineInformationDao> pipelines = pipelineRepository.findByEtlPipelineIri(etlPipelineIri);
         ExecutionDao e = new ExecutionDao();
         e.setExecutionStarted(executionIri);
-        e.setEtlPipelineIri(etlPipelineIri);
+        if (pipelines.size() > 0) {
+            e.setPipeline(pipelines.get(0));
+        } else {
+            logger.error("Pipeline information not found: " + etlPipelineIri)
+        }
         e.setSelectedVisualiser(selectedVisualiser);
         e.setStarted(new Date());
         user.addExecution(e);
@@ -223,7 +231,7 @@ public class UserServiceComponent implements UserService {
                 PipelineExecution exec = new PipelineExecution();
                 exec.status = e.getStatus();
                 exec.executionIri = e.getExecutionIri();
-                exec.etlPipelineIri = e.getEtlPipelineIri();
+                exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
                 exec.start = e.getStarted().getTime() / 1000L;
                 if (e.getFinished() != null) {

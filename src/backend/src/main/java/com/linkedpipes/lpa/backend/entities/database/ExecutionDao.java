@@ -15,9 +15,6 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String executionIri;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String etlPipelineIri;
-
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private EtlStatus status;
@@ -34,6 +31,9 @@ public class ExecutionDao implements Serializable {
     @ManyToOne
     private UserDao user;
 
+    @ManyToOne
+    private PipelineInformationDao pipeline;
+
     public UserDao getUser() {
         return user;
     }
@@ -44,6 +44,18 @@ public class ExecutionDao implements Serializable {
         if (!user.getExecutions().contains(this)) {
             user.getExecutions().add(this);
         }
+    }
+
+    public void setPipeline(PipelineInformationDao pipeline) {
+        this.pipeline = pipeline;
+
+        if (!pipeline.getExecutions().contains(this)) {
+            pipeline.getExecutions().add(this);
+        }
+    }
+
+    public PipelineInformationDao getPipeline() {
+        return this.pipeline;
     }
 
     public void setExecutionStarted(String executionIri) {
@@ -89,8 +101,4 @@ public class ExecutionDao implements Serializable {
     public Date getFinished() {
         return this.finished;
     }
-
-    public String getEtlPipelineIri() { return etlPipelineIri; }
-
-    public void setEtlPipelineIri(String etlPipelineIri) { this.etlPipelineIri = etlPipelineIri; }
 }
