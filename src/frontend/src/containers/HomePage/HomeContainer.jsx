@@ -74,15 +74,19 @@ class HomeContainer extends PureComponent<Props, State> {
         return;
       }
       const parsedData = JSON.parse(data);
-      const discoveryId = parsedData.discoveryId;
       if (parsedData.status.isFinished) {
-        socket.emit('leave', discoveryId);
+        socket.emit('leave', parsedData.discoveryId);
         const userProfile = self.props.userProfile;
         if (userProfile.discoverySessions.length > 0) {
           const updatedDiscovery = userProfile.discoverySessions.map(
             discoveryRecord => {
-              if (discoveryRecord.id === discoveryId) {
-                discoveryRecord.finished = true;
+              if (discoveryRecord.id === parsedData.discoveryId) {
+                discoveryRecord.finished = parsedData.status.isFinished;
+                discoveryRecord.stop = parsedData.finished;
+                discoveryRecord.sparqlEndpointIri =
+                  parsedData.sparqlEndpointIri;
+                discoveryRecord.namedGraph = parsedData.namedGraph;
+                discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
               }
               return discoveryRecord;
             }
@@ -109,6 +113,7 @@ class HomeContainer extends PureComponent<Props, State> {
           pipelineRecord => {
             if (pipelineRecord.executionIri === executionIri) {
               pipelineRecord.status = newStatus;
+              pipelineRecord.stop = parsedData.finished;
             }
             return pipelineRecord;
           }
