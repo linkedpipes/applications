@@ -1,33 +1,53 @@
 // @flow
 import * as React from 'react';
-import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, Typography, InputBase, Grid } from '@material-ui/core';
 import MapIcon from '@material-ui/icons/Map';
 
 type Props = {
-  title: string,
-  classes: { root: {}, textField: {} }
+  classes: { root: {}, textField: {}, textFieldFontSize: {} },
+  handleAppTitleChanged: Function,
+  title: string
 };
 
 const styles = {
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    display: 'inline-block',
+    margin: 'auto'
   },
   textField: {
-    flexGrow: 1
+    flexGrow: 1,
+    fontSize: 30
   }
 };
 
-const VisualizerControllerLabelsComponent = (props: Props) => (
-  <div className={props.classes.root}>
-    <MapIcon style={{ fontSize: '70px' }} />
-    <TextField
-      label="App title"
-      className={props.classes.textField}
-      value={props.title}
-      placeholder="Enter your app Title"
-      margin="normal"
-    />
+const VisualizerControllerLabelsComponent = ({
+  classes,
+  handleAppTitleChanged
+}: Props) => (
+  <div className={classes.root}>
+    <Grid container spacing={16}>
+      <Grid item>
+        <MapIcon style={{ fontSize: '70px' }} />
+      </Grid>
+      <Grid item xs={12} sm container>
+        <Grid item xs container direction="column" spacing={5}>
+          <Grid xs>
+            <InputBase
+              label="App title"
+              className={classes.textField}
+              variant="outlined"
+              placeholder="Enter your app title"
+              onChange={handleAppTitleChanged}
+              margin="normal"
+            />
+          </Grid>
+          <Grid item>
+            <Typography variant="title">Google Maps Visualizer</Typography>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
   </div>
 );
 

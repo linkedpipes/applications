@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import {
   withScriptjs,
   withGoogleMap,
@@ -10,12 +10,14 @@ import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClust
 import { compose, withProps, type HOC } from 'recompose';
 import uuid from 'uuid';
 import { Log, VisualizersService } from '@utils';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function
 };
 
 type State = {
@@ -23,7 +25,7 @@ type State = {
   zoomToMarkers: any
 };
 
-class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
+class GoogleMapsVisualizer extends PureComponent<Props, State> {
   constructor() {
     super();
     this.state = {
@@ -33,12 +35,15 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const response = await VisualizersService.getMarkers({
-      resultGraphIri: this.props.selectedResultGraphIri
-    });
-    const jsonData = await response.data;
+    // const response = await VisualizersService.getMarkers({
+    //   resultGraphIri: this.props.selectedResultGraphIri
+    // });
+    // const jsonData = await response.json();
+    const { handleSetCurrentApplicationData, markers } = this.props;
+    const { zoomToMarkers } = this.state;
+    const markersToUse = markers;
     this.setState({
-      markers: jsonData,
+      markers: markersToUse,
       zoomToMarkers: map => {
         const bounds = new window.google.maps.LatLngBounds();
         if (map !== null) {
@@ -55,6 +60,13 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
               }
             });
             map.fitBounds(bounds);
+
+            handleSetCurrentApplicationData({
+              id: uuid.v4(),
+              applicationEndpoint: 'map',
+              markers: markersToUse,
+              visualizerCode: 'MAP'
+            });
           }
         }
       }

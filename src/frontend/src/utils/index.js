@@ -10,10 +10,12 @@ import {
   getQueryString,
   replaceAll,
   extractUrlGroups,
-  unixTimeConverter
+  unixTimeConverter,
+  getLocation
 } from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
+import StorageToolbox from './StorageToolbox';
 
 export {
   VisualizersService,
@@ -28,6 +30,8 @@ export {
   replaceAll,
   extractUrlGroups,
   getBeautifiedVisualizerTitle,
+  unixTimeConverter,
   Log,
-  unixTimeConverter
+  getLocation,
+  StorageToolbox
 };

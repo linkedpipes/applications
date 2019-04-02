@@ -17,6 +17,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import HelpIcon from '@material-ui/icons/Help';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -165,12 +166,21 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link>
 
-        <Link style={{ textDecoration: 'none' }} to="/create-app">
+        {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
             <ListItemIcon>
-              <ViewModuleIcon />
+              <ViewModuleIcon/>
             </ListItemIcon>
-            <ListItemText primary="Applications" />
+            <ListItemText primary="Applications"/>
+          </ListItem>
+        </Link> */}
+
+        <Link style={{ textDecoration: 'none' }} to="/storage">
+          <ListItem button>
+            <ListItemIcon>
+              <StorageIcon />
+            </ListItemIcon>
+            <ListItemText primary="Storage" />
           </ListItem>
         </Link>
 

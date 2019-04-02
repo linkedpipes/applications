@@ -9,8 +9,8 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 type Props = {
-  checkedRefresh?: boolean,
-  classes: { button: {}, leftIcon: {}, root: {} }
+  classes: { button: {}, leftIcon: {}, root: {} },
+  handlePublishClicked: Function
 };
 
 const styles = theme => ({
@@ -25,35 +25,19 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerToolboxComponent = (props: Props) => (
+const VisualizerControllerToolboxComponent = ({
+  classes,
+  handlePublishClicked
+}: Props) => (
   <div>
-    <FormControlLabel
-      control={<Switch value="checkedRefresh" />}
-      label={props.checkedRefresh ? 'Refresh' : 'Fixed'}
-    />
     <Button
       variant="contained"
       color="default"
-      className={props.classes.button}
+      className={classes.button}
+      onClick={handlePublishClicked}
     >
-      <CloudUploadIcon className={props.classes.leftIcon} />
+      <CloudUploadIcon className={classes.leftIcon} />
       Publish
-    </Button>
-    <Button
-      variant="contained"
-      color="default"
-      className={props.classes.button}
-    >
-      <PreviewIcon className={props.classes.leftIcon} />
-      Embed
-    </Button>
-    <Button
-      variant="contained"
-      color="default"
-      className={props.classes.button}
-    >
-      <KeyboardArrowDownIcon className={props.classes.leftIcon} />
-      More
     </Button>
   </div>
 );

@@ -36,6 +36,12 @@ export function replaceAll(str, search, replacement) {
   return target.split(search).join(replacement);
 }
 
+export function getLocation(href) {
+  const l = document.createElement('a');
+  l.href = href;
+  return l;
+}
+
 export function extractUrlGroups(url) {
   const regex = /(?:http|https):\/\/((?:[\w-]+)(?:[\w-]+)+)(?:[\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gm;
   return url.match(regex);

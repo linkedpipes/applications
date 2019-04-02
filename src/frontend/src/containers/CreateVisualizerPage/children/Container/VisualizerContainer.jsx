@@ -12,7 +12,8 @@ type Props = {
   filters: any,
   visualizer: { visualizerCode: string },
   visualizerParams: any,
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function
 };
 
 const styles = theme => ({
@@ -30,7 +31,12 @@ const styles = theme => ({
   input: {}
 });
 
-const getVisualizer = (visualizerCode, selectedResultGraphIri, classes) => {
+const getVisualizer = (
+  visualizerCode,
+  selectedResultGraphIri,
+  handleSetCurrentApplicationData,
+  classes
+) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
@@ -39,12 +45,16 @@ const getVisualizer = (visualizerCode, selectedResultGraphIri, classes) => {
         <GoogleMapsVisualizer
           markers={markers}
           selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
     }
     case VISUALIZER_TYPE.TREEMAP:
       return (
-        <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+        <TreemapVisualizer
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
       );
     case VISUALIZER_TYPE.UNDEFINED:
       return (
@@ -68,6 +78,7 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
+        props.handleSetCurrentApplicationData,
         props.classes
       )}
     </Grid>
