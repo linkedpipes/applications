@@ -1,5 +1,7 @@
 os: "linux"
 
+services:
+  - 'docker'
 addons:
   postgresql: "10"
   apt:
@@ -7,21 +9,21 @@ addons:
       - postgresql-10
       - postgresql-client-10
 before_install:
+  - './.travis/main.sh'
   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
   - sudo /etc/init.d/postgresql restart
+  
 env:
   global:
     - PGPORT=5433
 
 stages:
   - name: push-build
-    if: type = push AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-Deploy\])/
+    if: type = push AND commit_message !~ /(\[Travis\])/ 
   - name: build
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request AND branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
-  - name: deploy
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
+    if: type = pull_request AND branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
 
 jobs:
   include:
@@ -31,6 +33,7 @@ jobs:
         - stable
       name: "Frontend"
       before_script:
+        - phpenv config-rm xdebug.ini || return 0
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
         - export PATH="$HOME/.yarn/bin:$PATH"
@@ -46,6 +49,7 @@ jobs:
       language: java
       jdk: openjdk10
       before_cache:
+        - phpenv config-rm xdebug.ini || return 0
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       cache:
@@ -63,6 +67,7 @@ jobs:
         - stable
       name: "Frontend"
       before_script:
+        - phpenv config-rm xdebug.ini || return 0
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
         - export PATH="$HOME/.yarn/bin:$PATH"
@@ -78,6 +83,7 @@ jobs:
       language: java
       jdk: openjdk10
       before_cache:
+        - phpenv config-rm xdebug.ini || return 0
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       cache:
@@ -102,7 +108,6 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
-        - docker
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -110,6 +115,7 @@ jobs:
         - ./gradlew flywayClean flywayMigrate
       script:
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
+      after_script:
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
@@ -125,7 +131,6 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
-        - docker
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -135,31 +140,20 @@ jobs:
         - ./gradlew dockerRun
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
-    - stage: deploy
-      name: "Deploying Backend to DockerHub"
-      sudo: required
-      services:
-        - docker
-      script:
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-
-        - cd src/backend
-        - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
-        - docker push linkedpipes/applications:backend
-
-    - name: "Deploying Frontend to DockerHub"
-      sudo: required
-      services:
-        - docker
-      script:
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-
-        - cd src/frontend
-        - docker build -t linkedpipes/applications:frontend .
-        - docker push linkedpipes/applications:frontend
-
-        - docker build -t linkedpipes/applications:frontend-prod -f Dockerfile-prod .
-        - docker push linkedpipes/applications:frontend-prod
+deploy:
+  # deploy develop/master to the staging environment
+  - provider: script
+    script:
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - cd src/deploy
+      - docker-compose -f docker-compose-travis-deploy build --parallel
+      - docker push linkedpipes/applications:frontend-prod
+      - docker push linkedpipes/applications:frontend
+      - docker push linkedpipes/applications:frontend-backend
+    on:
+      branch: 
+        - develop
+        - master
 
 notifications:
   slack:
