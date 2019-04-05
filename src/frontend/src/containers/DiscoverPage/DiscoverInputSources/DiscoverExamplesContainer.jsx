@@ -11,9 +11,9 @@ export const samples = [
     type: 'sparqlEndpoint',
     label: 'Treemap Sample',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
+    namedGraph: '',
     dataSampleIri:
-      'https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl',
-    namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008'
+      'https://gist.githubusercontent.com/ivan-lattak/63801f3e6a9e6105aada4c207d0f8abb/raw/aa2a805a4b14da6fd30711532c4f58692018665b/cpv-2008_sample.ttl'
   },
   {
     id: uuid.v4(),
@@ -24,10 +24,12 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'ttlFile',
+    type: 'sparqlEndpoint',
     label: 'Chord Sample',
-    fileUrl:
-      'https://gist.githubusercontent.com/Ponsietta/d65e08dee374d158de3f34927b93afd5/raw/34c6f1fddb31a5e0c458c48bd6b866d181ffe310/chord_test_data.ttl'
+    sparqlEndpointIri: 'http://lpa-virtuoso:8890/sparql',
+    namedGraph: 'https://applications.linkedpipes.com/generated-data/chord',
+    dataSampleIri:
+      'https://gist.githubusercontent.com/ivan-lattak/a8bf22f4bd4a9ea41714a73396f14e68/raw/fd1a52de6ec24bafb294b87361c84a7dad0b80ff/chord_sample.ttl'
   }
 ];
 
