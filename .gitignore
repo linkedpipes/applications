@@ -70,11 +70,6 @@ chrome-user-data
 *.swo
 
 #Database
-data/virtuoso/
-data/postgres/
+data
 
 src/frontend/public/
-
-data/\.dba_pwd_set
-
-data/clean-logs\.sh
