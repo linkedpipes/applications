@@ -1,7 +1,5 @@
 os: "linux"
 
-services:
-  - 'docker'
 addons:
   postgresql: "10"
   apt:
@@ -9,23 +7,17 @@ addons:
       - postgresql-10
       - postgresql-client-10
 before_install:
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-
   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
   - sudo /etc/init.d/postgresql restart
-
-  - export NODE_OPTIONS=--max_old_space_size=4096
-  
 env:
   global:
     - PGPORT=5433
 
 stages:
+  - name: push-build
+    if: type = push AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-Deploy\])/
   - name: build
-    if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: deploy
@@ -33,13 +25,12 @@ stages:
 
 jobs:
   include:
-    - stage: build
+    - stage: push-build
       language: node_js
       node_js:
         - stable
       name: "Frontend"
       before_script:
-        - phpenv config-rm xdebug.ini || return 0
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
         - export PATH="$HOME/.yarn/bin:$PATH"
@@ -55,7 +46,38 @@ jobs:
       language: java
       jdk: openjdk10
       before_cache:
-        - phpenv config-rm xdebug.ini || return 0
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      before_script:
+        - cd src/backend
+      script:
+        - ./gradlew assemble
+
+    - stage: build
+      language: node_js
+      node_js:
+        - stable
+      name: "Frontend"
+      before_script:
+        - cd src/frontend
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+        - export PATH="$HOME/.yarn/bin:$PATH"
+      cache:
+        yarn: true
+        directories:
+          - src/frontend/node_modules
+      script:
+        - yarn install --frozen-lockfile --check-files
+        - yarn run build
+
+    - name: "Backend"
+      language: java
+      jdk: openjdk10
+      before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       cache:
@@ -80,6 +102,7 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
+        - docker
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -87,7 +110,6 @@ jobs:
         - ./gradlew flywayClean flywayMigrate
       script:
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
-      after_script:
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
@@ -103,6 +125,7 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
+        - docker
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -124,7 +147,6 @@ jobs:
         - docker push linkedpipes/applications:frontend-prod
         - docker push linkedpipes/applications:frontend
         - docker push linkedpipes/applications:frontend-backend
-      
 
 notifications:
   slack:
