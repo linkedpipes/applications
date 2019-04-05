@@ -12,6 +12,7 @@ buildscript {
 
 plugins {
     id 'com.palantir.docker-run' version '0.20.1'
+    id "org.flywaydb.flyway" version "5.2.4"
 }
 
 configurations { codacy }
@@ -134,4 +135,10 @@ test {
 
 task testIntegration(type: Test, group: 'verification') {
     useJUnitPlatform()
+}
+
+flyway {
+    url = 'jdbc:postgresql://localhost:5433/lpa'
+    user = 'lpa'
+    password = 'example'
 }

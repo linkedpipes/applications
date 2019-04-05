@@ -94,21 +94,18 @@ const DiscoverComponent = ({
                       Back
                     </Button>
                     {activeStep === steps.length - 1 && (
-                      <Link
-                        style={{ textDecoration: 'none', color: 'transparent' }}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        disabled={
+                          etlExecutionStatus !== ETL_STATUS_TYPE.Finished
+                        }
+                        component={Link}
                         to="/create-app"
                       >
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          className={classes.button}
-                          disabled={
-                            etlExecutionStatus !== ETL_STATUS_TYPE.Finished
-                          }
-                        >
-                          Create App
-                        </Button>
-                      </Link>
+                        Create App
+                      </Button>
                     )}
                   </div>
                 </div>

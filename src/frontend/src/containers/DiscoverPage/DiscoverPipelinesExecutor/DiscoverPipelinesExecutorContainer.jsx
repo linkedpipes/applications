@@ -58,7 +58,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
   componentWillUnmount = () => {
     const { socket } = this.props;
-    socket.off('executionStatus');
+    socket.removeListener('executionStatus');
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -123,20 +123,33 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
     socket.emit('join', executionIri);
     socket.on('executionStatus', data => {
+      if (data === undefined) {
+        socket.emit('leave', executionIri);
+        socket.removeListener('executionStatus');
+        return;
+      }
+
+      const parsedData = JSON.parse(data);
+
+      if (parsedData.executionIri !== executionIri) {
+        return;
+      }
+
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
-      const executionCrashed = data === 'Crashed';
-      const executionTimeout = data === 'Polling terminated';
-      if (!data || executionCrashed || executionTimeout) {
+      socket.emit('leave', executionIri);
+      socket.removeListener('executionStatus');
+
+      if (parsedData.error || parsedData.timeout) {
         self.setState({
           loaderLabelText:
             'There was an error during the pipeline execution. Please, try different sources.'
         });
       } else {
-        const parsedData = JSON.parse(data);
         Log.info(parsedData, 'DiscoverPipelinesExecutorContainer');
-        let status = ETL_STATUS_MAP[parsedData.status.statusIri]
-          ? ETL_STATUS_MAP[parsedData.status.statusIri]
-          : ETL_STATUS_MAP[parsedData.status['@id']];
+        const parsedStatus = parsedData.status.status;
+        let status = ETL_STATUS_MAP[parsedStatus.statusIri]
+          ? ETL_STATUS_MAP[parsedStatus.statusIri]
+          : ETL_STATUS_MAP[parsedStatus['@id']];
 
         if (status === undefined) {
           self.setState({
@@ -156,8 +169,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
           status === ETL_STATUS_TYPE.Failed
         ) {
           onSetEtlExecutionStatus(status);
-          socket.emit('leave', executionIri);
-          socket.off('executionStatus');
         }
       }
     });

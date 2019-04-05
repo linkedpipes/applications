@@ -4,6 +4,8 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 const dev = process.env.NODE_ENV !== 'production';
 
+const externalAssets = ['./public/popup.html'];
+
 module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
     template: path.join(__dirname, './src/index.html'),
@@ -21,7 +23,13 @@ module.exports = () => {
       'process.env.BASE_SOCKET_URL': JSON.stringify(
         process.env.BASE_SOCKET_URL
       ),
-      'process.env.SOCKET_RECONNECT': process.env.SOCKET_RECONNECT === 'true'
+      'process.env.SOCKET_RECONNECT': process.env.SOCKET_RECONNECT === 'true',
+
+      'process.env.BASE_SERVER_PORT': JSON.stringify(
+        process.env.BASE_SERVER_PORT === undefined
+          ? ''
+          : process.env.BASE_SERVER_PORT
+      )
     })
   ];
 
@@ -66,7 +74,7 @@ module.exports = () => {
     devServer: {
       index: 'index.html',
       host: '0.0.0.0',
-      port: '9001',
+      port: process.env.BASE_SERVER_PORT,
       disableHostCheck: true, // solved Invalid-Host-header
       hot: true,
       headers: {

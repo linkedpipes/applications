@@ -71,5 +71,6 @@ chrome-user-data
 
 #Database
 data
+src/backend/create.sql
 
 src/frontend/public/

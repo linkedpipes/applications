@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class UserServiceComponent implements UserService {
 
     @Autowired
     private ApplicationRepository applicationRepository;
+
+    @Autowired
+    private PipelineInformationRepository pipelineRepository;
 
     @NotNull @Override
     public UserProfile addUser(@NotNull String webId) throws UserTakenException {
@@ -65,10 +69,13 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override
-    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId) throws UserNotFoundException {
+    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
+        d.setSparqlEndpointIri(sparqlEndpointIri);
+        d.setDataSampleIri(dataSampleIri);
+        d.setNamedGraph(namedGraph);
         user.addDiscovery(d);
         discoveryRepository.save(d);
         repository.save(user);
@@ -91,12 +98,18 @@ public class UserServiceComponent implements UserService {
     }
 
     private UserDao getUser(String username) throws UserNotFoundException {
+        logger.info("Find " + username + " by web ID");
         List<UserDao> users = repository.findByWebId(username);
         UserDao user;
-        if (users.size() == 0) throw new UserNotFoundException(username);
+        if (users.size() == 0) {
+            logger.info("Not found");
+            throw new UserNotFoundException(username);
+        }
         if (users.size() > 1) {
             logger.warn("Got multiple users with username: " + username);
         }
+
+        logger.info("Got him");
         user = users.get(0);
         return user;
     }
@@ -129,11 +142,18 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override
-    public void setUserExecution(@NotNull String username, @NotNull String executionIri, String selectedVisualiser) throws UserNotFoundException {
+    public void setUserExecution(@NotNull String username, @NotNull String executionIri, @NotNull String etlPipelineIri, String selectedVisualiser) throws UserNotFoundException {
         UserDao user = getUser(username);
+        List<PipelineInformationDao> pipelines = pipelineRepository.findByEtlPipelineIri(etlPipelineIri);
         ExecutionDao e = new ExecutionDao();
         e.setExecutionStarted(executionIri);
+        if (pipelines.size() > 0) {
+            e.setPipeline(pipelines.get(0));
+        } else {
+            logger.error("Pipeline information not found: " + etlPipelineIri);
+        }
         e.setSelectedVisualiser(selectedVisualiser);
+        e.setStarted(new Date());
         user.addExecution(e);
         executionRepository.save(e);
         repository.save(user);
@@ -192,6 +212,15 @@ public class UserServiceComponent implements UserService {
                 DiscoverySession session = new DiscoverySession();
                 session.id = d.getDiscoveryId();
                 session.finished = !d.getExecuting();
+                session.start = d.getStarted().getTime() / 1000L;
+                if (d.getFinished() != null) {
+                    session.stop = d.getFinished().getTime() / 1000L;
+                } else {
+                    session.stop = -1;
+                }
+                session.sparqlEndpointIri = d.getSparqlEndpointIri();
+                session.dataSampleIri = d.getDataSampleIri();
+                session.namedGraph = d.getNamedGraph();
                 profile.discoverySessions.add(session);
             }
         }
@@ -202,7 +231,14 @@ public class UserServiceComponent implements UserService {
                 PipelineExecution exec = new PipelineExecution();
                 exec.status = e.getStatus();
                 exec.executionIri = e.getExecutionIri();
+                exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
+                exec.start = e.getStarted().getTime() / 1000L;
+                if (e.getFinished() != null) {
+                    exec.stop = e.getFinished().getTime() / 1000L;
+                } else {
+                    exec.stop = -1;
+                }
                 profile.pipelineExecutions.add(exec);
             }
         }

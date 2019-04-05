@@ -21,6 +21,9 @@
   ],
   "plugins": ["babel", "material-ui", "import", "flowtype"],
   "rules": {
+    // Custom LPApps defined
+    "import/prefer-default-export": "off",
+
     // It's buggy
     "react/jsx-curly-brace-presence": "off",
     "react/require-default-props": "off",
