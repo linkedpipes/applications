@@ -47,6 +47,7 @@ jobs:
           - src/frontend/node_modules
       script:
         - yarn install --frozen-lockfile --check-files
+        - yarn node-high-memory-fix ./node_modules/webpack-sources/node_modules/source-map 
         - yarn run build
 
     - name: "Backend"
@@ -81,6 +82,7 @@ jobs:
           - src/frontend/node_modules
       script:
         - yarn install --frozen-lockfile --check-files
+        - yarn node-high-memory-fix ./node_modules/webpack-sources/node_modules/source-map 
         - yarn run build
 
     - name: "Backend"
