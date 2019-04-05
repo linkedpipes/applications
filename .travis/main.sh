@@ -28,8 +28,10 @@ main() {
 setup_dependencies() {
   echo "INFO:
   Setting up dependencies.
+  
   "
-
+  
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
   sudo apt update -y
   sudo apt install realpath python python-pip -y
   sudo apt install --only-upgrade docker-ce -y
