@@ -149,17 +149,9 @@ jobs:
 deploy:
   # deploy develop/master to the staging environment
   - provider: script
-    script:
-      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - cd src/deploy
-      - docker-compose -f docker-compose-travis-deploy build --parallel
-      - docker push linkedpipes/applications:frontend-prod
-      - docker push linkedpipes/applications:frontend
-      - docker push linkedpipes/applications:frontend-backend
+    script: bash src/deploy/travis.deploy.sh
     on:
-      branch: 
-        - develop
-        - master
+      branch: develop
 
 notifications:
   slack:
