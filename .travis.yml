@@ -28,8 +28,8 @@ stages:
     if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
-   # - name: push-build
-    #   if: type = push AND NOT (branch IN (master,dev)) AND commit_message !~ /(\[Travis\])/ 
+  - name: deploy
+    if: type = push AND branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
 
 jobs:
   include:
@@ -112,12 +112,19 @@ jobs:
         - ./gradlew dockerRun
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
-deploy:
-  # deploy develop/master to the staging environment
-  - provider: script
-    script: bash src/deploy/travis.deploy.sh
-    on:
-      branch: develop
+    - stage: deploy
+      name: "Pushing Backend & Frontend to DockerHub"
+      services:
+        - postgresql
+      before_script:
+        - cd src/deploy
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      script:
+        - docker-compose -f docker-compose-travis-deploy.yml build --parallel
+        - docker push linkedpipes/applications:frontend-prod
+        - docker push linkedpipes/applications:frontend
+        - docker push linkedpipes/applications:frontend-backend
+      
 
 notifications:
   slack:
