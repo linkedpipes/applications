@@ -1,8 +1,10 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.DataSource;
-import com.linkedpipes.lpa.backend.rdf.Prefixes;
-import com.linkedpipes.lpa.backend.rdf.vocabulary.*;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider;
@@ -21,7 +23,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class TtlGenerator {
 
@@ -47,10 +51,6 @@ public class TtlGenerator {
         return writeModelToString(
                 getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
                         extractorQuery, configurationQuery, namedGraph));
-    }
-
-    public static <E> String createRgmlGraph(Map<E, Map<E, Integer>> weightedGraph) {
-        return writeModelToString(createRgmlGraphModel(weightedGraph));
     }
 
     @NotNull
@@ -118,45 +118,6 @@ public class TtlGenerator {
         model.add(template, DCTerms.title, DATASET_TEMPLATE_TITLE, "en");
         model.add(template, LPD.outputTemplate, output);
         model.add(template, LPD.componentConfigurationTemplate, defaultConfiguration);
-        return model;
-    }
-
-    private static <E> Model createRgmlGraphModel(Map<E, Map<E, Integer>> weightedGraph) {
-        RIOT.init();
-        Model model = ModelFactory.createDefaultModel().setNsPrefixes(
-                Map.of("generated", LPA.Generated.uri,
-                        Prefixes.RDF_PREFIX, RDF.getURI(),
-                        Prefixes.RGML_PREFIX, RGML.uri));
-
-        model.add(LPA.Generated.graph, RDF.type, RGML.Graph);
-        model.addLiteral(LPA.Generated.graph, RGML.directed, true);
-
-        Set<E> allNodes = new HashSet<>(weightedGraph.keySet());
-        weightedGraph.values()
-                .stream()
-                .map(Map::keySet)
-                .forEach(allNodes::addAll);
-        allNodes.stream()
-                .map(Object::toString)
-                .map(s -> LPA.Generated.uri + "node/" + s)
-                .map(model::createResource)
-                .forEach(resource -> model.add(resource, RDF.type, RGML.Node));
-
-        for (var entry : weightedGraph.entrySet()) {
-            String edgeSource = entry.getKey().toString();
-            for (var innerEntry : entry.getValue().entrySet()) {
-                String edgeTarget = innerEntry.getKey().toString();
-                int edgeWeight = innerEntry.getValue();
-
-                Resource edge = model.createResource(
-                        LPA.Generated.uri + String.format("edge/%s/%s", edgeSource, edgeTarget));
-                model.add(edge, RDF.type, RGML.Edge);
-                model.add(edge, RGML.source, model.createResource(LPA.Generated.uri + "node/" + edgeSource));
-                model.add(edge, RGML.target, model.createResource(LPA.Generated.uri + "node/" + edgeTarget));
-                model.addLiteral(edge, RGML.weight, edgeWeight);
-            }
-        }
-
         return model;
     }
 

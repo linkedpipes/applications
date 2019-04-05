@@ -5,8 +5,6 @@ import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
 import com.linkedpipes.lpa.backend.enums.EdgeDirection;
-import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
-import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.EdgesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.GraphExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.NodesExtractor;
@@ -19,98 +17,16 @@ import com.linkedpipes.lpa.backend.sparql.queries.rgml.NodesQueryProvider;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import javax.annotation.PostConstruct;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
 @Service
 public class RgmlService {
 
-    //TODO
-    private static final Logger log = LoggerFactory.getLogger(RgmlService.class);
     private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
-
-    @PostConstruct
-    public void createDummyData() {
-        log.info("Filling our Virtuoso with dummy RGML data...");
-
-        Map<String, Map<String, Integer>> messagesByUser = getMessagesByUser();
-        Map<String, Map<String, Integer>> messagesByGroup = groupRandomly(messagesByUser);
-        putTtlToVirtuoso(TtlGenerator.createRgmlGraph(messagesByGroup));
-
-        log.info("Done!");
-    }
-
-    @NotNull
-    private static Map<String, Map<String, Integer>> getMessagesByUser() {
-        Map<String, Map<String, Integer>> userGraph = new HashMap<>();
-        String[] lines = Objects.requireNonNull(
-                new RestTemplate()
-                        .getForObject("http://opsahl.co.uk/tnet/datasets/OClinks_w.txt", String.class))
-                .split("\\r?\\n|\\r");
-        Arrays.stream(lines)
-                .filter(s -> !s.isEmpty())
-                .map(s -> s.split("\\s+"))
-                .forEach(line -> {
-                    String source = line[0],
-                            target = line[1];
-                    int weight = Integer.parseInt(line[2]);
-                    userGraph.computeIfAbsent(source, s -> new HashMap<>());
-                    userGraph.get(source).put(target, weight);
-                });
-        return userGraph;
-    }
-
-    private static Map<String, Map<String, Integer>> groupRandomly(Map<String, Map<String, Integer>> messagesByUser) {
-        Set<String> allUsers = new HashSet<>(messagesByUser.keySet());
-        messagesByUser.values()
-                .stream()
-                .map(Map::keySet)
-                .forEach(allUsers::addAll);
-
-        Random random = new Random(0xc0ffee);
-        Map<String, String> usersToGroups = allUsers.stream()
-                .map(s -> Map.entry(s, String.valueOf(random.nextInt(6))))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        Map<String, Map<String, Integer>> messagesByGroup = new HashMap<>();
-        for (var entry : messagesByUser.entrySet()) {
-            String source = usersToGroups.get(entry.getKey());
-            for (var innerEntry : entry.getValue().entrySet()) {
-                String target = usersToGroups.get(innerEntry.getKey());
-                int weight = innerEntry.getValue();
-
-                Map<String, Integer> stringIntegerMap = messagesByGroup.computeIfAbsent(source, s -> new HashMap<>());
-                stringIntegerMap.putIfAbsent(target, 0);
-                stringIntegerMap.put(target, stringIntegerMap.get(target) + weight);
-            }
-        }
-
-        return messagesByGroup;
-    }
-
-    private static void putTtlToVirtuoso(String ttlData) {
-        LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.CONTENT_TYPE, "text/turtle");
-        HttpEntity<String> entity = new HttpEntity<>(ttlData, headers);
-        URI uri = new DefaultUriBuilderFactory()
-                .uriString(Application.getConfig().getString("lpa.virtuoso.crudEndpoint"))
-                .queryParam("graph", LPA.Generated.uri)
-                .build();
-        new RestTemplate().put(uri, entity);
-    }
 
     /** Get a graph resource (resource of type rgml:Graph).
      *
@@ -131,7 +47,7 @@ public class RgmlService {
         return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
     }
 
-    public List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) {
+    private List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) {
         if (direction == null)
             return fetchAllEdges(graphIri, nodeUri);
 

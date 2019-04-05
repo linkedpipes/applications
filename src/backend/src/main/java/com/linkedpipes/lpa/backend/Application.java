@@ -94,7 +94,6 @@ public class Application {
     }
 
     public static void main(String[] args) {
-
         SpringApplication.run(Application.class, args);
 
         SOCKET_IO_SERVER.start();
