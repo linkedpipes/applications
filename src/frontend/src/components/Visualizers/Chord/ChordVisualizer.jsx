@@ -5,12 +5,14 @@ import { VisualizersService } from '@utils';
 import { CircularProgress } from '@material-ui/core';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri?: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function
 };
 
 type State = {
@@ -36,11 +38,6 @@ const styles = theme => ({
 });
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
-  static defaultProps = {
-    selectedResultGraphIri:
-      'https://applications.linkedpipes.com/generated-data/'
-  };
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -52,11 +49,18 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const nodesRequest = await VisualizersService.getChordNodes();
+    const { handleSetCurrentApplicationData } = this.props;
+    const nodesRequest = await VisualizersService.getChordNodes(
+      this.props.selectedResultGraphIri
+    );
     const nodesResponse = await nodesRequest.data;
     const nodeUris = nodesResponse.map(node => node.uri);
+    const labels = nodesResponse.map(node => node.label.languageMap.nolang);
 
-    const matrixRequest = await VisualizersService.getChordData(null, nodeUris);
+    const matrixRequest = await VisualizersService.getChordData(
+      this.props.selectedResultGraphIri,
+      nodeUris
+    );
     const matrixData = await matrixRequest.data;
 
     const colors = palette('sol-accent', nodeUris.length).map(
@@ -67,8 +71,16 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       dataLoadingStatus: 'ready',
       matrix: matrixData,
       groupColors: colors,
-      groupLabels: nodeUris
+      groupLabels: labels
     });
+
+    // handleSetCurrentApplicationData({
+    //   id: uuid.v4(),
+    //   applicationEndpoint: 'chord',
+    //   conceptIri: 'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+    //   selectedResultGraphIri: this.props.selectedResultGraphIri,
+    //   visualizerCode: 'CHORD'
+    // });
   }
 
   render() {

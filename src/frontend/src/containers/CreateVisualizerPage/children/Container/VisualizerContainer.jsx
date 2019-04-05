@@ -61,18 +61,22 @@ const getVisualizer = (
         />
       );
     case VISUALIZER_TYPE.CHORD:
-      return <ChordVisualizer />;
+      return (
+        <ChordVisualizer
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
+      );
     case VISUALIZER_TYPE.UNDEFINED:
-      return <ChordVisualizer />;
-    // return (
-    //   <div className={classes.containerView}>
-    //     <Typography variant="h2" gutterBottom>
-    //       No visualizers selected...
-    //     </Typography>
-    //   </div>
-    // );
+      return (
+        <div className={classes.containerView}>
+          <Typography variant="h2" gutterBottom>
+            No visualizers selected...
+          </Typography>
+        </div>
+      );
     default:
-      return <ChordVisualizer />;
+      return <div>No valid visualizer selected.</div>;
   }
 };
 
