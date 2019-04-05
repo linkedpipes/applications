@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.testutil.TestError;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
@@ -55,15 +55,6 @@ class DiscoveryControllerTests {
             throw new TestError(e);
         }
     }
-
-    private static final String DISCOVERY_CONFIG = ThrowableUtils.rethrowAsUnchecked(() ->
-            StreamUtils.copyToString(DiscoveryControllerTests.class.getResourceAsStream("discovery.config.rdf"),
-                    Application.DEFAULT_CHARSET));
-
-    private static final String DISCOVERY_CONFIG_IRI = "https://github.com/linkedpipes/discovery/blob/master/data/rdf/discovery-input/discovery/dbpedia-03/config.ttl";
-
-    private static final String NULL_DISCOVERY_ID = "00000000-0000-0000-0000-000000000000";
-    private static final String FAKE_DISCOVERY_ID = "12345678-90ab-cdef-ghij-klmnopqrstuv";
 
     private static final String USER_ID = "xyz";
 
@@ -131,30 +122,9 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInput() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(USER_ID, DISCOVERY_CONFIG);
-        assertFalse(response.getStatusCode().isError());
-
-        Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
-    }
-
-    @Test
     void testStartDiscoveryFromInputIriFake() {
         assertThrows(LpAppsException.class, () ->
                 discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI."));
     }
-
-    @Test
-    void testStartDiscoveryFromInputIri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(USER_ID, DISCOVERY_CONFIG_IRI);
-        assertFalse(response.getStatusCode().isError());
-
-        Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
-    }
-
 
 }
