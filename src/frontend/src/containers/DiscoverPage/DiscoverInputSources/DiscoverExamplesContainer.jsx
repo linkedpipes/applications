@@ -21,6 +21,13 @@ export const samples = [
     label: 'GoogleMaps Sample',
     fileUrl:
       'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
+  },
+  {
+    id: uuid.v4(),
+    type: 'ttlFile',
+    label: 'Chord Sample',
+    fileUrl:
+      'https://gist.githubusercontent.com/Ponsietta/d65e08dee374d158de3f34927b93afd5/raw/34c6f1fddb31a5e0c458c48bd6b866d181ffe310/chord_test_data.ttl'
   }
 ];
 
