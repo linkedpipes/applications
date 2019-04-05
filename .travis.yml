@@ -16,56 +16,23 @@ before_install:
 
   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
   - sudo /etc/init.d/postgresql restart
+
+  - export NODE_OPTIONS=--max_old_space_size=4096
   
 env:
   global:
     - PGPORT=5433
 
 stages:
-  - name: push-build
-    if: type = push AND NOT (branch IN (master,dev)) AND commit_message !~ /(\[Travis\])/ 
   - name: build
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+   # - name: push-build
+    #   if: type = push AND NOT (branch IN (master,dev)) AND commit_message !~ /(\[Travis\])/ 
 
 jobs:
   include:
-    - stage: push-build
-      language: node_js
-      node_js:
-        - stable
-      name: "Frontend"
-      before_script:
-        - phpenv config-rm xdebug.ini || return 0
-        - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
-        - export PATH="$HOME/.yarn/bin:$PATH"
-      cache:
-        yarn: true
-        directories:
-          - src/frontend/node_modules
-      script:
-        - yarn install --frozen-lockfile --check-files
-        - yarn node-high-memory-fix ./node_modules/webpack-sources/node_modules/source-map 
-        - yarn run build
-
-    - name: "Backend"
-      language: java
-      jdk: openjdk10
-      before_cache:
-        - phpenv config-rm xdebug.ini || return 0
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        directories:
-          - $HOME/.gradle/caches/
-          - $HOME/.gradle/wrapper/
-      before_script:
-        - cd src/backend
-      script:
-        - ./gradlew assemble
-
     - stage: build
       language: node_js
       node_js:
@@ -82,7 +49,6 @@ jobs:
           - src/frontend/node_modules
       script:
         - yarn install --frozen-lockfile --check-files
-        - yarn node-high-memory-fix ./node_modules/webpack-sources/node_modules/source-map 
         - yarn run build
 
     - name: "Backend"
