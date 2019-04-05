@@ -25,9 +25,9 @@ stages:
   - name: push-build
     if: type = push AND NOT (branch IN (master,dev)) AND commit_message !~ /(\[Travis\])/ 
   - name: build
-    if: type = pull_request AND branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
-    if: type = pull_request AND branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
 
 jobs:
   include:
