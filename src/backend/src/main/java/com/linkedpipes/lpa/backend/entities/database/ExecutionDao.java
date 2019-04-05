@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.Date;
 import com.linkedpipes.lpa.backend.entities.EtlStatus;
 
 @Entity(name="execution")
@@ -11,7 +12,7 @@ public class ExecutionDao implements Serializable {
     @GeneratedValue
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String executionIri;
 
     @Column(nullable = true)
@@ -21,8 +22,17 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private String selectedVisualiser;
 
+    @Column(nullable = false)
+    private Date started;
+
+    @Column(nullable = true)
+    private Date finished;
+
     @ManyToOne
     private UserDao user;
+
+    @ManyToOne
+    private PipelineInformationDao pipeline;
 
     public UserDao getUser() {
         return user;
@@ -34,6 +44,18 @@ public class ExecutionDao implements Serializable {
         if (!user.getExecutions().contains(this)) {
             user.getExecutions().add(this);
         }
+    }
+
+    public void setPipeline(PipelineInformationDao pipeline) {
+        this.pipeline = pipeline;
+
+        if (!pipeline.getExecutions().contains(this)) {
+            pipeline.getExecutions().add(this);
+        }
+    }
+
+    public PipelineInformationDao getPipeline() {
+        return this.pipeline;
     }
 
     public void setExecutionStarted(String executionIri) {
@@ -62,5 +84,21 @@ public class ExecutionDao implements Serializable {
 
     public String getSelectedVisualiser() {
         return this.selectedVisualiser;
+    }
+
+    public void setStarted(Date started) {
+        this.started = started;
+    }
+
+    public Date getStarted() {
+        return this.started;
+    }
+
+    public void setFinished(Date finished) {
+        this.finished = finished;
+    }
+
+    public Date getFinished() {
+        return this.finished;
     }
 }

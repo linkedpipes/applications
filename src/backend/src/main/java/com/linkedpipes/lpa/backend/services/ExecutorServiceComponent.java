@@ -11,6 +11,7 @@ import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ScheduledFuture;
 
@@ -60,8 +62,13 @@ public class ExecutorServiceComponent implements ExecutorService {
 
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+        return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
+    }
+
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
+        this.userService.setUserDiscovery(userId, discovery.id, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
@@ -69,7 +76,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        this.userService.setUserDiscovery(userId, discovery.id);  //this inserts discovery in DB and sets flags
+        this.userService.setUserDiscovery(userId, discovery.id, null, null, null);  //this inserts discovery in DB and sets flags
         startDiscoveryStatusPolling(discovery.id);
         return discovery;
     }
@@ -77,19 +84,25 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
-        this.userService.setUserExecution(userId, execution.iri, selectedVisualiser);  //this inserts execution in DB
+        this.userService.setUserExecution(userId, execution.iri, etlPipelineIri, selectedVisualiser);  //this inserts execution in DB
         startEtlStatusPolling(execution.iri);
         return execution;
     }
 
     private void startEtlStatusPolling(String executionIri) throws LpAppsException {
         Runnable checker = () -> {
+            PipelineInformationDao pipeline = null;
             try {
                 ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
 
-                //persist status in DB
+                //persist status in DB and get pipeline information
                 for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+                    //there should be only one
                     e.setStatus(executionStatus.status);
+                    if (!executionStatus.status.isPollable()) {
+                        e.setFinished(executionStatus.finished);
+                    }
+                    pipeline = e.getPipeline();
                     executionRepository.save(e);
                 }
 
@@ -99,6 +112,17 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.error = false;
                     report.timeout = false;
                     report.executionIri = executionIri;
+                    report.started = executionStatus.getStarted();
+                    report.finished = executionStatus.getFinished();
+
+                    if (pipeline != null) {
+                        report.pipeline = new PipelineExportResult();
+                        report.pipeline.pipelineId = pipeline.getPipelineId();
+                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
+                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
+                    } else {
+                        report.pipeline = null;
+                    }
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
@@ -116,9 +140,19 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.error = true;
                 report.timeout = false;
                 report.executionIri = executionIri;
+                report.started = -1;
+                report.finished = -1;
+                if (pipeline != null) {
+                    report.pipeline = new PipelineExportResult();
+                    report.pipeline.pipelineId = pipeline.getPipelineId();
+                    report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
+                    report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
+                } else {
+                    report.pipeline = null;
+                }
 
                 try {
-                    Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
+                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
                     logger.error("Failed to report execution status: " + executionIri, ex);
                 }
@@ -138,6 +172,17 @@ public class ExecutorServiceComponent implements ExecutorService {
                     report.error = true;
                     report.timeout = true;
                     report.executionIri = executionIri;
+                    report.started = -1;
+                    report.finished = -1;
+                    PipelineInformationDao pipeline = e.getPipeline();
+                    if (pipeline != null) {
+                        report.pipeline = new PipelineExportResult();
+                        report.pipeline.pipelineId = pipeline.getPipelineId();
+                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
+                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
+                    } else {
+                        report.pipeline = null;
+                    }
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
@@ -163,16 +208,37 @@ public class ExecutorServiceComponent implements ExecutorService {
 
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
         Runnable checker = () -> {
+            DiscoveryDao dao = null;
             try {
                 DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
 
                 if (discoveryStatus.isFinished) {
+                    Date finished = new Date();
+
+                    for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                        d.setExecuting(false);
+                        d.setFinished(finished);
+                        discoveryRepository.save(d);
+                        dao = d;
+                    }
+
                     logger.info("Reporting discovery finished in room " + discoveryId);
                     DiscoveryStatusReport report = new DiscoveryStatusReport();
                     report.discoveryId = discoveryId;
                     report.status = discoveryStatus;
                     report.error = false;
                     report.timeout = false;
+                    report.finished = finished.getTime() / 1000L;
+
+                    if (dao != null) {
+                        report.sparqlEndpointIri = dao.getSparqlEndpointIri();
+                        report.dataSampleIri = dao.getDataSampleIri();
+                        report.namedGraph = dao.getNamedGraph();
+                    } else {
+                        report.sparqlEndpointIri = null;
+                        report.dataSampleIri = null;
+                        report.namedGraph = null;
+                    }
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
@@ -181,10 +247,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     } catch (LpAppsException ex) {
                         logger.error("Failed to report discovery status: " + discoveryId, ex);
                     }
-                    for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                        d.setExecuting(false);
-                        discoveryRepository.save(d);
-                    }
+
 
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
@@ -194,6 +257,10 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.status = null;
                 report.error = true;
                 report.timeout = false;
+                report.finished = -1;
+                report.sparqlEndpointIri = null;
+                report.dataSampleIri = null;
+                report.namedGraph = null;
                 try {
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -207,11 +274,29 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
+            Date finished = new Date();
+            DiscoveryDao dao = null;
+            for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+                d.setExecuting(false);
+                d.setFinished(finished);
+                discoveryRepository.save(d);
+                dao = d;
+            }
             DiscoveryStatusReport report = new DiscoveryStatusReport();
             report.discoveryId = discoveryId;
             report.status = null;
             report.error = false;
             report.timeout = true;
+            if (dao != null) {
+                report.sparqlEndpointIri = dao.getSparqlEndpointIri();
+                report.dataSampleIri = dao.getDataSampleIri();
+                report.namedGraph = dao.getNamedGraph();
+            } else {
+                report.sparqlEndpointIri = null;
+                report.dataSampleIri = null;
+                report.namedGraph = null;
+            }
+
             try {
                 Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
             } catch (LpAppsException ex) {
@@ -221,10 +306,6 @@ public class ExecutorServiceComponent implements ExecutorService {
                 discoveryService.cancelDiscovery(discoveryId);
             } catch (LpAppsException ex) {
                 logger.warn("Failed to cancel discovery " + discoveryId, ex);
-            }
-            for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                d.setExecuting(false);
-                discoveryRepository.save(d);
             }
         };
 

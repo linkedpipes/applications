@@ -26,7 +26,7 @@ services:
     depends_on:
       - etl
       - discovery
-      - postgres
+      - flyway
 
   frontend:
     image: linkedpipes/applications:frontend
@@ -38,6 +38,8 @@ services:
     depends_on:
       - backend
 
+  # Refer to http://vos.openlinksw.com/owiki/wiki/VOS/VirtRDFPerformanceTuning
+  # For adjusting the NumberOfButters and MaxDirtyBuffers according to your RAM size
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
     container_name: lpa-virtuoso
@@ -49,6 +51,8 @@ services:
       VIRT_Parameters_MaxDirtyBuffers: 130000
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
+      VIRT_Parameters_MaxCheckpointRemap: 3750
+      VIRT_Parameters_CheckpointInterval: 1
     ports:
       - "8890:8890"
     restart: on-failure
@@ -80,7 +84,7 @@ services:
       - "8080:8080"
 
   postgres:
-    image: postgres
+    image: postgres:10.7
     container_name: lpa-postgres
     restart: on-failure
     environment:
@@ -91,3 +95,11 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  flyway:
+    image: boxfuse/flyway
+    command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
+    volumes:
+      - ./src/backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      - postgres
