@@ -15,6 +15,11 @@
     "automerge": true
   },
   "lockFileMaintenance": {
-    "automerge": true
+    "automerge": true,
+    "enabled": true,
+    "extends": "schedule:monthly"
+  },
+  "docker": {
+    "enabled": true
   }
 }
