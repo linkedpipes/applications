@@ -152,6 +152,8 @@ jobs:
         - ls
         - docker-compose up -d db 
         - cd src/backend
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
         - ./gradlew dockerRun
         - docker-compose logs 
         - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-crud testIntegration
