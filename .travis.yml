@@ -4,7 +4,7 @@ stages:
   - name: push-build
     if: type != pull_request AND branch NOT IN (master, develop) OR commit_message =~ /(\[Travis-Build\])/
   - name: build
-    if: type != pull_request OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
@@ -82,44 +82,12 @@ jobs:
         - ./gradlew assemble
 
     - stage: tests
-      # name: "Backend unit tests"
-      # language: java
-      # jdk: openjdk10
-      # before_cache:
-      #   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-      #   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-      # cache:
-      #   directories:
-      #     - $HOME/.gradle/caches/
-      #     - $HOME/.gradle/wrapper/
-      # addons:
-      #   postgresql: "10"
-      #   apt:
-      #     packages:
-      #       - postgresql-10
-      #       - postgresql-client-10
-      # services:
-      #   - postgresql
-      # before_install:
-      #   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-      #   - sudo /etc/init.d/postgresql restart
-      # before_script:
-      #   - cd src/backend
-      #   - psql -c "CREATE DATABASE lpa;" -U postgres
-      #   - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
-      #   - ./gradlew flywayClean flywayMigrate
-      # script:
-      #   - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
-      # after_script:
-      #   - ./gradlew jacocoTestReport
-      #   - ./gradlew sendCoverageToCodacy
-
-    - name: "Backend integration tests"
+      name: "Backend unit tests"
       language: java
       jdk: openjdk10
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       cache:
         directories:
           - $HOME/.gradle/caches/
@@ -131,34 +99,51 @@ jobs:
             - postgresql-10
             - postgresql-client-10
       services:
-        - docker
         - postgresql
-      env:
-        - DOCKER_COMPOSE_VERSION=1.23.2
       before_install:
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        - sudo apt-get update
-        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-
-        - sudo rm /usr/local/bin/docker-compose
-        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-        - chmod +x docker-compose
-        - sudo mv docker-compose /usr/local/bin
-        
         - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
         - sudo /etc/init.d/postgresql restart
-      
-      script:
-        - ls
-        - docker-compose up -d db 
+      before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
         - ./gradlew flywayClean flywayMigrate
+      script:
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
+      after_script:
+        - ./gradlew jacocoTestReport
+        - ./gradlew sendCoverageToCodacy
+
+    - name: "Backend integration tests"
+      language: java
+      jdk: openjdk10
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
+      addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql-10
+            - postgresql-client-10
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      services:
+        - postgresql
+        - docker
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
+      before_script:
+        - cd src/backend
+        - psql -c "CREATE DATABASE lpa;" -U postgres
+        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+        - ./gradlew flywayClean flywayMigrate
+      script:
         - ./gradlew dockerRun
-        - docker-compose logs 
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-crud testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
 
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
