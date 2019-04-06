@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.entities.DataSource;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
@@ -28,7 +29,6 @@ import java.util.Optional;
 
 public class TtlGenerator {
 
-    private static final String DATASET_URI = "https://lpapps.com/dataset/";
     private static final String DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template";
     private static final String DATASET_OUTPUT_TITLE = "Unspecified user-provided dataset output";
     private static final String DATASET_CONFIG_TITLE = "Unspecified user-provided dataset default configuration";
@@ -83,19 +83,19 @@ public class TtlGenerator {
 
         Model model = ModelFactory.createDefaultModel()
                 .setNsPrefixes(Map.of(
-                        "dataset", DATASET_URI,
+                        "dataset", LPA.Dataset.uri,
                         "lpd", LPD.uri,
                         "dcterms", DCTerms.getURI(),
                         "lpd-sparql", LPDSparql.uri,
                         "sd", SD.uri
                 ));
 
-        Resource output = model.createResource(DATASET_URI + "output");
+        Resource output = model.createResource(LPA.Dataset.uri + "output");
         model.add(output, RDF.type, LPD.OutputDataPortTemplate);
         model.add(output, DCTerms.title, DATASET_OUTPUT_TITLE);
         model.add(output, LPD.outputDataSample, model.createResource(dataSampleIri));
 
-        Resource defaultService = model.createResource(DATASET_URI + "defaultService");
+        Resource defaultService = model.createResource(LPA.Dataset.uri + "defaultService");
         model.add(defaultService, RDF.type, SD.Service);
         model.add(defaultService, SD.endpoint, model.createResource(sparqlEndpointIri));
 
@@ -106,14 +106,14 @@ public class TtlGenerator {
                 .map(blankNode -> model.createStatement(defaultService, SD.namedGraph, blankNode))
                 .ifPresent(model::add);
 
-        Resource defaultConfiguration = model.createResource(DATASET_URI + "defaultConfiguration");
+        Resource defaultConfiguration = model.createResource(LPA.Dataset.uri + "defaultConfiguration");
         model.add(defaultConfiguration, RDF.type, LPDSparql.SparqlEndpointDataSourceConfiguration);
         model.add(defaultConfiguration, DCTerms.title, DATASET_CONFIG_TITLE);
         model.add(defaultConfiguration, LPD.service, defaultService);
         model.add(defaultConfiguration, LPD.query, extractorQuery);
         model.add(defaultConfiguration, LPD.configurationQuery, configurationQuery);
 
-        Resource template = model.createResource(DATASET_URI + "template");
+        Resource template = model.createResource(LPA.Dataset.uri + "template");
         model.add(template, RDF.type, LPD.DataSourceTemplate);
         model.add(template, DCTerms.title, DATASET_TEMPLATE_TITLE, "en");
         model.add(template, LPD.outputTemplate, output);

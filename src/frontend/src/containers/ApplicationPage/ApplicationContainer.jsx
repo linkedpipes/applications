@@ -1,6 +1,10 @@
 import React, { PureComponent } from 'react';
 import { VISUALIZER_TYPE } from '@constants';
-import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
+import {
+  GoogleMapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer
+} from '@components';
 import { withRouter } from 'react-router-dom';
 import { Log } from '@utils';
 import axios from 'axios';
@@ -59,6 +63,13 @@ class ApplicationContainer extends PureComponent {
         const selectedResultGraphIri = applicationData.selectedResultGraphIri;
         return (
           <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+        );
+      }
+      case VISUALIZER_TYPE.CHORD: {
+        return (
+          <ChordVisualizer
+            selectedResultGraphIri={applicationData.selectedResultGraphIri}
+          />
         );
       }
       default:
