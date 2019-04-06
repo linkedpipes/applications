@@ -124,8 +124,14 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
+      addons:
+        apt:
+          packages:
+            - postgresql-10
+            - postgresql-client-10
       services:
         - docker
+        - postgresql
       env:
         - DOCKER_COMPOSE_VERSION=1.23.2
       before_install:
@@ -138,10 +144,13 @@ jobs:
         - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
         - chmod +x docker-compose
         - sudo mv docker-compose /usr/local/bin
+        
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       
       script:
         - ls
-        - docker-compose up -d db flyway postgres
+        - docker-compose up -d db 
         - cd src/backend
         - ./gradlew dockerRun
         - docker-compose logs 
