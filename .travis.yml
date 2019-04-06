@@ -30,6 +30,21 @@ jobs:
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
+    - name: "Backend"
+      language: java
+      jdk: openjdk10
+      before_cache:
+        - phpenv config-rm xdebug.ini || return 0
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      before_script:
+        - cd src/backend
+      script:
+        - ./gradlew assemble
 
     - stage: build
       language: node_js
