@@ -142,8 +142,9 @@ jobs:
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
         - ./gradlew flywayClean flywayMigrate
       script:
+        - docker run --name my-virtuos -p 8890:8890 -e DBA_PASSWORD=myDbaPassword  -e SPARQL_UPDATE=true  -e DEFAULT_GRAPH=http://www.example.com/my-graph -d tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
         - ./gradlew dockerRun
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dspring.discoveryServiceUrl=http://localhost:9000 -Dspring.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dspring.virtuoso.crudEndpoint=http://localhost:8890/sparql-crud testIntegration
 
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
