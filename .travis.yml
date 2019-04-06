@@ -1,36 +1,12 @@
 os: "linux"
 
-services:
-  - 'docker'
-addons:
-  postgresql: "10"
-  apt:
-    packages:
-      - postgresql-10
-      - postgresql-client-10
-before_install:
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-
-  - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-  - sudo /etc/init.d/postgresql restart
-
-  - export NODE_OPTIONS=--max_old_space_size=4096
-  
-env:
-  global:
-    - PGPORT=5433
-
 stages:
   - name: build
     if: type IN (push, pull_request) OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
   - name: deploy
-    if: type = push AND branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
-
+   
 jobs:
   include:
     - stage: build
@@ -38,6 +14,9 @@ jobs:
       node_js:
         - stable
       name: "Frontend"
+      env:
+        global:
+          - NODE_OPTIONS=--max_old_space_size=4096
       before_script:
         - phpenv config-rm xdebug.ini || return 0
         - cd src/frontend
@@ -80,7 +59,11 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
+        - docker
       before_script:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
+        
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
@@ -96,7 +79,16 @@ jobs:
       jdk: openjdk10
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
+      env:
+        global:
+          - PGPORT=5433
+      addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql-10
+            - postgresql-client-10
       cache:
         directories:
           - $HOME/.gradle/caches/
@@ -116,7 +108,12 @@ jobs:
       name: "Pushing Backend & Frontend to DockerHub"
       services:
         - postgresql
+        - docker
       before_script:
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - cd src/deploy
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       script:
@@ -124,6 +121,7 @@ jobs:
         - docker push linkedpipes/applications:frontend-prod
         - docker push linkedpipes/applications:frontend
         - docker push linkedpipes/applications:frontend-backend
+        - curl $DEPLOYMENT_URL
       
 
 notifications:
