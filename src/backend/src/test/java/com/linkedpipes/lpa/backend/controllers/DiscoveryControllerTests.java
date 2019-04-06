@@ -37,25 +37,9 @@ class DiscoveryControllerTests {
             }}
     );
 
-    private static final List<DataSource> DISCOVERY_DATA_SOURCES;
-
-    static {
-        try {
-            DISCOVERY_DATA_SOURCES = new LpAppsObjectMapper(new ObjectMapper()).readValue(
-                    ThrowableUtils.rethrowAsUnchecked(() ->
-                            StreamUtils.copyToString(
-                                    DiscoveryControllerTests.class.getResourceAsStream("discovery.data.sources.json"),
-                                    Application.DEFAULT_CHARSET
-                            )
-                    ),
-                    new TypeReference<ArrayList<DataSource>>() {
-                    }
-            );
-        } catch (LpAppsException e) {
-            throw new TestError(e);
-        }
-    }
-
+    private static final String TEST_TREEMAP_DATA_SAMPLE_URI = "https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl";
+    private static final String TEST_TREEMAP_NAMED_GRAPH_URI = "http://linked.opendata.cz/resource/dataset/cpv-2008";
+    private static final String TEST_TREEMAP_SPARQL_IRI = "https://linked.opendata.cz/sparql";
     private static final String USER_ID = "xyz";
 
     private final DiscoveryController discoveryController;
@@ -86,8 +70,9 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFakeUri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
+    void testStartDiscoveryFromEndpoint() throws LpAppsException {
+        ResponseEntity<?> response = discoveryController.startDiscoveryFromEndpoint(TEST_TREEMAP_SPARQL_IRI,
+                TEST_TREEMAP_DATA_SAMPLE_URI, TEST_TREEMAP_NAMED_GRAPH_URI, USER_ID);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -96,8 +81,8 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscovery() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, DISCOVERY_DATA_SOURCES);
+    void testStartDiscoveryFakeUri() throws LpAppsException {
+        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
