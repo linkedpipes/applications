@@ -74,13 +74,12 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       groupLabels: labels
     });
 
-    // handleSetCurrentApplicationData({
-    //   id: uuid.v4(),
-    //   applicationEndpoint: 'chord',
-    //   conceptIri: 'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
-    //   selectedResultGraphIri: this.props.selectedResultGraphIri,
-    //   visualizerCode: 'CHORD'
-    // });
+    handleSetCurrentApplicationData({
+      id: uuid.v4(),
+      applicationEndpoint: 'chord',
+      selectedResultGraphIri: this.props.selectedResultGraphIri,
+      visualizerCode: 'CHORD'
+    });
   }
 
   render() {
