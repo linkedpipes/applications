@@ -4,9 +4,9 @@ stages:
   - name: push-build
     if: type != pull_request AND branch NOT IN (master, develop) OR commit_message =~ /(\[Travis-Build\])/
   - name: build
-    if: type = pull_request OR branch IN (master, develop) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
-    if: type = pull_request OR branch IN (master, develop) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
     if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-Deploy\])/
 
