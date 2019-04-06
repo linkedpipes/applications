@@ -2,7 +2,11 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
+import {
+  GoogleMapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer
+} from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
 import FiltersComponent from '../Filters';
@@ -52,6 +56,13 @@ const getVisualizer = (
     case VISUALIZER_TYPE.TREEMAP:
       return (
         <TreemapVisualizer
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
+      );
+    case VISUALIZER_TYPE.CHORD:
+      return (
+        <ChordVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
