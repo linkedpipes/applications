@@ -123,6 +123,7 @@ class AppRouter extends React.PureComponent<Props> {
                   <PublicLayout path="/404" component={NotFoundPage} exact />
                   <Route path="/map" component={ApplicationPage} />
                   <Route path="/treemap" component={ApplicationPage} />
+                  <Route path="/chord" component={ApplicationPage} />
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>

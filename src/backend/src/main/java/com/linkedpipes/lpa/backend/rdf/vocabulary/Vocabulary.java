@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.rdf.vocabulary;
 
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -17,4 +18,5 @@ abstract class Vocabulary {
         return model.createProperty(nameSpace, localName);
     }
 
+    protected static TypeMapper typeMapper = new TypeMapper();
 }
