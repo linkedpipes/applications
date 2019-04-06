@@ -145,7 +145,7 @@ jobs:
         - cd src/backend
         - ./gradlew dockerRun
         - docker-compose logs 
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-crud testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-crud testIntegration
 
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
