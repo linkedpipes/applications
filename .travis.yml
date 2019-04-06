@@ -92,9 +92,6 @@ jobs:
         - postgresql
         - docker
       before_script:
-        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-        - sudo /etc/init.d/postgresql restart
-        
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
@@ -126,6 +123,9 @@ jobs:
           - $HOME/.gradle/wrapper/
       services:
         - postgresql
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
