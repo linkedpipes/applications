@@ -14,14 +14,12 @@ jobs:
       node_js:
         - stable
       name: "Frontend"
-      env:
-        global:
-          - NODE_OPTIONS=--max_old_space_size=4096
       before_script:
         - phpenv config-rm xdebug.ini || return 0
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
         - export PATH="$HOME/.yarn/bin:$PATH"
+        - export NODE_OPTIONS=--max_old_space_size=4096
       cache:
         yarn: true
         directories:
