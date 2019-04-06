@@ -11,6 +11,8 @@ services:
   frontend-dev:
     image: linkedpipes/applications:frontend
     container_name: lpa-frontend
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
     build:
       context: ../frontend/
       dockerfile: Dockerfile
@@ -18,6 +20,8 @@ services:
   frontend-prod:
     image: linkedpipes/applications:frontend-prod
     container_name: lpa-frontend
+    environment: 
+      NODE_OPTIONS: --max_old_space_size=4096
     build:
       context: ../frontend/
       dockerfile: Dockerfile-prod

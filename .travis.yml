@@ -126,7 +126,7 @@ jobs:
         - docker-compose -f docker-compose-travis-deploy.yml build --parallel
         - docker push linkedpipes/applications:frontend-prod
         - docker push linkedpipes/applications:frontend
-        - docker push linkedpipes/applications:frontend-backend
+        - docker push linkedpipes/applications:backend
         - curl $DEPLOYMENT_URL
       
 
