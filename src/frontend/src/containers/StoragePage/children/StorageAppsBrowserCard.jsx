@@ -57,10 +57,13 @@ type Props = {
   singleTileData: {
     applicationTitle: string,
     applicationIri: string,
+    applicationConfigurationIri: string,
+    applicationConfigurationLabel: string,
     applicationData: Object
   },
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
+  onHandleApplicationDeleted: Function,
   history: Object
 };
 
@@ -95,21 +98,29 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
   };
 
   handleDeleteApp = () => {
-    const applicationIri = this.props.singleTileData.applicationIri;
-    StorageToolbox.removeAppFromStorage(applicationIri).then(error => {
-      if (!error) {
-        this.setState({ anchorEl: null });
-        toast.success('Deleted application!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 2000
-        });
-      } else {
-        toast.error('Error! Unable to delete published application!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 2000
-        });
+    const { onHandleApplicationDeleted } = this.props;
+    const applicationConfigurationIri = this.props.singleTileData
+      .applicationConfigurationIri;
+    const applicationConfigurationLabel = this.props.singleTileData
+      .applicationConfigurationLabel;
+    const self = this;
+    StorageToolbox.removeAppFromStorage(applicationConfigurationIri).then(
+      error => {
+        if (!error) {
+          self.setState({ anchorEl: null });
+          onHandleApplicationDeleted(applicationConfigurationLabel);
+          toast.success('Deleted application!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          });
+        } else {
+          toast.error('Error! Unable to delete published application!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          });
+        }
       }
-    });
+    );
   };
 
   handleMenuClose = () => {

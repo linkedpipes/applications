@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 import { withWebId } from '@inrupt/solid-react-components';
 import axios from 'axios';
+import uuid from 'uuid';
 // eslint-disable-next-line import/order
 import { Log, getLocation } from '@utils';
 
@@ -41,8 +42,11 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
                   const tileData = Object.assign({}, self.state.tileData); // creating copy of object
                   tileData[element.label] = {
                     applicationIri: data.publishedUrl,
+                    applicationConfigurationIri: element.url,
+                    applicationConfigurationLabel: element.label,
                     applicationTitle: data.applicationTitle,
-                    applicationData: data.applicationData
+                    applicationData: data.applicationData,
+                    key: uuid()
                   };
                   self.setState({ tileData });
                 })
@@ -58,9 +62,23 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     }
   }
 
+  handleApplicationDeleted = applicationConfigurationLabel => {
+    const newTileData = this.state.tileData;
+    if (applicationConfigurationLabel in newTileData) {
+      delete newTileData[applicationConfigurationLabel];
+      this.setState({ tileData: newTileData });
+    }
+  };
+
   render() {
     const { tileData } = this.state;
-    return <StorageAppsBrowserComponent tileData={tileData} />;
+    const { handleApplicationDeleted } = this;
+    return (
+      <StorageAppsBrowserComponent
+        tileData={tileData}
+        onHandleApplicationDeleted={handleApplicationDeleted}
+      />
+    );
   }
 }
 
