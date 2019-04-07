@@ -2,5 +2,24 @@
   "extends": ["config:base"],
   "schedule": "every weekend",
   "assignees": ["aorumbayev"],
-  "baseBranches": ["dependency_updates"]
+  "baseBranches": ["dependency_updates"],
+  "separateMajorMinor": true,
+  "rebaseStalePrs": true,
+  "minor": {
+    "automerge": true
+  },
+  "patch": {
+    "automerge": true
+  },
+  "pin": {
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "automerge": true,
+    "enabled": true,
+    "extends": "schedule:monthly"
+  },
+  "docker": {
+    "enabled": true
+  }
 }
