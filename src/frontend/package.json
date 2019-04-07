@@ -5,10 +5,10 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
-    "startLocalDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server",
-    "startLocalDevSockets": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server",
-    "startDockerDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 SOCKET_RECONNECT=true webpack-dev-server",
-    "build": "cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack"
+    "startLocalDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server --progress",
+    "startLocalDevSockets": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server --progress",
+    "startDockerDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 SOCKET_RECONNECT=true webpack-dev-server --progress",
+    "build": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack --progress"
   },
   "precommit": [
     "NODE_ENV=development lint-staged",
