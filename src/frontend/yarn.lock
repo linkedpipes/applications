@@ -1880,7 +1880,7 @@
     text-encoding "^0.6.4"
     whatwg-url "^6.4.1"
 
-"@solid/query-ldflex@2.5.1", "@solid/query-ldflex@^2.0.0", "@solid/query-ldflex@^2.5.1":
+"@solid/query-ldflex@^2.0.0", "@solid/query-ldflex@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@solid/query-ldflex/-/query-ldflex-2.5.1.tgz#f6b180be666493ee167f799b9243d38345d556a1"
   integrity sha512-IjcxlH1zXl4gLZq5EfPhXSPs2atac9iheoE4YziGtVtKpbSRlnMZKxx1Ky426LA/sGjuJp6P6WYISRwKWCRJoQ==
