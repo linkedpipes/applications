@@ -2,7 +2,7 @@ os: "linux"
 
 stages:
   - name: push-build
-    if: type != pull_request AND branch NOT IN (master, develop) OR commit_message =~ /(\[Travis-Build\])/
+    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/
   - name: build
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests

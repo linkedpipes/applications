@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import connect from 'react-redux/lib/connect/connect';
+import { connect } from 'react-redux';
 import { discoverActions } from '../duck';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
