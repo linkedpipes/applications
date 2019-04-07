@@ -13,13 +13,21 @@ class UserProfileButtonContainer extends PureComponent {
     this.setState({ anchorElement: event.currentTarget });
   };
 
+  performLogout = async () => {
+    try {
+      await auth.logout();
+      // Remove localStorage
+      localStorage.removeItem('solid-auth-client');
+      // Redirect to login page
+      this.props.history.push('/login');
+    } catch (error) {
+      // console.log(`Error: ${error}`);
+    }
+  };
+
   handleLogout = () => {
-    const self = this;
-    self.setState({ anchorElement: null });
-    auth.logout().then(() => {
-      Log.info('Logout successfull', 'UserProfileButton');
-      self.props.history.push('/login');
-    });
+    this.setState({ anchorElement: null });
+    this.performLogout();
   };
 
   handleMenuClose = () => {
