@@ -4,8 +4,6 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 const dev = process.env.NODE_ENV !== 'production';
 
-const externalAssets = ['./public/popup.html'];
-
 module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
     template: path.join(__dirname, './src/index.html'),
@@ -69,6 +67,11 @@ module.exports = () => {
           ]
         }
       ]
+    },
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
     },
     devtool: dev ? 'inline-source-map' : 'source-map',
     devServer: {
