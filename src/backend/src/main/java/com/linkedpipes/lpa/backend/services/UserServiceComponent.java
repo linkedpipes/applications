@@ -254,6 +254,11 @@ public class UserServiceComponent implements UserService {
         user.addApplication(app);
         applicationRepository.save(app);
         repository.save(user);
+
+        Application a = new Application();
+        a.solidIri = solidIri;
+        Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
+
         return getUserProfile(username);
     }
 
