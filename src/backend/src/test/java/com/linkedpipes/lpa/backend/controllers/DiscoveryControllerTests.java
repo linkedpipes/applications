@@ -37,7 +37,7 @@ class DiscoveryControllerTests {
             }}
     );
 
-    private static final String TEST_TREEMAP_DATA_SAMPLE_URI = "https://raw.githubusercontent.com/linkedpipes/applications/develop/data/rdf/cpv-2008/sample.ttl";
+    private static final String TEST_TREEMAP_DATA_SAMPLE_URI = "https://gist.githubusercontent.com/ivan-lattak/63801f3e6a9e6105aada4c207d0f8abb/raw/aa2a805a4b14da6fd30711532c4f58692018665b/cpv-2008_sample.ttl";
     private static final String TEST_TREEMAP_NAMED_GRAPH_URI = "http://linked.opendata.cz/resource/dataset/cpv-2008";
     private static final String TEST_TREEMAP_SPARQL_IRI = "https://linked.opendata.cz/sparql";
     private static final String USER_ID = "xyz";

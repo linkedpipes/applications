@@ -79,13 +79,13 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
-    private void processStartedDiscovery(String discoveryId, String userId) {
+    private void processStartedDiscovery(String discoveryId, String userId) throws LpAppsException, UserNotFoundException {
         this.userService.setUserDiscovery(userId, discoveryId, null, null, null);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
 
-    private void notifyDiscoveryStarted(String discoveryId, String userId) {
+    private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
         DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
             DiscoveryStatusReport report = new DiscoveryStatusReport();
@@ -112,7 +112,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         return execution;
     }
 
-    private void notifyExecutionStarted(String executionIri, String userId) {
+    private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
             EtlStatusReport report = new EtlStatusReport();
@@ -123,9 +123,9 @@ public class ExecutorServiceComponent implements ExecutorService {
             report.started = executionStatus.getStarted();
             report.finished = executionStatus.getFinished();
             report.pipeline = new PipelineExportResult();
-            report.pipeline.pipelineId = pipeline.getPipelineId();
-            report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-            report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
+            report.pipeline.pipelineId = e.getPipeline().getPipelineId();
+            report.pipeline.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
+            report.pipeline.resultGraphIri = e.getPipeline().getResultGraphIri();
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(report));
         }
     }

@@ -5,6 +5,8 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public interface UserService {
     UserProfile getUserProfile(String user) throws UserNotFoundException;
     UserProfile addUserIfNotPresent(String user);
 
-    UserProfile addApplication(String user, String solidIri) throws UserNotFoundException;
+    UserProfile addApplication(String user, String solidIri) throws UserNotFoundException, LpAppsException;
     UserProfile deleteApplication(String user, String solidIri) throws UserNotFoundException;
 
     void setUserDiscovery(String user, String discovery, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws UserNotFoundException;
