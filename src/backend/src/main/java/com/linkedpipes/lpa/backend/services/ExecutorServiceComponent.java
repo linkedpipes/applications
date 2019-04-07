@@ -68,19 +68,19 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        processStartedDiscovery(discovery.id, userId);
+        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraph);
         return discovery;
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        processStartedDiscovery(discovery.id, userId);
+        processStartedDiscovery(discovery.id, userId, null, null, null);
         return discovery;
     }
 
-    private void processStartedDiscovery(String discoveryId, String userId) throws LpAppsException, UserNotFoundException {
-        this.userService.setUserDiscovery(userId, discoveryId, null, null, null);  //this inserts discovery in DB and sets flags
+    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws LpAppsException, UserNotFoundException {
+        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
@@ -120,7 +120,11 @@ public class ExecutorServiceComponent implements ExecutorService {
             report.error = false;
             report.timeout = false;
             report.executionIri = executionIri;
-            report.started = executionStatus.getStarted();
+            if (executionStatus.getStarted() == -1) {
+                report.started = new Date().getTime() / 1000L;
+            } else {
+                report.started = executionStatus.getStarted();
+            }
             report.finished = executionStatus.getFinished();
             report.pipeline = new PipelineExportResult();
             report.pipeline.pipelineId = e.getPipeline().getPipelineId();
