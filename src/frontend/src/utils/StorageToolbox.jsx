@@ -50,7 +50,7 @@ const appIriToPublishUrl = (applicationIri, applicationEndpoint) => {
       ? ''
       : `:${process.env.BASE_SERVER_PORT}`;
   const hostName = os.hostname().toLowerCase();
-  const http = hostName === 'localhost' ? 'http://' : 'https//';
+  const http = hostName === 'localhost' ? 'http://' : 'https://';
   const publishedUrl = `${http}${hostName}${portSpecifier}/${applicationEndpoint}?applicationIri=${applicationIri}`;
 
   return publishedUrl;
