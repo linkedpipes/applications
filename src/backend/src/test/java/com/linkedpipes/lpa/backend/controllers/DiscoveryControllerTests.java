@@ -6,7 +6,6 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
 import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.testutil.TestError;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
