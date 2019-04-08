@@ -1,6 +1,5 @@
 package com.linkedpipes.lpa.backend.services.rgml;
 
-import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
@@ -14,7 +13,7 @@ import com.linkedpipes.lpa.backend.sparql.queries.rgml.EdgesQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.rgml.GraphQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.rgml.IncidentEdgesQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.rgml.NodesQueryProvider;
-import org.apache.jena.query.QueryExecutionFactory;
+import com.linkedpipes.lpa.backend.util.JenaUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,6 @@ import java.util.stream.DoubleStream;
 @Service
 public class RgmlService {
 
-    private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
-
     /** Get a graph resource (resource of type rgml:Graph).
      *
      * If there are multiple resources of this type available, return an arbitrary one. For this
@@ -36,15 +33,13 @@ public class RgmlService {
      */
     public Graph getGraph(@Nullable String graphIri) {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
-        System.out.println(provider.get(graphIri));
-        return GraphExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+        return JenaUtils.withQueryExecution(provider.get(graphIri), GraphExtractor::extract);
     }
 
     /** Get all edges (resources of type rgml:Edge). */
     public List<Edge> getEdges(@Nullable String graphIri) {
         ConstructSparqlQueryProvider provider = new EdgesQueryProvider();
-        System.out.println(provider.get(graphIri));
-        return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+        return JenaUtils.withQueryExecution(provider.get(graphIri), EdgesExtractor::extract);
     }
 
     private List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) {
@@ -60,8 +55,7 @@ public class RgmlService {
 
     private List<Edge> fetchEdges(@Nullable String graphIri, String nodeUri, EdgeDirection direction){
         ConstructSparqlQueryProvider provider = new IncidentEdgesQueryProvider(nodeUri, direction);
-        System.out.println(provider.get(graphIri));
-        return EdgesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+        return JenaUtils.withQueryExecution(provider.get(graphIri), EdgesExtractor::extract);
     }
 
     private List<Edge> fetchAllEdges(@Nullable String graphIri, String nodeUri) {
@@ -72,14 +66,12 @@ public class RgmlService {
 
     public List<Node> getNodes(@Nullable String graphIri, Integer limit, Integer offset) {
         ConstructSparqlQueryProvider provider = new NodesQueryProvider(limit, offset);
-        System.out.println(provider.get(graphIri));
-        return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+        return JenaUtils.withQueryExecution(provider.get(graphIri), NodesExtractor::extract);
     }
 
     public List<Node> getNodesByUris(@Nullable String graphIri, List<String> nodeUris) {
         ConstructSparqlQueryProvider provider = new NodesQueryProvider(nodeUris);
-        System.out.println(provider.get(graphIri));
-        return NodesExtractor.extract(QueryExecutionFactory.sparqlService(ENDPOINT, provider.get(graphIri)));
+        return JenaUtils.withQueryExecution(provider.get(graphIri), NodesExtractor::extract);
     }
 
     public double[][] getMatrix(@Nullable String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
