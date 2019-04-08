@@ -3,9 +3,8 @@ import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 import { withWebId } from '@inrupt/solid-react-components';
 import axios from 'axios';
-import uuid from 'uuid';
 // eslint-disable-next-line import/order
-import { Log, getLocation } from '@utils';
+import { Log, getLocation, StorageToolbox } from '@utils';
 
 const FileClient = require('solid-file-client');
 
@@ -23,6 +22,10 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   };
 
   componentDidMount() {
+    this.loadStoredApplications();
+  }
+
+  loadStoredApplications = () => {
     const { webId } = this.props;
     if (webId) {
       const url = `${getLocation(webId).origin}/public/lpapps`;
@@ -39,14 +42,18 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
               axios
                 .get(element.url)
                 .then(({ data }) => {
-                  const tileData = Object.assign({}, self.state.tileData); // creating copy of object
+                  // creating copy of object
+                  const tileData = Object.assign({}, self.state.tileData);
+                  const publishedUrl = StorageToolbox.appIriToPublishUrl(
+                    element.url,
+                    data.applicationData.applicationEndpoint
+                  );
                   tileData[element.label] = {
-                    applicationIri: data.publishedUrl,
+                    applicationIri: publishedUrl,
                     applicationConfigurationIri: element.url,
                     applicationConfigurationLabel: element.label,
                     applicationTitle: data.applicationTitle,
-                    applicationData: data.applicationData,
-                    key: uuid()
+                    applicationData: data.applicationData
                   };
                   self.setState({ tileData });
                 })
@@ -60,10 +67,10 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
         err => Log.error(err, 'StorageAppsBrowserContainer')
       );
     }
-  }
+  };
 
   handleApplicationDeleted = applicationConfigurationLabel => {
-    const newTileData = this.state.tileData;
+    const newTileData = Object.assign({}, this.state.tileData);
     if (applicationConfigurationLabel in newTileData) {
       delete newTileData[applicationConfigurationLabel];
       this.setState({ tileData: newTileData });
@@ -75,7 +82,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     const { handleApplicationDeleted } = this;
     return (
       <StorageAppsBrowserComponent
-        tileData={tileData}
+        tileData={this.state.tileData}
         onHandleApplicationDeleted={handleApplicationDeleted}
       />
     );

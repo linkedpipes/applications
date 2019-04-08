@@ -26,6 +26,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
+import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -64,6 +65,7 @@ type Props = {
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   onHandleApplicationDeleted: Function,
+  handleSetSelectedApplicationTitle: Function,
   history: Object
 };
 
@@ -142,16 +144,19 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     const {
       handleSetSelectedVisualizer,
       handleSetResultPipelineIri,
+      handleSetSelectedApplicationTitle,
       singleTileData,
       history
     } = this.props;
     const applicationData = singleTileData.applicationData;
     const resultGraphIri = applicationData.selectedResultGraphIri;
+    const selectedApplicationTitle = singleTileData.applicationTitle;
     const selectedVisualiser = {
       visualizer: { visualizerCode: applicationData.visualizerCode }
     };
 
     handleSetResultPipelineIri(resultGraphIri);
+    handleSetSelectedApplicationTitle(selectedApplicationTitle);
     handleSetSelectedVisualizer(selectedVisualiser);
 
     history.push({
@@ -266,9 +271,13 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleSetSelectedApplicationTitle = applicationTitle =>
+    dispatch(applicationActions.setApplicationTitle(applicationTitle));
+
   return {
     handleSetResultPipelineIri,
-    handleSetSelectedVisualizer
+    handleSetSelectedVisualizer,
+    handleSetSelectedApplicationTitle
   };
 };
 

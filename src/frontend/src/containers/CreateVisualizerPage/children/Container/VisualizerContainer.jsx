@@ -47,7 +47,7 @@ const getVisualizer = (
       const markers = [];
       return (
         <GoogleMapsVisualizer
-          markers={markers}
+          propMarkers={markers}
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
