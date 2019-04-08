@@ -52,11 +52,7 @@ class DiscoveryControllerTests {
 
     @BeforeClass
     public void setUpUser() {
-        try {
-            userService.addUser(USER_ID);
-        } catch(UserTakenException e) {
-            //User already exists, thats ok on testing DB
-        }
+        userService.addUserIfNotPresent(USER_ID);
     }
 
     @Test
