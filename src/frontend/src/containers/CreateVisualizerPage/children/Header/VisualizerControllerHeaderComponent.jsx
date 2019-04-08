@@ -20,11 +20,13 @@ import { getBeautifiedVisualizerTitle } from '@utils';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
-  headerParams: { title: string, subtitle?: string },
   handlePublishClicked: Function,
+  handleEmbedClicked: Function,
   handleAppTitleChanged: Function,
   publishDialogOpen: boolean,
+  embedDialogOpen: boolean,
   handleClosePublishDialog: Function,
+  handleCloseEmbedDialog: Function,
   handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
   fullScreen: any,
@@ -56,9 +58,12 @@ const styles = theme => ({
 const VisualizerControllerHeaderComponent = ({
   classes,
   handlePublishClicked,
+  handleEmbedClicked,
   handleAppTitleChanged,
   publishDialogOpen,
+  embedDialogOpen,
   handleClosePublishDialog,
+  handleCloseEmbedDialog,
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
   fullScreen,
@@ -121,7 +126,7 @@ const VisualizerControllerHeaderComponent = ({
             <Button
               variant="outlined"
               color="primary"
-              onClick={handlePublishClicked}
+              onClick={handleEmbedClicked}
             >
               Embed
             </Button>
@@ -170,6 +175,46 @@ const VisualizerControllerHeaderComponent = ({
           autoFocus
         >
           Browse Published Apps
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+    <Dialog
+      fullScreen={fullScreen}
+      open={embedDialogOpen}
+      onClose={handleCloseEmbedDialog}
+      aria-labelledby="responsive-dialog-title"
+    >
+      <DialogTitle id="responsive-dialog-title">
+        {'Application published and ready to be embedded'}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Here is the code needed to embed the visualization into another
+          website
+        </DialogContentText>
+      </DialogContent>
+      <DialogContent>
+        <CopyToClipboard
+          text={`<iframe src="${appIri}" height="400" width="400" />`}
+          onCopy={handleCopyLinkClicked}
+        >
+          <TextField
+            color="primary"
+            label="Click to copy"
+            variant="outlined"
+            fullWidth
+            value={`<iframe src="${appIri}" height="400" width="400"></iframe>`}
+            autoFocus
+            style={{
+              textDecoration: 'none'
+            }}
+          />
+        </CopyToClipboard>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseEmbedDialog} color="primary" autoFocus>
+          Close
         </Button>
       </DialogActions>
     </Dialog>

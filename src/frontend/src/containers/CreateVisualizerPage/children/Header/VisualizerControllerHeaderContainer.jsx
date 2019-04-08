@@ -22,12 +22,14 @@ type Props = {
 
 type State = {
   publishDialogOpen: boolean,
+  embedDialogOpen: boolean,
   appIri: string
 };
 
 class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
   state = {
     publishDialogOpen: false,
+    embedDialogOpen: false,
     appIri: ''
   };
 
@@ -59,6 +61,34 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     });
   };
 
+  handleEmbedClicked = () => {
+    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
+    const { handleAppEmbedded } = this;
+
+    if (selectedApplicationTitle === '') {
+      toast.error('Please, provide application title!', {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 5000
+      });
+      return;
+    }
+
+    StorageToolbox.saveAppToSolid(
+      selectedApplication,
+      selectedApplicationTitle,
+      webId,
+      'public/lpapps'
+    ).then(({ applicationIri, applicationEndpoint }, error) => {
+      if (!error) {
+        const publishedUrl = StorageToolbox.appIriToPublishUrl(
+          applicationIri,
+          applicationEndpoint
+        );
+        handleAppEmbedded(publishedUrl);
+      }
+    });
+  };
+
   onHandleAppTitleChanged = e => {
     const value = e.target.value;
     const { handleAppTitleChanged } = this.props;
@@ -69,12 +99,20 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ appIri, publishDialogOpen: true });
   };
 
+  handleAppEmbedded = appIri => {
+    this.setState({ appIri, embedDialogOpen: true });
+  };
+
   handleClickPublishDialogOpen = () => {
     this.setState({ publishDialogOpen: true });
   };
 
   handleClosePublishDialog = () => {
     this.setState({ publishDialogOpen: false });
+  };
+
+  handleCloseEmbedDialog = () => {
+    this.setState({ embedDialogOpen: false });
   };
 
   handleProceedToApplicationClicked = () => {
@@ -97,20 +135,25 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     } = this.props;
     const {
       handlePublishClicked,
+      handleEmbedClicked,
       onHandleAppTitleChanged,
       handleClosePublishDialog,
+      handleCloseEmbedDialog,
       handleProceedToApplicationClicked,
       handleCopyLinkClicked
     } = this;
-    const { publishDialogOpen, appIri } = this.state;
+    const { embedDialogOpen, publishDialogOpen, appIri } = this.state;
     return (
       <VisualizerControllerHeaderComponent
         handleAppTitleChanged={onHandleAppTitleChanged}
         handlePublishClicked={handlePublishClicked}
+        handleEmbedClicked={handleEmbedClicked}
         headerParams={headerParams}
         onRefreshSwitchChange={onRefreshSwitchChange}
         publishDialogOpen={publishDialogOpen}
+        embedDialogOpen={embedDialogOpen}
         handleClosePublishDialog={handleClosePublishDialog}
+        handleCloseEmbedDialog={handleCloseEmbedDialog}
         handleProceedToApplicationClicked={handleProceedToApplicationClicked}
         handleCopyLinkClicked={handleCopyLinkClicked}
         selectedVisualizer={selectedVisualizer}
