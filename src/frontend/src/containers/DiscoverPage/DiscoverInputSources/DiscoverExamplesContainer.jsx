@@ -11,7 +11,7 @@ export const samples = [
     type: 'sparqlEndpoint',
     label: 'Treemap Sample',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
-    namedGraph: '',
+    namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008',
     dataSampleIri:
       'https://gist.githubusercontent.com/ivan-lattak/63801f3e6a9e6105aada4c207d0f8abb/raw/aa2a805a4b14da6fd30711532c4f58692018665b/cpv-2008_sample.ttl'
   },
