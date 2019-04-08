@@ -34,7 +34,8 @@ type Props = {
   handleCopyLinkClicked: Function,
   fullScreen: any,
   appIri: string,
-  selectedVisualizer: Object
+  selectedVisualizer: Object,
+  selectedApplicationTitle: string
 };
 
 const styles = theme => ({
@@ -67,6 +68,7 @@ const VisualizerControllerHeaderComponent = ({
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
   fullScreen,
+  selectedApplicationTitle,
   selectedVisualizer,
   appIri
 }: Props) => (
@@ -93,6 +95,7 @@ const VisualizerControllerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
+              value={selectedApplicationTitle}
               className={classes.textField}
               variant="outlined"
               placeholder="Enter your application title..."

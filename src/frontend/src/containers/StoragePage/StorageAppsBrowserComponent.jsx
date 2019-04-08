@@ -74,11 +74,12 @@ type Props = {
     form: {},
     gridList: {}
   },
-  tileData: {}
+  tileData: {},
+  onHandleApplicationDeleted: Function
 };
 
 function StorageAppsBrowserComponent(props: Props) {
-  const { classes, tileData } = props;
+  const { classes, tileData, onHandleApplicationDeleted } = props;
 
   return (
     <div className={classes.main}>
@@ -100,6 +101,7 @@ function StorageAppsBrowserComponent(props: Props) {
               {Object.keys(tileData).map((keyName, i) => (
                 <StorageAppsBrowserCardComponent
                   singleTileData={tileData[keyName]}
+                  onHandleApplicationDeleted={onHandleApplicationDeleted}
                 />
               ))}
             </GridList>

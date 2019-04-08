@@ -56,19 +56,27 @@ class ApplicationContainer extends PureComponent {
       case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
         const markers = applicationData.markers;
         return (
-          <GoogleMapsVisualizer markers={markers} selectedResultGraphIri={''} />
+          <GoogleMapsVisualizer
+            propMarkers={markers}
+            selectedResultGraphIri={''}
+            isPublished
+          />
         );
       }
       case VISUALIZER_TYPE.TREEMAP: {
         const selectedResultGraphIri = applicationData.selectedResultGraphIri;
         return (
-          <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+          <TreemapVisualizer
+            selectedResultGraphIri={selectedResultGraphIri}
+            isPublished
+          />
         );
       }
       case VISUALIZER_TYPE.CHORD: {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
+            isPublished
           />
         );
       }

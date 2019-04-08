@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
 import auth from 'solid-auth-client';
 import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { Log } from '@utils';
 
 class UserProfileButtonContainer extends PureComponent {
@@ -28,6 +29,7 @@ class UserProfileButtonContainer extends PureComponent {
   handleLogout = () => {
     this.setState({ anchorElement: null });
     this.performLogout();
+    this.props.resetReduxStore();
   };
 
   handleMenuClose = () => {
@@ -51,4 +53,15 @@ class UserProfileButtonContainer extends PureComponent {
   }
 }
 
-export default withRouter(UserProfileButtonContainer);
+const mapDispatchToProps = dispatch => {
+  const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
+
+  return {
+    resetReduxStore
+  };
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(withRouter(UserProfileButtonContainer));
