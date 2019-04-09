@@ -10,7 +10,6 @@ import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClust
 import { compose, withProps, type HOC } from 'recompose';
 import uuid from 'uuid';
 import { Log, VisualizersService } from '@utils';
-import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   classes: {

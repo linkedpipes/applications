@@ -53,7 +53,8 @@ const mapStateToProps = state => {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
     filters: state.visualizers.filters,
-    selectedResultGraphIri: state.etl.selectedResultGraphIri
+    selectedResultGraphIri: state.etl.selectedResultGraphIri,
+    selectedApplication: state.application.selectedApplication
   };
 };
 

@@ -78,7 +78,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { tileData } = this.state;
     const { handleApplicationDeleted } = this;
     return (
       <StorageAppsBrowserComponent

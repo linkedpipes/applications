@@ -2,10 +2,12 @@
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import Dialog from '@material-ui/core/Dialog';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import blue from '@material-ui/core/colors/blue';
 
 const styles = theme => ({
@@ -47,25 +49,24 @@ class DiscoveryInformationDialog extends PureComponent<Props> {
         <DialogTitle id="simple-dialog-title">
           Discovery Execution Info
         </DialogTitle>
-        <Paper className={classes.paper}>
-          <Grid container spacing={16}>
-            <Grid item>
-              <Typography align="left">{`SPARQL IRI: ${
-                selectedValue.sparqlEndpointIri
-              }`}</Typography>
-            </Grid>
-            <Grid item>
-              <Typography align="left">{`Data sample IRI: ${
-                selectedValue.dataSampleIri
-              }`}</Typography>
-            </Grid>
-            <Grid item>
-              <Typography align="left">{`Named Graph IRI: ${
-                selectedValue.namedGraph
-              }`}</Typography>
-            </Grid>
-          </Grid>
-        </Paper>
+        <DialogContent>
+          <DialogContentText>
+            <Typography align="left">{`SPARQL IRI: ${
+              selectedValue.sparqlEndpointIri
+            }`}</Typography>
+            <Typography align="left">{`Data sample IRI: ${
+              selectedValue.dataSampleIri
+            }`}</Typography>
+            <Typography align="left">{`Named Graph IRI: ${
+              selectedValue.namedGraph
+            }`}</Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.handleClose} color="primary" autoFocus>
+            Close
+          </Button>
+        </DialogActions>
         <div />
       </Dialog>
     );

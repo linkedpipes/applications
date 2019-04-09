@@ -19,11 +19,11 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     selectedDiscovery: {}
   };
 
-  handleClose = value => {
+  handleClose = () => {
     this.setState({ selectedDiscovery: {}, open: false });
   };
 
-  handleDiscoveryRowClicked = discovery => {
+  handleDiscoveryRowClicked = (discovery: string) => {
     this.setState({
       open: true,
       selectedDiscovery: discovery

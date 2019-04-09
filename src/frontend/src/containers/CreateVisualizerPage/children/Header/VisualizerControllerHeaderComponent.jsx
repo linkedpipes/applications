@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
-import Labels from './VisualizerControllerLabelsComponent';
-import Toolbox from './VisualizerControllerToolboxComponent';
 import {
-  AppBar,
-  Toolbar,
   Dialog,
   Button,
   DialogActions,
@@ -15,7 +11,6 @@ import {
   DialogTitle,
   Paper,
   withMobileDialog,
-  CssBaseline,
   InputBase,
   Typography,
   withStyles
@@ -61,7 +56,6 @@ const styles = theme => ({
 const VisualizerControllerHeaderComponent = ({
   classes,
   handlePublishClicked,
-  headerParams,
   handleAppTitleChanged,
   publishDialogOpen,
   handleClosePublishDialog,
@@ -167,6 +161,9 @@ const VisualizerControllerHeaderComponent = ({
         </CopyToClipboard>
       </DialogContent>
       <DialogActions>
+        <Button onClick={handleClosePublishDialog} color="primary" autoFocus>
+          Close
+        </Button>
         <Button
           onClick={handleProceedToApplicationClicked}
           color="primary"

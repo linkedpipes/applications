@@ -24,12 +24,13 @@ type Props = {
   handleSetUserProfile: Function,
   discoveriesList: Array<{ id: string, finished: boolean }>,
   applicationsList: Array<{}>,
+  // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   socket: Object,
   pipelinesList: Array<{
     executionIri: string,
     selectedVisualiser: string,
-    status: { '@id'?: string, status?: string },
+    status: { '@id'?: string, status?: string, statusIri: string },
     webId: string
   }>,
   handleSetResultPipelineIri: Function,
