@@ -1,11 +1,19 @@
+// @flow
 import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
 import auth from 'solid-auth-client';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Log } from '@utils';
 
-class UserProfileButtonContainer extends PureComponent {
+type Props = {
+  history: Object,
+  resetReduxStore: Function
+};
+
+type State = {
+  anchorElement: Object
+};
+class UserProfileButtonContainer extends PureComponent<Props, State> {
   state = {
     anchorElement: null
   };

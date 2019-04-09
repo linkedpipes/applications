@@ -15,9 +15,9 @@ type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {} },
   filters: any,
   visualizer: { visualizerCode: string },
-  visualizerParams: any,
   selectedResultGraphIri: string,
-  handleSetCurrentApplicationData: Function
+  handleSetCurrentApplicationData: Function,
+  selectedApplication: Object
 };
 
 const styles = theme => ({
@@ -38,13 +38,16 @@ const styles = theme => ({
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
+  selectedApplication,
   handleSetCurrentApplicationData,
   classes
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-      const markers = [];
+      const markers = selectedApplication.markers
+        ? selectedApplication.markers
+        : [];
       return (
         <GoogleMapsVisualizer
           propMarkers={markers}
@@ -89,6 +92,7 @@ const VisualizerControllerContainer = (props: Props) => (
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
+        props.selectedApplication,
         props.handleSetCurrentApplicationData,
         props.classes
       )}

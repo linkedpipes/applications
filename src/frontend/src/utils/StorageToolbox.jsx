@@ -23,14 +23,14 @@ const shareApp = (appIri, webId) => {
 
   return new Promise((resolve, reject) => {
     FileClient.updateFile(url, appIri, 'text/plain').then(
-      success => {
+      () => {
         Log.info(`Updated file!`);
         resolve();
       },
       err => {
         Log.info(err, 'StorageToolbox');
         FileClient.createFile(url, 'text/plain').then(
-          success => {
+          () => {
             Log.info(`Created file!`);
             resolve();
           },
@@ -130,7 +130,7 @@ const createOrUpdateFolder = (webId, path) => {
     folder => {
       Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
     },
-    err => {
+    () => {
       FileClient.createFolder(folderPath).then(
         body => {
           Log.info(`File content is : ${body}.`, 'StorageToolbox');

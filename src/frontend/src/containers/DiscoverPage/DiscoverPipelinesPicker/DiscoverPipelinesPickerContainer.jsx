@@ -66,7 +66,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
 DiscoverPipelinesPickerContainer.propTypes = {
   dataSourceGroups: PropTypes.any,
   discoveryId: PropTypes.any,
-  executions: PropTypes.any,
   handleSetSelectedPipelineId: PropTypes.any,
   onNextClicked: PropTypes.any
 };
