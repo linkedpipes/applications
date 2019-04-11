@@ -97,6 +97,7 @@ const DiscoverComponent = ({
                       <Button
                         variant="contained"
                         color="primary"
+                        id="create-app-button"
                         className={classes.button}
                         disabled={
                           etlExecutionStatus !== ETL_STATUS_TYPE.Finished

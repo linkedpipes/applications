@@ -98,6 +98,7 @@ const AuthorizationComponent = ({
           control={
             <Checkbox
               name="withWebIdStatus"
+              id="with-web-id-checkbox"
               checked={withWebIdStatus}
               onChange={onSetWithWebId}
               color="primary"
@@ -107,6 +108,7 @@ const AuthorizationComponent = ({
         />
         <Button
           type="submit"
+          id="sign-in-button"
           fullWidth
           variant="contained"
           color="primary"

@@ -71,12 +71,12 @@ const DiscoverPipelinesPickerComponent = ({
           {dataSourceGroups
             .sort(getSorting(order, orderBy))
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map(datasourceAndPipelines => {
+            .map((datasourceAndPipelines, index) => {
               return (
                 <TableRow hover tabIndex={-1} key={uuid()}>
                   <TableCell component="th" scope="row" padding="checkbox">
                     <Button
-                      id={`button_${datasourceAndPipelines.dataSources[0].uri}`}
+                      id={`button-${index}-pipeline`}
                       size="small"
                       disabled={Object.keys(loadingButtons).length > 0}
                       variant="contained"

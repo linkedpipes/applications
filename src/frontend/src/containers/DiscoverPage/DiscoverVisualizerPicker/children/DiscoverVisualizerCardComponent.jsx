@@ -28,12 +28,14 @@ const styles = {
 const DiscoverVisualizerCardComponent = ({
   classes,
   visualizerData,
-  handleSelectVisualizer
+  handleSelectVisualizer,
+  cardIndex
 }) => (
   <Card className={classes.card}>
     <CardActionArea
       style={{ textAlign: 'center' }}
       onClick={handleSelectVisualizer}
+      id={`visualizer-${cardIndex}-card`}
     >
       <VisualizerIcon
         visualizerType={visualizerData.visualizer.visualizerCode}
@@ -52,6 +54,7 @@ const DiscoverVisualizerCardComponent = ({
 );
 
 DiscoverVisualizerCardComponent.propTypes = {
+  cardIndex: PropTypes.any,
   classes: PropTypes.object.isRequired,
   handleSelectVisualizer: PropTypes.any,
   visualizerData: PropTypes.any
