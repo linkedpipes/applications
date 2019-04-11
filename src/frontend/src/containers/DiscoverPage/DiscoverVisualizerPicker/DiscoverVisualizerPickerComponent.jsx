@@ -7,6 +7,7 @@ import Card from '@material-ui/core/Card';
 import DiscoverVisualizerCard from './children';
 import classNames from 'classnames';
 import Emoji from 'react-emoji-render';
+import uuid from 'uuid';
 
 const styles = theme => ({
   root: {
@@ -60,8 +61,8 @@ const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
             </Card>
           </Grid>
         ) : (
-          visualizers.map((value, index) => (
-            <Grid key={index} item sm={6} md={4} lg={3}>
+          visualizers.map(value => (
+            <Grid key={uuid()} item sm={6} md={4} lg={3}>
               <DiscoverVisualizerCard visualizerData={value} />
             </Grid>
           ))

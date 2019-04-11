@@ -69,3 +69,11 @@ You can also customize some settings in the following files:
 - `docker-compose.yml`
 - `nginx.conf`
 - `src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties`
+
+---
+
+## Testing
+
+<p align="center"><img img width=35% src="https://i.ibb.co/MnhHHBq/Browserstack-logo-2x.png" alt="Browserstack-logo-2x" border="0"><br /></p>
+
+LinkedPipes Applications uses [BrowserStack](https://www.browserstack.com) for automated integration testing.

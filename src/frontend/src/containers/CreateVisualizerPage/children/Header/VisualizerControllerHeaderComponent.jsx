@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
-import Labels from './VisualizerControllerLabelsComponent';
-import Toolbox from './VisualizerControllerToolboxComponent';
 import {
-  AppBar,
-  Toolbar,
   Dialog,
   Button,
   DialogActions,
@@ -15,7 +11,6 @@ import {
   DialogTitle,
   Paper,
   withMobileDialog,
-  CssBaseline,
   InputBase,
   Typography,
   withStyles
@@ -34,7 +29,8 @@ type Props = {
   handleCopyLinkClicked: Function,
   fullScreen: any,
   appIri: string,
-  selectedVisualizer: Object
+  selectedVisualizer: Object,
+  selectedApplicationTitle: string
 };
 
 const styles = theme => ({
@@ -60,13 +56,13 @@ const styles = theme => ({
 const VisualizerControllerHeaderComponent = ({
   classes,
   handlePublishClicked,
-  headerParams,
   handleAppTitleChanged,
   publishDialogOpen,
   handleClosePublishDialog,
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
   fullScreen,
+  selectedApplicationTitle,
   selectedVisualizer,
   appIri
 }: Props) => (
@@ -93,6 +89,7 @@ const VisualizerControllerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
+              value={selectedApplicationTitle}
               className={classes.textField}
               variant="outlined"
               placeholder="Enter your application title..."
@@ -164,6 +161,9 @@ const VisualizerControllerHeaderComponent = ({
         </CopyToClipboard>
       </DialogContent>
       <DialogActions>
+        <Button onClick={handleClosePublishDialog} color="primary" autoFocus>
+          Close
+        </Button>
         <Button
           onClick={handleProceedToApplicationClicked}
           color="primary"

@@ -16,7 +16,8 @@ type Props = {
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
   history: any,
-  selectedVisualizer: Object
+  selectedVisualizer: Object,
+  selectedApplicationTitle: string
 };
 
 type State = {
@@ -47,9 +48,13 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationTitle,
       webId,
       'public/lpapps'
-    ).then((appIri, error) => {
+    ).then(({ applicationIri, applicationEndpoint }, error) => {
       if (!error) {
-        handleAppPublished(appIri);
+        const publishedUrl = StorageToolbox.appIriToPublishUrl(
+          applicationIri,
+          applicationEndpoint
+        );
+        handleAppPublished(publishedUrl);
       }
     });
   };
@@ -87,7 +92,8 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     const {
       headerParams,
       onRefreshSwitchChange,
-      selectedVisualizer
+      selectedVisualizer,
+      selectedApplicationTitle
     } = this.props;
     const {
       handlePublishClicked,
@@ -108,6 +114,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
         handleProceedToApplicationClicked={handleProceedToApplicationClicked}
         handleCopyLinkClicked={handleCopyLinkClicked}
         selectedVisualizer={selectedVisualizer}
+        selectedApplicationTitle={selectedApplicationTitle}
         appIri={appIri}
       />
     );

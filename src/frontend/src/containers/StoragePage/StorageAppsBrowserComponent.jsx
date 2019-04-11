@@ -3,14 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -74,11 +67,12 @@ type Props = {
     form: {},
     gridList: {}
   },
-  tileData: {}
+  tileData: {},
+  onHandleApplicationDeleted: Function
 };
 
 function StorageAppsBrowserComponent(props: Props) {
-  const { classes, tileData } = props;
+  const { classes, tileData, onHandleApplicationDeleted } = props;
 
   return (
     <div className={classes.main}>
@@ -97,9 +91,10 @@ function StorageAppsBrowserComponent(props: Props) {
               cellHeight={200}
               className={classes.gridList}
             >
-              {Object.keys(tileData).map((keyName, i) => (
+              {Object.keys(tileData).map(keyName => (
                 <StorageAppsBrowserCardComponent
                   singleTileData={tileData[keyName]}
+                  onHandleApplicationDeleted={onHandleApplicationDeleted}
                 />
               ))}
             </GridList>
