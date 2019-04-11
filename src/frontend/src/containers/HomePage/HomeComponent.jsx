@@ -113,6 +113,9 @@ class HomeComponent extends PureComponent<Props> {
               {samples.map(sample => (
                 <Button
                   key={uuid()}
+                  id={`${sample.label
+                    .replace(/ /g, '-')
+                    .toLowerCase()}-home-button`}
                   variant="contained"
                   size="large"
                   className={classes.templatesBtn}
