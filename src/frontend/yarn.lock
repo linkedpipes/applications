@@ -5261,6 +5261,11 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
 
+fs@0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/fs/-/fs-0.0.1-security.tgz#8a7bd37186b6dddf3813f23858b57ecaaf5e41d4"
+  integrity sha1-invTcYa23d84E/I4WLV+yq9eQdQ=
+
 fsevents@^1.0.0, fsevents@^1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-1.2.7.tgz#4851b664a3783e52003b3c66eb0eee1074933aa4"
@@ -8754,7 +8759,16 @@ readable-error@^1.0.0:
     string_decoder "~1.1.1"
     util-deprecate "~1.0.1"
 
-readable-stream@^3.0.2, readable-stream@^3.0.6, readable-stream@^3.1.1:
+readable-stream@^3.0.2:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.3.0.tgz#cb8011aad002eb717bf040291feba8569c986fb9"
+  integrity sha512-EsI+s3k3XsW+fU8fQACLN59ky34AZ14LoeVZpYwmZvldCFo0r0gnelwF2TcMjLor/BTL5aDJVBMkss0dthToPw==
+  dependencies:
+    inherits "^2.0.3"
+    string_decoder "^1.1.1"
+    util-deprecate "^1.0.1"
+
+readable-stream@^3.0.6, readable-stream@^3.1.1:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.2.0.tgz#de17f229864c120a9f56945756e4f32c4045245d"
   integrity sha512-RV20kLjdmpZuTF1INEb9IA3L68Nmi+Ri7ppZqo78wj//Pn62fCoJyV9zalccNzDD/OuJpMG4f+pfMl8+L6QdGw==
@@ -8771,11 +8785,6 @@ readdirp@^2.0.0, readdirp@^2.2.1:
     graceful-fs "^4.1.11"
     micromatch "^3.1.10"
     readable-stream "^2.0.2"
-
-readline-sync@^1.4.9:
-  version "1.4.9"
-  resolved "https://registry.yarnpkg.com/readline-sync/-/readline-sync-1.4.9.tgz#3eda8e65f23cd2a17e61301b1f0003396af5ecda"
-  integrity sha1-PtqOZfI80qF+YTAbHwADOWr17No=
 
 recast@~0.11.12:
   version "0.11.23"
@@ -9457,17 +9466,17 @@ sockjs@0.3.19:
     uuid "^3.0.1"
 
 solid-auth-cli@^0.1.8:
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.1.11.tgz#54d6c6179bf63452cd151e0643f0be7045014501"
-  integrity sha512-TnJPi1KweK0h7x0Ccd1WPrp05R4fi7yAX4hu6lileYjC+3ewYb9YAKaeiQWf+TXwNa8xysUHLMgkeRYD1LeakA==
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.1.13.tgz#1130dfd8f2a6436cf6f2272960fe0952ea01d946"
+  integrity sha512-mRZ4eaWniGd9jLRzSWD3n9EwMfTcmwlfXK5MggIzSQOyXa1XJCWxHnJDL0DWTX5sMi1ovYa6RI4u6TNOzsEZiw==
   dependencies:
     "@solid/cli" "^0.1.0"
     async "^2.6.1"
     file-fetch "^1.1.1"
+    fs "0.0.1-security"
     isomorphic-fetch "^2.2.1"
     jsonld "^1.4.0"
     n3 "^1.0.3"
-    readline-sync "^1.4.9"
 
 solid-auth-client@^2.2.14, solid-auth-client@^2.2.3, solid-auth-client@^2.3.0:
   version "2.3.0"
@@ -9480,7 +9489,7 @@ solid-auth-client@^2.2.14, solid-auth-client@^2.2.3, solid-auth-client@^2.3.0:
     commander "^2.11.0"
     isomorphic-fetch "^2.2.1"
 
-solid-file-client@0.4.9:
+solid-file-client@^0.4.9:
   version "0.4.9"
   resolved "https://registry.yarnpkg.com/solid-file-client/-/solid-file-client-0.4.9.tgz#4f0db777528c483bddac8be5f39323b3eeca1adf"
   integrity sha512-/4KmS52APjvIVea+nWD3spUYiPmq5gE/ze8fP2XufwrTXST3Oh+rRj2zjfQyhFcVXwhrV++MrUcTY/YId/kqwg==

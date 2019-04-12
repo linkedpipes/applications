@@ -15,10 +15,18 @@ import {
   ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log } from '@utils';
+import {
+  SocketContext,
+  Log,
+  AuthenticationService,
+  StorageToolbox
+} from '@utils';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
+import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
+import auth from 'solid-auth-client';
+import { pipeline } from 'stream';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -40,7 +48,9 @@ const styles = () => ({
 
 type Props = {
   classes: any,
-  userId: ?string
+  userId: ?string,
+  userProfile: Object,
+  handleSetUserProfile: Function
 };
 
 const errorHandler = userId => {
@@ -58,6 +68,9 @@ const errorHandler = userId => {
 
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
+    const { handleSetUserProfile } = this.props;
+    const self = this;
+
     socket.on('connect', data => {
       Log.warn('Client connected', 'AppRouter');
       Log.warn(data, 'AppRouter');
@@ -73,6 +86,77 @@ class AppRouter extends React.PureComponent<Props> {
       Log.warn(data, 'AppRouter');
       Log.warn(socket.id, 'AppRouter');
     });
+
+    socket.on('discoveryAdded', data => {
+      if (data === undefined) {
+        return;
+      }
+      const parsedData = JSON.parse(data);
+      const curUserProfile = self.props.userProfile;
+      const discoveryRecord = {};
+
+      discoveryRecord.isFinished = parsedData.status.isFinished;
+      discoveryRecord.stared = parsedData.started;
+      discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
+      discoveryRecord.namedGraph = parsedData.namedGraph;
+      discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
+
+      const updatedDiscoverySessions = curUserProfile.discoverySessions;
+      updatedDiscoverySessions.push(discoveryRecord);
+      curUserProfile.discoverySessions = updatedDiscoverySessions;
+      handleSetUserProfile(curUserProfile);
+    });
+
+    socket.on('executionAdded', data => {
+      if (data === undefined) {
+        return;
+      }
+
+      const parsedData = JSON.parse(data);
+      const executionIri = parsedData.executionIri;
+      const newStatus = parsedData.status.status;
+
+      const curUserProfile = self.props.userProfile;
+      const updatedPipelineExecutions = curUserProfile.pipelineExecutions;
+
+      const pipelineRecord = {};
+      pipelineRecord.status = newStatus;
+      pipelineRecord.finished = parsedData.finished;
+      pipelineRecord.executionIri = executionIri;
+
+      curUserProfile.pipelineExecutions = updatedPipelineExecutions;
+      handleSetUserProfile(curUserProfile);
+    });
+
+    auth.trackSession(session => {
+      if (session) {
+        Log.info(session);
+        AuthenticationService.getUserProfile(session.webId)
+          .then(res => {
+            Log.info(
+              'Response from get user profile call:',
+              'AuthenticationService'
+            );
+            Log.info(res, 'AuthenticationService');
+            Log.info(res.data, 'AuthenticationService');
+
+            return res.data;
+          })
+          .then(jsonResponse => {
+            handleSetUserProfile(jsonResponse);
+            socket.emit('join', session.webId);
+          })
+          .catch(error => {
+            Log.error(error, 'HomeContainer');
+          });
+
+        StorageToolbox.createOrUpdateFolder(session.webId, 'public/lpapps');
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners();
   }
 
   render() {
@@ -138,10 +222,20 @@ class AppRouter extends React.PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId
+    userId: state.user.webId,
+    userProfile: state.user
   };
 };
 
-export default connect(mapStateToProps)(
-  withRoot(withStyles(styles)(AppRouter))
-);
+const mapDispatchToProps = dispatch => {
+  const handleSetUserProfile = userProfile =>
+    dispatch(userActions.setUserProfile(userProfile));
+  return {
+    handleSetUserProfile
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRoot(withStyles(styles)(AppRouter)));
