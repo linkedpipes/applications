@@ -170,12 +170,12 @@ class UntitledTestCase(unittest.TestCase):
             "chat.postMessage",
             channel="CGGD5F3FY",
             text="E2E tests on LPA were performed :tada: \n\n See results:\n"
-                 "```*project_name*: {0}\n"
-                 "*build_name*: {1}\n"
-                 "*browser*: {2} {3}\n"
-                 "*os*: {4} {5}\n"
-                 "*url*: {6}```".format(project_name, build_name, browser,
-                                       browser_version, os_name, os_version, public_url)
+                 "```project_name: {0}\n"
+                 "build_name: {1}\n"
+                 "browser: {2} {3}\n"
+                 "os: {4} {5}\n"
+                 "url: {6}```".format(project_name, build_name, browser,
+                                      browser_version, os_name, os_version, public_url)
         )
 
         self.assertEqual([], self.verificationErrors)
@@ -183,8 +183,9 @@ class UntitledTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        UntitledTestCase.pr_repo_title = sys.argv.pop()
-        UntitledTestCase.build_travis_number = 'travis_{0}'.format(sys.argv.pop())
+        UntitledTestCase.pr_repo_title = 'travis_on_{0}'.format(sys.argv.pop())
+        UntitledTestCase.build_travis_number = 'travis_{0}'.format(
+            sys.argv.pop())
         UntitledTestCase.browserstack_access_key = sys.argv.pop()
         UntitledTestCase.browserstack_username = sys.argv.pop()
 

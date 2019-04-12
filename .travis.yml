@@ -175,6 +175,7 @@ jobs:
 
     - stage: e2e_tests
       name: "E2E testing of whole LPA platform"
+      cache: pip
       dist: xenial   # required for Python >= 3.7
       language: python
       python:
