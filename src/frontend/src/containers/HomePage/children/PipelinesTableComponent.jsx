@@ -15,8 +15,8 @@ import uuid from 'uuid';
 type Props = {
   pipelinesList: Array<{
     status: { '@id'?: string, status?: string },
-    start: number,
-    stop: number,
+    started: number,
+    finished: number,
     executionIri: string,
     selectedVisualiser: string
   }>,
@@ -81,10 +81,10 @@ const PipelinesTableComponent = ({
                     'N/A'}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.start)}
+                  {unixTimeConverter(pipeline.started)}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.stop)}
+                  {unixTimeConverter(pipeline.finished)}
                 </TableCell>
               </TableRow>
             ))}

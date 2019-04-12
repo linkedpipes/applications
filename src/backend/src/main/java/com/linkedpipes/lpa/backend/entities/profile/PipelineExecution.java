@@ -5,5 +5,5 @@ public class PipelineExecution {
     public String executionIri;
     public String etlPipelineIri;
     public String selectedVisualiser;
-    public long start, stop;
+    public long started, finished;
 }
