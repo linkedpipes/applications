@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
@@ -13,11 +12,10 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { StorageToolbox, getBeautifiedVisualizerTitle } from '@utils';
 import IconButton from '@material-ui/core/IconButton';
@@ -26,6 +24,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
+import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -57,23 +56,26 @@ type Props = {
   singleTileData: {
     applicationTitle: string,
     applicationIri: string,
+    applicationConfigurationIri: string,
+    applicationConfigurationLabel: string,
     applicationData: Object
   },
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
+  onHandleApplicationDeleted: Function,
+  handleSetSelectedApplicationTitle: Function,
+  handleSetSelectedApplicationData: Function,
   history: Object
 };
 
 type State = {
   open: boolean,
-  textValue: string,
   anchorEl: any
 };
 
 class StorageAppsBrowserCard extends PureComponent<Props, State> {
   state = {
     open: false,
-    textValue: '',
     anchorEl: undefined
   };
 
@@ -85,31 +87,34 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     this.setState({ open: false });
   };
 
-  handleChange = e => {
-    const textValue = e.target.value;
-    this.setState({ textValue });
-  };
-
   handleMenuClick = event => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
   handleDeleteApp = () => {
-    const applicationIri = this.props.singleTileData.applicationIri;
-    StorageToolbox.removeAppFromStorage(applicationIri).then(error => {
-      if (!error) {
-        this.setState({ anchorEl: null });
-        toast.success('Deleted application!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 2000
-        });
-      } else {
-        toast.error('Error! Unable to delete published application!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 2000
-        });
+    const { onHandleApplicationDeleted } = this.props;
+    const applicationConfigurationIri = this.props.singleTileData
+      .applicationConfigurationIri;
+    const applicationConfigurationLabel = this.props.singleTileData
+      .applicationConfigurationLabel;
+    const self = this;
+    StorageToolbox.removeAppFromStorage(applicationConfigurationIri).then(
+      error => {
+        if (!error) {
+          self.setState({ anchorEl: null });
+          onHandleApplicationDeleted(applicationConfigurationLabel);
+          toast.success('Deleted application!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          });
+        } else {
+          toast.error('Error! Unable to delete published application!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          });
+        }
       }
-    });
+    );
   };
 
   handleMenuClose = () => {
@@ -131,16 +136,21 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     const {
       handleSetSelectedVisualizer,
       handleSetResultPipelineIri,
+      handleSetSelectedApplicationTitle,
+      handleSetSelectedApplicationData,
       singleTileData,
       history
     } = this.props;
     const applicationData = singleTileData.applicationData;
     const resultGraphIri = applicationData.selectedResultGraphIri;
+    const selectedApplicationTitle = singleTileData.applicationTitle;
     const selectedVisualiser = {
       visualizer: { visualizerCode: applicationData.visualizerCode }
     };
 
     handleSetResultPipelineIri(resultGraphIri);
+    handleSetSelectedApplicationTitle(selectedApplicationTitle);
+    handleSetSelectedApplicationData(applicationData);
     handleSetSelectedVisualizer(selectedVisualiser);
 
     history.push({
@@ -153,7 +163,6 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     const { anchorEl } = this.state;
     const {
       handleMenuClick,
-      handleMenuClose,
       handleDeleteApp,
       handleShareApp,
       handleApplicationClicked,
@@ -224,7 +233,8 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
                 value={singleTileData.applicationIri}
                 autoFocus
                 style={{
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  width: '400px'
                 }}
               />
             </CopyToClipboard>
@@ -255,9 +265,17 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleSetSelectedApplicationTitle = applicationTitle =>
+    dispatch(applicationActions.setApplicationTitle(applicationTitle));
+
+  const handleSetSelectedApplicationData = applicationData =>
+    dispatch(applicationActions.setApplication(applicationData));
+
   return {
     handleSetResultPipelineIri,
-    handleSetSelectedVisualizer
+    handleSetSelectedVisualizer,
+    handleSetSelectedApplicationTitle,
+    handleSetSelectedApplicationData
   };
 };
 

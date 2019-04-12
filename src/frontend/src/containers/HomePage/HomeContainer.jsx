@@ -24,12 +24,13 @@ type Props = {
   handleSetUserProfile: Function,
   discoveriesList: Array<{ id: string, finished: boolean }>,
   applicationsList: Array<{}>,
+  // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   socket: Object,
   pipelinesList: Array<{
     executionIri: string,
     selectedVisualiser: string,
-    status: { '@id'?: string, status?: string },
+    status: { '@id'?: string, status?: string, statusIri: string },
     webId: string
   }>,
   handleSetResultPipelineIri: Function,
@@ -80,9 +81,9 @@ class HomeContainer extends PureComponent<Props, State> {
         if (userProfile.discoverySessions.length > 0) {
           const updatedDiscovery = userProfile.discoverySessions.map(
             discoveryRecord => {
-              if (discoveryRecord.id === parsedData.discoveryId) {
-                discoveryRecord.finished = parsedData.status.isFinished;
-                discoveryRecord.stop = parsedData.finished;
+              if (discoveryRecord.discoveryId === parsedData.discoveryId) {
+                discoveryRecord.isFinished = parsedData.status.isFinished;
+                discoveryRecord.finished = parsedData.finished;
                 discoveryRecord.sparqlEndpointIri =
                   parsedData.sparqlEndpointIri;
                 discoveryRecord.namedGraph = parsedData.namedGraph;
@@ -113,7 +114,7 @@ class HomeContainer extends PureComponent<Props, State> {
           pipelineRecord => {
             if (pipelineRecord.executionIri === executionIri) {
               pipelineRecord.status = newStatus;
-              pipelineRecord.stop = parsedData.finished;
+              pipelineRecord.finished = parsedData.finished;
             }
             return pipelineRecord;
           }
@@ -151,9 +152,9 @@ class HomeContainer extends PureComponent<Props, State> {
         ? ETL_STATUS_MAP[rawStatus.statusIri]
         : ETL_STATUS_MAP[rawStatus['@id']];
       if (
-        status !== ETL_STATUS_TYPE.Finished ||
-        status !== ETL_STATUS_TYPE.Cancelled ||
-        status !== ETL_STATUS_TYPE.Unknown ||
+        status !== ETL_STATUS_TYPE.Finished &&
+        status !== ETL_STATUS_TYPE.Cancelled &&
+        status !== ETL_STATUS_TYPE.Unknown &&
         status !== ETL_STATUS_TYPE.Failed
       ) {
         socket.emit('join', pipelineRecord.executionIri);

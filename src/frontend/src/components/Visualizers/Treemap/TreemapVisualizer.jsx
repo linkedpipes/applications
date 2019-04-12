@@ -11,7 +11,8 @@ type Props = {
     progress: number
   },
   selectedResultGraphIri: string,
-  handleSetCurrentApplicationData: Function
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
 };
 
 type State = {
@@ -52,7 +53,19 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData } = this.props;
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'treemap',
+        conceptIri:
+          'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'TREEMAP'
+      });
+    }
+
     this.conceptsFetched = new Set();
     // Add the root to the list of fetched data
     this.conceptsFetched.add(
@@ -109,14 +122,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     this.setState({
       dataLoadingStatus: 'ready',
       chartData
-    });
-
-    handleSetCurrentApplicationData({
-      id: uuid.v4(),
-      applicationEndpoint: 'treemap',
-      conceptIri: 'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
-      selectedResultGraphIri: this.props.selectedResultGraphIri,
-      visualizerCode: 'TREEMAP'
     });
   }
 

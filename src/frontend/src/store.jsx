@@ -29,16 +29,23 @@ const enhancer =
       )
     : composeEnhancers(applyMiddleware(...middlewares));
 
-const store = createStore(
-  combineReducers({
-    user: userReducer,
-    globals: globalReducer,
-    discover: discoverReducer,
-    discovery: discoveryReducer,
-    visualizers: visualizersReducer,
-    etl: etlReducer,
-    application: applicationReducer
-  }),
-  enhancer
-);
+const appReducer = combineReducers({
+  user: userReducer,
+  globals: globalReducer,
+  discover: discoverReducer,
+  discovery: discoveryReducer,
+  visualizers: visualizersReducer,
+  etl: etlReducer,
+  application: applicationReducer
+});
+
+const rootReducer = (state, action) => {
+  if (action.type === 'USER_LOGOUT') {
+    state = undefined;
+  }
+
+  return appReducer(state, action);
+};
+
+const store = createStore(rootReducer, enhancer);
 export default () => store;
