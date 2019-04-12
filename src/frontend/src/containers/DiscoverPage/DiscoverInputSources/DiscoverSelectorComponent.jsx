@@ -140,6 +140,7 @@ const DiscoverSelectorComponent = ({
                     variant="contained"
                     component="span"
                     color="secondary"
+                    id="start-discovery-button"
                     disabled={
                       !ttlFile &&
                       !dataSourcesUris &&

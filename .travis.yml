@@ -2,13 +2,15 @@ os: "linux"
 
 stages:
   - name: push-build
-    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/
+    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
   - name: build
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
     if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-Deploy\])/
+  - name: e2e_tests
+    if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-E2E\])/
 
 env:
   global:
@@ -170,6 +172,20 @@ jobs:
         - docker push linkedpipes/applications:frontend
         - docker push linkedpipes/applications:backend
         - curl $DEPLOYMENT_URL
+
+    - stage: e2e_tests
+      name: "E2E testing of whole LPA platform"
+      cache: pip
+      dist: xenial   # required for Python >= 3.7
+      language: python
+      python:
+        - "3.7"
+      install:
+        - cd src/tests
+        - pip3 install -r requirements.txt
+      script:
+        - sleep 30 # Hardcoded workaround to wait until data is deployed 
+        - python3 e2e_tests.py "$BROWSERSTACK_USERNAME" "$BROWSERSTACK_APIKEY" "$TRAVIS_BUILD_NUMBER" "$TRAVIS_BRANCH"
       
 
 notifications:

@@ -87,7 +87,10 @@ const DiscoverComponent = ({
                 <div className={classes.actionsContainer}>
                   <div>
                     <Button
-                      disabled={activeStep === 0}
+                      disabled={
+                        activeStep === 0 ||
+                        etlExecutionStatus === ETL_STATUS_TYPE.Finished
+                      }
                       onClick={onBackClicked}
                       className={classes.button}
                     >
@@ -97,6 +100,7 @@ const DiscoverComponent = ({
                       <Button
                         variant="contained"
                         color="primary"
+                        id="create-app-button"
                         className={classes.button}
                         disabled={
                           etlExecutionStatus !== ETL_STATUS_TYPE.Finished
