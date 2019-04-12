@@ -34,7 +34,7 @@ class UntitledTestCase(unittest.TestCase):
     build_travis_number = -1
 
     def setUp(self):
-        desired_cap['build'] = "test"
+        desired_cap['build'] = self.build_travis_number
         desired_cap['project'] = self.pr_repo_title
 
         self.driver = webdriver.Remote(
