@@ -74,3 +74,5 @@ data
 src/backend/create.sql
 
 src/frontend/public/
+
+src/tests/venv/
