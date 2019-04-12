@@ -36,9 +36,7 @@ type Props = {
 };
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1
-  },
+  root: {},
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
@@ -196,7 +194,7 @@ const VisualizerControllerHeaderComponent = ({
       </DialogContent>
       <DialogContent>
         <CopyToClipboard
-          text={`<iframe src="${appIri}" height="400" width="400" />`}
+          text={`<iframe src="${appIri}" height="400" width="400"></iframe>`}
           onCopy={handleCopyLinkClicked}
         >
           <TextField
