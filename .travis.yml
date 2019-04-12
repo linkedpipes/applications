@@ -184,6 +184,7 @@ jobs:
         - cd src/tests
         - pip3 install -r requirements.txt
       script:
+        - sleep 30 # Hardcoded workaround to wait until data is deployed 
         - python3 e2e_tests.py "$BROWSERSTACK_USERNAME" "$BROWSERSTACK_APIKEY" "$TRAVIS_BUILD_NUMBER" "$TRAVIS_BRANCH"
       
 
