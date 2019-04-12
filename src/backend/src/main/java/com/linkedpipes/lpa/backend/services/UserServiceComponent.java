@@ -162,7 +162,7 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public UserProfile addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException, LpAppsException {
+    public void addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException, LpAppsException {
         UserDao user = getUser(username);
         ApplicationDao app = new ApplicationDao();
         app.setSolidIri(solidIri);
@@ -173,21 +173,5 @@ public class UserServiceComponent implements UserService {
         Application a = new Application();
         a.solidIri = solidIri;
         com.linkedpipes.lpa.backend.Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
-
-        return getUserProfile(username);
-    }
-
-    @NotNull @Override
-    public UserProfile deleteApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException {
-        UserDao user = getUser(username);
-
-        for (ApplicationDao app : user.getApplications()) {
-            if (app.getSolidIri().equals(solidIri)) {
-                applicationRepository.delete(app);
-                break;
-            }
-        }
-
-        return getUserProfile(username);
     }
 }
