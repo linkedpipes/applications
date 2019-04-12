@@ -14,13 +14,14 @@ import uuid from 'uuid';
 
 type Props = {
   pipelinesList: Array<{
+    status: { '@id'?: string, status?: string },
+    start: number,
+    stop: number,
     executionIri: string,
-    selectedVisualiser: string,
-    status: { '@id'?: string, status?: string, start: number, stop: number },
-    webId: string,
-    classes: Object,
-    onHandleSelectPipelineExecutionClick: Function
-  }>
+    selectedVisualiser: string
+  }>,
+  classes: Object,
+  onHandleSelectPipelineExecutionClick: Function
 };
 
 const styles = () => ({

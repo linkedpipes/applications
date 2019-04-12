@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
-import { withStyles, Grid } from '@material-ui/core';
+import { withStyles } from '@material-ui/core';
 import { VisualizerControllerHeader, VisualizerContainer } from './children';
 
 type Props = {
   selectedVisualizer: any,
+  selectedApplication: any,
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,
@@ -29,6 +30,7 @@ const CreateVisualizerComponent = ({
   headerParams,
   filters,
   selectedResultGraphIri,
+  selectedApplication,
   handleSetCurrentApplicationData
 }: Props) => (
   <div className={classes.root}>
@@ -41,6 +43,7 @@ const CreateVisualizerComponent = ({
       visualizer={selectedVisualizer.visualizer}
       selectedResultGraphIri={selectedResultGraphIri}
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+      selectedApplication={selectedApplication}
     />
   </div>
 );

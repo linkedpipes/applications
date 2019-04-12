@@ -20,7 +20,7 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 
 public class MarkerExtractor {
 
-    public static List<Marker> extract(QueryExecution queryExec){
+    public static List<Marker> extract(QueryExecution queryExec) {
         ResultSet result = queryExec.execSelect();
 
         Spliterator<QuerySolution> spliterator =

@@ -25,10 +25,11 @@ class DiscoverVisualizerPickerContainer extends PureComponent {
   };
 
   render() {
-    const { visualizerData } = this.props;
+    const { visualizerData, cardIndex } = this.props;
     return (
       <DiscoverVisualizerCardComponent
         visualizerData={visualizerData}
+        cardIndex={cardIndex}
         handleSelectVisualizer={this.onSelectVisualizer}
       />
     );
@@ -52,6 +53,7 @@ const mapDispatchToProps = dispatch => {
 };
 
 DiscoverVisualizerPickerContainer.propTypes = {
+  cardIndex: PropTypes.any,
   visualizerData: PropTypes.any
 };
 

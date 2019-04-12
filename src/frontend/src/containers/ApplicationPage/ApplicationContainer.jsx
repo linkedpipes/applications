@@ -1,3 +1,4 @@
+// @flow
 import React, { PureComponent } from 'react';
 import { VISUALIZER_TYPE } from '@constants';
 import {
@@ -13,7 +14,18 @@ import Typography from '@material-ui/core/Typography';
 
 const queryString = require('query-string');
 
-class ApplicationContainer extends PureComponent {
+type Props = {
+  location: Object
+};
+
+type State = {
+  applicationType: string,
+  applicationData: Object,
+  width: number,
+  height: number
+};
+
+class ApplicationContainer extends PureComponent<Props, State> {
   state = {
     applicationType: 'UNDEFINED',
     applicationData: {},
@@ -50,25 +62,33 @@ class ApplicationContainer extends PureComponent {
     window.removeEventListener('resize', this.updateWindowDimensions);
   }
 
-  getApplication = (applicationType, applicationData, classes) => {
+  getApplication = (applicationType, applicationData) => {
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
       case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
         const markers = applicationData.markers;
         return (
-          <GoogleMapsVisualizer markers={markers} selectedResultGraphIri={''} />
+          <GoogleMapsVisualizer
+            propMarkers={markers}
+            selectedResultGraphIri={''}
+            isPublished
+          />
         );
       }
       case VISUALIZER_TYPE.TREEMAP: {
         const selectedResultGraphIri = applicationData.selectedResultGraphIri;
         return (
-          <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+          <TreemapVisualizer
+            selectedResultGraphIri={selectedResultGraphIri}
+            isPublished
+          />
         );
       }
       case VISUALIZER_TYPE.CHORD: {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
+            isPublished
           />
         );
       }
@@ -81,14 +101,13 @@ class ApplicationContainer extends PureComponent {
     }
   };
 
-  updateWindowDimensions() {
+  updateWindowDimensions = () => {
     this.setState({ width: window.innerWidth, height: window.innerHeight });
-  }
+  };
 
   render() {
     const { getApplication } = this;
     const { applicationType, applicationData, width, height } = this.state;
-    const { classes } = this.props;
 
     return (
       <div>
@@ -100,7 +119,7 @@ class ApplicationContainer extends PureComponent {
             textAlign: 'center'
           }}
         >
-          {getApplication(applicationType, applicationData, classes)}
+          {getApplication(applicationType, applicationData)}
         </div>
       </div>
     );

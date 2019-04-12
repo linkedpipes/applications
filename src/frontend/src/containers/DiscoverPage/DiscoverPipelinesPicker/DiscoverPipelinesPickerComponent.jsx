@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -40,6 +40,18 @@ const styles = theme => ({
   }
 });
 
+type Props = {
+  classes: Object,
+  order: any,
+  orderBy: any,
+  dataSourceGroups: Object,
+  rowsPerPage: any,
+  page: any,
+  loadingButtons: Object,
+  emptyRows: Object,
+  onSelectPipeline: Function
+};
+
 const DiscoverPipelinesPickerComponent = ({
   classes,
   order,
@@ -50,7 +62,7 @@ const DiscoverPipelinesPickerComponent = ({
   loadingButtons,
   emptyRows,
   onSelectPipeline
-}) => (
+}: Props) => (
   <Paper className={classes.root}>
     <div className={classes.tableWrapper}>
       <Table className={classes.table} aria-labelledby="tableTitle">
@@ -59,12 +71,12 @@ const DiscoverPipelinesPickerComponent = ({
           {dataSourceGroups
             .sort(getSorting(order, orderBy))
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map(datasourceAndPipelines => {
+            .map((datasourceAndPipelines, index) => {
               return (
                 <TableRow hover tabIndex={-1} key={uuid()}>
                   <TableCell component="th" scope="row" padding="checkbox">
                     <Button
-                      id={`button_${datasourceAndPipelines.dataSources[0].uri}`}
+                      id={`button-${index}-pipeline`}
                       size="small"
                       disabled={Object.keys(loadingButtons).length > 0}
                       variant="contained"
@@ -95,18 +107,5 @@ const DiscoverPipelinesPickerComponent = ({
     </div>
   </Paper>
 );
-
-DiscoverPipelinesPickerComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  dataSourceGroups: PropTypes.any,
-  discoveryId: PropTypes.any,
-  emptyRows: PropTypes.any,
-  exportAndStartPolling: PropTypes.any,
-  loadingButtons: PropTypes.any,
-  order: PropTypes.any,
-  orderBy: PropTypes.any,
-  page: PropTypes.any,
-  rowsPerPage: PropTypes.any
-};
 
 export default withStyles(styles)(DiscoverPipelinesPickerComponent);

@@ -31,6 +31,7 @@ const VisualizerControllerToolboxComponent = ({
 }: Props) => (
   <div>
     <Button
+      id="create-app-publish-button"
       variant="contained"
       color="default"
       className={classes.button}

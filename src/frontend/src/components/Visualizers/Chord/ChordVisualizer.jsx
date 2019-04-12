@@ -12,7 +12,8 @@ type Props = {
     progress: number
   },
   selectedResultGraphIri: string,
-  handleSetCurrentApplicationData: Function
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
 };
 
 type State = {
@@ -49,7 +50,17 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData } = this.props;
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'chord',
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'CHORD'
+      });
+    }
+
     const nodesRequest = await VisualizersService.getChordNodes(
       this.props.selectedResultGraphIri
     );
@@ -72,13 +83,6 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       matrix: matrixData,
       groupColors: colors,
       groupLabels: labels
-    });
-
-    handleSetCurrentApplicationData({
-      id: uuid.v4(),
-      applicationEndpoint: 'chord',
-      selectedResultGraphIri: this.props.selectedResultGraphIri,
-      visualizerCode: 'CHORD'
     });
   }
 
