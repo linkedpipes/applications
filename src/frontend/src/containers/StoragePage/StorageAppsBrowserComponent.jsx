@@ -93,6 +93,7 @@ function StorageAppsBrowserComponent(props: Props) {
             >
               {Object.keys(tileData).map(keyName => (
                 <StorageAppsBrowserCardComponent
+                  key={keyName}
                   singleTileData={tileData[keyName]}
                   onHandleApplicationDeleted={onHandleApplicationDeleted}
                 />

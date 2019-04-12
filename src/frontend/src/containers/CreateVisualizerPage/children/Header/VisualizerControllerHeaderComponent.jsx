@@ -92,6 +92,7 @@ const VisualizerControllerHeaderComponent = ({
               value={selectedApplicationTitle}
               className={classes.textField}
               variant="outlined"
+              id="application-title-field"
               placeholder="Enter your application title..."
               onChange={handleAppTitleChanged}
               margin="normal"
@@ -110,6 +111,7 @@ const VisualizerControllerHeaderComponent = ({
         <Grid container spacing={16} justify="center">
           <Grid item>
             <Button
+              id="create-app-publish-button"
               variant="contained"
               color="primary"
               onClick={handlePublishClicked}
@@ -167,6 +169,7 @@ const VisualizerControllerHeaderComponent = ({
         <Button
           onClick={handleProceedToApplicationClicked}
           color="primary"
+          id="browse-published-button"
           autoFocus
         >
           Browse Published Apps

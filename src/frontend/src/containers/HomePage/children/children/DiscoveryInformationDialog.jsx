@@ -51,13 +51,13 @@ class DiscoveryInformationDialog extends PureComponent<Props> {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <Typography align="left">{`SPARQL IRI: ${
+            <Typography component={'span'} align="left">{`SPARQL IRI: ${
               selectedValue.sparqlEndpointIri
             }`}</Typography>
-            <Typography align="left">{`Data sample IRI: ${
+            <Typography component={'span'} align="left">{`Data sample IRI: ${
               selectedValue.dataSampleIri
             }`}</Typography>
-            <Typography align="left">{`Named Graph IRI: ${
+            <Typography component={'span'} align="left">{`Named Graph IRI: ${
               selectedValue.namedGraph
             }`}</Typography>
           </DialogContentText>

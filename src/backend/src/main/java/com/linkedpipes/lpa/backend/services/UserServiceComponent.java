@@ -125,13 +125,13 @@ public class UserServiceComponent implements UserService {
         if (user.getDiscoveries() != null) {
             for (DiscoveryDao d : user.getDiscoveries()) {
                 DiscoverySession session = new DiscoverySession();
-                session.id = d.getDiscoveryId();
-                session.finished = !d.getExecuting();
-                session.start = d.getStarted().getTime() / 1000L;
+                session.discoveryId = d.getDiscoveryId();
+                session.isFinished = !d.getExecuting();
+                session.started = d.getStarted().getTime() / 1000L;
                 if (d.getFinished() != null) {
-                    session.stop = d.getFinished().getTime() / 1000L;
+                    session.finished = d.getFinished().getTime() / 1000L;
                 } else {
-                    session.stop = -1;
+                    session.finished = -1;
                 }
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
@@ -148,11 +148,11 @@ public class UserServiceComponent implements UserService {
                 exec.executionIri = e.getExecutionIri();
                 exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
-                exec.start = e.getStarted().getTime() / 1000L;
+                exec.started = e.getStarted().getTime() / 1000L;
                 if (e.getFinished() != null) {
-                    exec.stop = e.getFinished().getTime() / 1000L;
+                    exec.finished = e.getFinished().getTime() / 1000L;
                 } else {
-                    exec.stop = -1;
+                    exec.finished = -1;
                 }
                 profile.pipelineExecutions.add(exec);
             }

@@ -61,9 +61,12 @@ const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
             </Card>
           </Grid>
         ) : (
-          visualizers.map(value => (
+          visualizers.map((value, index) => (
             <Grid key={uuid()} item sm={6} md={4} lg={3}>
-              <DiscoverVisualizerCard visualizerData={value} />
+              <DiscoverVisualizerCard
+                cardIndex={index}
+                visualizerData={value}
+              />
             </Grid>
           ))
         )}
