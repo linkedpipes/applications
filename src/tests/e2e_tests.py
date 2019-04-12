@@ -19,7 +19,8 @@ from slackclient import SlackClient
 desired_cap = {
     'browserName': 'Chrome',
     "browser_version": "73",
-    "browserstack.debug": True
+    "browserstack.debug": True,
+    "browserstack.networkLogs": True
 }
 
 slack_token = os.environ["SLACK_API_TOKEN"]
