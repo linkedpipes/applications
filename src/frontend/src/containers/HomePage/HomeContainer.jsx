@@ -62,7 +62,6 @@ class HomeContainer extends PureComponent<Props, State> {
           discoveryRecord.discoveryId = parsedData.discoveryId;
           discoveryRecord.isFinished = parsedData.status.isFinished;
           discoveryRecord.finished = parsedData.finished;
-          discoveryRecord.started = parsedData.started;
           discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
           discoveryRecord.namedGraph = parsedData.namedGraph;
           discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
@@ -86,7 +85,6 @@ class HomeContainer extends PureComponent<Props, State> {
       if (userProfile.pipelineExecutions.length > 0) {
         const pipelineRecord = {};
         pipelineRecord.status = newStatus;
-        pipelineRecord.started = parsedData.started;
         pipelineRecord.finished = parsedData.finished;
         pipelineRecord.executionIri = executionIri;
 

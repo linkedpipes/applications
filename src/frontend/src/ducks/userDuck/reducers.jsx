@@ -24,8 +24,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
         discoverySessions: {
           $apply: discoverySessions =>
             discoverySessions.map(item => {
-              if (item.discoveryId === action.session.discoveryId)
-                return action.session;
+              if (item.discoveryId === action.session.discoveryId) {
+                const newItem = item;
+                Object.keys(action.session).forEach(key => {
+                  if (
+                    action.session[key] !== -1 &&
+                    action.session[key] !== undefined
+                  ) {
+                    newItem[key] = action.session[key];
+                  }
+                });
+                return newItem;
+              }
               return item;
             })
         }
@@ -42,8 +52,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
         pipelineExecutions: {
           $apply: pipelineExecutions =>
             pipelineExecutions.map(item => {
-              if (item.executionIri === action.session.executionIri)
-                return action.session;
+              if (item.executionIri === action.session.executionIri) {
+                const newItem = item;
+                Object.keys(action.session).forEach(key => {
+                  if (
+                    action.session[key] !== -1 &&
+                    action.session[key] !== undefined
+                  ) {
+                    newItem[key] = action.session[key];
+                  }
+                });
+                return newItem;
+              }
               return item;
             })
         }

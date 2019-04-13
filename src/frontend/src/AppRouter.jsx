@@ -95,18 +95,8 @@ class AppRouter extends React.PureComponent<Props> {
         return;
       }
       const parsedData = JSON.parse(data);
-      const discoveryRecord = {};
-
-      discoveryRecord.discoveryId = parsedData.discoveryId;
-      discoveryRecord.isFinished = parsedData.status.isFinished;
-      discoveryRecord.started = parsedData.started;
-      discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
-      discoveryRecord.namedGraph = parsedData.namedGraph;
-      discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
-      discoveryRecord.finished = -1;
-
-      socket.emit('join', discoveryRecord.discoveryId);
-      handleAddDiscoverySession(discoveryRecord);
+      socket.emit('join', parsedData.discoveryId);
+      handleAddDiscoverySession(parsedData);
     });
 
     socket.on('executionAdded', data => {
@@ -116,10 +106,10 @@ class AppRouter extends React.PureComponent<Props> {
 
       const parsedData = JSON.parse(data);
       const executionIri = parsedData.executionIri;
-      const newStatus = parsedData.status.status;
+      // const newStatus = parsedData.status.status;
 
       const pipelineRecord = {};
-      pipelineRecord.status = newStatus;
+      // pipelineRecord.status = newStatus;
       pipelineRecord.started = parsedData.started;
       pipelineRecord.finished = parsedData.finished;
       pipelineRecord.executionIri = executionIri;
