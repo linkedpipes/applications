@@ -9,7 +9,6 @@ import { etlActions } from '@ducks/etlDuck';
 import { globalActions } from '@ducks/globalDuck';
 import {
   Log,
-  AuthenticationService,
   SocketContext,
   ETLService,
   ETL_STATUS_TYPE,
@@ -19,22 +18,14 @@ import axios from 'axios';
 
 type Props = {
   history: { push: any },
-  webId: string,
   onInputExampleClicked: (sample: {}) => void,
-  handleSetUserProfile: Function,
-  discoveriesList: Array<{ id: string, finished: boolean }>,
-  applicationsList: Array<{}>,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   socket: Object,
-  pipelinesList: Array<{
-    executionIri: string,
-    selectedVisualiser: string,
-    status: { '@id'?: string, status?: string, statusIri: string },
-    webId: string
-  }>,
   handleSetResultPipelineIri: Function,
-  handleSetSelectedVisualizer: Function
+  handleSetSelectedVisualizer: Function,
+  handleUpdateDiscoverySession: Function,
+  handleUpdateExecutionSession: Function
 };
 type State = {
   tabIndex: number
@@ -46,29 +37,16 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   componentDidMount() {
-    const { webId, handleSetUserProfile, socket } = this.props;
+    const {
+      socket,
+      handleUpdateDiscoverySession,
+      handleUpdateExecutionSession
+    } = this.props;
     const { setupDiscoveryListeners, setupEtlExecutionsListeners } = this;
     const self = this;
-    AuthenticationService.getUserProfile(webId)
-      .then(res => {
-        Log.info(
-          'Response from get user profile call:',
-          'AuthenticationService'
-        );
-        Log.info(res, 'AuthenticationService');
-        Log.info(res.data, 'AuthenticationService');
 
-        return res.data;
-      })
-      .then(jsonResponse => {
-        handleSetUserProfile(jsonResponse).then(() => {
-          setupDiscoveryListeners();
-          setupEtlExecutionsListeners();
-        });
-      })
-      .catch(error => {
-        Log.error(error, 'HomeContainer');
-      });
+    setupDiscoveryListeners();
+    setupEtlExecutionsListeners();
 
     socket.on('discoveryStatus', data => {
       if (data === undefined) {
@@ -79,21 +57,17 @@ class HomeContainer extends PureComponent<Props, State> {
         socket.emit('leave', parsedData.discoveryId);
         const userProfile = self.props.userProfile;
         if (userProfile.discoverySessions.length > 0) {
-          const updatedDiscovery = userProfile.discoverySessions.map(
-            discoveryRecord => {
-              if (discoveryRecord.discoveryId === parsedData.discoveryId) {
-                discoveryRecord.isFinished = parsedData.status.isFinished;
-                discoveryRecord.finished = parsedData.finished;
-                discoveryRecord.sparqlEndpointIri =
-                  parsedData.sparqlEndpointIri;
-                discoveryRecord.namedGraph = parsedData.namedGraph;
-                discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
-              }
-              return discoveryRecord;
-            }
-          );
-          userProfile.discoverySessions = updatedDiscovery;
-          handleSetUserProfile(userProfile);
+          const discoveryRecord = {};
+
+          discoveryRecord.discoveryId = parsedData.discoveryId;
+          discoveryRecord.isFinished = parsedData.status.isFinished;
+          discoveryRecord.finished = parsedData.finished;
+          discoveryRecord.started = parsedData.started;
+          discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
+          discoveryRecord.namedGraph = parsedData.namedGraph;
+          discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
+
+          handleUpdateDiscoverySession(discoveryRecord);
         }
       }
     });
@@ -110,17 +84,13 @@ class HomeContainer extends PureComponent<Props, State> {
       socket.emit('leave', executionIri);
       const userProfile = self.props.userProfile;
       if (userProfile.pipelineExecutions.length > 0) {
-        const updatedPipelineExecutions = userProfile.pipelineExecutions.map(
-          pipelineRecord => {
-            if (pipelineRecord.executionIri === executionIri) {
-              pipelineRecord.status = newStatus;
-              pipelineRecord.finished = parsedData.finished;
-            }
-            return pipelineRecord;
-          }
-        );
-        userProfile.pipelineExecutions = updatedPipelineExecutions;
-        handleSetUserProfile(userProfile);
+        const pipelineRecord = {};
+        pipelineRecord.status = newStatus;
+        pipelineRecord.started = parsedData.started;
+        pipelineRecord.finished = parsedData.finished;
+        pipelineRecord.executionIri = executionIri;
+
+        handleUpdateExecutionSession(pipelineRecord);
       }
     });
   }
@@ -132,9 +102,9 @@ class HomeContainer extends PureComponent<Props, State> {
   }
 
   setupDiscoveryListeners = () => {
-    const { discoveriesList, socket } = this.props;
+    const { userProfile, socket } = this.props;
     // eslint-disable-next-line array-callback-return
-    discoveriesList.map(discoveryRecord => {
+    userProfile.discoverySessions.map(discoveryRecord => {
       if (!discoveryRecord.finished) {
         socket.emit('join', discoveryRecord.id);
         Log.info(`Sending join to discovery room ${discoveryRecord.id}`);
@@ -144,9 +114,9 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   setupEtlExecutionsListeners = () => {
-    const { pipelinesList, socket } = this.props;
+    const { userProfile, socket } = this.props;
     // eslint-disable-next-line array-callback-return
-    pipelinesList.map(pipelineRecord => {
+    userProfile.pipelineExecutions.map(pipelineRecord => {
       const rawStatus = pipelineRecord.status;
       const status = ETL_STATUS_MAP[rawStatus.statusIri]
         ? ETL_STATUS_MAP[rawStatus.statusIri]
@@ -246,7 +216,7 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick
     } = this;
-    const { discoveriesList, pipelinesList, applicationsList } = this.props;
+    const { userProfile } = this.props;
     const { tabIndex } = this.state;
 
     return (
@@ -258,9 +228,9 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandleSelectPipelineExecutionClick={
             onHandleSelectPipelineExecutionClick
           }
-          applicationsList={applicationsList}
-          pipelinesList={pipelinesList}
-          discoveriesList={discoveriesList}
+          applicationsList={userProfile.applications}
+          pipelinesList={userProfile.pipelineExecutions}
+          discoveriesList={userProfile.discoverySessions}
           tabIndex={tabIndex}
         />
       </div>
@@ -276,16 +246,14 @@ const HomeContainerWithSocket = props => (
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user,
-    discoveriesList: state.user.discoverySessions,
-    pipelinesList: state.user.pipelineExecutions,
-    applicationsList: state.user.applications
+    userProfile: state.user
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const onInputExampleClicked = sample =>
     dispatch(discoverActions.setSelectedInputExample(sample));
+
   const handleSetUserProfile = userProfile =>
     dispatch(userActions.setUserProfileAsync(userProfile));
 
@@ -303,11 +271,19 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleUpdateDiscoverySession = discoverySession =>
+    dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
+
+  const handleUpdateExecutionSession = executionSession =>
+    dispatch(userActions.updateExecutionSession({ session: executionSession }));
+
   return {
     handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
-    handleSetSelectedVisualizer
+    handleSetSelectedVisualizer,
+    handleUpdateDiscoverySession,
+    handleUpdateExecutionSession
   };
 };
 

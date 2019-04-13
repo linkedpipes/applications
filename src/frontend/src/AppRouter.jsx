@@ -26,7 +26,6 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import auth from 'solid-auth-client';
-import { pipeline } from 'stream';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -49,8 +48,9 @@ const styles = () => ({
 type Props = {
   classes: any,
   userId: ?string,
-  userProfile: Object,
-  handleSetUserProfile: Function
+  handleSetUserProfile: Function,
+  handleAddDiscoverySession: Function,
+  handleAddExecutionSession: Function
 };
 
 const errorHandler = userId => {
@@ -68,8 +68,11 @@ const errorHandler = userId => {
 
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
-    const { handleSetUserProfile } = this.props;
-    const self = this;
+    const {
+      handleSetUserProfile,
+      handleAddDiscoverySession,
+      handleAddExecutionSession
+    } = this.props;
 
     socket.on('connect', data => {
       Log.warn('Client connected', 'AppRouter');
@@ -92,19 +95,18 @@ class AppRouter extends React.PureComponent<Props> {
         return;
       }
       const parsedData = JSON.parse(data);
-      const curUserProfile = self.props.userProfile;
       const discoveryRecord = {};
 
+      discoveryRecord.discoveryId = parsedData.discoveryId;
       discoveryRecord.isFinished = parsedData.status.isFinished;
-      discoveryRecord.stared = parsedData.started;
+      discoveryRecord.started = parsedData.started;
       discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
       discoveryRecord.namedGraph = parsedData.namedGraph;
       discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
+      discoveryRecord.finished = -1;
 
-      const updatedDiscoverySessions = curUserProfile.discoverySessions;
-      updatedDiscoverySessions.push(discoveryRecord);
-      curUserProfile.discoverySessions = updatedDiscoverySessions;
-      handleSetUserProfile(curUserProfile);
+      socket.emit('join', discoveryRecord.discoveryId);
+      handleAddDiscoverySession(discoveryRecord);
     });
 
     socket.on('executionAdded', data => {
@@ -116,16 +118,14 @@ class AppRouter extends React.PureComponent<Props> {
       const executionIri = parsedData.executionIri;
       const newStatus = parsedData.status.status;
 
-      const curUserProfile = self.props.userProfile;
-      const updatedPipelineExecutions = curUserProfile.pipelineExecutions;
-
       const pipelineRecord = {};
       pipelineRecord.status = newStatus;
+      pipelineRecord.started = parsedData.started;
       pipelineRecord.finished = parsedData.finished;
       pipelineRecord.executionIri = executionIri;
 
-      curUserProfile.pipelineExecutions = updatedPipelineExecutions;
-      handleSetUserProfile(curUserProfile);
+      socket.emit('join', pipelineRecord.executionIri);
+      handleAddExecutionSession(pipelineRecord);
     });
 
     auth.trackSession(session => {
@@ -187,11 +187,7 @@ class AppRouter extends React.PureComponent<Props> {
                   <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout path="/dashboard" component={HomePage} exact />
-                  {/* <PrivateLayout
-                    path="/create-app"
-                    component={CreateVisualizerPage}
-                    exact
-                  /> */}
+
                   <PrivateLayout
                     path="/discover"
                     component={DiscoverPage}
@@ -222,16 +218,24 @@ class AppRouter extends React.PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId,
-    userProfile: state.user
+    userId: state.user.webId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const handleSetUserProfile = userProfile =>
     dispatch(userActions.setUserProfile(userProfile));
+
+  const handleAddDiscoverySession = discoverySession =>
+    dispatch(userActions.addDiscoverySession({ session: discoverySession }));
+
+  const handleAddExecutionSession = executionSession =>
+    dispatch(userActions.addExecutionSession({ session: executionSession }));
+
   return {
-    handleSetUserProfile
+    handleSetUserProfile,
+    handleAddDiscoverySession,
+    handleAddExecutionSession
   };
 };
 

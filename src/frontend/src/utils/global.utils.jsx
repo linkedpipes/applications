@@ -48,7 +48,7 @@ export function extractUrlGroups(url) {
 }
 
 export function unixTimeConverter(UNIX_timestamp) {
-  if (UNIX_timestamp === -1) {
+  if (UNIX_timestamp === -1 || UNIX_timestamp === undefined) {
     return '-';
   }
   const a = new Date(UNIX_timestamp * 1000);

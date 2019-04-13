@@ -23,7 +23,8 @@ type Props = {
   handleSetDataSampleIriFieldValue: Function,
   resetFieldsAndExamples: Function,
   // eslint-disable-next-line react/no-unused-prop-types
-  webId: string
+  webId: string,
+  discoveryId: string
 };
 
 type State = {
@@ -33,15 +34,22 @@ type State = {
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
+  isMounted = false;
+
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
     discoveryLoadingLabel: ''
   };
 
+  componentDidMount() {
+    this.isMounted = true;
+  }
+
   componentWillUnmount = () => {
     const { socket } = this.props;
     socket.removeListener('discoveryStatus');
+    this.isMounted = false;
   };
 
   postStartFromFile = async instance => {
@@ -119,7 +127,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
-    socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
       if (data === undefined) {
         socket.emit('leave', discoveryId);
@@ -134,6 +141,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             autoClose: 2000
           }
         );
+      } else if (!self.isMounted) {
+        socket.emit('leave', discoveryId);
+        socket.removeListener('discoveryStatus');
       } else {
         const parsedData = JSON.parse(data);
         if (parsedData.discoveryId !== discoveryId) {

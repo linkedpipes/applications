@@ -121,7 +121,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     const { socket, onSetEtlExecutionStatus } = this.props;
     const self = this;
 
-    socket.emit('join', executionIri);
     socket.on('executionStatus', data => {
       if (data === undefined) {
         socket.emit('leave', executionIri);
@@ -190,6 +189,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
   etlExecutionStatus: PropTypes.any,
+  executions: PropTypes.any,
   onAddSelectedResultGraphIriAction: PropTypes.any,
   onAddSingleExecution: PropTypes.any,
   onAddSingleExport: PropTypes.any,
@@ -205,7 +205,8 @@ const mapStateToProps = state => {
     pipelineId: state.etl.pipelineId,
     discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
-    etlExecutionStatus: state.discover.etlExecutionStatus
+    etlExecutionStatus: state.discover.etlExecutionStatus,
+    executions: state.etl.executions
   };
 };
 
