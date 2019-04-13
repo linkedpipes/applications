@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
+import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
@@ -86,20 +87,20 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
-        DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-            DiscoveryStatusReport report = new DiscoveryStatusReport();
-            report.discoveryId = discoveryId;
-            report.status = discoveryStatus;
-            report.error = false;
-            report.timeout = false;
+            DiscoverySession session = new DiscoverySession();
+            session.discoveryId = d.getDiscoveryId();
+            session.isFinished = !d.getExecuting();
+            session.started = d.getStarted().getTime() / 1000L;
             if (d.getFinished() != null) {
-                report.finished = d.getFinished().getTime() / 1000L;
+                session.finished = d.getFinished().getTime() / 1000L;
+            } else {
+                session.finished = -1;
             }
-            report.sparqlEndpointIri = d.getSparqlEndpointIri();
-            report.dataSampleIri = d.getDataSampleIri();
-            report.namedGraph = d.getNamedGraph();
-            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(report));
+            session.sparqlEndpointIri = d.getSparqlEndpointIri();
+            session.dataSampleIri = d.getDataSampleIri();
+            session.namedGraph = d.getNamedGraph();
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
         }
     }
 
@@ -113,24 +114,19 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
-        ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-            EtlStatusReport report = new EtlStatusReport();
-            report.status = executionStatus;
-            report.error = false;
-            report.timeout = false;
-            report.executionIri = executionIri;
-            if (executionStatus.getStarted() == -1) {
-                report.started = new Date().getTime() / 1000L;
+            PipelineExecution exec = new PipelineExecution();
+            exec.status = e.getStatus();
+            exec.executionIri = e.getExecutionIri();
+            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
+            exec.selectedVisualiser = e.getSelectedVisualiser();
+            exec.started = e.getStarted().getTime() / 1000L;
+            if (e.getFinished() != null) {
+                exec.finished = e.getFinished().getTime() / 1000L;
             } else {
-                report.started = executionStatus.getStarted();
+                exec.finished = -1;
             }
-            report.finished = executionStatus.getFinished();
-            report.pipeline = new PipelineExportResult();
-            report.pipeline.pipelineId = e.getPipeline().getPipelineId();
-            report.pipeline.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-            report.pipeline.resultGraphIri = e.getPipeline().getResultGraphIri();
-            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(report));
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(exec));
         }
     }
 
