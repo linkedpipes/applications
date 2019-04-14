@@ -19,6 +19,7 @@ desired_cap = {
     'browserName': 'Chrome',
     "browser_version": "73",
     "browserstack.debug": True
+    "acceptSslCerts": True
 }
 
 slack_token = os.environ["SLACK_API_TOKEN"]
@@ -109,7 +110,55 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
         driver.find_element_by_id(
-            "application-title-field").send_keys("Test selenium app")
+            "application-title-field").send_keys("Test selenium gmaps app")
+        driver.find_element_by_id("create-app-publish-button").click()
+
+        self.custom_wait_clickable_and_click("browse-published-button")
+
+        driver.find_element_by_xpath(
+            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[2]").click()
+        driver.find_element_by_xpath(
+            "(.//*[normalize-space(text()) and normalize-space(.)='Dashboard'])[1]/following::div[1]").click()
+        driver.find_element_by_xpath(
+            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[1]").click()
+        driver.find_element_by_xpath(
+            "(.//*[normalize-space(text()) and normalize-space(.)='Share'])[1]/following::li[1]").click()
+
+    def test_chord_flow(self):
+        driver = self.driver
+
+        driver.get("https://applications.linkedpipes.com/login")
+        driver.find_element_by_id("with-web-id-checkbox").click()
+        driver.find_element_by_id("webId").click()
+        driver.find_element_by_id("webId").clear()
+        driver.find_element_by_id("webId").send_keys(
+            "https://seleniumlpa.inrupt.net/profile/card#me")
+        driver.find_element_by_id(
+            "sign-in-button").click()
+        driver.find_element_by_id("username").click()
+        driver.find_element_by_id("username").clear()
+        driver.find_element_by_id("username").send_keys("seleniumlpa")
+        driver.find_element_by_id("password").click()
+        driver.find_element_by_id("password").clear()
+        driver.find_element_by_id("password").send_keys("Selenium123!")
+        driver.find_element_by_id("login").click()
+
+        self.custom_wait_clickable_and_click(
+            element_id="chord-sample-home-button")
+
+        self.custom_wait_clickable_and_click(
+            element_id="start-discovery-button")
+
+        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
+
+        self.custom_wait_clickable_and_click(element_id="button-0-pipeline")
+
+        self.custom_wait_clickable_and_click(element_id="create-app-button")
+
+        self.custom_wait_clickable_and_click("application-title-field")
+        driver.find_element_by_id("application-title-field").clear()
+        driver.find_element_by_id(
+            "application-title-field").send_keys("Test selenium chord app")
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
