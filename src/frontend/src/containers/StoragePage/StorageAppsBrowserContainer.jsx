@@ -4,6 +4,7 @@ import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 import axios from 'axios';
 // eslint-disable-next-line import/order
 import { Log, getLocation, StorageToolbox, withWebId } from '@utils';
+import { connect } from 'react-redux';
 
 type Props = {
   webId: string
@@ -87,4 +88,10 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 }
 
-export default withWebId(StorageAppsBrowserContainer);
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
+export default connect(mapStateToProps)(StorageAppsBrowserContainer);

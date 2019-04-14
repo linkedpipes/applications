@@ -4,8 +4,7 @@ import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { logout } from 'solid-auth-client';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { SocketContext } from '@utils';
-import { withWebId } from '@inrupt/solid-react-components';
+import { SocketContext, withWebId } from '@utils';
 
 type Props = {
   history: Object,

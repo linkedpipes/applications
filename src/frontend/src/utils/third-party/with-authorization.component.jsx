@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from 'react';
-import withWebId from './withWebId';
+import { withWebId } from './withWebId';
 import { Redirect } from 'react-router-dom';
 
 export const withAuthorization = (Component, Loader) =>

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import lpaAxios from './api.service';
 
 export const ETL_STATUS_MAP = {
   'http://etl.linkedpipes.com/resources/status/queued': 'Queued',
@@ -26,7 +26,7 @@ export const ETL_STATUS_TYPE = {
 
 export const ETLService = {
   async getExecutePipeline({ etlPipelineIri, webId, selectedVisualiser }) {
-    return axios.post('/pipeline/execute', null, {
+    return lpaAxios.post('/pipeline/execute', null, {
       params: {
         etlPipelineIri,
         webId,
@@ -36,7 +36,7 @@ export const ETLService = {
   },
 
   async getExportPipeline({ discoveryId, pipelineId }) {
-    return axios.get('/pipeline/exportWithSD', {
+    return lpaAxios.get('/pipeline/exportWithSD', {
       params: {
         discoveryId,
         pipelineUri: pipelineId
@@ -45,7 +45,7 @@ export const ETLService = {
   },
 
   async getExecutionStatus({ executionIri }) {
-    return axios.get('/pipeline/status', {
+    return lpaAxios.get('/pipeline/status', {
       params: {
         executionIri
       }
@@ -53,7 +53,7 @@ export const ETLService = {
   },
 
   async getPipeline({ pipelineIri }) {
-    return axios.get('/pipeline', {
+    return lpaAxios.get('/pipeline', {
       params: {
         pipelineIri
       }

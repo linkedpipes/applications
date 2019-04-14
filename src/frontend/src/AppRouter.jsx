@@ -149,13 +149,10 @@ class AppRouter extends React.PureComponent<Props> {
 
           handleUpdateDiscoverySession(discoveryRecord);
 
-          toast.info(
-            `Discovery session at has finished!\nCheck your dashboard.`,
-            {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 4000
-            }
-          );
+          toast.info(`Discovery session has finished!\nCheck your dashboard.`, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 4000
+          });
         }
       }
     });

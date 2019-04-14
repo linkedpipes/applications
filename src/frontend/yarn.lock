@@ -4750,6 +4750,13 @@ ignore@^4.0.6:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
   integrity sha512-cyFDKrqc/YdcWFniJhzI42+AzS+gNwmUzOSFcRCQYwySuBBBy/KjuxWLZ/FHEH6Moq1NizMOBWyTcv8O4OZIMg==
 
+immutability-helper@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/immutability-helper/-/immutability-helper-3.0.0.tgz#a74e989c60e2ddab85a6abeed8078981b2d13271"
+  integrity sha512-Ww7oOSnBIRb9ihT9UH9eHz0uhie0rw9bpqGYCb7qD5VpsdOLv+fx/KCRgHqvX/13LgSM5sDfsLpeSIM6kodUxQ==
+  dependencies:
+    invariant "^2.2.4"
+
 import-fresh@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-2.0.0.tgz#d81355c15612d386c61f9ddd3922d4304822a546"
@@ -8140,7 +8147,7 @@ solid-auth-cli@^0.1.8:
     jsonld "^1.4.0"
     n3 "^1.0.3"
 
-solid-auth-client@2.3.0, solid-auth-client@^2.2.14, solid-auth-client@^2.2.3:
+solid-auth-client@^2.2.14, solid-auth-client@^2.2.3:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.0.tgz#4bac06984b61981ad9d06f285b8ead6200f21aaa"
   integrity sha512-+9RfqC64oWpH4afoWYhCtieuAziFyWiiW/isB9XEV6N+yb2jZ69UCJxpX7iBCpxK0j36bDeisdbp0zHRp/F46A==
@@ -8151,7 +8158,7 @@ solid-auth-client@2.3.0, solid-auth-client@^2.2.14, solid-auth-client@^2.2.3:
     commander "^2.11.0"
     isomorphic-fetch "^2.2.1"
 
-solid-file-client@^0.4.9:
+solid-file-client@0.4.9:
   version "0.4.9"
   resolved "https://registry.yarnpkg.com/solid-file-client/-/solid-file-client-0.4.9.tgz#4f0db777528c483bddac8be5f39323b3eeca1adf"
   integrity sha512-/4KmS52APjvIVea+nWD3spUYiPmq5gE/ze8fP2XufwrTXST3Oh+rRj2zjfQyhFcVXwhrV++MrUcTY/YId/kqwg==

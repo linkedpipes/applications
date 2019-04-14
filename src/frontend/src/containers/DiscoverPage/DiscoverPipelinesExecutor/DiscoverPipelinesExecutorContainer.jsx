@@ -29,25 +29,23 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     const {
       discoveryId,
       pipelineId,
-      webId,
       selectedVisualizer,
       onSetEtlExecutionStatus
     } = this.props;
 
     onSetEtlExecutionStatus('Queued');
 
-    const visualizerCode =
-      selectedVisualizer !== undefined
-        ? selectedVisualizer.visualizer.visualizerCode
-        : '';
     const self = this;
     self
       .exportPipeline(discoveryId, pipelineId)
       .then(json => {
+        const visualizerCode =
+          selectedVisualizer !== undefined
+            ? selectedVisualizer.visualizer.visualizerCode
+            : '';
         self.executePipeline(
           json.pipelineId,
           json.etlPipelineIri,
-          webId,
           visualizerCode
         );
       })
@@ -93,8 +91,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       });
   };
 
-  executePipeline = (pipelineId, etlPipelineIri, webId, visualizerCode) => {
-    const { onAddSingleExecution } = this.props;
+  executePipeline = (pipelineId, etlPipelineIri, visualizerCode) => {
+    const { onAddSingleExecution, webId } = this.props;
     const self = this;
 
     return ETLService.getExecutePipeline({

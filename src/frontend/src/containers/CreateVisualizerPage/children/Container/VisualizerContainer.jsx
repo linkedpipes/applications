@@ -45,9 +45,10 @@ const getVisualizer = (
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-      const markers = selectedApplication.markers
-        ? selectedApplication.markers
-        : [];
+      const markers =
+        selectedApplication && selectedApplication.markers
+          ? selectedApplication.markers
+          : [];
       return (
         <GoogleMapsVisualizer
           propMarkers={markers}
