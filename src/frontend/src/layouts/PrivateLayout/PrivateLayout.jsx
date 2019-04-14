@@ -12,7 +12,6 @@ import {
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';
-import lifecycle from 'react-pure-lifecycle';
 
 const styles = theme => ({
   root: {
@@ -37,31 +36,6 @@ const styles = theme => ({
     width: '100%'
   }
 });
-
-const componentDidMount = props => {
-  const { webId, handleSetUserProfile } = props;
-  AuthenticationService.getUserProfile(webId)
-    .then(res => {
-      Log.info('Response from get user profile call:', 'AuthenticationService');
-      Log.info(res, 'AuthenticationService');
-      Log.info(res.data, 'AuthenticationService');
-
-      return res.data;
-    })
-    .then(jsonResponse => {
-      handleSetUserProfile(jsonResponse);
-    })
-    .catch(error => {
-      Log.error(error, 'HomeContainer');
-    });
-
-  StorageToolbox.createOrUpdateFolder(webId, 'public/lpapps');
-};
-
-const methods = {
-  componentDidMount
-};
-
 type Props = {
   classes: any,
   component: any,
@@ -110,5 +84,5 @@ export default withAuthorization(
   connect(
     null,
     mapDispatchToProps
-  )(lifecycle(methods)(withStyles(styles)(PrivateLayout)))
+  )(withStyles(styles)(PrivateLayout))
 );

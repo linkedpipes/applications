@@ -32,15 +32,20 @@ type State = {
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
+  isMounted = false;
+
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
     discoveryLoadingLabel: ''
   };
 
+  componentDidMount() {
+    this.isMounted = true;
+  }
+
   componentWillUnmount = () => {
-    const { socket } = this.props;
-    socket.removeListener('discoveryStatus');
+    this.isMounted = false;
   };
 
   postStartFromFile = async instance => {
@@ -118,11 +123,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
-    socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
+      if (!this.isMounted) {
+        return;
+      }
+
       if (data === undefined) {
-        socket.emit('leave', discoveryId);
-        socket.removeListener('discoveryStatus');
         self.setState({
           discoveryIsLoading: false
         });
@@ -139,8 +145,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           return;
         }
         if (parsedData.status.isFinished) {
-          socket.emit('leave', discoveryId);
-          socket.removeListener('discoveryStatus');
           self.loadPipelineGroups(discoveryId).then(() => {
             self.setState({
               discoveryIsLoading: false

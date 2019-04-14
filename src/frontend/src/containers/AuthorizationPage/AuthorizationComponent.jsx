@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
@@ -12,6 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import SolidProviderComponent from './children';
+import Switch from '@material-ui/core/Switch';
 
 const styles = theme => ({
   main: {
@@ -96,11 +96,10 @@ const AuthorizationComponent = ({
         )}
         <FormControlLabel
           control={
-            <Checkbox
-              name="withWebIdStatus"
-              id="with-web-id-checkbox"
+            <Switch
               checked={withWebIdStatus}
               onChange={onSetWithWebId}
+              value="checkedA"
               color="primary"
             />
           }
