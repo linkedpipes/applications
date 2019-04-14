@@ -1,12 +1,12 @@
 package com.linkedpipes.lpa.backend.services;
 
+import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
 import com.linkedpipes.lpa.backend.entities.database.PipelineInformationRepository;
 import com.linkedpipes.lpa.backend.entities.database.PipelineInformationDao;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
-import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
 import com.linkedpipes.lpa.backend.controllers.PipelineController;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 
@@ -45,7 +45,7 @@ public class PipelineExportServiceComponent implements PipelineExportService {
         ServiceDescription serviceDescription = new ServiceDescription(getOurServiceDescriptionUri(graphId));
         PipelineExportResult response = discoveryService.exportPipelineUsingSD(discoveryId, pipelineUri, serviceDescription);
         logger.debug("resultGraphIri = " + response.resultGraphIri);
-        response.resultGraphIri = PipelineController.GRAPH_NAME_PREFIX + graphId;
+        response.resultGraphIri = VirtuosoController.GRAPH_NAME_PREFIX + graphId;
 
         for (PipelineInformationDao dao : repository.findByEtlPipelineIri(response.etlPipelineIri)) {
             repository.delete(dao);
@@ -63,8 +63,8 @@ public class PipelineExportServiceComponent implements PipelineExportService {
     @NotNull
     private String getOurServiceDescriptionUri(@NotNull String graphId) {
         Method serviceDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
-                PipelineController.class.getDeclaredMethod("serviceDescription", String.class));
-        return methodIntrospector.getHandlerMethodUri(PipelineController.class, serviceDescriptionMethod)
+                VirtuosoController.class.getDeclaredMethod("serviceDescription", String.class));
+        return methodIntrospector.getHandlerMethodUri(VirtuosoController.class, serviceDescriptionMethod)
                 .requestParam("graphId", graphId)
                 .build()
                 .toString();
