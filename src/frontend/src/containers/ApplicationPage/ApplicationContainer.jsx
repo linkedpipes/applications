@@ -94,7 +94,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
         id="viz-div"
         style={{
           flex: 1,
-          height: '95vh'
+          height: '100vh',
+          textAlign: 'center'
         }}
       >
         {getApplication(applicationType, applicationData)}

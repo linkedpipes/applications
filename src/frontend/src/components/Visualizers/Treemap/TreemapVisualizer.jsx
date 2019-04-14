@@ -133,8 +133,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     const { classes } = this.props;
     return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
-        width="100%"
-        height="100%"
+        height="99%"
         chartType="TreeMap"
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}
