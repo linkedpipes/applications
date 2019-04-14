@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import HomeComponent from './HomeComponent';
 import { connect } from 'react-redux';
 import { userActions } from '@ducks/userDuck';
-import { withWebId, withAuthorization } from '@inrupt/solid-react-components';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { globalActions } from '@ducks/globalDuck';
@@ -12,7 +11,9 @@ import {
   SocketContext,
   ETLService,
   ETL_STATUS_TYPE,
-  ETL_STATUS_MAP
+  ETL_STATUS_MAP,
+  withWebId,
+  withAuthorization
 } from '@utils';
 import axios from 'axios';
 
@@ -220,8 +221,10 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default withAuthorization(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withWebId(HomeContainerWithSocket))
+  withWebId(
+    connect(
+      mapStateToProps,
+      mapDispatchToProps
+    )(HomeContainerWithSocket)
+  )
 );

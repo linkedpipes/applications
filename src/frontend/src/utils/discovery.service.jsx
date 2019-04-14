@@ -1,8 +1,8 @@
-import axios from './api.service';
+import lpaAxios from './api.service';
 
 const DiscoveryService = {
   async postDiscoverFromTtl({ ttlFile, webId }) {
-    return axios.post('/pipelines/discoverFromInput', ttlFile, {
+    return lpaAxios.post('/pipelines/discoverFromInput', ttlFile, {
       params: { webId }
     });
   },
@@ -14,24 +14,24 @@ const DiscoveryService = {
     namedGraph,
     webId
   }) {
-    return axios.post('/pipelines/discoverFromEndpoint', null, {
+    return lpaAxios.post('/pipelines/discoverFromEndpoint', null, {
       params: { sparqlEndpointIri, dataSampleIri, namedGraph, webId }
     });
   },
 
   // WebId should be sent in body itself
   async postDiscoverFromUriList({ datasourceUris, webId }) {
-    return axios.post('/pipelines/discover/', datasourceUris, {
+    return lpaAxios.post('/pipelines/discover/', datasourceUris, {
       params: { webId }
     });
   },
 
   async getDiscoveryStatus({ discoveryId }) {
-    return axios.get(`/discovery/${discoveryId}/status`);
+    return lpaAxios.get(`/discovery/${discoveryId}/status`);
   },
 
   async getPipelineGroups({ discoveryId }) {
-    return axios.get(`/discovery/${discoveryId}/pipelineGroups`);
+    return lpaAxios.get(`/discovery/${discoveryId}/pipelineGroups`);
   }
 };
 

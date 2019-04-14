@@ -3,10 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
+import { DiscoveryService, extractUrlGroups, SocketContext, Log, withWebId } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
 
 type Props = {

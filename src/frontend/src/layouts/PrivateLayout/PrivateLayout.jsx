@@ -1,9 +1,14 @@
 import React, { Fragment } from 'react';
 import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
-import { withAuthorization } from '@inrupt/solid-react-components';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import {
+  Log,
+  AuthenticationService,
+  StorageToolbox,
+  withAuthorization
+} from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';

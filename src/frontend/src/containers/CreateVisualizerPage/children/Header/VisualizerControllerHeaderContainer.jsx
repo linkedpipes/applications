@@ -1,10 +1,9 @@
 // @flow
 import React, { PureComponent } from 'react';
 import VisualizerControllerHeaderComponent from './VisualizerControllerHeaderComponent';
-import { withWebId } from '@inrupt/solid-react-components';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox } from '@utils';
+import { StorageToolbox, withWebId } from '@utils';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
