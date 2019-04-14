@@ -20,6 +20,11 @@ public class D3ChordVisualizerController {
         rgmlService = context.getBean(RgmlService.class);
     }
 
+    /**
+     * Get rgml graph from rdf store
+     * @param graphIri
+     * @return
+     */
     @GetMapping("/api/chord/graph")
     public ResponseEntity<Graph> getGraph(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) {
         return ResponseEntity.ok(rgmlService.getGraph(graphIri));
@@ -31,6 +36,13 @@ public class D3ChordVisualizerController {
         return ResponseEntity.ok(rgmlService.getNodesByUris(graphIri, nodeUrisList));
     }
 
+    /**
+     * Get nodes in rgml graph from rdf store
+     * @param graphIri
+     * @param limit
+     * @param offset
+     * @return
+     */
     @GetMapping("/api/chord/nodes")
     public ResponseEntity<List<Node>> getNodes(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                @Nullable @RequestParam(value = "limit", required = false) Integer limit,
@@ -43,6 +55,13 @@ public class D3ChordVisualizerController {
         return ResponseEntity.ok(rgmlService.getEdges(graphIri));
     }
 
+    /**
+     * Get matrix for rgml graph from rdf store
+     * @param graphIri
+     * @param useWeights
+     * @param nodeUris
+     * @return
+     */
     @PostMapping("/api/chord/matrix")
     public ResponseEntity<double[][]> getMatrix(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                 @RequestParam("useWeights") boolean useWeights,

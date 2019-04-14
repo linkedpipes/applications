@@ -3,13 +3,9 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
-import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.ExecutorService;
-import com.linkedpipes.lpa.backend.services.UserService;
-import com.linkedpipes.lpa.backend.services.HandlerMethodIntrospector;
-import com.linkedpipes.lpa.backend.services.TtlGenerator;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
+import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.jetbrains.annotations.NotNull;
@@ -94,6 +90,15 @@ public class DiscoveryController {
         }
     }
 
+    /**
+     * Start discovery of pipelines using data in SPARQL endpoint
+     * @param sparqlEndpointIri
+     * @param dataSampleIri
+     * @param namedGraph
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
@@ -130,6 +135,12 @@ public class DiscoveryController {
                 .toString();
     }
 
+    /**
+     * Get pipelines found for discovery, grouped by visualizer
+     * @param discoveryId
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("/api/discovery/{id}/pipelineGroups")
     public ResponseEntity<PipelineGroups> getPipelineGroups(@NotNull @PathVariable("id") String discoveryId) throws LpAppsException {
         PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);

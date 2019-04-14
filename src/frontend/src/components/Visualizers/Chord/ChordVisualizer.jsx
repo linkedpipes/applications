@@ -2,7 +2,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
-import { CircularProgress } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
 import uuid from 'uuid';

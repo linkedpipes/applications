@@ -3,7 +3,7 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { LinearLoader } from '@components';
-import { withStyles } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import { ETL_STATUS_TYPE } from '@utils';
 
 const styles = () => ({
