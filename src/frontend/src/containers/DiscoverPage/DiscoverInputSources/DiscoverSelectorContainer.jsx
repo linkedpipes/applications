@@ -23,8 +23,7 @@ type Props = {
   handleSetDataSampleIriFieldValue: Function,
   resetFieldsAndExamples: Function,
   // eslint-disable-next-line react/no-unused-prop-types
-  webId: string,
-  discoveryId: string
+  webId: string
 };
 
 type State = {
@@ -47,8 +46,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   }
 
   componentWillUnmount = () => {
-    const { socket } = this.props;
-    socket.removeListener('discoveryStatus');
     this.isMounted = false;
   };
 
@@ -128,9 +125,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     const self = this;
 
     socket.on('discoveryStatus', data => {
+      if (!this.isMounted) {
+        return;
+      }
+
       if (data === undefined) {
-        socket.emit('leave', discoveryId);
-        socket.removeListener('discoveryStatus');
         self.setState({
           discoveryIsLoading: false
         });
@@ -141,17 +140,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             autoClose: 2000
           }
         );
-      } else if (!self.isMounted) {
-        socket.emit('leave', discoveryId);
-        socket.removeListener('discoveryStatus');
       } else {
         const parsedData = JSON.parse(data);
         if (parsedData.discoveryId !== discoveryId) {
           return;
         }
         if (parsedData.status.isFinished) {
-          socket.emit('leave', discoveryId);
-          socket.removeListener('discoveryStatus');
           self.loadPipelineGroups(discoveryId).then(() => {
             self.setState({
               discoveryIsLoading: false

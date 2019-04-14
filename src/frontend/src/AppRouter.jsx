@@ -26,6 +26,7 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import auth from 'solid-auth-client';
+import { toast } from 'react-toastify';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -48,9 +49,13 @@ const styles = () => ({
 type Props = {
   classes: any,
   userId: ?string,
+  // eslint-disable-next-line react/no-unused-prop-types
+  userProfile: Object,
   handleSetUserProfile: Function,
   handleAddDiscoverySession: Function,
-  handleAddExecutionSession: Function
+  handleAddExecutionSession: Function,
+  handleUpdateDiscoverySession: Function,
+  handleUpdateExecutionSession: Function
 };
 
 const errorHandler = userId => {
@@ -71,7 +76,9 @@ class AppRouter extends React.PureComponent<Props> {
     const {
       handleSetUserProfile,
       handleAddDiscoverySession,
-      handleAddExecutionSession
+      handleAddExecutionSession,
+      handleUpdateDiscoverySession,
+      handleUpdateExecutionSession
     } = this.props;
 
     socket.on('connect', data => {
@@ -99,6 +106,8 @@ class AppRouter extends React.PureComponent<Props> {
       handleAddDiscoverySession(parsedData);
     });
 
+    const self = this;
+
     socket.on('executionAdded', data => {
       if (data === undefined) {
         return;
@@ -106,16 +115,76 @@ class AppRouter extends React.PureComponent<Props> {
 
       const parsedData = JSON.parse(data);
       const executionIri = parsedData.executionIri;
-      // const newStatus = parsedData.status.status;
+      const newStatus = parsedData.status;
 
       const pipelineRecord = {};
-      // pipelineRecord.status = newStatus;
+      pipelineRecord.status = newStatus;
+      pipelineRecord.selectedVisualiser = parsedData.selectedVisualiser;
+      pipelineRecord.etlPipelineIri = parsedData.etlPipelineIri;
       pipelineRecord.started = parsedData.started;
       pipelineRecord.finished = parsedData.finished;
       pipelineRecord.executionIri = executionIri;
 
       socket.emit('join', pipelineRecord.executionIri);
       handleAddExecutionSession(pipelineRecord);
+    });
+
+    socket.on('discoveryStatus', data => {
+      if (data === undefined) {
+        return;
+      }
+      const parsedData = JSON.parse(data);
+      if (parsedData.status.isFinished) {
+        socket.emit('leave', parsedData.discoveryId);
+        const userProfile = self.props.userProfile;
+        if (userProfile.discoverySessions.length > 0) {
+          const discoveryRecord = {};
+
+          discoveryRecord.discoveryId = parsedData.discoveryId;
+          discoveryRecord.isFinished = parsedData.status.isFinished;
+          discoveryRecord.finished = parsedData.finished;
+          discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
+          discoveryRecord.namedGraph = parsedData.namedGraph;
+          discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
+
+          handleUpdateDiscoverySession(discoveryRecord);
+
+          toast.info(
+            `Discovery session at has finished!\nCheck your dashboard.`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
+        }
+      }
+    });
+
+    socket.on('executionStatus', data => {
+      if (data === undefined) {
+        return;
+      }
+
+      const parsedData = JSON.parse(data);
+      const executionIri = parsedData.executionIri;
+      const newStatus = parsedData.status.status;
+
+      socket.emit('leave', executionIri);
+      const userProfile = self.props.userProfile;
+      if (userProfile.pipelineExecutions.length > 0) {
+        const pipelineRecord = {};
+        pipelineRecord.status = newStatus;
+        pipelineRecord.started = parsedData.started;
+        pipelineRecord.finished = parsedData.finished;
+        pipelineRecord.executionIri = executionIri;
+
+        handleUpdateExecutionSession(pipelineRecord);
+
+        toast.info(`Pipeline execution has finished!\nCheck your dashboard.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
     });
 
     auth.trackSession(session => {
@@ -208,7 +277,8 @@ class AppRouter extends React.PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId
+    userId: state.user.webId,
+    userProfile: state.user
   };
 };
 
@@ -222,10 +292,18 @@ const mapDispatchToProps = dispatch => {
   const handleAddExecutionSession = executionSession =>
     dispatch(userActions.addExecutionSession({ session: executionSession }));
 
+  const handleUpdateDiscoverySession = discoverySession =>
+    dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
+
+  const handleUpdateExecutionSession = executionSession =>
+    dispatch(userActions.updateExecutionSession({ session: executionSession }));
+
   return {
     handleSetUserProfile,
     handleAddDiscoverySession,
-    handleAddExecutionSession
+    handleAddExecutionSession,
+    handleUpdateDiscoverySession,
+    handleUpdateExecutionSession
   };
 };
 

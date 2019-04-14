@@ -14,6 +14,8 @@ import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
 
 class DiscoverPipelinesExecutorContainer extends PureComponent {
+  isMounted = false;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -22,6 +24,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   }
 
   componentDidMount = () => {
+    this.isMounted = true;
+
     const {
       discoveryId,
       pipelineId,
@@ -57,8 +61,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   componentWillUnmount = () => {
-    const { socket } = this.props;
-    socket.removeListener('executionStatus');
+    this.isMounted = false;
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -122,9 +125,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     const self = this;
 
     socket.on('executionStatus', data => {
-      if (data === undefined) {
-        socket.emit('leave', executionIri);
-        socket.removeListener('executionStatus');
+      if (data === undefined || !self.isMounted) {
         return;
       }
 
@@ -135,8 +136,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       }
 
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
-      socket.emit('leave', executionIri);
-      socket.removeListener('executionStatus');
 
       if (parsedData.error || parsedData.timeout) {
         self.setState({
@@ -189,7 +188,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 DiscoverPipelinesExecutorContainer.propTypes = {
   discoveryId: PropTypes.any,
   etlExecutionStatus: PropTypes.any,
-  executions: PropTypes.any,
   onAddSelectedResultGraphIriAction: PropTypes.any,
   onAddSingleExecution: PropTypes.any,
   onAddSingleExport: PropTypes.any,

@@ -23,9 +23,7 @@ type Props = {
   userProfile: Object,
   socket: Object,
   handleSetResultPipelineIri: Function,
-  handleSetSelectedVisualizer: Function,
-  handleUpdateDiscoverySession: Function,
-  handleUpdateExecutionSession: Function
+  handleSetSelectedVisualizer: Function
 };
 type State = {
   tabIndex: number
@@ -37,66 +35,10 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   componentDidMount() {
-    const {
-      socket,
-      handleUpdateDiscoverySession,
-      handleUpdateExecutionSession
-    } = this.props;
     const { setupDiscoveryListeners, setupEtlExecutionsListeners } = this;
-    const self = this;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
-
-    socket.on('discoveryStatus', data => {
-      if (data === undefined) {
-        return;
-      }
-      const parsedData = JSON.parse(data);
-      if (parsedData.status.isFinished) {
-        socket.emit('leave', parsedData.discoveryId);
-        const userProfile = self.props.userProfile;
-        if (userProfile.discoverySessions.length > 0) {
-          const discoveryRecord = {};
-
-          discoveryRecord.discoveryId = parsedData.discoveryId;
-          discoveryRecord.isFinished = parsedData.status.isFinished;
-          discoveryRecord.finished = parsedData.finished;
-          discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
-          discoveryRecord.namedGraph = parsedData.namedGraph;
-          discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
-
-          handleUpdateDiscoverySession(discoveryRecord);
-        }
-      }
-    });
-
-    socket.on('executionStatus', data => {
-      if (data === undefined) {
-        return;
-      }
-
-      const parsedData = JSON.parse(data);
-      const executionIri = parsedData.executionIri;
-      const newStatus = parsedData.status.status;
-
-      socket.emit('leave', executionIri);
-      const userProfile = self.props.userProfile;
-      if (userProfile.pipelineExecutions.length > 0) {
-        const pipelineRecord = {};
-        pipelineRecord.status = newStatus;
-        pipelineRecord.finished = parsedData.finished;
-        pipelineRecord.executionIri = executionIri;
-
-        handleUpdateExecutionSession(pipelineRecord);
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    const { socket } = this.props;
-    socket.removeListener('discoveryStatus');
-    socket.removeListener('executionStatus');
   }
 
   setupDiscoveryListeners = () => {
@@ -269,19 +211,11 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
-  const handleUpdateDiscoverySession = discoverySession =>
-    dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
-
-  const handleUpdateExecutionSession = executionSession =>
-    dispatch(userActions.updateExecutionSession({ session: executionSession }));
-
   return {
     handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
-    handleSetSelectedVisualizer,
-    handleUpdateDiscoverySession,
-    handleUpdateExecutionSession
+    handleSetSelectedVisualizer
   };
 };
 
