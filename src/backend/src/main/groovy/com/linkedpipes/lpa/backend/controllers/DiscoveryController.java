@@ -90,6 +90,15 @@ public class DiscoveryController {
         }
     }
 
+    /**
+     * Start discovery of pipelines using data in SPARQL endpoint
+     * @param sparqlEndpointIri
+     * @param dataSampleIri
+     * @param namedGraph
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
@@ -126,6 +135,12 @@ public class DiscoveryController {
                 .toString();
     }
 
+    /**
+     * Get pipelines found for discovery, grouped by visualizer
+     * @param discoveryId
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("/api/discovery/{id}/pipelineGroups")
     public ResponseEntity<PipelineGroups> getPipelineGroups(@NotNull @PathVariable("id") String discoveryId) throws LpAppsException {
         PipelineGroups pipelineGroups = discoveryService.getPipelineGroups(discoveryId);

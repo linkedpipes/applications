@@ -25,9 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PipelineController {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
-    public static final String GRAPH_NAME_PREFIX = "https://applications.linkedpipes.com/graph/";
-
-    private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuosoServiceDescription";
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
@@ -50,25 +47,30 @@ public class PipelineController {
         }
     }
 
+    /**
+     * Call discovery service to export pipeline to ETL
+     * @param discoveryId
+     * @param pipelineUri
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("/api/pipeline/export")
     public ResponseEntity<PipelineExportResult> exportPipeline(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
         PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Call discovery service to export pipeline to ETL, passing it the service description of our Virtuoso database
+     * for future use when storing pipeline execution results
+     * @param discoveryId
+     * @param pipelineUri
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
         return ResponseEntity.ok(pipelineExportService.exportPipeline(discoveryId, pipelineUri));
-    }
-
-    @GetMapping(SERVICE_DESCRIPTION_PATH)
-    public ResponseEntity<String> serviceDescription(@RequestParam(value = "graphId") String graphId) {
-        return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription(GRAPH_NAME_PREFIX + graphId));
-    }
-
-    @GetMapping("/api/pipeline/create")
-    public void createPipeline(@RequestParam(value = "discoveryId") String discoveryId, @RequestParam(value = "pipelineUri") String pipelineUri) {
-
     }
 
     @NotNull

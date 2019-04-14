@@ -20,6 +20,12 @@ public class ExecutionController {
         etlService = context.getBean(EtlService.class);
     }
 
+    /**
+     * Get the result of a pipeline execution from the ETL service
+     * @param executionIri
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("/api/execution/result")
     @ResponseBody
     public ResponseEntity<?> getResult(@NotNull @RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
