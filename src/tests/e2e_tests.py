@@ -5,7 +5,6 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,8 +18,7 @@ from slackclient import SlackClient
 desired_cap = {
     'browserName': 'Chrome',
     "browser_version": "73",
-    "browserstack.debug": True,
-    "browserstack.networkLogs": True
+    "browserstack.debug": True
 }
 
 slack_token = os.environ["SLACK_API_TOKEN"]
