@@ -87,10 +87,11 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
+        DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
             DiscoverySession session = new DiscoverySession();
             session.discoveryId = d.getDiscoveryId();
-            session.isFinished = !d.getExecuting();
+            session.isFinished = status.isFinished();
             session.started = d.getStarted().getTime() / 1000L;
             if (d.getFinished() != null) {
                 session.finished = d.getFinished().getTime() / 1000L;
@@ -114,9 +115,10 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
+        ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
             PipelineExecution exec = new PipelineExecution();
-            exec.status = e.getStatus();
+            exec.status = executionStatus;
             exec.executionIri = e.getExecutionIri();
             exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
             exec.selectedVisualiser = e.getSelectedVisualiser();
