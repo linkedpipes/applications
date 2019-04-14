@@ -14,6 +14,8 @@ import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
 
 class DiscoverPipelinesExecutorContainer extends PureComponent {
+  isMounted = false;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -22,6 +24,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   }
 
   componentDidMount = () => {
+    this.isMounted = true;
+
     const {
       discoveryId,
       pipelineId,
@@ -57,8 +61,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   componentWillUnmount = () => {
-    const { socket } = this.props;
-    socket.removeListener('executionStatus');
+    this.isMounted = false;
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
@@ -121,11 +124,8 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     const { socket, onSetEtlExecutionStatus } = this.props;
     const self = this;
 
-    socket.emit('join', executionIri);
     socket.on('executionStatus', data => {
-      if (data === undefined) {
-        socket.emit('leave', executionIri);
-        socket.removeListener('executionStatus');
+      if (data === undefined || !self.isMounted) {
         return;
       }
 
@@ -136,8 +136,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       }
 
       Log.info(data, 'DiscoverPipelinesExecutorContainer');
-      socket.emit('leave', executionIri);
-      socket.removeListener('executionStatus');
 
       if (parsedData.error || parsedData.timeout) {
         self.setState({
@@ -205,7 +203,8 @@ const mapStateToProps = state => {
     pipelineId: state.etl.pipelineId,
     discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
-    etlExecutionStatus: state.discover.etlExecutionStatus
+    etlExecutionStatus: state.discover.etlExecutionStatus,
+    executions: state.etl.executions
   };
 };
 

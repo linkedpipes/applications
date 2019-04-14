@@ -15,10 +15,18 @@ import {
   ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log } from '@utils';
+import {
+  SocketContext,
+  Log,
+  AuthenticationService,
+  StorageToolbox
+} from '@utils';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
+import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
+import auth from 'solid-auth-client';
+import { toast } from 'react-toastify';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -40,7 +48,14 @@ const styles = () => ({
 
 type Props = {
   classes: any,
-  userId: ?string
+  userId: ?string,
+  // eslint-disable-next-line react/no-unused-prop-types
+  userProfile: Object,
+  handleSetUserProfile: Function,
+  handleAddDiscoverySession: Function,
+  handleAddExecutionSession: Function,
+  handleUpdateDiscoverySession: Function,
+  handleUpdateExecutionSession: Function
 };
 
 const errorHandler = userId => {
@@ -58,6 +73,14 @@ const errorHandler = userId => {
 
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
+    const {
+      handleSetUserProfile,
+      handleAddDiscoverySession,
+      handleAddExecutionSession,
+      handleUpdateDiscoverySession,
+      handleUpdateExecutionSession
+    } = this.props;
+
     socket.on('connect', data => {
       Log.warn('Client connected', 'AppRouter');
       Log.warn(data, 'AppRouter');
@@ -73,6 +96,126 @@ class AppRouter extends React.PureComponent<Props> {
       Log.warn(data, 'AppRouter');
       Log.warn(socket.id, 'AppRouter');
     });
+
+    socket.on('discoveryAdded', data => {
+      if (data === undefined) {
+        return;
+      }
+      const parsedData = JSON.parse(data);
+      socket.emit('join', parsedData.discoveryId);
+      handleAddDiscoverySession(parsedData);
+    });
+
+    const self = this;
+
+    socket.on('executionAdded', data => {
+      if (data === undefined) {
+        return;
+      }
+
+      const parsedData = JSON.parse(data);
+      const executionIri = parsedData.executionIri;
+      const newStatus = parsedData.status;
+
+      const pipelineRecord = {};
+      pipelineRecord.status = newStatus;
+      pipelineRecord.selectedVisualiser = parsedData.selectedVisualiser;
+      pipelineRecord.etlPipelineIri = parsedData.etlPipelineIri;
+      pipelineRecord.started = parsedData.started;
+      pipelineRecord.finished = parsedData.finished;
+      pipelineRecord.executionIri = executionIri;
+
+      socket.emit('join', pipelineRecord.executionIri);
+      handleAddExecutionSession(pipelineRecord);
+    });
+
+    socket.on('discoveryStatus', data => {
+      if (data === undefined) {
+        return;
+      }
+      const parsedData = JSON.parse(data);
+      if (parsedData.status.isFinished) {
+        socket.emit('leave', parsedData.discoveryId);
+        const userProfile = self.props.userProfile;
+        if (userProfile.discoverySessions.length > 0) {
+          const discoveryRecord = {};
+
+          discoveryRecord.discoveryId = parsedData.discoveryId;
+          discoveryRecord.isFinished = parsedData.status.isFinished;
+          discoveryRecord.finished = parsedData.finished;
+          discoveryRecord.sparqlEndpointIri = parsedData.sparqlEndpointIri;
+          discoveryRecord.namedGraph = parsedData.namedGraph;
+          discoveryRecord.dataSampleIri = parsedData.dataSampleIri;
+
+          handleUpdateDiscoverySession(discoveryRecord);
+
+          toast.info(
+            `Discovery session at has finished!\nCheck your dashboard.`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
+        }
+      }
+    });
+
+    socket.on('executionStatus', data => {
+      if (data === undefined) {
+        return;
+      }
+
+      const parsedData = JSON.parse(data);
+      const executionIri = parsedData.executionIri;
+      const newStatus = parsedData.status.status;
+
+      socket.emit('leave', executionIri);
+      const userProfile = self.props.userProfile;
+      if (userProfile.pipelineExecutions.length > 0) {
+        const pipelineRecord = {};
+        pipelineRecord.status = newStatus;
+        pipelineRecord.started = parsedData.started;
+        pipelineRecord.finished = parsedData.finished;
+        pipelineRecord.executionIri = executionIri;
+
+        handleUpdateExecutionSession(pipelineRecord);
+
+        toast.info(`Pipeline execution has finished!\nCheck your dashboard.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
+    });
+
+    auth.trackSession(session => {
+      if (session) {
+        Log.info(session);
+        AuthenticationService.getUserProfile(session.webId)
+          .then(res => {
+            Log.info(
+              'Response from get user profile call:',
+              'AuthenticationService'
+            );
+            Log.info(res, 'AuthenticationService');
+            Log.info(res.data, 'AuthenticationService');
+
+            return res.data;
+          })
+          .then(jsonResponse => {
+            handleSetUserProfile(jsonResponse);
+            socket.emit('join', session.webId);
+          })
+          .catch(error => {
+            Log.error(error, 'HomeContainer');
+          });
+
+        StorageToolbox.createOrUpdateFolder(session.webId, 'public/lpapps');
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners();
   }
 
   render() {
@@ -103,11 +246,7 @@ class AppRouter extends React.PureComponent<Props> {
                   <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout path="/dashboard" component={HomePage} exact />
-                  {/* <PrivateLayout
-                    path="/create-app"
-                    component={CreateVisualizerPage}
-                    exact
-                  /> */}
+
                   <PrivateLayout
                     path="/discover"
                     component={DiscoverPage}
@@ -138,10 +277,37 @@ class AppRouter extends React.PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId
+    userId: state.user.webId,
+    userProfile: state.user
   };
 };
 
-export default connect(mapStateToProps)(
-  withRoot(withStyles(styles)(AppRouter))
-);
+const mapDispatchToProps = dispatch => {
+  const handleSetUserProfile = userProfile =>
+    dispatch(userActions.setUserProfile(userProfile));
+
+  const handleAddDiscoverySession = discoverySession =>
+    dispatch(userActions.addDiscoverySession({ session: discoverySession }));
+
+  const handleAddExecutionSession = executionSession =>
+    dispatch(userActions.addExecutionSession({ session: executionSession }));
+
+  const handleUpdateDiscoverySession = discoverySession =>
+    dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
+
+  const handleUpdateExecutionSession = executionSession =>
+    dispatch(userActions.updateExecutionSession({ session: executionSession }));
+
+  return {
+    handleSetUserProfile,
+    handleAddDiscoverySession,
+    handleAddExecutionSession,
+    handleUpdateDiscoverySession,
+    handleUpdateExecutionSession
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRoot(withStyles(styles)(AppRouter)));

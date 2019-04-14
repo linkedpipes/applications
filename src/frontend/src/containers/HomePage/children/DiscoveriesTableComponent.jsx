@@ -92,7 +92,7 @@ const DiscoveriesTableComponent = ({
                 </TableCell>
 
                 <TableCell align="center">
-                  {discovery.finished ? 'Finished' : 'In progress'}
+                  {discovery.isFinished ? 'Finished' : 'In progress'}
                 </TableCell>
                 <TableCell align="center">{discovery.namedGraph}</TableCell>
                 <TableCell align="center">
