@@ -97,6 +97,7 @@ const AuthorizationComponent = ({
         <FormControlLabel
           control={
             <Switch
+              id="with-web-id-checkbox"
               checked={withWebIdStatus}
               onChange={onSetWithWebId}
               value="checkedA"
