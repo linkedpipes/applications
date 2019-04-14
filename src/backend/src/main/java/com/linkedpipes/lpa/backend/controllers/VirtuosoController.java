@@ -22,6 +22,11 @@ public class VirtuosoController {
         discoveryService = context.getBean(DiscoveryService.class);
     }
 
+    /**
+     * Get service description of our virtuoso SPARQL endpoint
+     * @param graphId
+     * @return
+     */
     @GetMapping(SERVICE_DESCRIPTION_PATH)
     public ResponseEntity<String> serviceDescription(@RequestParam(value = "graphId") String graphId) {
         return ResponseEntity.ok(discoveryService.getVirtuosoServiceDescription(GRAPH_NAME_PREFIX + graphId));

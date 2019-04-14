@@ -15,6 +15,12 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class MapVisualizerController {
 
+    /**
+     * Get markers for displaying on map
+     * @param graphIri
+     * @param filters
+     * @return
+     */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                    @RequestBody(required = false) Map<String, List<ValueFilter>> filters) {
@@ -25,5 +31,7 @@ public class MapVisualizerController {
     public ResponseEntity<List<Property>> getProperties(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) {
         return ResponseEntity.ok(GeoService.getProperties(graphIri));
     }
+
+    //TODO create endpoints for getting polygon entities and their properties (https://github.com/ldvm/LDVMi/blob/master/src/app/controllers/api/MapApiController.scala)
 
 }
