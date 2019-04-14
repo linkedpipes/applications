@@ -19,7 +19,7 @@ from slackclient import SlackClient
 desired_cap = {
     'browserName': 'Chrome',
     "browser_version": "73",
-    "browserstack.debug": True
+    "browserstack.debug": True,
     "acceptSslCerts": True
 }
 
