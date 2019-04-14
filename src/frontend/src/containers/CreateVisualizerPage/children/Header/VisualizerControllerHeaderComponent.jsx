@@ -13,7 +13,8 @@ import {
   withMobileDialog,
   InputBase,
   Typography,
-  withStyles
+  withStyles,
+  InputAdornment
 } from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { getBeautifiedVisualizerTitle } from '@utils';
@@ -32,7 +33,11 @@ type Props = {
   fullScreen: any,
   appIri: string,
   selectedVisualizer: Object,
-  selectedApplicationTitle: string
+  selectedApplicationTitle: string,
+  handleChangeHeight: Function,
+  handleChangeWidth: Function,
+  height: number,
+  width: number
 };
 
 const styles = theme => ({
@@ -46,7 +51,8 @@ const styles = theme => ({
   textField: {
     flexGrow: 1,
     width: '100%',
-    fontSize: 30
+    fontSize: 30,
+    marginTop: '1rem'
   },
   button: {
     margin: theme.spacing.unit
@@ -67,7 +73,11 @@ const VisualizerControllerHeaderComponent = ({
   fullScreen,
   selectedApplicationTitle,
   selectedVisualizer,
-  appIri
+  appIri,
+  height,
+  width,
+  handleChangeHeight,
+  handleChangeWidth
 }: Props) => (
   <div className={classes.root}>
     <Paper className={classes.header} position="static" color="default">
@@ -135,7 +145,6 @@ const VisualizerControllerHeaderComponent = ({
       </Grid>
     </Paper>
     <Dialog
-      fullScreen={fullScreen}
       open={publishDialogOpen}
       onClose={handleClosePublishDialog}
       aria-labelledby="responsive-dialog-title"
@@ -153,6 +162,7 @@ const VisualizerControllerHeaderComponent = ({
       <DialogContent>
         <CopyToClipboard text={appIri} onCopy={handleCopyLinkClicked}>
           <TextField
+            className={classes.textField}
             color="primary"
             label="Click to copy"
             variant="outlined"
@@ -181,7 +191,6 @@ const VisualizerControllerHeaderComponent = ({
     </Dialog>
 
     <Dialog
-      fullScreen={fullScreen}
       open={embedDialogOpen}
       onClose={handleCloseEmbedDialog}
       aria-labelledby="responsive-dialog-title"
@@ -196,8 +205,36 @@ const VisualizerControllerHeaderComponent = ({
         </DialogContentText>
       </DialogContent>
       <DialogContent>
+        <TextField
+          id="height-input"
+          style={{
+            textDecoration: 'none'
+          }}
+          className={classes.textField}
+          variant="outlined"
+          label="Height"
+          value={height}
+          onChange={handleChangeHeight}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">px</InputAdornment>
+          }}
+        />
+        <TextField
+          id="width-input"
+          style={{
+            textDecoration: 'none'
+          }}
+          className={classes.textField}
+          variant="outlined"
+          label="Width"
+          value={width}
+          onChange={handleChangeWidth}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">px</InputAdornment>
+          }}
+        />
         <CopyToClipboard
-          text={`<iframe src="${appIri}" height="400" width="400"></iframe>`}
+          text={`<iframe src="${appIri}" height="${height}" width="${width}"></iframe>`}
           onCopy={handleCopyLinkClicked}
         >
           <TextField
@@ -205,7 +242,8 @@ const VisualizerControllerHeaderComponent = ({
             label="Click to copy"
             variant="outlined"
             fullWidth
-            value={`<iframe src="${appIri}" height="400" width="400"></iframe>`}
+            className={classes.textField}
+            value={`<iframe src="${appIri}" height="${height}" width="${width}></iframe>`}
             autoFocus
             style={{
               textDecoration: 'none'

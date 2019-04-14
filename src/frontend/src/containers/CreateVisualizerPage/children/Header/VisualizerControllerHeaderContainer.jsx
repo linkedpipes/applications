@@ -23,14 +23,18 @@ type Props = {
 type State = {
   publishDialogOpen: boolean,
   embedDialogOpen: boolean,
-  appIri: string
+  appIri: string,
+  height: number,
+  width: number
 };
 
 class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
   state = {
     publishDialogOpen: false,
     embedDialogOpen: false,
-    appIri: ''
+    appIri: '',
+    height: 400,
+    width: 400
   };
 
   handlePublishClicked = () => {
@@ -126,6 +130,14 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     });
   };
 
+  handleChangeWidth = event => {
+    this.setState({ width: event.target.value });
+  };
+
+  handleChangeHeight = event => {
+    this.setState({ height: event.target.value });
+  };
+
   render() {
     const {
       headerParams,
@@ -140,9 +152,17 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       handleClosePublishDialog,
       handleCloseEmbedDialog,
       handleProceedToApplicationClicked,
-      handleCopyLinkClicked
+      handleCopyLinkClicked,
+      handleChangeHeight,
+      handleChangeWidth
     } = this;
-    const { embedDialogOpen, publishDialogOpen, appIri } = this.state;
+    const {
+      embedDialogOpen,
+      publishDialogOpen,
+      appIri,
+      height,
+      width
+    } = this.state;
     return (
       <VisualizerControllerHeaderComponent
         handleAppTitleChanged={onHandleAppTitleChanged}
@@ -159,6 +179,10 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
         selectedVisualizer={selectedVisualizer}
         selectedApplicationTitle={selectedApplicationTitle}
         appIri={appIri}
+        height={height}
+        width={width}
+        handleChangeWidth={handleChangeWidth}
+        handleChangeHeight={handleChangeHeight}
       />
     );
   }
