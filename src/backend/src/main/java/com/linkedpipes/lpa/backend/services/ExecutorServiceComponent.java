@@ -91,7 +91,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
             DiscoverySession session = new DiscoverySession();
             session.discoveryId = d.getDiscoveryId();
-            session.isFinished = status.isFinished();
+            session.isFinished = discoveryStatus.isFinished;
             session.started = d.getStarted().getTime() / 1000L;
             if (d.getFinished() != null) {
                 session.finished = d.getFinished().getTime() / 1000L;
@@ -118,16 +118,12 @@ public class ExecutorServiceComponent implements ExecutorService {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
             PipelineExecution exec = new PipelineExecution();
-            exec.status = executionStatus;
+            exec.status = executionStatus.status;
             exec.executionIri = e.getExecutionIri();
             exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
             exec.selectedVisualiser = e.getSelectedVisualiser();
-            exec.started = e.getStarted().getTime() / 1000L;
-            if (e.getFinished() != null) {
-                exec.finished = e.getFinished().getTime() / 1000L;
-            } else {
-                exec.finished = -1;
-            }
+            exec.started = executionStatus.getStarted();
+            exec.finished = executionStatus.getFinished();
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(exec));
         }
     }
