@@ -1,9 +1,13 @@
 package com.linkedpipes.lpa.backend.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -17,11 +21,15 @@ import org.springframework.transaction.annotation.Isolation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 @Service
 @Profile("!disableDB")
 public class UserServiceComponent implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
+    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
+            new ObjectMapper()
+                    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
     @Autowired
     private UserRepository repository;
@@ -154,12 +162,16 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException {
+    public void addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException, LpAppsException {
         UserDao user = getUser(username);
         ApplicationDao app = new ApplicationDao();
         app.setSolidIri(solidIri);
         user.addApplication(app);
         applicationRepository.save(app);
         repository.save(user);
+
+        Application a = new Application();
+        a.solidIri = solidIri;
+        com.linkedpipes.lpa.backend.Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
     }
 }
