@@ -1,8 +1,8 @@
-import axios from './api.service';
+import lpaAxios from './api.service';
 
 const AuthenticationService = {
   getUserProfile(webIdValue) {
-    return axios.post('/user', null, { params: { webId: webIdValue } });
+    return lpaAxios.post('/user', null, { params: { webId: webIdValue } });
   }
 };
 

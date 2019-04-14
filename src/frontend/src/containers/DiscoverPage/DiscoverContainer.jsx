@@ -16,6 +16,12 @@ const componentDidMount = props => {
   if (location.state && location.state.discoveryId) {
     Log.info(`Just received ${location.state.discoveryId}`);
     const discoveryId = location.state.discoveryId;
+
+    history.replace({
+      pathname: location.pathname,
+      state: undefined
+    });
+
     handleSetDiscoveryId(discoveryId);
     DiscoveryService.getPipelineGroups({ discoveryId })
       .then(response => {
@@ -25,11 +31,6 @@ const componentDidMount = props => {
         handleSetPipelineGroups(jsonResponse.pipelineGroups);
         onNextClicked();
       });
-
-    history.replace({
-      pathname: location.pathname,
-      state: undefined
-    });
   }
 };
 

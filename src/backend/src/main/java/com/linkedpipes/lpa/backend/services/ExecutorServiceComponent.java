@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
+import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
@@ -68,25 +69,63 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        this.userService.setUserDiscovery(userId, discovery.id, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
-        startDiscoveryStatusPolling(discovery.id);
+        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraph);
         return discovery;
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        this.userService.setUserDiscovery(userId, discovery.id, null, null, null);  //this inserts discovery in DB and sets flags
-        startDiscoveryStatusPolling(discovery.id);
+        processStartedDiscovery(discovery.id, userId, null, null, null);
         return discovery;
+    }
+
+    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws LpAppsException, UserNotFoundException {
+        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
+        notifyDiscoveryStarted(discoveryId, userId);
+        startDiscoveryStatusPolling(discoveryId);
+    }
+
+    private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
+        DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
+        for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+            DiscoverySession session = new DiscoverySession();
+            session.discoveryId = d.getDiscoveryId();
+            session.isFinished = discoveryStatus.isFinished;
+            session.started = d.getStarted().getTime() / 1000L;
+            if (d.getFinished() != null) {
+                session.finished = d.getFinished().getTime() / 1000L;
+            } else {
+                session.finished = -1;
+            }
+            session.sparqlEndpointIri = d.getSparqlEndpointIri();
+            session.dataSampleIri = d.getDataSampleIri();
+            session.namedGraph = d.getNamedGraph();
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+        }
     }
 
     @NotNull @Override
     public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
         this.userService.setUserExecution(userId, execution.iri, etlPipelineIri, selectedVisualiser);  //this inserts execution in DB
+        notifyExecutionStarted(execution.iri, userId);
         startEtlStatusPolling(execution.iri);
         return execution;
+    }
+
+    private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
+        ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            PipelineExecution exec = new PipelineExecution();
+            exec.status = executionStatus.status;
+            exec.executionIri = e.getExecutionIri();
+            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
+            exec.selectedVisualiser = e.getSelectedVisualiser();
+            exec.started = executionStatus.getStarted();
+            exec.finished = executionStatus.getFinished();
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(exec));
+        }
     }
 
     private void startEtlStatusPolling(String executionIri) throws LpAppsException {

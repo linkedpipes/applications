@@ -16,6 +16,7 @@ import {
 import SocketContext from './socket.service';
 import Log from './logger.service';
 import StorageToolbox from './StorageToolbox';
+import { withAuthorization, withWebId } from './third-party';
 
 export {
   VisualizersService,
@@ -33,5 +34,7 @@ export {
   unixTimeConverter,
   Log,
   getLocation,
-  StorageToolbox
+  StorageToolbox,
+  withAuthorization,
+  withWebId
 };
