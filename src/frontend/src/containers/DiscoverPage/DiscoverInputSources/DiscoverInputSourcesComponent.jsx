@@ -3,7 +3,7 @@ import React from 'react';
 import DiscoverExamplesContainer from './DiscoverExamplesContainer';
 import DiscoverSelectorContainer from './DiscoverSelectorContainer';
 import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 
 type Props = {
   classes: { root: { width: string } },

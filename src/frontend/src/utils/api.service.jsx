@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Log } from '@utils';
+import { Log } from './logger.service';
 import * as Sentry from '@sentry/browser';
 
 axios.defaults.baseURL = process.env.BASE_BACKEND_URL || '/api';

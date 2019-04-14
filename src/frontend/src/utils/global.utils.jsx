@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable */
 export function urlDomain(url) {
   let hostname;
   // find & remove protocol (http, ftp, etc.) and get hostname

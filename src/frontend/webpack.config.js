@@ -1,8 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
 
 const dev = process.env.NODE_ENV !== 'production';
+const previewSize = process.env.BUNDLE_ANALYZER_ENABLED;
 
 module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
@@ -13,6 +16,7 @@ module.exports = () => {
 
   const plugins = [
     HTMLWebpackPluginConfig,
+
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.BASE_BACKEND_URL': JSON.stringify(
@@ -22,6 +26,8 @@ module.exports = () => {
         process.env.BASE_SOCKET_URL
       ),
       'process.env.SOCKET_RECONNECT': process.env.SOCKET_RECONNECT === 'true',
+      'process.env.BUNDLE_ANALYZER_ENABLED':
+        process.env.BUNDLE_ANALYZER_ENABLED !== undefined,
 
       'process.env.BASE_SERVER_PORT': JSON.stringify(
         process.env.BASE_SERVER_PORT === undefined
@@ -32,6 +38,7 @@ module.exports = () => {
   ];
 
   if (dev) plugins.push(new webpack.HotModuleReplacementPlugin());
+  if (previewSize) plugins.push(new BundleAnalyzerPlugin());
 
   return {
     entry: [path.join(__dirname, '/src/index.jsx')],
@@ -47,7 +54,8 @@ module.exports = () => {
         '@ducks': path.resolve(__dirname, './src/ducks'),
         '@utils': path.resolve(__dirname, './src/utils'),
         '@constants': path.resolve(__dirname, './src/constants'),
-        '@layouts': path.resolve(__dirname, './src/layouts')
+        '@layouts': path.resolve(__dirname, './src/layouts'),
+        'material-ui': 'material-ui/es'
       }
     },
     module: {

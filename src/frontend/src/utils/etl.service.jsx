@@ -1,4 +1,4 @@
-import axios from './api.service';
+import axios from 'axios';
 
 export const ETL_STATUS_MAP = {
   'http://etl.linkedpipes.com/resources/status/queued': 'Queued',

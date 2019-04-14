@@ -8,9 +8,9 @@ import {
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
   SocketContext,
-  Log
+  Log,
+  withWebId
 } from '@utils';
-import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
 
 class DiscoverPipelinesExecutorContainer extends PureComponent {

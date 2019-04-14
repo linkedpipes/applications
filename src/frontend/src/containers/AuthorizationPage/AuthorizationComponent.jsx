@@ -10,7 +10,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import withStyles from '@material-ui/core/styles/withStyles';
+import { withStyles } from '@material-ui/core/styles';
 import SolidProviderComponent from './children';
 
 const styles = theme => ({

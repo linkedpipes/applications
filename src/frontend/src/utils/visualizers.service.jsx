@@ -1,4 +1,4 @@
-import axios from './api.service';
+import axios from 'axios';
 
 // Note that axios will remove from the request params
 // the params that are null or undefined

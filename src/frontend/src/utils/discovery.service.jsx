@@ -1,4 +1,4 @@
-import axios from './api.service';
+import axios from 'axios';
 
 const DiscoveryService = {
   async postDiscoverFromTtl({ ttlFile, webId }) {
