@@ -5,6 +5,7 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
