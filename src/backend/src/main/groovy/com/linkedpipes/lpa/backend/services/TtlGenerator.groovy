@@ -1,9 +1,11 @@
 package com.linkedpipes.lpa.backend.services
 
-
 import com.linkedpipes.lpa.backend.entities.DataSource
 import com.linkedpipes.lpa.backend.rdf.Prefixes
-import com.linkedpipes.lpa.backend.rdf.vocabulary.*
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD
+import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql
+import com.linkedpipes.lpa.backend.rdf.vocabulary.SD
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider
@@ -86,7 +88,7 @@ class TtlGenerator {
 
                                     if (namedGraph != null && !namedGraph.isEmpty()) {
                                         prop SD.namedGraph, resource(
-                                                (SD.name as Property): namedGraph,
+                                                (SD.name as Property): resource(namedGraph),
                                         )
                                     }
                                 },
