@@ -23,14 +23,14 @@ const shareApp = (appIri, webId) => {
 
   return new Promise((resolve, reject) => {
     FileClient.updateFile(url, appIri, 'text/plain').then(
-      success => {
+      () => {
         Log.info(`Updated file!`);
         resolve();
       },
       err => {
         Log.info(err, 'StorageToolbox');
         FileClient.createFile(url, 'text/plain').then(
-          success => {
+          () => {
             Log.info(`Created file!`);
             resolve();
           },
@@ -42,6 +42,18 @@ const shareApp = (appIri, webId) => {
       }
     );
   });
+};
+
+const appIriToPublishUrl = (applicationIri, applicationEndpoint) => {
+  const portSpecifier =
+    process.env.BASE_SERVER_PORT === ''
+      ? ''
+      : `:${process.env.BASE_SERVER_PORT}`;
+  const hostName = os.hostname().toLowerCase();
+  const http = hostName === 'localhost' ? 'http://' : 'https://';
+  const publishedUrl = `${http}${hostName}${portSpecifier}/${applicationEndpoint}?applicationIri=${applicationIri}`;
+
+  return publishedUrl;
 };
 
 const saveAppToSolid = (appData, appTitle, webId, path) => {
@@ -56,33 +68,26 @@ const saveAppToSolid = (appData, appTitle, webId, path) => {
 
   const formattedTitle = appTitle.trim().toLowerCase();
   const hash = stringHash(JSON.stringify(formattedTitle, null, 2)).toString();
-  const portSpecifier =
-    process.env.BASE_SERVER_PORT === ''
-      ? ''
-      : `:${process.env.BASE_SERVER_PORT}`;
-  const fileUrl = `${url}/lpapp${hash}.json`;
-  const hostName = os.hostname().toLowerCase();
+  const applicationIri = `${url}/lpapp${hash}.json`;
   const applicationEndpoint = appData.applicationEndpoint;
-  const publishedUrl = `${hostName}${portSpecifier}/${applicationEndpoint}?applicationIri=${fileUrl}`;
 
   const file = JSON.stringify({
     applicationData: appData,
-    publishedUrl,
     applicationTitle: appTitle
   });
 
   return new Promise((resolve, reject) => {
-    FileClient.updateFile(fileUrl, file).then(
+    FileClient.updateFile(applicationIri, file).then(
       () => {
         Log.info(`Updated file!`);
-        resolve(publishedUrl);
+        resolve({ applicationIri, applicationEndpoint });
       },
       err => {
         Log.info(err, 'StorageToolbox');
-        FileClient.createFile(fileUrl).then(
+        FileClient.createFile(applicationIri).then(
           () => {
             Log.info(`Created file!`);
-            resolve(publishedUrl);
+            resolve({ applicationIri, applicationEndpoint });
           },
           errCreate => {
             reject(errCreate);
@@ -125,7 +130,7 @@ const createOrUpdateFolder = (webId, path) => {
     folder => {
       Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
     },
-    err => {
+    () => {
       FileClient.createFolder(folderPath).then(
         body => {
           Log.info(`File content is : ${body}.`, 'StorageToolbox');
@@ -142,5 +147,6 @@ export default {
   loadAppFromSolid,
   shareApp,
   createOrUpdateFolder,
-  removeAppFromStorage
+  removeAppFromStorage,
+  appIriToPublishUrl
 };

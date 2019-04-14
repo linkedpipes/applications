@@ -14,13 +14,14 @@ import uuid from 'uuid';
 
 type Props = {
   pipelinesList: Array<{
+    status: { '@id'?: string, status?: string },
+    started: number,
+    finished: number,
     executionIri: string,
-    selectedVisualiser: string,
-    status: { '@id'?: string, status?: string, start: number, stop: number },
-    webId: string,
-    classes: Object,
-    onHandleSelectPipelineExecutionClick: Function
-  }>
+    selectedVisualiser: string
+  }>,
+  classes: Object,
+  onHandleSelectPipelineExecutionClick: Function
 };
 
 const styles = () => ({
@@ -80,10 +81,10 @@ const PipelinesTableComponent = ({
                     'N/A'}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.start)}
+                  {unixTimeConverter(pipeline.started)}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.stop)}
+                  {unixTimeConverter(pipeline.finished)}
                 </TableCell>
               </TableRow>
             ))}

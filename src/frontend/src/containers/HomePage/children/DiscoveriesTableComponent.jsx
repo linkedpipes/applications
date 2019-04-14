@@ -15,11 +15,11 @@ import uuid from 'uuid';
 type Props = {
   classes: Object,
   discoveriesList: Array<{
-    id: string,
-    finished: boolean,
+    discoveryId: string,
+    isFinished: boolean,
     namedGraph: string,
-    start: number,
-    stop: number
+    started: number,
+    finished: number
   }>,
   onHandleSelectDiscoveryClick: Function,
   onHandleDiscoveryRowClicked: Function
@@ -61,13 +61,13 @@ const DiscoveriesTableComponent = ({
                   padding="checkbox"
                 >
                   <Button
-                    id={`button_${discovery.id}`}
+                    id={`button_${discovery.discoveryId}`}
                     size="small"
-                    disabled={!discovery.finished}
+                    disabled={!discovery.isFinished}
                     variant="contained"
                     color="secondary"
                     onClick={() => {
-                      onHandleSelectDiscoveryClick(discovery.id);
+                      onHandleSelectDiscoveryClick(discovery.discoveryId);
                     }}
                   >
                     Continue
@@ -80,9 +80,9 @@ const DiscoveriesTableComponent = ({
                   padding="checkbox"
                 >
                   <Button
-                    id={`button_${discovery.id}`}
+                    id={`button_${discovery.discoveryId}`}
                     size="small"
-                    disabled={!discovery.finished}
+                    disabled={!discovery.isFinished}
                     variant="contained"
                     color="primary"
                     onClick={() => onHandleDiscoveryRowClicked(discovery)}
@@ -96,10 +96,10 @@ const DiscoveriesTableComponent = ({
                 </TableCell>
                 <TableCell align="center">{discovery.namedGraph}</TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(discovery.start)}
+                  {unixTimeConverter(discovery.started)}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(discovery.stop)}
+                  {unixTimeConverter(discovery.finished)}
                 </TableCell>
               </TableRow>
             ))}
@@ -108,7 +108,7 @@ const DiscoveriesTableComponent = ({
       </Paper>
     ) : (
       <Paper>
-        <Typography variant="body1" gutterBottom>
+        <Typography component={'span'} variant="body1" gutterBottom>
           No discoveries found
         </Typography>
       </Paper>

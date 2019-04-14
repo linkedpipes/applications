@@ -10,14 +10,15 @@ import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClust
 import { compose, withProps, type HOC } from 'recompose';
 import uuid from 'uuid';
 import { Log, VisualizersService } from '@utils';
-import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   classes: {
     progress: number
   },
   selectedResultGraphIri: string,
-  handleSetCurrentApplicationData: Function
+  propMarkers: Array<{ coordinates: { lat: number, lon: number } }>,
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
 };
 
 type State = {
@@ -34,16 +35,54 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     };
   }
 
-  async componentDidMount() {
-    // const response = await VisualizersService.getMarkers({
-    //   resultGraphIri: this.props.selectedResultGraphIri
-    // });
-    // const jsonData = await response.json();
-    const { handleSetCurrentApplicationData, markers } = this.props;
-    const { zoomToMarkers } = this.state;
-    const markersToUse = markers;
+  componentDidMount() {
+    const {
+      propMarkers,
+      selectedResultGraphIri,
+      handleSetCurrentApplicationData,
+      isPublished
+    } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'map',
+        propMarkers,
+        visualizerCode: 'MAP'
+      });
+    }
+
+    const self = this;
+
+    if (propMarkers.length === 0) {
+      VisualizersService.getMarkers({
+        resultGraphIri: selectedResultGraphIri
+      })
+        .then(response => {
+          if (response !== undefined) {
+            const data = response.data;
+            self.updateMarkersState(data);
+          }
+        })
+        .catch(reason => Log.error(reason.message));
+    } else {
+      self.updateMarkersState(propMarkers);
+    }
+  }
+
+  fetchMarkers = async selectedResultGraphIri => {
+    const response = await VisualizersService.getMarkers({
+      resultGraphIri: selectedResultGraphIri
+    });
+    const responseMarkers = await response.json();
+    // only proceed once second promise is resolved
+    return responseMarkers;
+  };
+
+  updateMarkersState = markers => {
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
     this.setState({
-      markers: markersToUse,
+      markers,
       zoomToMarkers: map => {
         const bounds = new window.google.maps.LatLngBounds();
         if (map !== null) {
@@ -61,17 +100,19 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
             });
             map.fitBounds(bounds);
 
-            handleSetCurrentApplicationData({
-              id: uuid.v4(),
-              applicationEndpoint: 'map',
-              markers: markersToUse,
-              visualizerCode: 'MAP'
-            });
+            if (!isPublished) {
+              handleSetCurrentApplicationData({
+                id: uuid.v4(),
+                applicationEndpoint: 'map',
+                markers,
+                visualizerCode: 'MAP'
+              });
+            }
           }
         }
       }
     });
-  }
+  };
 
   render() {
     const { markers, zoomToMarkers } = this.state;
