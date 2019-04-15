@@ -28,6 +28,12 @@ export const setSelectedInputExample = sample => {
   };
 };
 
+export const resetSelectedInputExample = () => {
+  return {
+    type: types.RESET_SELECTED_INPUT_EXAMPLE
+  };
+};
+
 export const setEtlExecutionStatus = value => {
   return {
     type: types.SET_ETL_EXECUTION_STATUS,
@@ -35,16 +41,35 @@ export const setEtlExecutionStatus = value => {
   };
 };
 
-const changeTabAction = tabValue => ({
-  type: types.TAB_CHANGED,
-  tabValue
-});
+export const setNamedGraph = namedGraph => {
+  return {
+    type: types.SET_NAMED_GRAPH,
+    namedGraph
+  };
+};
+
+export const setSparqlEndpointIri = sparqlEndpointIri => {
+  return {
+    type: types.SET_SPARQL_ENDPOINT_IRI,
+    sparqlEndpointIri
+  };
+};
+
+export const setDataSampleIri = dataSampleIri => {
+  return {
+    type: types.SET_DATA_SAMPLE_IRI,
+    dataSampleIri
+  };
+};
 
 export default {
   incrementActiveStep,
   decrementActiveStep,
   resetActiveStep,
   setSelectedInputExample,
+  resetSelectedInputExample,
   setEtlExecutionStatus,
-  changeTabAction
+  setNamedGraph,
+  setSparqlEndpointIri,
+  setDataSampleIri
 };

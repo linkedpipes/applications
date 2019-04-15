@@ -9,10 +9,14 @@ import {
   urlDomain,
   getQueryString,
   replaceAll,
-  extractUrlGroups
+  extractUrlGroups,
+  unixTimeConverter,
+  getLocation
 } from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
+import StorageToolbox from './StorageToolbox';
+import { withAuthorization, withWebId } from './third-party';
 
 export {
   VisualizersService,
@@ -27,5 +31,10 @@ export {
   replaceAll,
   extractUrlGroups,
   getBeautifiedVisualizerTitle,
-  Log
+  unixTimeConverter,
+  Log,
+  getLocation,
+  StorageToolbox,
+  withAuthorization,
+  withWebId
 };

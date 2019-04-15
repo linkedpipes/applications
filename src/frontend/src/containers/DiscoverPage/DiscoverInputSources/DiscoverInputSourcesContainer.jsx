@@ -2,6 +2,13 @@ import DiscoverInputSourcesComponent from './DiscoverInputSourcesComponent';
 import { discoverActions } from '../duck';
 import { connect } from 'react-redux';
 
+const mapStateToProps = state => {
+  return {
+    selectedInputExample: state.discover.selectedInputExample,
+    activeStep: state.discover.activeStep
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   const onInputExampleClicked = sample =>
     dispatch(discoverActions.setSelectedInputExample(sample));
@@ -10,13 +17,6 @@ const mapDispatchToProps = dispatch => {
   return {
     onInputExampleClicked,
     onNextClicked
-  };
-};
-
-const mapStateToProps = state => {
-  return {
-    selectedInputExample: state.discover.selectedInputExample,
-    activeStep: state.discover.activeStep
   };
 };
 

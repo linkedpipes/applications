@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import connect from 'react-redux/lib/connect/connect';
+import { connect } from 'react-redux';
 import { discoverActions } from '../duck';
-import { globalActions } from '@ducks/globalDuck';
+import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
 import ErrorBoundary from 'react-error-boundary';
 
@@ -66,7 +66,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
 DiscoverPipelinesPickerContainer.propTypes = {
   dataSourceGroups: PropTypes.any,
   discoveryId: PropTypes.any,
-  executions: PropTypes.any,
   handleSetSelectedPipelineId: PropTypes.any,
   onNextClicked: PropTypes.any
 };
@@ -74,7 +73,7 @@ DiscoverPipelinesPickerContainer.propTypes = {
 const mapDispatchToProps = dispatch => {
   const handleSetSelectedPipelineId = pipelineId =>
     dispatch(
-      globalActions.setPipelineIdAction({
+      etlActions.setPipelineIdAction({
         id: pipelineId
       })
     );
@@ -91,7 +90,7 @@ const mapStateToProps = state => {
   return {
     exportsDict: state.etl.exports,
     executions: state.etl.executions,
-    discoveryId: state.globals.discoveryId,
+    discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     dataSourceGroups:
       state.globals.selectedVisualizer !== undefined

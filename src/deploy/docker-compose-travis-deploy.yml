@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  backend:
+    image: linkedpipes/applications:backend
+    container_name: lpa-backend
+    environment:
+      SENTRY_ENVIRONMENT: "development"
+    build:
+      context: ../backend/
+
+  frontend-dev:
+    image: linkedpipes/applications:frontend
+    container_name: lpa-frontend
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
+    build:
+      context: ../frontend/
+      dockerfile: Dockerfile
+
+  frontend-prod:
+    image: linkedpipes/applications:frontend-prod
+    container_name: lpa-frontend
+    environment: 
+      NODE_OPTIONS: --max_old_space_size=4096
+    build:
+      context: ../frontend/
+      dockerfile: Dockerfile-prod

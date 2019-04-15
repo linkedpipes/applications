@@ -1,25 +1,30 @@
-import { BASE_URL, rest } from './api.service';
-import { getQueryString } from './global.utils';
+import lpaAxios from './api.service';
 
-const GET_MARKERS_URL = `${BASE_URL}map/markers`;
-const GET_PROPERTIES_URL = `${BASE_URL}map/properties`;
-const SKOS_CONCEPTS_URL = `${BASE_URL}skos/concepts`;
-const SKOS_CONCEPTS_COUNT_URL = `${BASE_URL}skos/conceptsCounts`;
-const SKOS_SCHEME_URL = `${BASE_URL}skos/schemeSubtree`;
+// Note that axios will remove from the request params
+// the params that are null or undefined
 
 const VisualizersService = {
   getFilters: async () => {
-    return rest(GET_PROPERTIES_URL, undefined, 'GET', undefined);
+    return lpaAxios.get('/map/properties');
   },
 
+  // why is this a post request?
   getMarkers: async ({ resultGraphIri, filters = {} }) => {
-    return rest(
-      `${GET_MARKERS_URL}?${getQueryString({
-        resultGraphIri
-      })}`,
-      filters,
-      'POST'
-    );
+    return lpaAxios.post('/map/markers', filters, {
+      params: { resultGraphIri }
+    });
+  },
+
+  getChordNodes: async (resultGraphIri, limit, offset) => {
+    return lpaAxios.get('/chord/nodes', {
+      params: { resultGraphIri, limit, offset }
+    });
+  },
+
+  getChordData: async (resultGraphIri, nodeUris, useWeights = true) => {
+    return lpaAxios.post('/chord/matrix', nodeUris, {
+      params: { resultGraphIri, useWeights }
+    });
   },
 
   getSkosScheme: async (
@@ -27,26 +32,22 @@ const VisualizersService = {
     resultGraphIri = null,
     conceptUri = null
   ) => {
-    let url = `${SKOS_SCHEME_URL}?schemeUri=${schemeUri}`;
-    if (conceptUri) url += `&conceptUri=${conceptUri}`;
-    if (resultGraphIri) url += `&resultGraphIri=${resultGraphIri}`;
-    return rest(url, undefined, 'GET', undefined);
+    return lpaAxios.get('/skos/schemeSubtree', {
+      params: { schemeUri, resultGraphIri, conceptUri }
+    });
   },
 
   getSKOSConcepts: async () => {
-    return rest(SKOS_CONCEPTS_URL, undefined, 'GET', undefined);
+    return lpaAxios.get('/skos/schemeSubtree');
   },
 
+  // Again, should it really be POST?
   getSKOSConceptsCount: async ({ propertyUri, conceptUris }) => {
-    return rest(
-      SKOS_CONCEPTS_COUNT_URL,
-      { propertyUri, conceptUris },
-      'POST',
-      undefined
-    );
+    return lpaAxios.post('skos/conceptsCounts', { propertyUri, conceptUris });
   }
 };
 
+// Maybe move to misc/utils?
 const getBeautifiedVisualizerTitle = visualizerId => {
   if (visualizerId !== undefined) {
     // eslint-disable-next-line func-names no-useless-escape
@@ -54,7 +55,6 @@ const getBeautifiedVisualizerTitle = visualizerId => {
     const capitalized = removedUnderscore.replace(/\w\S*/g, txt => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
-
     return capitalized;
   }
   return '';

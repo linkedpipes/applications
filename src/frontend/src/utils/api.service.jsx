@@ -1,33 +1,41 @@
-import 'whatwg-fetch';
+import axios from 'axios';
+import Log from './logger.service';
+import * as Sentry from '@sentry/browser';
 
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
+axios.defaults.baseURL = process.env.BASE_BACKEND_URL || '/api';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.interceptors.request.use(
+  config => {
+    // Do something before request is sent
+
+    Log.info(config, 'api.service');
+    return config;
+  },
+  error => {
+    // Do something with request error
+    Log.info(error, 'api.service');
+    return Promise.reject(error);
   }
-  return response;
-}
+);
 
-export const rest = (
-  url,
-  body = '',
-  method = 'POST',
-  contentType = 'application/json'
-) => {
-  // console.log('Sending request:\n');
-  // console.log(`URL: ${url}\n`);
-  // console.log(`Body: ${JSON.stringify(body)}\n`);
-  // console.log(`Method: ${method}\n`);
+axios.interceptors.response.use(
+  response => {
+    Log.info(response, 'api.service');
+    return response;
+  },
+  error => {
+    // handle error
+    if (error.response) {
+      Log.error(error.response.data.message, 'api.service');
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setExtra('api-call', error.response.data);
+        Sentry.captureException(error);
+        Sentry.showReportDialog(); // Only if not production
+      });
+    }
+  }
+);
+const wrappedAxios = axios;
 
-  return method === 'POST'
-    ? fetch(url, {
-        method,
-        body: body.constructor === File ? body : JSON.stringify(body),
-        headers: {
-          'Content-Type': contentType
-        },
-        credentials: 'same-origin'
-      }).then(handleErrors)
-    : fetch(url).then(handleErrors);
-};
-
-export const BASE_URL = process.env.BASE_BACKEND_URL;
+export default wrappedAxios;

@@ -3,24 +3,24 @@ import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService, Log } from '@utils';
-import { CircularProgress } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
 };
 
 type State = {
   dataLoadingStatus: string,
-  chartData: Array<Array<mixed>>
+  chartData: Array<Array<any>>
 };
 
 const styles = theme => ({
-  root: {
-    height: '72vh'
-  },
   filterSideBar: {
     overflowY: 'auto'
   },
@@ -50,6 +50,19 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'treemap',
+        conceptIri:
+          'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'TREEMAP'
+      });
+    }
+
     this.conceptsFetched = new Set();
     // Add the root to the list of fetched data
     this.conceptsFetched.add(
@@ -76,7 +89,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
             this.props.selectedResultGraphIri,
             iri
           );
-          const jsonData = await response.json();
+          const jsonData = await response.data;
 
           // Update state
           this.setState(
@@ -101,7 +114,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       this.props.selectedResultGraphIri
     );
     const headers = [['id', 'parentId', 'size', 'color']];
-    const jsonData = await response.json();
+    const jsonData = await response.data;
     const chartData = headers.concat(transformData(jsonData));
     this.setState({
       dataLoadingStatus: 'ready',
@@ -113,15 +126,14 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
   chartEvents: Array<{
     eventName: string,
-    callback: ({ chartWrapper: any }) => void
+    callback: ({ chartWrapper: any }) => Function
   }>;
 
   render() {
     const { classes } = this.props;
     return this.state.dataLoadingStatus === 'ready' ? (
       <Chart
-        width={'100%'}
-        height={'75vh'}
+        height="99%"
         chartType="TreeMap"
         loader={<div>Loading Chart</div>}
         data={this.state.chartData}

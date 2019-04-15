@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import {
   withScriptjs,
   withGoogleMap,
@@ -7,7 +7,7 @@ import {
   Marker
 } from 'react-google-maps';
 import MarkerClusterer from 'react-google-maps/lib/components/addons/MarkerClusterer';
-import { compose, withProps } from 'recompose';
+import { compose, withProps, type HOC } from 'recompose';
 import uuid from 'uuid';
 import { Log, VisualizersService } from '@utils';
 
@@ -15,7 +15,10 @@ type Props = {
   classes: {
     progress: number
   },
-  selectedResultGraphIri: string
+  selectedResultGraphIri: string,
+  propMarkers: Array<{ coordinates: { lat: number, lon: number } }>,
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
 };
 
 type State = {
@@ -23,7 +26,7 @@ type State = {
   zoomToMarkers: any
 };
 
-class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
+class GoogleMapsVisualizer extends PureComponent<Props, State> {
   constructor() {
     super();
     this.state = {
@@ -32,13 +35,54 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    const {
+      propMarkers,
+      selectedResultGraphIri,
+      handleSetCurrentApplicationData,
+      isPublished
+    } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'map',
+        propMarkers,
+        visualizerCode: 'MAP'
+      });
+    }
+
+    const self = this;
+
+    if (propMarkers.length === 0) {
+      VisualizersService.getMarkers({
+        resultGraphIri: selectedResultGraphIri
+      })
+        .then(response => {
+          if (response !== undefined) {
+            const data = response.data;
+            self.updateMarkersState(data);
+          }
+        })
+        .catch(reason => Log.error(reason.message));
+    } else {
+      self.updateMarkersState(propMarkers);
+    }
+  }
+
+  fetchMarkers = async selectedResultGraphIri => {
     const response = await VisualizersService.getMarkers({
-      resultGraphIri: this.props.selectedResultGraphIri
+      resultGraphIri: selectedResultGraphIri
     });
-    const jsonData = await response.json();
+    const responseMarkers = await response.json();
+    // only proceed once second promise is resolved
+    return responseMarkers;
+  };
+
+  updateMarkersState = markers => {
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
     this.setState({
-      markers: jsonData,
+      markers,
       zoomToMarkers: map => {
         const bounds = new window.google.maps.LatLngBounds();
         if (map !== null) {
@@ -55,11 +99,20 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
               }
             });
             map.fitBounds(bounds);
+
+            if (!isPublished) {
+              handleSetCurrentApplicationData({
+                id: uuid.v4(),
+                applicationEndpoint: 'map',
+                markers,
+                visualizerCode: 'MAP'
+              });
+            }
           }
         }
       }
     });
-  }
+  };
 
   render() {
     const { markers, zoomToMarkers } = this.state;
@@ -86,7 +139,14 @@ class GoogleMapsVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const GoogleMapsVisualizerWithProps = compose(
+type GoogleMapsVisualizerProps = {
+  googleMapURL?: string,
+  loadingElement: Object,
+  containerElement: Object,
+  mapElement: Object
+};
+
+const enhance: HOC<*, GoogleMapsVisualizerProps> = compose(
   withProps({
     googleMapURL:
       'https://maps.googleapis.com/maps/api/js?key=AIzaSyA5rWPSxDEp4ktlEK9IeXECQBtNUvoxybQ&libraries=places',
@@ -96,6 +156,6 @@ const GoogleMapsVisualizerWithProps = compose(
   }),
   withScriptjs,
   withGoogleMap
-)(props => <GoogleMapsVisualizer {...props} />);
+);
 
-export default GoogleMapsVisualizerWithProps;
+export default enhance(GoogleMapsVisualizer);

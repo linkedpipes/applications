@@ -1,16 +1,22 @@
 package com.linkedpipes.lpa.backend;
 
 import com.corundumstudio.socketio.*;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.typesafe.config.Config;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,8 +37,35 @@ public class Application {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:9001", "https://applications.linkedpipes.com");
+                registry.addMapping("/**")
+                        .allowedOrigins(getConfig().getStringList("lpa.allowedOrigins").toArray(new String[0]));
             }
+        };
+    }
+
+    @Bean
+    @SuppressWarnings("unused")
+    public ServletContextInitializer sentryServletContextInitializer() {
+        return new io.sentry.spring.SentryServletContextInitializer();
+    }
+
+    @Bean
+    public HandlerExceptionResolver sentryExceptionResolver() {
+        return new io.sentry.spring.SentryExceptionResolver() {
+            @Override
+            public ModelAndView resolveException(HttpServletRequest request,
+                                                 HttpServletResponse response,
+                                                 Object handler,
+                                                 Exception ex) {
+
+                    if (ex instanceof LpAppsException && ((LpAppsException) ex).getErrorStatus().is4xxClientError())
+                        return null;
+
+                    super.resolveException(request, response, handler, ex);
+
+                return null;
+            }
+
         };
     }
 
@@ -40,6 +73,7 @@ public class Application {
     private static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();
         config.setPort(9092);
+        config.setRandomSession(true);  //default is false
         SocketConfig socketConfig = new SocketConfig();
         socketConfig.setReuseAddress(true);
         config.setSocketConfig(socketConfig);
@@ -48,12 +82,12 @@ public class Application {
         SocketIOServer server = new SocketIOServer(config);
 
         server.addEventListener("join", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
-                logger.info("Client joined room: " + roomName);
+                logger.info("Client " + socketIOClient.getSessionId() + " joined room: " + roomName);
                 socketIOClient.joinRoom(roomName);
             });
 
         server.addEventListener("leave", String.class, (SocketIOClient socketIOClient, String roomName, AckRequest ackRequest) -> {
-                logger.info("Client left room: " + roomName);
+                logger.info("Client " + socketIOClient.getSessionId() + " left room: " + roomName);
                 socketIOClient.leaveRoom(roomName);
             });
 
@@ -61,7 +95,6 @@ public class Application {
     }
 
     public static void main(String[] args) {
-
         SpringApplication.run(Application.class, args);
 
         SOCKET_IO_SERVER.start();
