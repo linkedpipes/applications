@@ -13,28 +13,33 @@ import withMobileDialog from '@material-ui/core/withMobileDialog';
 import InputBase from '@material-ui/core/InputBase';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { getBeautifiedVisualizerTitle } from '@utils';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
-  headerParams: { title: string, subtitle?: string },
   handlePublishClicked: Function,
+  handleEmbedClicked: Function,
   handleAppTitleChanged: Function,
   publishDialogOpen: boolean,
+  embedDialogOpen: boolean,
   handleClosePublishDialog: Function,
+  handleCloseEmbedDialog: Function,
   handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
   fullScreen: any,
   appIri: string,
   selectedVisualizer: Object,
-  selectedApplicationTitle: string
+  selectedApplicationTitle: string,
+  handleChangeHeight: Function,
+  handleChangeWidth: Function,
+  height: number,
+  width: number
 };
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1
-  },
+  root: {},
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
@@ -44,7 +49,8 @@ const styles = theme => ({
   textField: {
     flexGrow: 1,
     width: '100%',
-    fontSize: 30
+    fontSize: 30,
+    marginTop: '1rem'
   },
   button: {
     margin: theme.spacing.unit
@@ -54,15 +60,22 @@ const styles = theme => ({
 const VisualizerControllerHeaderComponent = ({
   classes,
   handlePublishClicked,
+  handleEmbedClicked,
   handleAppTitleChanged,
   publishDialogOpen,
+  embedDialogOpen,
   handleClosePublishDialog,
+  handleCloseEmbedDialog,
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
   fullScreen,
   selectedApplicationTitle,
   selectedVisualizer,
-  appIri
+  appIri,
+  height,
+  width,
+  handleChangeHeight,
+  handleChangeWidth
 }: Props) => (
   <div className={classes.root}>
     <Paper className={classes.header} position="static" color="default">
@@ -121,7 +134,7 @@ const VisualizerControllerHeaderComponent = ({
             <Button
               variant="outlined"
               color="primary"
-              onClick={handlePublishClicked}
+              onClick={handleEmbedClicked}
             >
               Embed
             </Button>
@@ -130,7 +143,6 @@ const VisualizerControllerHeaderComponent = ({
       </Grid>
     </Paper>
     <Dialog
-      fullScreen={fullScreen}
       open={publishDialogOpen}
       onClose={handleClosePublishDialog}
       aria-labelledby="responsive-dialog-title"
@@ -148,6 +160,7 @@ const VisualizerControllerHeaderComponent = ({
       <DialogContent>
         <CopyToClipboard text={appIri} onCopy={handleCopyLinkClicked}>
           <TextField
+            className={classes.textField}
             color="primary"
             label="Click to copy"
             variant="outlined"
@@ -171,6 +184,74 @@ const VisualizerControllerHeaderComponent = ({
           autoFocus
         >
           Browse Published Apps
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+    <Dialog
+      open={embedDialogOpen}
+      onClose={handleCloseEmbedDialog}
+      aria-labelledby="responsive-dialog-title"
+    >
+      <DialogTitle id="responsive-dialog-title">
+        {'Application published and ready to be embedded'}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Here is the code needed to embed the visualization into another
+          website
+        </DialogContentText>
+      </DialogContent>
+      <DialogContent>
+        <TextField
+          id="height-input"
+          style={{
+            textDecoration: 'none'
+          }}
+          className={classes.textField}
+          variant="outlined"
+          label="Height"
+          value={height}
+          onChange={handleChangeHeight}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">px</InputAdornment>
+          }}
+        />
+        <TextField
+          id="width-input"
+          style={{
+            textDecoration: 'none'
+          }}
+          className={classes.textField}
+          variant="outlined"
+          label="Width"
+          value={width}
+          onChange={handleChangeWidth}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">px</InputAdornment>
+          }}
+        />
+        <CopyToClipboard
+          text={`<iframe src="${appIri}" height="${height}" width="${width}"></iframe>`}
+          onCopy={handleCopyLinkClicked}
+        >
+          <TextField
+            color="primary"
+            label="Click to copy"
+            variant="outlined"
+            fullWidth
+            className={classes.textField}
+            value={`<iframe src="${appIri}" height="${height}" width="${width}></iframe>`}
+            autoFocus
+            style={{
+              textDecoration: 'none'
+            }}
+          />
+        </CopyToClipboard>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseEmbedDialog} color="primary" autoFocus>
+          Close
         </Button>
       </DialogActions>
     </Dialog>

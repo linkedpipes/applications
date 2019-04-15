@@ -17,8 +17,10 @@ type Props = {
 
 const styles = {
   root: {
-    justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    display: 'flex',
+    flexFlow: 'column',
+    height: '100%'
   },
   card: {},
   input: {}

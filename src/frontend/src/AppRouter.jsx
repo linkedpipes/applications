@@ -42,7 +42,8 @@ const socket = io.connect(
 
 const styles = () => ({
   root: {
-    display: 'flex'
+    display: 'flex',
+    height: '100vh'
   }
 });
 

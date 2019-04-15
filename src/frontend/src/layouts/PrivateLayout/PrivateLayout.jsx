@@ -19,6 +19,7 @@ const styles = theme => ({
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
+    flexFlow: 'column',
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto'
