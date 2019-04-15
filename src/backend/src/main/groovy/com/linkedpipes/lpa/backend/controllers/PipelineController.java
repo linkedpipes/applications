@@ -5,10 +5,7 @@ import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.ExecutorService;
-import com.linkedpipes.lpa.backend.services.PipelineExportService;
-import com.linkedpipes.lpa.backend.services.UserService;
+import com.linkedpipes.lpa.backend.services.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +53,7 @@ public class PipelineController {
      */
     @GetMapping("/api/pipeline/export")
     public ResponseEntity<PipelineExportResult> exportPipeline(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
-        PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(discoveryService.exportPipeline(discoveryId, pipelineUri));
     }
 
     /**

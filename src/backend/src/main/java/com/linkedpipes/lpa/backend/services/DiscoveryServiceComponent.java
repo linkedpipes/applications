@@ -8,25 +8,15 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.Visualizers;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.rdf.vocabulary.SD;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.Streams;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.RIOT;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.DataInputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -126,33 +116,6 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     public PipelineExportResult exportPipelineUsingSD(String discoveryId, String pipelineUri, ServiceDescription serviceDescription) throws LpAppsException {
         String exportResult = httpActions.exportPipelineUsingSD(discoveryId, pipelineUri, OBJECT_MAPPER.writeValueAsString(serviceDescription));
         return OBJECT_MAPPER.readValue(exportResult, PipelineExportResult.class);
-    }
-
-    @Override
-    public String getVirtuosoServiceDescription(String graphName) {
-        RIOT.init();
-
-        // create an empty model
-        Model model = ModelFactory.createDefaultModel();
-
-        //read base rdf from resource
-        InputStream fileStream = new DataInputStream(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl"));
-        model.read(fileStream, "", "TURTLE");
-
-        String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint");
-
-        //create triple ns1:service sd:namedGraph [sd:name <graphName>];
-        //resource, property, RDFNode
-        Resource endpoint = model.createResource(virtuosoEndpoint + "/service");
-        Resource blankNode = model.createResource().addProperty(SD.name, model.createResource(graphName));
-        model.add(endpoint, SD.namedGraph, blankNode);
-
-        StringWriter stringWriter = new StringWriter();
-        RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY);
-
-        String serviceDescription = stringWriter.toString();
-        logger.debug(String.format("Service description of our Virtuoso server for named graph <%s> is:\n%s", graphName, serviceDescription));
-        return serviceDescription;
     }
 
     @Override

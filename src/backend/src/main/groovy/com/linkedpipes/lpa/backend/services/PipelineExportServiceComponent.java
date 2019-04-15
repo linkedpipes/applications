@@ -3,26 +3,22 @@ package com.linkedpipes.lpa.backend.services;
 import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.entities.ServiceDescription;
-import com.linkedpipes.lpa.backend.entities.database.PipelineInformationRepository;
 import com.linkedpipes.lpa.backend.entities.database.PipelineInformationDao;
+import com.linkedpipes.lpa.backend.entities.database.PipelineInformationRepository;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
-import com.linkedpipes.lpa.backend.controllers.PipelineController;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
-
 import org.jetbrains.annotations.NotNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Profile("!disableDB")
