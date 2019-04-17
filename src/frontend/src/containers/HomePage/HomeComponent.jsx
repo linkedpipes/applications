@@ -1,11 +1,21 @@
 // @flow
-import * as React from 'react';
+import React, { PureComponent } from 'react';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import Button from '@material-ui/core/Button/Button';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import {
+  DiscoveriesTable,
+  ApplicationsTable,
+  PipelinesTable
+} from './children';
+import { samples } from '../DiscoverPage/DiscoverInputSources/DiscoverExamplesContainer';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -14,15 +24,29 @@ type Props = {
     button: {},
     templatesBtn: {},
     createBtn: {}
-  }
+  },
+  history: { push: any },
+  discoveriesList: Array<{ id: string, finished: boolean }>,
+  applicationsList: Array<any>,
+  pipelinesList: Array<{
+    executionIri: string,
+    selectedVisualiser: string,
+    status: { '@id'?: string, status?: string },
+    webId: string
+  }>,
+  onHandleTabChange: Function,
+  onHandleSelectDiscoveryClick: Function,
+  onHandleSampleClick: Function,
+  onHandleSelectPipelineExecutionClick: Function,
+  tabIndex: Number
 };
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
     marginTop: '2rem',
-    marginLeft: '10%',
-    marginRight: '10%'
+    marginLeft: '4%',
+    marginRight: '4%'
   },
   paper: {
     padding: theme.spacing.unit * 2,
@@ -33,13 +57,14 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: '90%'
   },
-  templatesBtn: {
+  createBtn: {
     margin: theme.spacing.unit,
     width: '90%',
     backgroundColor: theme.palette.primary.dark,
-    color: 'white'
+    color: 'white',
+    textTransform: 'none'
   },
-  createBtn: {
+  templatesBtn: {
     margin: theme.spacing.unit,
     width: '90%',
     backgroundColor: theme.palette.secondary.main,
@@ -48,52 +73,95 @@ const styles = theme => ({
   }
 });
 
-const HomeComponent = ({ classes }: Props) => (
-  <div className={classes.root}>
-    <Grid container spacing={24}>
-      <Grid item xs={4}>
-        <Paper className={classes.paper}>
-          <Typography variant="subtitle1" gutterBottom>
-            Start by creating a new application
-          </Typography>
-          <Link
-            style={{ textDecoration: 'none', color: 'transparent' }}
-            to="/discover"
-          >
-            <Button
-              variant="contained"
-              size="large"
-              className={classes.createBtn}
+class HomeComponent extends PureComponent<Props> {
+  render() {
+    const {
+      classes,
+      discoveriesList,
+      applicationsList,
+      pipelinesList,
+      onHandleTabChange,
+      onHandleSampleClick,
+      onHandleSelectDiscoveryClick,
+      onHandleSelectPipelineExecutionClick,
+      tabIndex
+    } = this.props;
+    return (
+      <div className={classes.root}>
+        <Grid container spacing={24}>
+          <Grid item xs={4}>
+            <Paper className={classes.paper}>
+              <Typography variant="subtitle1" gutterBottom>
+                Create a new application
+              </Typography>
+              <Link
+                style={{ textDecoration: 'none', color: 'transparent' }}
+                to="/discover"
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  className={classes.createBtn}
+                >
+                  Create
+                </Button>
+              </Link>
+              <br />
+              <Typography variant="subtitle1" gutterBottom>
+                Or try one of our predefined examples
+              </Typography>
+              {samples.map(sample => (
+                <Button
+                  key={uuid()}
+                  id={`${sample.label
+                    .replace(/ /g, '-')
+                    .toLowerCase()}-home-button`}
+                  variant="contained"
+                  size="large"
+                  className={classes.templatesBtn}
+                  onClick={onHandleSampleClick(sample)}
+                >
+                  {sample.label}
+                </Button>
+              ))}
+            </Paper>
+          </Grid>
+          <Grid item xs={8}>
+            <AppBar position="static" color="secondary">
+              <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
+                <Tab label="Discoveries" />
+                <Tab label="Pipelines" />
+                {/* <Tab label="My Applications" /> */}
+              </Tabs>
+            </AppBar>
+            <div
+              style={{
+                textAlign: 'center'
+              }}
             >
-              Create
-            </Button>
-          </Link>
-          <br />
-          <Button
-            variant="contained"
-            size="large"
-            className={classes.templatesBtn}
-          >
-            Templates
-          </Button>
-        </Paper>
-      </Grid>
-      <Grid item xs={8}>
-        <Paper className={classes.paper}>
-          <Typography variant="subtitle1" gutterBottom>
-            Recent applications
-          </Typography>
-        </Paper>
-      </Grid>
-      <Grid item xs={4}>
-        <Paper className={classes.paper}>
-          <Typography variant="subtitle1" gutterBottom>
-            Running discoveries
-          </Typography>
-        </Paper>
-      </Grid>
-    </Grid>
-  </div>
-);
+              {tabIndex === 0 && (
+                <DiscoveriesTable
+                  discoveriesList={discoveriesList}
+                  onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
+                />
+              )}
+              {tabIndex === 1 && (
+                <PipelinesTable
+                  pipelinesList={pipelinesList}
+                  onHandleSelectPipelineExecutionClick={
+                    onHandleSelectPipelineExecutionClick
+                  }
+                />
+              )}
+              {tabIndex === 2 && (
+                <ApplicationsTable applicationsList={applicationsList} />
+              )}
+            </div>
+          </Grid>
+        </Grid>
+      </div>
+    );
+  }
+}
 
 export default withStyles(styles)(HomeComponent);

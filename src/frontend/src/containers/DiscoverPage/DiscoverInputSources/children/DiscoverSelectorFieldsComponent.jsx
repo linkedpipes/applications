@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import { Grid, TextField } from '@material-ui/core';
-
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
 type Props = {
   classes: { textField: {} },
   dataSampleIri: string,

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.exceptions.UserTakenException;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.testutil.TestError;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
@@ -37,34 +36,9 @@ class DiscoveryControllerTests {
             }}
     );
 
-    private static final List<DataSource> DISCOVERY_DATA_SOURCES;
-
-    static {
-        try {
-            DISCOVERY_DATA_SOURCES = new LpAppsObjectMapper(new ObjectMapper()).readValue(
-                    ThrowableUtils.rethrowAsUnchecked(() ->
-                            StreamUtils.copyToString(
-                                    DiscoveryControllerTests.class.getResourceAsStream("discovery.data.sources.json"),
-                                    Application.DEFAULT_CHARSET
-                            )
-                    ),
-                    new TypeReference<ArrayList<DataSource>>() {
-                    }
-            );
-        } catch (LpAppsException e) {
-            throw new TestError(e);
-        }
-    }
-
-    private static final String DISCOVERY_CONFIG = ThrowableUtils.rethrowAsUnchecked(() ->
-            StreamUtils.copyToString(DiscoveryControllerTests.class.getResourceAsStream("discovery.config.rdf"),
-                    Application.DEFAULT_CHARSET));
-
-    private static final String DISCOVERY_CONFIG_IRI = "https://github.com/linkedpipes/discovery/blob/master/data/rdf/discovery-input/discovery/dbpedia-03/config.ttl";
-
-    private static final String NULL_DISCOVERY_ID = "00000000-0000-0000-0000-000000000000";
-    private static final String FAKE_DISCOVERY_ID = "12345678-90ab-cdef-ghij-klmnopqrstuv";
-
+    private static final String TEST_TREEMAP_DATA_SAMPLE_URI = "https://gist.githubusercontent.com/ivan-lattak/63801f3e6a9e6105aada4c207d0f8abb/raw/aa2a805a4b14da6fd30711532c4f58692018665b/cpv-2008_sample.ttl";
+    private static final String TEST_TREEMAP_NAMED_GRAPH_URI = "http://linked.opendata.cz/resource/dataset/cpv-2008";
+    private static final String TEST_TREEMAP_SPARQL_IRI = "https://linked.opendata.cz/sparql";
     private static final String USER_ID = "xyz";
 
     private final DiscoveryController discoveryController;
@@ -77,11 +51,7 @@ class DiscoveryControllerTests {
 
     @BeforeClass
     public void setUpUser() {
-        try {
-            userService.addUser(USER_ID);
-        } catch(UserTakenException e) {
-            //User already exists, thats ok on testing DB
-        }
+        userService.addUserIfNotPresent(USER_ID);
     }
 
     @Test
@@ -95,8 +65,9 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFakeUri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
+    void testStartDiscoveryFromEndpoint() throws LpAppsException {
+        ResponseEntity<?> response = discoveryController.startDiscoveryFromEndpoint(TEST_TREEMAP_SPARQL_IRI,
+                TEST_TREEMAP_DATA_SAMPLE_URI, TEST_TREEMAP_NAMED_GRAPH_URI, USER_ID);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -105,8 +76,8 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscovery() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, DISCOVERY_DATA_SOURCES);
+    void testStartDiscoveryFakeUri() throws LpAppsException {
+        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
@@ -131,30 +102,9 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInput() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInput(USER_ID, DISCOVERY_CONFIG);
-        assertFalse(response.getStatusCode().isError());
-
-        Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
-    }
-
-    @Test
     void testStartDiscoveryFromInputIriFake() {
         assertThrows(LpAppsException.class, () ->
                 discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI."));
     }
-
-    @Test
-    void testStartDiscoveryFromInputIri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscoveryFromInputIri(USER_ID, DISCOVERY_CONFIG_IRI);
-        assertFalse(response.getStatusCode().isError());
-
-        Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
-    }
-
 
 }

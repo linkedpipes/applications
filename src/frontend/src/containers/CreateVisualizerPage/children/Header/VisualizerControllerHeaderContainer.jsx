@@ -1,44 +1,93 @@
 // @flow
 import React, { PureComponent } from 'react';
 import VisualizerControllerHeaderComponent from './VisualizerControllerHeaderComponent';
-import { withWebId } from '@inrupt/solid-react-components';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, Log } from '@utils';
+import { StorageToolbox, withWebId } from '@utils';
 import { withRouter } from 'react-router-dom';
-import uuid from 'uuid';
+import { toast } from 'react-toastify';
 
 type Props = {
   selectedApplication: any,
   selectedApplicationTitle: any,
   handleAppTitleChanged: any,
   webId: string,
-  checkedPublished?: boolean,
   onRefreshSwitchChange?: (event: {}, checked: boolean) => void,
   headerParams: { title: string, subtitle?: string },
-  history: any
+  history: any,
+  selectedVisualizer: Object,
+  selectedApplicationTitle: string
 };
 
 type State = {
-  publishDialogOpen: boolean
+  publishDialogOpen: boolean,
+  embedDialogOpen: boolean,
+  appIri: string,
+  height: number,
+  width: number
 };
 
 class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
   state = {
-    publishDialogOpen: false
+    publishDialogOpen: false,
+    embedDialogOpen: false,
+    appIri: '',
+    height: 400,
+    width: 400
   };
 
   handlePublishClicked = () => {
     const { selectedApplication, selectedApplicationTitle, webId } = this.props;
-    const { handleClickPublishDialogOpen } = this;
-    selectedApplication.id = uuid.v4();
+    const { handleAppPublished } = this;
+
+    if (selectedApplicationTitle === '') {
+      toast.error('Please, provide application title!', {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 5000
+      });
+      return;
+    }
+
     StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
-      webId
-    ).then((appIri, error) => {
+      webId,
+      'public/lpapps'
+    ).then(({ applicationIri, applicationEndpoint }, error) => {
       if (!error) {
-        handleClickPublishDialogOpen();
+        const publishedUrl = StorageToolbox.appIriToPublishUrl(
+          applicationIri,
+          applicationEndpoint
+        );
+        handleAppPublished(publishedUrl);
+      }
+    });
+  };
+
+  handleEmbedClicked = () => {
+    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
+    const { handleAppEmbedded } = this;
+
+    if (selectedApplicationTitle === '') {
+      toast.error('Please, provide application title!', {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 5000
+      });
+      return;
+    }
+
+    StorageToolbox.saveAppToSolid(
+      selectedApplication,
+      selectedApplicationTitle,
+      webId,
+      'public/lpapps'
+    ).then(({ applicationIri, applicationEndpoint }, error) => {
+      if (!error) {
+        const publishedUrl = StorageToolbox.appIriToPublishUrl(
+          applicationIri,
+          applicationEndpoint
+        );
+        handleAppEmbedded(publishedUrl);
       }
     });
   };
@@ -49,6 +98,14 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     handleAppTitleChanged(value);
   };
 
+  handleAppPublished = appIri => {
+    this.setState({ appIri, publishDialogOpen: true });
+  };
+
+  handleAppEmbedded = appIri => {
+    this.setState({ appIri, embedDialogOpen: true });
+  };
+
   handleClickPublishDialogOpen = () => {
     this.setState({ publishDialogOpen: true });
   };
@@ -57,33 +114,74 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ publishDialogOpen: false });
   };
 
+  handleCloseEmbedDialog = () => {
+    this.setState({ embedDialogOpen: false });
+  };
+
   handleProceedToApplicationClicked = () => {
     this.props.history.push('/storage');
+  };
+
+  handleCopyLinkClicked = () => {
+    toast.success('Copied link to clipboard!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 2000
+    });
+  };
+
+  handleChangeWidth = event => {
+    this.setState({ width: event.target.value });
+  };
+
+  handleChangeHeight = event => {
+    this.setState({ height: event.target.value });
   };
 
   render() {
     const {
       headerParams,
       onRefreshSwitchChange,
-      checkedPublished
+      selectedVisualizer,
+      selectedApplicationTitle
     } = this.props;
     const {
       handlePublishClicked,
+      handleEmbedClicked,
       onHandleAppTitleChanged,
       handleClosePublishDialog,
-      handleProceedToApplicationClicked
+      handleCloseEmbedDialog,
+      handleProceedToApplicationClicked,
+      handleCopyLinkClicked,
+      handleChangeHeight,
+      handleChangeWidth
     } = this;
-    const { publishDialogOpen } = this.state;
+    const {
+      embedDialogOpen,
+      publishDialogOpen,
+      appIri,
+      height,
+      width
+    } = this.state;
     return (
       <VisualizerControllerHeaderComponent
         handleAppTitleChanged={onHandleAppTitleChanged}
         handlePublishClicked={handlePublishClicked}
+        handleEmbedClicked={handleEmbedClicked}
         headerParams={headerParams}
-        checkedPublished={checkedPublished}
         onRefreshSwitchChange={onRefreshSwitchChange}
         publishDialogOpen={publishDialogOpen}
+        embedDialogOpen={embedDialogOpen}
         handleClosePublishDialog={handleClosePublishDialog}
+        handleCloseEmbedDialog={handleCloseEmbedDialog}
         handleProceedToApplicationClicked={handleProceedToApplicationClicked}
+        handleCopyLinkClicked={handleCopyLinkClicked}
+        selectedVisualizer={selectedVisualizer}
+        selectedApplicationTitle={selectedApplicationTitle}
+        appIri={appIri}
+        height={height}
+        width={width}
+        handleChangeWidth={handleChangeWidth}
+        handleChangeHeight={handleChangeHeight}
       />
     );
   }

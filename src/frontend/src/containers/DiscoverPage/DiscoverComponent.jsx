@@ -87,28 +87,29 @@ const DiscoverComponent = ({
                 <div className={classes.actionsContainer}>
                   <div>
                     <Button
-                      disabled={activeStep === 0}
+                      disabled={
+                        activeStep === 0 ||
+                        etlExecutionStatus === ETL_STATUS_TYPE.Finished
+                      }
                       onClick={onBackClicked}
                       className={classes.button}
                     >
                       Back
                     </Button>
                     {activeStep === steps.length - 1 && (
-                      <Link
-                        style={{ textDecoration: 'none', color: 'transparent' }}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        id="create-app-button"
+                        className={classes.button}
+                        disabled={
+                          etlExecutionStatus !== ETL_STATUS_TYPE.Finished
+                        }
+                        component={Link}
                         to="/create-app"
                       >
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          className={classes.button}
-                          disabled={
-                            etlExecutionStatus !== ETL_STATUS_TYPE.Finished
-                          }
-                        >
-                          Create App
-                        </Button>
-                      </Link>
+                        Create App
+                      </Button>
                     )}
                   </div>
                 </div>

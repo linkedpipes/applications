@@ -15,7 +15,7 @@ const composeEnhancers =
   typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? // eslint-disable-next-line no-underscore-dangle
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-        // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+        // Specify extenreadFolderion’s options like name, actionsBlacklist, actionsCreators, serialize...
       })
     : compose;
 
@@ -29,16 +29,23 @@ const enhancer =
       )
     : composeEnhancers(applyMiddleware(...middlewares));
 
-const store = createStore(
-  combineReducers({
-    user: userReducer,
-    globals: globalReducer,
-    discover: discoverReducer,
-    discovery: discoveryReducer,
-    visualizers: visualizersReducer,
-    etl: etlReducer,
-    application: applicationReducer
-  }),
-  enhancer
-);
+const appReducer = combineReducers({
+  user: userReducer,
+  globals: globalReducer,
+  discover: discoverReducer,
+  discovery: discoveryReducer,
+  visualizers: visualizersReducer,
+  etl: etlReducer,
+  application: applicationReducer
+});
+
+const rootReducer = (state, action) => {
+  if (action.type === 'USER_LOGOUT') {
+    state = undefined;
+  }
+
+  return appReducer(state, action);
+};
+
+const store = createStore(rootReducer, enhancer);
 export default () => store;

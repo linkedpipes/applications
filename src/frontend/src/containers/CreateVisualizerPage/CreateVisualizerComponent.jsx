@@ -5,6 +5,7 @@ import { VisualizerControllerHeader, VisualizerContainer } from './children';
 
 type Props = {
   selectedVisualizer: any,
+  selectedApplication: any,
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,
@@ -16,8 +17,10 @@ type Props = {
 
 const styles = {
   root: {
-    justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    display: 'flex',
+    flexFlow: 'column',
+    height: '100%'
   },
   card: {},
   input: {}
@@ -29,19 +32,20 @@ const CreateVisualizerComponent = ({
   headerParams,
   filters,
   selectedResultGraphIri,
+  selectedApplication,
   handleSetCurrentApplicationData
 }: Props) => (
   <div className={classes.root}>
     <VisualizerControllerHeader
       headerParams={headerParams}
       onRefreshSwitchChange={() => {}}
-      checkedPublished={() => {}}
     />
     <VisualizerContainer
       filters={filters}
       visualizer={selectedVisualizer.visualizer}
       selectedResultGraphIri={selectedResultGraphIri}
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+      selectedApplication={selectedApplication}
     />
   </div>
 );

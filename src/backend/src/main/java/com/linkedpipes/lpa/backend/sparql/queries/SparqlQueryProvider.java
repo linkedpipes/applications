@@ -42,6 +42,21 @@ public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> imp
     }
 
     @NotNull
+    protected B addGroupBy(@NotNull B builder) {
+        return builder;
+    }
+
+    @NotNull
+    protected B addLimit(@NotNull B builder) {
+        return builder;
+    }
+
+    @NotNull
+    protected B addOffset(@NotNull B builder) {
+        return builder;
+    }
+
+    @NotNull
     protected B addAdditional(@NotNull B builder) {
         return builder;
     }

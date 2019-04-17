@@ -28,69 +28,25 @@ public class UserController {
     }
 
     @NotNull
-    @PostMapping("/api/user/discovery")
-    public ResponseEntity<List<Discovery>> getUserDiscoveries(@NotNull @RequestParam(value="webId", required=true) String user)
-                            throws LpAppsException {
-        try {
-            userService.addUserIfNotPresent(user);
-            return ResponseEntity.ok(userService.getUserDiscoveries(user));
-        } catch (UserNotFoundException e) {
-            logger.error("User not found: " + user);
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
-        }
-    }
-
-    @DeleteMapping("/api/user/discovery")
-    public void deleteUserDiscovery(@NotNull @RequestParam(value="webId", required=true) String user,
-                                    @NotNull @RequestParam(value="discoveryId", required=true) String discovery)
-                              throws LpAppsException {
-        logger.info("Delete discovery:: user = '" + user + "', discovery = '" + discovery + "'");
-        userService.deleteUserDiscovery(user, discovery);
-    }
-
-    @DeleteMapping("/api/user/execution")
-    public void deleteUserExecution(@NotNull @RequestParam(value="webId", required=true) String user,
-                                    @NotNull @RequestParam(value="executionIri", required=true) String execution)
-                              throws LpAppsException {
-        logger.info("Delete execution:: user = '" + user + "', execution = '" + execution + "'");
-        userService.deleteUserExecution(user, execution);
-    }
-
-    @NotNull
     @PostMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
                     throws LpAppsException {
         try {
-            userService.addUserIfNotPresent(user);
-            return ResponseEntity.ok(userService.getUserProfile(user));
-        } catch(UserNotFoundException e) {
-            logger.error("User not found: " + user);
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+            return ResponseEntity.ok(userService.addUserIfNotPresent(user));
+        } catch(org.springframework.dao.CannotAcquireLockException | org.hibernate.exception.LockAcquisitionException e) {
+            logger.warn("Error storing user, will retry once");
+            return ResponseEntity.ok(userService.addUserIfNotPresent(user));
         }
     }
 
     @NotNull
     @PostMapping("/api/user/application")
-    public ResponseEntity<UserProfile> addApplication(@NotNull @RequestParam(value="webId", required=true) String user,
+    public void addApplication(@NotNull @RequestParam(value="webId", required=true) String user,
                                                       @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
                       throws LpAppsException {
         try {
             userService.addUserIfNotPresent(user);
-            return ResponseEntity.ok(userService.addApplication(user, solidIri));
-        } catch(UserNotFoundException e) {
-          logger.error("User not found: " + user);
-          throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
-        }
-    }
-
-    @NotNull
-    @DeleteMapping("/api/user/application")
-    public ResponseEntity<UserProfile> deleteApplication(@NotNull @RequestParam(value="webId", required=true) String user,
-                                                         @NotNull @RequestParam(value="solidIri", required=true) String solidIri)
-                     throws LpAppsException {
-        try {
-            userService.addUserIfNotPresent(user);
-            return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
+            userService.addApplication(user, solidIri);
         } catch(UserNotFoundException e) {
           logger.error("User not found: " + user);
           throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);

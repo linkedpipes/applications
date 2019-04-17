@@ -2,7 +2,11 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { GoogleMapsVisualizer, TreemapVisualizer } from '@components';
+import {
+  GoogleMapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer
+} from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
 import FiltersComponent from '../Filters';
@@ -11,14 +15,14 @@ type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {} },
   filters: any,
   visualizer: { visualizerCode: string },
-  visualizerParams: any,
   selectedResultGraphIri: string,
-  handleSetCurrentApplicationData: Function
+  handleSetCurrentApplicationData: Function,
+  selectedApplication: Object
 };
 
 const styles = theme => ({
   root: {
-    height: '100vh'
+    flex: 1
   },
   containerView: {
     textAlign: 'center',
@@ -34,17 +38,26 @@ const styles = theme => ({
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
-  visualizerParams = null,
-  classes,
-  handleSetCurrentApplicationData
+  selectedApplication,
+  handleSetCurrentApplicationData,
+  classes
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-      const markers = [];
       return (
         <GoogleMapsVisualizer
-          markers={markers}
+          propMarkers={[]}
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
+      );
+    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+      const markers = selectedApplication.markers
+        ? selectedApplication.markers
+        : [];
+      return (
+        <GoogleMapsVisualizer
+          propMarkers={markers}
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
@@ -52,20 +65,25 @@ const getVisualizer = (
     }
     case VISUALIZER_TYPE.TREEMAP:
       return (
-        <TreemapVisualizer selectedResultGraphIri={selectedResultGraphIri} />
-      );
-    case VISUALIZER_TYPE.UNDEFINED:
-      return (
-        // <div className={classes.containerView}>
-        //   <Typography variant="h2" gutterBottom>
-        //     No visualizers selected...
-        //   </Typography>
-        // </div>
-        <GoogleMapsVisualizer
-          markers={[]}
+        <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
+      );
+    case VISUALIZER_TYPE.CHORD:
+      return (
+        <ChordVisualizer
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
+      );
+    case VISUALIZER_TYPE.UNDEFINED:
+      return (
+        <div className={classes.containerView}>
+          <Typography variant="h2" gutterBottom>
+            No visualizers selected...
+          </Typography>
+        </div>
       );
     default:
       return <div>No valid visualizer selected.</div>;
@@ -77,13 +95,13 @@ const VisualizerControllerContainer = (props: Props) => (
     <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
       <FiltersComponent filters={props.filters} />
     </Grid>
-    <Grid item lg={9} md={8} xs={12}>
+    <Grid id="viz-div" item lg={9} md={8} xs={12}>
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,
-        props.visualizerParams,
-        props.classes,
-        props.handleSetCurrentApplicationData
+        props.selectedApplication,
+        props.handleSetCurrentApplicationData,
+        props.classes
       )}
     </Grid>
   </Grid>

@@ -1,15 +1,54 @@
 os: "linux"
 
 stages:
+  - name: push-build
+    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
   - name: build
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis\])/
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
-    if: type = pull_request OR branch IN (master, dev) OR commit_message =~ /(\[Travis-Deploy\])/
+    if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-Deploy\])/
+  - name: e2e_tests
+    if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-E2E\])/
+
+env:
+  global:
+    - PGPORT=5433
 
 jobs:
   include:
+    - stage: push-build
+      language: node_js
+      node_js:
+        - stable
+      name: "Frontend"
+      before_script:
+        - cd src/frontend
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+        - export PATH="$HOME/.yarn/bin:$PATH"
+      cache:
+        yarn: true
+        directories:
+          - src/frontend/node_modules
+      script:
+        - yarn install --frozen-lockfile --check-files
+        - yarn run build
+    - name: "Backend"
+      language: java
+      jdk: openjdk10
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+      before_script:
+        - cd src/backend
+      script:
+        - ./gradlew assemble
+
     - stage: build
       language: node_js
       node_js:
@@ -37,12 +76,8 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
-      services:
-        - postgresql
       before_script:
         - cd src/backend
-        - psql -c "CREATE DATABASE lpa;" -U postgres
-        - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
       script:
         - ./gradlew assemble
 
@@ -57,15 +92,25 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
+      addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql-10
+            - postgresql-client-10
       services:
         - postgresql
-        - docker
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
+        - ./gradlew flywayClean flywayMigrate
       script:
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa test
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa test
+      after_script:
         - ./gradlew jacocoTestReport
         - ./gradlew sendCoverageToCodacy
 
@@ -74,7 +119,13 @@ jobs:
       jdk: openjdk10
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
+      addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql-10
+            - postgresql-client-10
       cache:
         directories:
           - $HOME/.gradle/caches/
@@ -82,39 +133,60 @@ jobs:
       services:
         - postgresql
         - docker
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
         - psql -c "CREATE USER lpa WITH PASSWORD 'example';" -U postgres
-      script:
+        - ./gradlew flywayClean flywayMigrate
+        - docker run --name my-virtuoso -p 8890:8890 -e DBA_PASSWORD=myDbaPassword  -e SPARQL_UPDATE=true  -e DEFAULT_GRAPH=http://www.example.com/my-graph -d tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
         - ./gradlew dockerRun
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 testIntegration
+      script:
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5433/lpa -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-graph-crud testIntegration
 
     - stage: deploy
-      name: "Deploying Backend to DockerHub"
-      sudo: required
+      name: "Pushing Backend & Frontend to DockerHub"
       services:
+        - postgresql
         - docker
-      script:
+      env:
+        - DOCKER_COMPOSE_VERSION=1.23.2
+      before_install:
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+        - sudo rm /usr/local/bin/docker-compose
+        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+        - chmod +x docker-compose
+        - sudo mv docker-compose /usr/local/bin
+      before_script:
+        - cd src/deploy
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-
-        - cd src/backend
-        - docker build -t linkedpipes/applications:backend --build-arg JAR_FILE=build/libs/backend-0.0.1.jar .
-        - docker push linkedpipes/applications:backend
-
-    - name: "Deploying Frontend to DockerHub"
-      sudo: required
-      services:
-        - docker
       script:
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-
-        - cd src/frontend
-        - docker build -t linkedpipes/applications:frontend .
-        - docker push linkedpipes/applications:frontend
-
-        - docker build -t linkedpipes/applications:frontend-prod -f Dockerfile-prod .
+        - docker-compose -f docker-compose-travis-deploy.yml build --parallel
         - docker push linkedpipes/applications:frontend-prod
+        - docker push linkedpipes/applications:frontend
+        - docker push linkedpipes/applications:backend
+        - curl $DEPLOYMENT_URL
+
+    - stage: e2e_tests
+      name: "E2E testing of whole LPA platform"
+      cache: pip
+      dist: xenial   # required for Python >= 3.7
+      language: python
+      python:
+        - "3.7"
+      install:
+        - cd src/tests
+        - pip3 install -r requirements.txt
+      script:
+        - sleep 30 # Hardcoded workaround to wait until data is deployed 
+        - python3 e2e_tests.py "$BROWSERSTACK_USERNAME" "$BROWSERSTACK_APIKEY" "$TRAVIS_BUILD_NUMBER" "$TRAVIS_BRANCH"
+      
 
 notifications:
   slack:

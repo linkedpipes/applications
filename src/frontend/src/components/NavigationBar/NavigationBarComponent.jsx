@@ -1,6 +1,7 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import { Toolbar, Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+import Toolbar from '@material-ui/core/Toolbar';
 import PropTypes from 'prop-types';
 import { withTheme, withStyles } from '@material-ui/core/styles';
 import { ToastContainer } from 'react-toastify';
@@ -16,7 +17,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
-import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import HelpIcon from '@material-ui/icons/Help';
 import classNames from 'classnames';
@@ -166,14 +166,14 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link>
 
-        <Link style={{ textDecoration: 'none' }} to="/create-app">
+        {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
             <ListItemIcon>
-              <ViewModuleIcon />
+              <ViewModuleIcon/>
             </ListItemIcon>
-            <ListItemText primary="Applications" />
+            <ListItemText primary="Applications"/>
           </ListItem>
-        </Link>
+        </Link> */}
 
         <Link style={{ textDecoration: 'none' }} to="/storage">
           <ListItem button>

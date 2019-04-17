@@ -1,13 +1,30 @@
-import axios from './api.service';
+import lpaAxios from './api.service';
+
+// Note that axios will remove from the request params
+// the params that are null or undefined
 
 const VisualizersService = {
   getFilters: async () => {
-    return axios.get('/map/properties');
+    return lpaAxios.get('/map/properties');
   },
 
   // why is this a post request?
   getMarkers: async ({ resultGraphIri, filters = {} }) => {
-    return axios.post('/map/markers', filters, { params: { resultGraphIri } });
+    return lpaAxios.post('/map/markers', filters, {
+      params: { resultGraphIri }
+    });
+  },
+
+  getChordNodes: async (resultGraphIri, limit, offset) => {
+    return lpaAxios.get('/chord/nodes', {
+      params: { resultGraphIri, limit, offset }
+    });
+  },
+
+  getChordData: async (resultGraphIri, nodeUris, useWeights = true) => {
+    return lpaAxios.post('/chord/matrix', nodeUris, {
+      params: { resultGraphIri, useWeights }
+    });
   },
 
   getSkosScheme: async (
@@ -15,20 +32,18 @@ const VisualizersService = {
     resultGraphIri = null,
     conceptUri = null
   ) => {
-    // Note that axios will remove from the request params
-    // the params that are null or undefined
-    return axios.get('/skos/schemeSubtree', {
+    return lpaAxios.get('/skos/schemeSubtree', {
       params: { schemeUri, resultGraphIri, conceptUri }
     });
   },
 
   getSKOSConcepts: async () => {
-    return axios.get('/skos/schemeSubtree');
+    return lpaAxios.get('/skos/schemeSubtree');
   },
 
   // Again, should it really be POST?
   getSKOSConceptsCount: async ({ propertyUri, conceptUris }) => {
-    return axios.post('skos/conceptsCounts', { propertyUri, conceptUris });
+    return lpaAxios.post('skos/conceptsCounts', { propertyUri, conceptUris });
   }
 };
 
