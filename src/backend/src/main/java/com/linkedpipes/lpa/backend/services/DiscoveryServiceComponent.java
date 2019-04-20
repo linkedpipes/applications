@@ -40,7 +40,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
-    private static final String OUR_DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template";
+    public static final String OUR_DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template";
 
     @NotNull private final ApplicationContext context;
     @NotNull private final HttpActions httpActions = new HttpActions();
