@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
+import com.linkedpipes.lpa.backend.entities.Filters;
 import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.services.geo.GeoService;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
@@ -8,12 +9,16 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @SuppressWarnings("unused")
 public class MapVisualizerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MapVisualizerController.class);
 
     /**
      * Get markers for displaying on map
@@ -23,8 +28,15 @@ public class MapVisualizerController {
      */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
-                                                   @RequestBody(required = false) Map<String, List<ValueFilter>> filters) {
-        return ResponseEntity.ok(GeoService.getMarkers(graphIri, filters));
+                                                   @RequestBody(required = false) Filters filters) {
+        logger.info("Get markers: listing filters");
+        for (String key : filters.filters.keySet()) {
+            for (ValueFilter vf : filters.filters.get(key)) {
+                logger.info("Key: " + key + ", label: " + vf.label + ", dataType: " + vf.dataType + ", uri: " + vf.uri + ", isActive: " + (vf.isActive?"yes":"no"));
+            }
+        }
+        logger.info("Done listing filters");
+        return ResponseEntity.ok(GeoService.getMarkers(graphIri, filters.filters));
     }
 
     @GetMapping("/api/map/properties")
