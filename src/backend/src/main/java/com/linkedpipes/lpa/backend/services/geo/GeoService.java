@@ -25,6 +25,7 @@ public class GeoService {
         }
 
         SelectSparqlQueryProvider provider = new MarkerQueryProvider(filters);
+        System.out.println(provider.get(graphIri));
         return JenaUtils.withQueryExecution(provider.get(graphIri), MarkerExtractor::extract);
     }
 
