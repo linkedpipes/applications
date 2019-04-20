@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/query/MarkerQuery.scala
 public class MarkerQueryProvider extends SelectSparqlQueryProvider {
@@ -35,7 +36,12 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
     public static final String[] LABEL_VARIABLES = {VAR_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION};
 
     public MarkerQueryProvider(Map<String, List<ValueFilter>> filters){
-        this.filters = filters;
+        //remove "active" filters, as we want to filter out triples that satisfy non-active properties
+        //keep only the ValueFilters that have isActive = false
+        Map<String, List<ValueFilter>> effectiveFilters = filters;
+        effectiveFilters.entrySet().forEach(f -> f.getValue().removeIf(vf -> (vf.isActive != null && vf.isActive)));
+        effectiveFilters.entrySet().removeIf(f -> f.getValue().size() == 0);
+        this.filters = effectiveFilters;
     }
 
     @NotNull
