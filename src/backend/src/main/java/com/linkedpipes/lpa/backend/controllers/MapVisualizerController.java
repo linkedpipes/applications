@@ -1,7 +1,7 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.entities.FiltersWrapper;
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
-import com.linkedpipes.lpa.backend.entities.Filters;
 import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.services.geo.GeoService;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
@@ -23,20 +23,21 @@ public class MapVisualizerController {
     /**
      * Get markers for displaying on map
      * @param graphIri
-     * @param filters
+     * @param filtersWrapper
      * @return
      */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
-                                                   @RequestBody(required = false) Filters filters) {
+                                                   @RequestBody(required = false) FiltersWrapper filtersWrapper) {
+
         logger.info("Get markers: listing filters");
-        for (String key : filters.filters.keySet()) {
-            for (ValueFilter vf : filters.filters.get(key)) {
+        for (String key : filtersWrapper.filters.keySet()) {
+            for (ValueFilter vf : filtersWrapper.filters.get(key)) {
                 logger.info("Key: " + key + ", label: " + vf.label + ", dataType: " + vf.dataType + ", uri: " + vf.uri + ", isActive: " + (vf.isActive?"yes":"no"));
             }
         }
         logger.info("Done listing filters");
-        return ResponseEntity.ok(GeoService.getMarkers(graphIri, filters.filters));
+        return ResponseEntity.ok(GeoService.getMarkers(graphIri, filtersWrapper.filters));
     }
 
     @GetMapping("/api/map/properties")
