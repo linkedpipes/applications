@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/query/MarkerQuery.scala
 public class MarkerQueryProvider extends SelectSparqlQueryProvider {
