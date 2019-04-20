@@ -22,7 +22,7 @@ type Props = {
 
 const styles = theme => ({
   root: {
-    height: '100vh'
+    flex: 1
   },
   containerView: {
     textAlign: 'center',
@@ -44,6 +44,13 @@ const getVisualizer = (
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
+      return (
+        <GoogleMapsVisualizer
+          propMarkers={[]}
+          selectedResultGraphIri={selectedResultGraphIri}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        />
+      );
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
       const markers = selectedApplication.markers
         ? selectedApplication.markers
@@ -88,7 +95,7 @@ const VisualizerControllerContainer = (props: Props) => (
     <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
       <FiltersComponent filters={props.filters} />
     </Grid>
-    <Grid item lg={9} md={8} xs={12}>
+    <Grid id="viz-div" item lg={9} md={8} xs={12}>
       {getVisualizer(
         props.visualizer.visualizerCode,
         props.selectedResultGraphIri,

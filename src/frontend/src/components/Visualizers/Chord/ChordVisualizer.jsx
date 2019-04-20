@@ -2,7 +2,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
-import { CircularProgress } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
 import uuid from 'uuid';
@@ -20,13 +20,11 @@ type State = {
   dataLoadingStatus: string,
   matrix: Array<Array<any>>,
   groupColors: Array<string>,
-  groupLabels: Array<string>
+  groupLabels: Array<string>,
+  size: number
 };
 
 const styles = theme => ({
-  root: {
-    height: '72vh'
-  },
   filterSideBar: {
     overflowY: 'auto'
   },
@@ -45,12 +43,15 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       dataLoadingStatus: 'loading',
       matrix: [],
       groupColors: [],
-      groupLabels: []
+      groupLabels: [],
+      size: 100
     };
   }
 
   async componentDidMount() {
     const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const size = document.getElementById('viz-div').clientHeight;
+    this.setState({ size });
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
@@ -96,6 +97,9 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         matrix={this.state.matrix}
         componentId={1}
         labelColors={this.state.groupLabels.map(() => 'whitesmoke')}
+        height={this.state.size}
+        width={this.state.size}
+        style={{ font: '10px sans-serif' }}
       />
     );
   }

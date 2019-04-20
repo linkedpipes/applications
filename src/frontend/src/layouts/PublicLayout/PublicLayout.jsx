@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { withWebId } from '@inrupt/solid-react-components';
+import { withWebId } from '@utils';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 

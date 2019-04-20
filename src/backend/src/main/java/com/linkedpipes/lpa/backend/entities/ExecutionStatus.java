@@ -13,12 +13,20 @@ public class ExecutionStatus {
 
     @JsonProperty("executionStarted")
     public long getStarted() {
-        return started.getTime() / 1000L;
+        if (started != null) {
+            return started.getTime() / 1000L;
+        } else {
+            return -1;
+        }
     }
 
     @JsonProperty("executionFinished")
     public long getFinished() {
-        return finished.getTime() / 1000L;
+        if (finished != null) {
+            return finished.getTime() / 1000L;
+        } else {
+            return -1;
+        }
     }
 
     @Override

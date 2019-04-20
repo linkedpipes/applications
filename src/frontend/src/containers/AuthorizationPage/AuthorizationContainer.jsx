@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
-import auth from 'solid-auth-client';
+import { login } from 'solid-auth-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { withWebId } from '@inrupt/solid-react-components';
-import { Log } from '@utils';
+import { Log, withWebId } from '@utils';
 
 const providers = {
   Inrupt: 'https://inrupt.net/auth',
@@ -50,7 +49,7 @@ class AuthorizationContainer extends Component {
 
       const ldp = withWebIdStatus ? webIdValue : providerLink;
 
-      const session = await auth.login(ldp, {
+      const session = await login(ldp, {
         callbackUri,
         storage: localStorage
       });

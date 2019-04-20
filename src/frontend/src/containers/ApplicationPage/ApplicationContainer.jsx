@@ -20,28 +20,16 @@ type Props = {
 
 type State = {
   applicationType: string,
-  applicationData: Object,
-  width: number,
-  height: number
+  applicationData: Object
 };
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
     applicationType: 'UNDEFINED',
-    applicationData: {},
-    width: 0,
-    height: 0
+    applicationData: {}
   };
 
-  constructor(props) {
-    super(props);
-    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-  }
-
   componentDidMount() {
-    this.updateWindowDimensions();
-    window.addEventListener('resize', this.updateWindowDimensions);
-
     const self = this;
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
@@ -56,10 +44,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
         Log.error(err, 'ApplicationContainer');
         return <div>No stored data found!</div>;
       });
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateWindowDimensions);
   }
 
   getApplication = (applicationType, applicationData) => {
@@ -101,26 +85,20 @@ class ApplicationContainer extends PureComponent<Props, State> {
     }
   };
 
-  updateWindowDimensions = () => {
-    this.setState({ width: window.innerWidth, height: window.innerHeight });
-  };
-
   render() {
     const { getApplication } = this;
-    const { applicationType, applicationData, width, height } = this.state;
+    const { applicationType, applicationData } = this.state;
 
     return (
-      <div>
-        <div
-          style={{
-            flex: 1,
-            width: `${width}px`,
-            height: `${height}px`,
-            textAlign: 'center'
-          }}
-        >
-          {getApplication(applicationType, applicationData)}
-        </div>
+      <div
+        id="viz-div"
+        style={{
+          flex: 1,
+          height: '100vh',
+          textAlign: 'center'
+        }}
+      >
+        {getApplication(applicationType, applicationData)}
       </div>
     );
   }

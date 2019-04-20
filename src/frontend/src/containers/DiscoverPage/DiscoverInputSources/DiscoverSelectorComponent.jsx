@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import 'react-toastify/dist/ReactToastify.css';
 import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import DiscoverSelectorFields from './children';
 
 type Props = {

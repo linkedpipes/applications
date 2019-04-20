@@ -3,10 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups, SocketContext, Log } from '@utils';
+import { DiscoveryService, extractUrlGroups, SocketContext, Log, withWebId } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import { withWebId } from '@inrupt/solid-react-components';
 import { discoverActions } from '../duck';
 
 type Props = {
@@ -33,15 +32,20 @@ type State = {
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
+  isMounted = false;
+
   state = {
     ttlFile: undefined,
     discoveryIsLoading: false,
     discoveryLoadingLabel: ''
   };
 
+  componentDidMount() {
+    this.isMounted = true;
+  }
+
   componentWillUnmount = () => {
-    const { socket } = this.props;
-    socket.removeListener('discoveryStatus');
+    this.isMounted = false;
   };
 
   postStartFromFile = async instance => {
@@ -119,11 +123,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
-    socket.emit('join', discoveryId);
     socket.on('discoveryStatus', data => {
+      if (!this.isMounted) {
+        return;
+      }
+
       if (data === undefined) {
-        socket.emit('leave', discoveryId);
-        socket.removeListener('discoveryStatus');
         self.setState({
           discoveryIsLoading: false
         });
@@ -140,8 +145,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           return;
         }
         if (parsedData.status.isFinished) {
-          socket.emit('leave', discoveryId);
-          socket.removeListener('discoveryStatus');
           self.loadPipelineGroups(discoveryId).then(() => {
             self.setState({
               discoveryIsLoading: false
