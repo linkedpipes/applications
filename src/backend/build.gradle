@@ -69,6 +69,9 @@ dependencies {
 
 sourceSets {
     main {
+        groovy.srcDirs = ["$projectDir/src/main/groovy", "$projectDir/src/main/java"]
+        java.srcDirs = []
+        
         resources {
             srcDir "src/main/config"
         }
