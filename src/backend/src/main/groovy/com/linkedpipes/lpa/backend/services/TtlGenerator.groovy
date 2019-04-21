@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD
+import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.Nullable
 
 class TtlGenerator {
 
-    private static final String DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template"
     private static final String DATASET_OUTPUT_TITLE = "Unspecified user-provided dataset output"
     private static final String DATASET_CONFIG_TITLE = "Unspecified user-provided dataset default configuration"
 
@@ -96,7 +96,7 @@ class TtlGenerator {
                                 (LPD.configurationQuery): configurationQuery,
                         ])
                 )
-                prop DCTerms.title, DATASET_TEMPLATE_TITLE, "en"
+                prop DCTerms.title, DiscoveryServiceComponent.OUR_DATASET_TEMPLATE_TITLE, "en"
             }
         }.build()
     }
