@@ -20,12 +20,16 @@ export default class AppConfiguration {
   /** A text of the application's endpoint */
   endpoint: string;
 
+  /** Used to assing individual random color to visualizer */
+  cardColor: string;
+
   constructor(
     url: string,
     object: string,
     title: string,
     endpoint: String,
     creator: string,
+    cardColor: string,
     createdAt: Date
   ) {
     this.url = url;
@@ -33,6 +37,7 @@ export default class AppConfiguration {
     this.title = title;
     this.endpoint = endpoint;
     this.creator = creator;
+    this.cardColor = cardColor;
     this.createdAt = createdAt;
   }
 }

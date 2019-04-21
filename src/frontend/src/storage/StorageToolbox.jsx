@@ -1,7 +1,6 @@
 /* eslint-disable */
 import stringHash from 'string-hash';
-import { getLocation } from '../utils/global.utils';
-import Log from '../utils/logger.service';
+import { Log, GlobalUtils } from '@utils';
 import SolidBackend from './StorageBackend';
 
 const os = require('os');
@@ -14,14 +13,16 @@ const shareApp = (appIri, webId) => {
     return;
   }
 
-  const title = getLocation(appIri)
+  const title = GlobalUtils.getLocation(appIri)
     .pathname.split('/public/lpapps/')[1]
     .split('.json')[0];
 
-  const url = `${getLocation(webId).origin}/inbox/lpapps/${title}`;
+  const url = `${GlobalUtils.getLocation(webId).origin}/inbox/lpapps/${title}`;
 
   return new Promise((resolve, reject) => {
-    import('solid-file-client').then(FileClient => {
+    import(
+      /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
+    ).then(FileClient => {
       FileClient.updateFile(url, appIri, 'text/plain').then(
         () => {
           Log.info(`Updated file!`);
@@ -75,6 +76,8 @@ const saveAppToSolid = async (
 
   const appEndpoint = appData.applicationEndpoint;
 
+  const randomColor = GlobalUtils.randDarkColor();
+
   return await SolidBackend.uploadAppConfiguration(
     file,
     appTitle,
@@ -82,6 +85,7 @@ const saveAppToSolid = async (
     webId,
     appFolder,
     isPublic,
+    randomColor,
     []
   );
 };
@@ -91,7 +95,7 @@ const removeAppFromStorage = async appConfiguration => {
 };
 
 const loadAppFromSolid = appIri => {
-  import('solid-file-client').then(FileClient => {
+  import(/* webpackChunkName: "solid-file-client" */  'solid-file-client').then(FileClient => {
     FileClient.readFile(appIri).then(
       body => {
         Log.info(`File content is : ${body}.`, 'StorageToolbox');
@@ -103,9 +107,9 @@ const loadAppFromSolid = appIri => {
 };
 
 const createOrUpdateFolder = (webId, path) => {
-  const folderPath = `${getLocation(webId).origin}/${path}`;
+  const folderPath = `${GlobalUtils.getLocation(webId).origin}/${path}`;
 
-  import('solid-file-client').then(FileClient => {
+  import(/* webpackChunkName: "solid-file-client" */  'solid-file-client').then(FileClient => {
     FileClient.readFolder(folderPath).then(
       folder => {
         Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);

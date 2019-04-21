@@ -1,11 +1,9 @@
 // @flow
 import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
-import axios from 'axios';
 // eslint-disable-next-line import/order
-import { Log, getLocation, withWebId } from '@utils';
+import { Log } from '@utils';
 import StorageBackend from '../../StorageBackend';
-import StorageToolbox from '../../StorageToolbox';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
@@ -13,8 +11,7 @@ import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
   webId: string,
-  applicationsFolder: string,
-  setApplicationLoaderStatus: Function
+  applicationsFolder: string
 };
 
 type State = {
@@ -42,6 +39,8 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.setApplicationLoaderStatus(false);
   }
+
+  setApplicationLoaderStatus: boolean => void;
 
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingAppIsActive: isLoading });
@@ -83,11 +82,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     const { handleApplicationDeleted, setApplicationLoaderStatus } = this;
     const { loadingAppIsActive } = this.state;
     return (
-      <LoadingOverlay
-        active={loadingAppIsActive}
-        spinner
-        text="Loading application..."
-      >
+      <LoadingOverlay active={loadingAppIsActive} spinner>
         <StorageAppsBrowserComponent
           applicationsMetadata={this.state.applicationsMetadata}
           setApplicationLoaderStatus={setApplicationLoaderStatus}

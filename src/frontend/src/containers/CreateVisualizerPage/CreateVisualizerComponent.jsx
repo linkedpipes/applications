@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizerControllerHeader, VisualizerContainer } from './children';
+import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
   selectedVisualizer: any,
@@ -12,7 +13,9 @@ type Props = {
   classes: {
     root: {}
   },
-  handleSetCurrentApplicationData: Function
+  handleSetCurrentApplicationData: Function,
+  setApplicationLoaderStatus: Function,
+  loadingIsActive: boolean
 };
 
 const styles = {
@@ -33,12 +36,15 @@ const CreateVisualizerComponent = ({
   filters,
   selectedResultGraphIri,
   selectedApplication,
-  handleSetCurrentApplicationData
+  handleSetCurrentApplicationData,
+  setApplicationLoaderStatus,
+  loadingIsActive
 }: Props) => (
-  <div className={classes.root}>
+  <LoadingOverlay className={classes.root} active={loadingIsActive} spinner>
     <VisualizerControllerHeader
       headerParams={headerParams}
       onRefreshSwitchChange={() => {}}
+      setApplicationLoaderStatus={setApplicationLoaderStatus}
     />
     <VisualizerContainer
       filters={filters}
@@ -47,7 +53,7 @@ const CreateVisualizerComponent = ({
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
       selectedApplication={selectedApplication}
     />
-  </div>
+  </LoadingOverlay>
 );
 
 export default withStyles(styles)(CreateVisualizerComponent);

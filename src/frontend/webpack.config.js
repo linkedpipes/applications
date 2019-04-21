@@ -99,6 +99,12 @@ module.exports = () => {
     },
     mode: dev ? 'development' : 'production',
     plugins,
-    externals: {}
+    externals: {
+      'node-fetch': 'fetch',
+      'text-encoding': 'TextEncoder',
+      'whatwg-url': 'window',
+      'isomorphic-fetch': 'fetch',
+      '@trust/webcrypto': 'crypto'
+    }
   };
 };

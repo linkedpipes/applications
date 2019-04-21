@@ -18,7 +18,8 @@ type Props = {
   history: any,
   selectedVisualizer: Object,
   selectedApplicationTitle: string,
-  applicationsFolder: string
+  applicationsFolder: string,
+  setApplicationLoaderStatus: Function
 };
 
 type State = {
@@ -43,14 +44,19 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication,
       selectedApplicationTitle,
       webId,
-      applicationsFolder
+      applicationsFolder,
+      setApplicationLoaderStatus
     } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
@@ -67,6 +73,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication.applicationEndpoint
     );
 
+    setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
   };
 
@@ -75,14 +82,19 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication,
       selectedApplicationTitle,
       applicationsFolder,
-      webId
+      webId,
+      setApplicationLoaderStatus
     } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
@@ -99,6 +111,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication.applicationEndpoint
     );
 
+    setApplicationLoaderStatus(false);
     this.handleAppEmbedded(publishedUrl);
   };
 

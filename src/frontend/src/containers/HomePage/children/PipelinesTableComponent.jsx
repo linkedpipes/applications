@@ -9,8 +9,9 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { ETL_STATUS_MAP, unixTimeConverter } from '@utils';
+import { ETL_STATUS_MAP } from '@utils';
 import uuid from 'uuid';
+import moment from 'moment'
 
 type Props = {
   pipelinesList: Array<{
@@ -81,10 +82,10 @@ const PipelinesTableComponent = ({
                     'N/A'}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.started)}
+                  {moment.unix(pipeline.started).format('lll')}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(pipeline.finished)}
+                  {moment.unix(pipeline.finished).format('lll')}
                 </TableCell>
               </TableRow>
             ))}

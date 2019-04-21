@@ -15,18 +15,12 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, AuthenticationService } from '@utils';
-import {
-  StoragePage,
-  StorageToolbox,
-  StorageBackend,
-  StoragePickFolderDialog
-} from '@storage';
+import { StoragePage, StorageBackend, StoragePickFolderDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
-import auth from 'solid-auth-client';
 import { toast } from 'react-toastify';
 
 // Socket URL defaults to window.location
@@ -78,7 +72,6 @@ const errorHandler = userId => {
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
     const {
-      handleSetUserProfile,
       handleAddDiscoverySession,
       handleAddExecutionSession,
       handleUpdateDiscoverySession,
@@ -188,7 +181,18 @@ class AppRouter extends React.PureComponent<Props> {
       }
     });
 
-    auth.trackSession(session => {
+    this.setupSessionTracker();
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners();
+  }
+
+  setupSessionTracker = async () => {
+    const authClient = await import(/* webpackChunkName: "solid-auth-client" */  'solid-auth-client');
+    const { handleSetUserProfile } = this.props;
+    const self = this;
+    authClient.trackSession(session => {
       if (session) {
         Log.info(session);
         AuthenticationService.getUserProfile(session.webId)
@@ -213,11 +217,7 @@ class AppRouter extends React.PureComponent<Props> {
         self.handleStorageFolder(session.webId);
       }
     });
-  }
-
-  componentWillUnmount() {
-    socket.removeAllListeners();
-  }
+  };
 
   handleStorageFolder = async webId => {
     await StorageBackend.getValidAppFolder(webId)

@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
-import { logout } from 'solid-auth-client';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { SocketContext, withWebId } from '@utils';
@@ -27,6 +26,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
 
   performLogout = async () => {
     try {
+      const { logout } = await import(/* webpackChunkName: "solid-auth-client" */  'solid-auth-client');
       await logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');

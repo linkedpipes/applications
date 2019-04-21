@@ -1,20 +1,18 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import CardActions from '@material-ui/core/CardActions';
+import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
-import GridListTile from '@material-ui/core/GridListTile';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
-import { VISUALIZER_TYPE } from '@constants';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { getBeautifiedVisualizerTitle, Log } from '@utils';
@@ -29,23 +27,23 @@ import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
+import ShareIcon from '@material-ui/icons/Share';
 import axios from 'axios';
 
 const styles = {
-  root: {
-    justifyContent: 'center'
-  },
   card: {
-    height: '100%',
-    width: '200px',
-    display: 'flex',
-    flexDirection: 'column'
+    height: '280',
+    width: '190',
+    flexDirection: 'column',
+    marginRight: 5
   },
-  cardContent: {
-    flexGrow: 1
-  },
+
   media: {
-    objectFit: 'cover'
+    textAlign: 'center'
+  },
+
+  actions: {
+    display: 'flex'
   }
 };
 
@@ -54,7 +52,8 @@ type Props = {
     root: {},
     card: {},
     cardContent: {},
-    media: {}
+    media: {},
+    actions: {}
   },
   applicationMetadata: AppConfiguration,
   handleSetResultPipelineIri: Function,
@@ -167,7 +166,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleCopyLinkClicked
     } = this;
     return (
-      <GridListTile>
+      <Fragment>
         <Card className={classes.card}>
           <CardHeader
             action={
@@ -179,34 +178,36 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 <MoreVertIcon />
               </IconButton>
             }
+            title={applicationMetadata.title}
+            subheader={getBeautifiedVisualizerTitle(
+              applicationMetadata.endpoint
+            )}
           />
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={this.handleMenuClose}
-          >
-            <MenuItem onClick={handleShareApp}>Share</MenuItem>
-            <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
-          </Menu>
-          <CardActionArea
-            onClick={handleApplicationClicked}
-            style={{ textAlign: 'center' }}
-          >
-            <VisualizerIcon
-              visualizerType={VISUALIZER_TYPE.MAP}
-              style={{ color: 'white', fontSize: '85px' }}
-            />
-            <CardContent className={classes.cardContent}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {applicationMetadata.title}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="h2">
-                {getBeautifiedVisualizerTitle(applicationMetadata.endpoint)}
-              </Typography>
-            </CardContent>
+          <CardActionArea onClick={handleApplicationClicked}>
+            <CardMedia
+              className={classes.media}
+              style={{ backgroundColor: applicationMetadata.cardColor }}
+            >
+              <VisualizerIcon
+                visualizerType={applicationMetadata.endpoint}
+                style={{ color: 'white', fontSize: '85px' }}
+              />
+            </CardMedia>
           </CardActionArea>
+          <CardActions className={classes.actions} disableActionSpacing>
+            <IconButton aria-label="Share" onClick={handleShareApp}>
+              <ShareIcon />
+            </IconButton>
+          </CardActions>
         </Card>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={this.handleMenuClose}
+        >
+          <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
+        </Menu>
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}
@@ -218,7 +219,10 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
           <DialogContent>
             <CopyToClipboard
-              text={applicationMetadata.object}
+              text={StorageToolbox.appIriToPublishUrl(
+                applicationMetadata.object,
+                applicationMetadata.endpoint
+              )}
               onCopy={handleCopyLinkClicked}
             >
               <TextField
@@ -226,7 +230,10 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 label="Click to copy"
                 variant="outlined"
                 fullWidth
-                value={applicationMetadata.object}
+                value={StorageToolbox.appIriToPublishUrl(
+                  applicationMetadata.object,
+                  applicationMetadata.endpoint
+                )}
                 autoFocus
                 style={{
                   textDecoration: 'none',
@@ -241,7 +248,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
             </Button>
           </DialogActions>
         </Dialog>
-      </GridListTile>
+      </Fragment>
     );
   }
 }

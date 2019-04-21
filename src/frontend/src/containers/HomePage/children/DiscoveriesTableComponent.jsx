@@ -8,9 +8,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { unixTimeConverter } from '@utils/';
 import { withStyles } from '@material-ui/core/styles';
 import uuid from 'uuid';
+import moment from 'moment';
 
 type Props = {
   classes: Object,
@@ -96,10 +96,10 @@ const DiscoveriesTableComponent = ({
                 </TableCell>
                 <TableCell align="center">{discovery.namedGraph}</TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(discovery.started)}
+                  {moment.unix(discovery.started).format('lll')}
                 </TableCell>
                 <TableCell align="center">
-                  {unixTimeConverter(discovery.finished)}
+                  {moment.unix(discovery.started).format('lll')}
                 </TableCell>
               </TableRow>
             ))}

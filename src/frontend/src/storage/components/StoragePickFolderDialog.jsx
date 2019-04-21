@@ -48,6 +48,8 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
     this.setState({ folderTitle: event.target.value });
   };
 
+  handleFolderConfirm: () => void;
+
   async handleFolderConfirm() {
     const folderSelected =
       this.state.folderTitle === undefined

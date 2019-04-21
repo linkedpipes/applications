@@ -1,6 +1,5 @@
 /* eslint-disable */
 import * as $rdf from 'rdflib';
-import * as fileClient from 'solid-file-client';
 import { Utils } from './utils';
 import { AppConfiguration } from './models';
 import { Log } from '@utils';
@@ -186,6 +185,10 @@ class SolidBackend {
   async createAppFolders(webId: string, folderUrl: string): Promise<boolean> {
     const configurationsUrl = `${folderUrl}configurations/`;
     try {
+      const fileClient = await import(
+        /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
+      );
+
       await fileClient.createFolder(folderUrl).then(success => {
         console.log(`Created folder ${folderUrl}.`);
       });
@@ -311,6 +314,7 @@ class SolidBackend {
       const title = this.store.any(fileUrl, DCT('title'), null, file);
       const endpoint = this.store.any(fileUrl, DCT('identifier'), null, file);
       const creator = this.store.any(fileUrl, DCT('creator'), null, file);
+      const color = this.store.any(fileUrl, VCARD('label'), null, file);
       const created = this.store.any(fileUrl, DCT('created'), null, file);
       return new AppConfiguration(
         url.toString(),
@@ -318,6 +322,7 @@ class SolidBackend {
         title.value,
         endpoint.value,
         creator.value,
+        color.value,
         new Date(created.value)
       );
     }
@@ -330,6 +335,7 @@ class SolidBackend {
    * @param {string} webId A WebID of the image's creator.
    * @param {string} appFolder An application folder of the application's creator.
    * @param {boolean} isPublic Whether the image is public or private.
+   * @param {string} color Color for application card.
    * @param {string[]} allowedUsers An array of the user's which are allowed to access the application.
    * @return {Promise<ApplicationConfiguration>} Uploaded image.
    */
@@ -340,6 +346,7 @@ class SolidBackend {
     webId: string,
     appFolder: string,
     isPublic: boolean,
+    color: string,
     allowedUsers: string[]
   ): Promise<AppConfiguration> {
     const appConfigName = `${appFolder}configurations/${Utils.getName()}.json`;
@@ -347,6 +354,8 @@ class SolidBackend {
     let appConfigUrl;
     const created = new Date(Date.now());
     try {
+      const fileClient = await import(/* webpackChunkName: "solid-file-client" */  'solid-file-client');
+
       await fileClient
         .createFile(appConfigName, appConfigurationFile)
         .then(fileCreated => {
@@ -359,6 +368,7 @@ class SolidBackend {
         appTitle,
         appEndpoint,
         webId,
+        color,
         created
       );
       await fileClient
@@ -409,6 +419,7 @@ class SolidBackend {
       appTitle,
       appEndpoint,
       webId,
+      color,
       created
     );
   }
@@ -416,6 +427,8 @@ class SolidBackend {
   async removeAppConfiguration(
     appConfiguration: AppConfiguration
   ): Promise<Boolean> {
+    const fileClient = await import(/* webpackChunkName: "solid-file-client" */  'solid-file-client');
+
     await fileClient.deleteFile(appConfiguration.url).then(
       () => {
         Log.info(`Removed file!`);
@@ -462,6 +475,7 @@ class SolidBackend {
    * @param {string} appTitle A title of an application configuration.
    * @param {string} appEndpoint An endpoint of application configuration
    * @param {string} user A WebID of the image's creator.
+   * @param {string} cardColor Color to be used for card visualizing the app
    * @param {Date} createdAt A creation date of the image.
    * @return {$rdf.Statement[]} An array of the image RDF statements.
    */
@@ -472,6 +486,7 @@ class SolidBackend {
     appTitle: string,
     appEndpoint: string,
     user: string,
+    cardColor: String,
     createdAt: Date
   ): $rdf.Statement[] {
     const appConfigFile = $rdf.sym(appConfigFileUrl);
@@ -479,6 +494,7 @@ class SolidBackend {
     const title = $rdf.lit(appTitle);
     const endpoint = $rdf.lit(appEndpoint);
     const creator = $rdf.sym(user);
+    const color = $rdf.lit(cardColor);
     const doc = appConfigFile.doc();
     return [
       $rdf.st(appConfigFile, RDF('type'), SIOC('Post'), doc),
@@ -486,6 +502,7 @@ class SolidBackend {
       $rdf.st(appConfigFile, DCT('title'), title, doc),
       $rdf.st(appConfigFile, DCT('identifier'), endpoint, doc),
       $rdf.st(appConfigFile, DCT('creator'), creator, doc),
+      $rdf.st(appConfigFile, VCARD('label'), color, doc),
       $rdf.st(
         appConfigFile,
         DCT('created'),

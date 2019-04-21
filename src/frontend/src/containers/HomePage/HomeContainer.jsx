@@ -5,8 +5,10 @@ import { connect } from 'react-redux';
 import { userActions } from '@ducks/userDuck';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
+import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
 import { StorageBackend } from '@storage';
+import { toast } from 'react-toastify';
 import {
   Log,
   SocketContext,
@@ -17,6 +19,7 @@ import {
   withAuthorization
 } from '@utils';
 import axios from 'axios';
+import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
   history: { push: any },
@@ -25,18 +28,29 @@ type Props = {
   userProfile: Object,
   socket: Object,
   handleSetResultPipelineIri: Function,
-  handleSetSelectedVisualizer: Function
+  handleSetSelectedVisualizer: Function,
+  handleSetSelectedApplicationData: Function,
+  handleSetSelectedApplicationTitle: Function
 };
 type State = {
   tabIndex: number,
-  applicationsMetadata: []
+  applicationsMetadata: [],
+  loadingAppIsActive: boolean
 };
 
 class HomeContainer extends PureComponent<Props, State> {
   state = {
     tabIndex: 0,
-    applicationsMetadata: []
+    applicationsMetadata: [],
+    loadingAppIsActive: false
   };
+
+  constructor(props) {
+    super(props);
+    this.setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
+      this
+    );
+  }
 
   componentDidMount() {
     const {
@@ -48,6 +62,12 @@ class HomeContainer extends PureComponent<Props, State> {
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
+  }
+
+  setApplicationLoaderStatus: boolean => void;
+
+  setApplicationLoaderStatus(isLoading) {
+    this.setState({ loadingAppIsActive: isLoading });
   }
 
   loadApplicationsMetadata = async () => {
@@ -174,18 +194,68 @@ class HomeContainer extends PureComponent<Props, State> {
       });
   };
 
+  handleAppClicked = async applicationMetadata => {
+    const {
+      handleSetSelectedVisualizer,
+      handleSetResultPipelineIri,
+      handleSetSelectedApplicationTitle,
+      handleSetSelectedApplicationData,
+      history
+    } = this.props;
+
+    this.setApplicationLoaderStatus(true);
+
+    const appConfigurationResponse = await axios.get(
+      applicationMetadata.object
+    );
+
+    if (appConfigurationResponse.status !== 200) {
+      toast.error('Error, unable to load!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+      this.setApplicationLoaderStatus(false);
+    }
+    const applicationData = appConfigurationResponse.data.applicationData;
+
+    const resultGraphIri = applicationData.selectedResultGraphIri;
+    const selectedVisualiser = {
+      visualizer: { visualizerCode: applicationData.visualizerCode }
+    };
+
+    handleSetResultPipelineIri(resultGraphIri);
+    handleSetSelectedApplicationTitle(applicationMetadata.title);
+    handleSetSelectedApplicationData(applicationData);
+    handleSetSelectedVisualizer(selectedVisualiser);
+    history.push({
+      pathname: '/create-app'
+    });
+    Log.info('test');
+
+    this.setApplicationLoaderStatus(false);
+  };
+
+  handleShareAppClicked = () => {
+    toast.success('Copied link to clipboard!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 2000
+    });
+  };
+
   render() {
     const {
       handleChange,
       handleSampleClick,
       handleSelectDiscoveryClick,
-      onHandleSelectPipelineExecutionClick
+      onHandleSelectPipelineExecutionClick,
+      handleAppClicked,
+      handleShareAppClicked
     } = this;
     const { userProfile } = this.props;
-    const { tabIndex } = this.state;
+    const { tabIndex, loadingAppIsActive } = this.state;
 
     return (
-      <div>
+      <LoadingOverlay active={loadingAppIsActive} spinner>
         <HomeComponent
           onHandleTabChange={handleChange}
           onHandleSampleClick={handleSampleClick}
@@ -197,8 +267,10 @@ class HomeContainer extends PureComponent<Props, State> {
           pipelinesList={userProfile.pipelineExecutions}
           discoveriesList={userProfile.discoverySessions}
           tabIndex={tabIndex}
+          onHandleAppClicked={handleAppClicked}
+          onHandleShareAppClicked={handleShareAppClicked}
         />
-      </div>
+      </LoadingOverlay>
     );
   }
 }
@@ -236,11 +308,19 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleSetSelectedApplicationTitle = applicationTitle =>
+    dispatch(applicationActions.setApplicationTitle(applicationTitle));
+
+  const handleSetSelectedApplicationData = applicationData =>
+    dispatch(applicationActions.setApplication(applicationData));
+
   return {
     handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
-    handleSetSelectedVisualizer
+    handleSetSelectedVisualizer,
+    handleSetSelectedApplicationTitle,
+    handleSetSelectedApplicationData
   };
 };
 
