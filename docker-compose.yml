@@ -53,13 +53,13 @@ services:
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
       VIRT_Parameters_CheckpointInterval: 1
-      VIRT_Parameters_DirsAllowed: /tmp/upload
+      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata
     ports:
       - "8890:8890"
     restart: on-failure
     volumes:
       - ./data/virtuoso:/var/lib/virtuoso/data
-      - etl_output:/tmp/upload
+      - ./appdata:/appdata
 
   discovery:
     image: linkedpipes/applications:discovery
@@ -85,7 +85,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - etl_output:/tmp/output
+      - ./appdata:/appdata
 
   postgres:
     image: postgres:10.7
@@ -107,6 +107,3 @@ services:
       - ./src/backend/src/main/resources/db/migration:/flyway/sql
     depends_on:
       - postgres
-
-volumes:
-  etl_output:
