@@ -131,7 +131,7 @@ class HomeComponent extends PureComponent<Props> {
               <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
                 <Tab label="Discoveries" />
                 <Tab label="Pipelines" />
-                {/* <Tab label="My Applications" /> */}
+                <Tab label="My Applications" />
               </Tabs>
             </AppBar>
             <div

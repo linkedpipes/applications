@@ -53,6 +53,7 @@ module.exports = () => {
         '@containers': path.resolve(__dirname, './src/containers'),
         '@ducks': path.resolve(__dirname, './src/ducks'),
         '@utils': path.resolve(__dirname, './src/utils'),
+        '@storage': path.resolve(__dirname, './src/storage'),
         '@constants': path.resolve(__dirname, './src/constants'),
         '@layouts': path.resolve(__dirname, './src/layouts'),
         'material-ui': 'material-ui/es'

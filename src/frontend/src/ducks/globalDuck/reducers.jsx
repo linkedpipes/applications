@@ -4,7 +4,8 @@ const INITIAL_STATE = {
   headerParams: {
     title: ''
   },
-  selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } }
+  selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
+  chooseFolderDialogIsOpen: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -13,6 +14,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, {
         selectedVisualizer: action.selectedVisualizer
       });
+
+    case types.SET_CHOOSE_FOLDER_DIALOG_STATE:
+      return {
+        ...state,
+        chooseFolderDialogIsOpen: action.isOpen
+      };
 
     default:
       return { ...state };

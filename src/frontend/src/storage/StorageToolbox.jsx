@@ -1,8 +1,8 @@
-/* eslint-disable consistent-return */
-/* eslint-disable import/order */
+/* eslint-disable */
 import stringHash from 'string-hash';
-import { getLocation } from './global.utils';
-import Log from './logger.service';
+import { getLocation } from '../utils/global.utils';
+import Log from '../utils/logger.service';
+import SolidBackend from './StorageBackend';
 
 const os = require('os');
 
@@ -57,65 +57,37 @@ const appIriToPublishUrl = (applicationIri, applicationEndpoint) => {
   return publishedUrl;
 };
 
-const saveAppToSolid = (appData, appTitle, webId, path) => {
-  Log.info(appData, 'StorageToolbox');
-
+const saveAppToSolid = async (
+  appData,
+  appTitle,
+  webId,
+  appFolder,
+  isPublic
+) => {
   if (!webId) {
     Log.error('No webID available', 'StorageToolbox');
     return;
   }
 
-  const url = `${getLocation(webId).origin}/${path}`;
-
-  const formattedTitle = appTitle.trim().toLowerCase();
-  const hash = stringHash(JSON.stringify(formattedTitle, null, 2)).toString();
-  const applicationIri = `${url}/lpapp${hash}.json`;
-  const applicationEndpoint = appData.applicationEndpoint;
-
   const file = JSON.stringify({
-    applicationData: appData,
-    applicationTitle: appTitle
+    applicationData: appData
   });
 
-  return new Promise((resolve, reject) => {
-    import('solid-file-client').then(FileClient => {
-      FileClient.updateFile(applicationIri, file).then(
-        () => {
-          Log.info(`Updated file!`);
-          resolve({ applicationIri, applicationEndpoint });
-        },
-        err => {
-          Log.info(err, 'StorageToolbox');
-          FileClient.createFile(applicationIri).then(
-            () => {
-              Log.info(`Created file!`);
-              resolve({ applicationIri, applicationEndpoint });
-            },
-            errCreate => {
-              reject(errCreate);
-              Log.info(errCreate, 'StorageToolbox');
-            }
-          );
-        }
-      );
-    });
-  });
+  const appEndpoint = appData.applicationEndpoint;
+
+  return await SolidBackend.uploadAppConfiguration(
+    file,
+    appTitle,
+    appEndpoint,
+    webId,
+    appFolder,
+    isPublic,
+    []
+  );
 };
 
-const removeAppFromStorage = fileUrl => {
-  return new Promise((resolve, reject) => {
-    import('solid-file-client').then(FileClient => {
-      FileClient.deleteFile(fileUrl).then(
-        () => {
-          Log.info(`Removed file!`);
-          resolve();
-        },
-        err => {
-          reject(err);
-        }
-      );
-    });
-  });
+const removeAppFromStorage = async appConfiguration => {
+  return await SolidBackend.removeAppConfiguration(appConfiguration);
 };
 
 const loadAppFromSolid = appIri => {

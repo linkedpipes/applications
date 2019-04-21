@@ -6,6 +6,7 @@ import { userActions } from '@ducks/userDuck';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { globalActions } from '@ducks/globalDuck';
+import { StorageBackend } from '@storage';
 import {
   Log,
   SocketContext,
@@ -27,20 +28,43 @@ type Props = {
   handleSetSelectedVisualizer: Function
 };
 type State = {
-  tabIndex: number
+  tabIndex: number,
+  applicationsMetadata: []
 };
 
 class HomeContainer extends PureComponent<Props, State> {
   state = {
-    tabIndex: 0
+    tabIndex: 0,
+    applicationsMetadata: []
   };
 
   componentDidMount() {
-    const { setupDiscoveryListeners, setupEtlExecutionsListeners } = this;
+    const {
+      setupDiscoveryListeners,
+      setupEtlExecutionsListeners,
+      loadApplicationsMetadata
+    } = this;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
+    loadApplicationsMetadata();
   }
+
+  loadApplicationsMetadata = async () => {
+    const { userProfile } = this.props;
+    const webId = userProfile.webId;
+    const applicationsFolder = userProfile.applicationsFolder;
+    if (webId) {
+      const metadata = await StorageBackend.getAppConfigurationsMetadata(
+        webId,
+        applicationsFolder
+      );
+
+      this.setState({ applicationsMetadata: metadata });
+
+      Log.info(metadata, 'HomeContainer');
+    }
+  };
 
   setupDiscoveryListeners = () => {
     const { userProfile, socket } = this.props;
@@ -169,7 +193,7 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandleSelectPipelineExecutionClick={
             onHandleSelectPipelineExecutionClick
           }
-          applicationsList={userProfile.applications}
+          applicationsList={this.state.applicationsMetadata}
           pipelinesList={userProfile.pipelineExecutions}
           discoveriesList={userProfile.discoverySessions}
           tabIndex={tabIndex}

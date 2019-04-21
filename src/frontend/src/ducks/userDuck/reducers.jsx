@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 
 const INITIAL_STATE = {
   webId: '',
+  applicationsFolder: '',
   applications: [],
   discoverySessions: [],
   pipelineExecutions: []
@@ -68,6 +69,12 @@ const userReducer = (state = INITIAL_STATE, action) => {
             })
         }
       });
+
+    case types.UPDATE_APPLICATIONS_FOLDER:
+      return {
+        ...state,
+        applicationsFolder: action.value
+      };
 
     default:
       return state;

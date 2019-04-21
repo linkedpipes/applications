@@ -15,7 +15,6 @@ import {
 } from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
-import StorageToolbox from './StorageToolbox';
 import { withAuthorization, withWebId } from './third-party';
 
 export {
@@ -34,7 +33,6 @@ export {
   unixTimeConverter,
   Log,
   getLocation,
-  StorageToolbox,
   withAuthorization,
   withWebId
 };

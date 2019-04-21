@@ -11,19 +11,20 @@ import {
   AboutPage,
   CreateVisualizerPage,
   AuthorizationPage,
-  StoragePage,
   ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
+import { SocketContext, Log, AuthenticationService } from '@utils';
 import {
-  SocketContext,
-  Log,
-  AuthenticationService,
-  StorageToolbox
-} from '@utils';
+  StoragePage,
+  StorageToolbox,
+  StorageBackend,
+  StoragePickFolderDialog
+} from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
+import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
 import auth from 'solid-auth-client';
 import { toast } from 'react-toastify';
@@ -56,7 +57,9 @@ type Props = {
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
   handleUpdateDiscoverySession: Function,
-  handleUpdateExecutionSession: Function
+  handleUpdateExecutionSession: Function,
+  handleUpdateApplicationsFolder: Function,
+  handleUpdateChooseFolderDialogState: Function
 };
 
 const errorHandler = userId => {
@@ -207,7 +210,7 @@ class AppRouter extends React.PureComponent<Props> {
             Log.error(error, 'HomeContainer');
           });
 
-        StorageToolbox.createOrUpdateFolder(session.webId, 'public/lpapps');
+        self.handleStorageFolder(session.webId);
       }
     });
   }
@@ -215,6 +218,19 @@ class AppRouter extends React.PureComponent<Props> {
   componentWillUnmount() {
     socket.removeAllListeners();
   }
+
+  handleStorageFolder = async webId => {
+    await StorageBackend.getValidAppFolder(webId)
+      .then(folder => {
+        if (folder) {
+          this.props.handleUpdateApplicationsFolder(folder);
+        }
+      })
+      .catch(err => {
+        Log.error(err, 'AppRouter');
+        this.props.handleUpdateChooseFolderDialogState(true);
+      });
+  };
 
   render() {
     const { classes, userId } = this.props;
@@ -264,6 +280,7 @@ class AppRouter extends React.PureComponent<Props> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
+                <StoragePickFolderDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>
@@ -276,7 +293,8 @@ class AppRouter extends React.PureComponent<Props> {
 const mapStateToProps = state => {
   return {
     userId: state.user.webId,
-    userProfile: state.user
+    userProfile: state.user,
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
   };
 };
 
@@ -296,12 +314,20 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateExecutionSession = executionSession =>
     dispatch(userActions.updateExecutionSession({ session: executionSession }));
 
+  const handleUpdateApplicationsFolder = value =>
+    dispatch(userActions.updateApplicationsFolder({ value }));
+
+  const handleUpdateChooseFolderDialogState = state =>
+    dispatch(globalActions.setChooseFolderDialogState({ state }));
+
   return {
     handleSetUserProfile,
     handleAddDiscoverySession,
     handleAddExecutionSession,
     handleUpdateDiscoverySession,
-    handleUpdateExecutionSession
+    handleUpdateExecutionSession,
+    handleUpdateApplicationsFolder,
+    handleUpdateChooseFolderDialogState
   };
 };
 

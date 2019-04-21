@@ -7,8 +7,10 @@ import Avatar from '@material-ui/core/Avatar';
 import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import StorageAppsBrowserCardComponent from './children';
+import { StorageAppsBrowserCardComponent } from './children';
+import AppConfiguration from '@storage/models/AppConfiguration';
 import Emoji from 'react-emoji-render';
+import uuid from 'uuid';
 
 const styles = theme => ({
   root: {
@@ -67,12 +69,18 @@ type Props = {
     form: {},
     gridList: {}
   },
-  tileData: {},
-  onHandleApplicationDeleted: Function
+  applicationsMetadata: Array<AppConfiguration>,
+  onHandleApplicationDeleted: Function,
+  setApplicationLoaderStatus: Function
 };
 
 function StorageAppsBrowserComponent(props: Props) {
-  const { classes, tileData, onHandleApplicationDeleted } = props;
+  const {
+    classes,
+    applicationsMetadata,
+    onHandleApplicationDeleted,
+    setApplicationLoaderStatus
+  } = props;
 
   return (
     <div className={classes.main}>
@@ -84,17 +92,18 @@ function StorageAppsBrowserComponent(props: Props) {
           LPApps Storage
         </Typography>
         <form className={classes.form}>
-          {Object.keys(tileData).length !== 0 ? (
+          {applicationsMetadata.length !== 0 ? (
             <GridList
               spacing={1}
               padding={20}
               cellHeight={200}
               className={classes.gridList}
             >
-              {Object.keys(tileData).map(keyName => (
+              {applicationsMetadata.map(metadata => (
                 <StorageAppsBrowserCardComponent
-                  key={keyName}
-                  singleTileData={tileData[keyName]}
+                  key={uuid.v4()}
+                  applicationMetadata={metadata}
+                  setApplicationLoaderStatus={setApplicationLoaderStatus}
                   onHandleApplicationDeleted={onHandleApplicationDeleted}
                 />
               ))}
