@@ -30,6 +30,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper();
+    public static final String OUR_DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template";
 
     @NotNull private final ApplicationContext context;
     @NotNull private final HttpActions httpActions = new HttpActions();
@@ -94,6 +95,15 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
                 pipelineGrp.dataSourceGroups.add(dataSrcGroup);
             }
+
+            for (DataSourceGroup dsg : pipelineGrp.dataSourceGroups) {
+                for (DataSource ds : dsg.dataSources) {
+                    if (ds.label.equals(OUR_DATASET_TEMPLATE_TITLE)) {
+                        ds.label = "SPARQL endpoint -> " + pipelineGrp.visualizer.label;
+                    }
+                }
+            }
+
             pipelineGroups.pipelineGroups.add(pipelineGrp);
         }
 
