@@ -189,7 +189,9 @@ class AppRouter extends React.PureComponent<Props> {
   }
 
   setupSessionTracker = async () => {
-    const authClient = await import(/* webpackChunkName: "solid-auth-client" */  'solid-auth-client');
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     const { handleSetUserProfile } = this.props;
     const self = this;
     authClient.trackSession(session => {

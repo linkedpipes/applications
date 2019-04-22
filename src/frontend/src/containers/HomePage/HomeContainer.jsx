@@ -47,7 +47,7 @@ class HomeContainer extends PureComponent<Props, State> {
 
   constructor(props) {
     super(props);
-    this.setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
+    (this: any).setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
       this
     );
   }
@@ -63,8 +63,6 @@ class HomeContainer extends PureComponent<Props, State> {
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
   }
-
-  setApplicationLoaderStatus: boolean => void;
 
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingAppIsActive: isLoading });

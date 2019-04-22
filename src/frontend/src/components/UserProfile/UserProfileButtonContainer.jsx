@@ -26,7 +26,9 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
 
   performLogout = async () => {
     try {
-      const { logout } = await import(/* webpackChunkName: "solid-auth-client" */  'solid-auth-client');
+      const { logout } = await import(
+        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+      );
       await logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');

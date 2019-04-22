@@ -27,7 +27,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
 
   constructor(props) {
     super(props);
-    this.setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
+    (this: any).setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
       this
     );
   }
@@ -49,8 +49,6 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     this.props.handleResetCurrentApplicationData();
     this.props.handleResetCurrentApplicationTitle();
   }
-
-  setApplicationLoaderStatus: boolean => void;
 
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingIsActive: isLoading });

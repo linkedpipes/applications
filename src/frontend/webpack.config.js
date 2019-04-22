@@ -44,7 +44,8 @@ module.exports = () => {
     entry: [path.join(__dirname, '/src/index.jsx')],
     output: {
       path: path.join(__dirname, '/public'),
-      filename: 'bundle.js'
+      filename: '[name].bundle.js',
+      chunkFilename: '[name].bundle.js'
     },
     resolve: {
       extensions: ['.mjs', '.js', '.jsx'],

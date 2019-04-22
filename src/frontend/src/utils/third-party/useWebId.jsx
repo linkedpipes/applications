@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { useReducer, useEffect, useDebugValue } from 'react';
+import { trackSession } from 'solid-auth-client';
 
 // Keep track of the WebID and the state setters tracking it
 let webId = undefined;
@@ -24,10 +25,8 @@ export default function useWebId(reducer = getWebId) {
   return result;
 }
 
-import(/* webpackChunkName: "solid-file-client" */  'solid-file-client').then(({ trackSession }) => {
-  // Inform subscribers when the WebID changes
-  trackSession(session => {
-    webId = session ? session.webId : null;
-    for (const subscriber of subscribers) subscriber(webId);
-  });
+// Inform subscribers when the WebID changes
+trackSession(session => {
+  webId = session ? session.webId : null;
+  for (const subscriber of subscribers) subscriber(webId);
 });

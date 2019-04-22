@@ -49,7 +49,7 @@ class AuthorizationContainer extends Component {
       const ldp = withWebIdStatus ? webIdValue : providerLink;
 
       const { login } = await import(
-        /* webpackChunkName: "print" */ 'solid-auth-client'
+        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
       );
 
       const session = await login(ldp, {
