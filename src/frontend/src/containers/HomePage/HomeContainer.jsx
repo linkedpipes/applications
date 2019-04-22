@@ -39,6 +39,8 @@ type State = {
 };
 
 class HomeContainer extends PureComponent<Props, State> {
+  isMounted = false;
+
   state = {
     tabIndex: 0,
     applicationsMetadata: [],
@@ -58,10 +60,15 @@ class HomeContainer extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
+    this.isMounted = true;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -78,9 +85,11 @@ class HomeContainer extends PureComponent<Props, State> {
         applicationsFolder
       );
 
-      this.setState({ applicationsMetadata: metadata });
+      if (this.isMounted) {
+        this.setState({ applicationsMetadata: metadata });
 
-      Log.info(metadata, 'HomeContainer');
+        Log.info(metadata, 'HomeContainer');
+      }
     }
   };
 
@@ -201,7 +210,7 @@ class HomeContainer extends PureComponent<Props, State> {
       history
     } = this.props;
 
-    this.setApplicationLoaderStatus(true);
+    await this.setApplicationLoaderStatus(true);
 
     const appConfigurationResponse = await axios.get(
       applicationMetadata.object
@@ -212,7 +221,7 @@ class HomeContainer extends PureComponent<Props, State> {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 2000
       });
-      this.setApplicationLoaderStatus(false);
+      await this.setApplicationLoaderStatus(false);
     }
     const applicationData = appConfigurationResponse.data.applicationData;
 
@@ -225,12 +234,13 @@ class HomeContainer extends PureComponent<Props, State> {
     handleSetSelectedApplicationTitle(applicationMetadata.title);
     handleSetSelectedApplicationData(applicationData);
     handleSetSelectedVisualizer(selectedVisualiser);
+
+    await this.setApplicationLoaderStatus(false);
+
     history.push({
       pathname: '/create-app'
     });
     Log.info('test');
-
-    this.setApplicationLoaderStatus(false);
   };
 
   handleShareAppClicked = () => {

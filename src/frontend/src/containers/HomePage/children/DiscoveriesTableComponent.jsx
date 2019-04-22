@@ -18,6 +18,7 @@ type Props = {
     discoveryId: string,
     isFinished: boolean,
     namedGraph: string,
+    sparqlEndpointIri: string,
     started: number,
     finished: number
   }>,
@@ -46,6 +47,7 @@ const DiscoveriesTableComponent = ({
               <TableCell align="center">Action</TableCell>
               <TableCell align="center">Info</TableCell>
               <TableCell align="center">Status</TableCell>
+              <TableCell align="center">SPARQL IRI</TableCell>
               <TableCell align="center">Named Graph IRI</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
@@ -93,6 +95,9 @@ const DiscoveriesTableComponent = ({
 
                 <TableCell align="center">
                   {discovery.isFinished ? 'Finished' : 'In progress'}
+                </TableCell>
+                <TableCell align="center">
+                  {discovery.sparqlEndpointIri}
                 </TableCell>
                 <TableCell align="center">{discovery.namedGraph}</TableCell>
                 <TableCell align="center">

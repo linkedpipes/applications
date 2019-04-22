@@ -11,7 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { ETL_STATUS_MAP } from '@utils';
 import uuid from 'uuid';
-import moment from 'moment'
+import moment from 'moment';
 
 type Props = {
   pipelinesList: Array<{
@@ -71,7 +71,11 @@ const PipelinesTableComponent = ({
                     Create App
                   </Button>
                 </TableCell>
-                <TableCell align="center">{pipeline.executionIri}</TableCell>
+                <TableCell align="center">
+                  {pipeline.executionIri
+                    ? pipeline.executionIri.split('/executions/')[1]
+                    : 'N/A'}
+                </TableCell>
                 <TableCell align="center">
                   {pipeline.selectedVisualiser}
                 </TableCell>

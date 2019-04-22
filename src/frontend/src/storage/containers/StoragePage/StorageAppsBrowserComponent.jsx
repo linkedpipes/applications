@@ -46,10 +46,10 @@ function StorageAppsBrowserComponent(props: Props) {
 
   return (
     <div className={classes.root}>
-      <div className={classes.gridArea}>
-        <Grid container spacing={4}>
-          {applicationsMetadata.length !== 0 ? (
-            applicationsMetadata.map(metadata => (
+      {applicationsMetadata.length !== 0 ? (
+        <div className={classes.gridArea}>
+          <Grid container spacing={8}>
+            {applicationsMetadata.map(metadata => (
               <Grid
                 key={metadata.createdAt}
                 item
@@ -66,14 +66,22 @@ function StorageAppsBrowserComponent(props: Props) {
                   onHandleApplicationDeleted={onHandleApplicationDeleted}
                 />
               </Grid>
-            ))
-          ) : (
-            <Typography variant="body2" align="center" gutterBottom>
-              <Emoji text="No applications published yet ☹️" />
-            </Typography>
-          )}
-        </Grid>
-      </div>
+            ))}
+          </Grid>
+        </div>
+      ) : (
+        <Typography
+          variant="h5"
+          align="center"
+          style={{
+            textAlign: 'center'
+          }}
+          gutterBottom
+        >
+          No applications published yet
+          <Emoji text=" ☹️" />
+        </Typography>
+      )}
     </div>
   );
 }
@@ -83,32 +91,3 @@ StorageAppsBrowserComponent.propTypes = {
 };
 
 export default withStyles(styles)(StorageAppsBrowserComponent);
-
-//
-
-/* <div className={classes.main}> */
-//       <Avatar className={classes.avatar}>
-//         <StorageIcon />
-//       </Avatar>
-//       <Typography component="h1" variant="h5">
-//         LPApps Storage
-//       </Typography>
-//       <form className={classes.form}>
-//         {applicationsMetadata.length !== 0 ? (
-//           <GridList spacing={20} cellHeight={200} className={classes.gridList}>
-//             {applicationsMetadata.map(metadata => (
-//               <StorageAppsBrowserCardComponent
-//                 key={uuid.v4()}
-//                 applicationMetadata={metadata}
-//                 setApplicationLoaderStatus={setApplicationLoaderStatus}
-//                 onHandleApplicationDeleted={onHandleApplicationDeleted}
-//               />
-//             ))}
-//           </GridList>
-//         ) : (
-//           <Typography variant="body2" align="center" gutterBottom>
-//             <Emoji text="No applications published yet ☹️" />
-//           </Typography>
-//         )}
-//       </form>
-//     </div>

@@ -74,9 +74,11 @@ class SolidBackend {
    * Fetches and loads a given document to the store.
    * @param {$rdf.NamedNode} document A given document to fetch and load.
    */
-  async load(document: $rdf.NamedNode) {
+  async load(document: $rdf.NamedNode, forceReload = true) {
     try {
-      return await this.fetcher.load(document);
+      return await this.fetcher.load(document, {
+        force: forceReload
+      });
     } catch (err) {
       return Promise.reject(new Error('Could not fetch the document.'));
     }
@@ -108,7 +110,7 @@ class SolidBackend {
    * @param {$rdf.NamedNode} document A given document to register.
    */
   registerChanges(document: $rdf.NamedNode) {
-    this.updater.addDownstreamChangeListener(document, () => {});
+    // this.updater.addDownstreamChangeListener(document, () => {});
   }
 
   /**
@@ -354,7 +356,9 @@ class SolidBackend {
     let appConfigUrl;
     const created = new Date(Date.now());
     try {
-      const fileClient = await import(/* webpackChunkName: "solid-file-client" */  'solid-file-client');
+      const fileClient = await import(
+        /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
+      );
 
       await fileClient
         .createFile(appConfigName, appConfigurationFile)
@@ -425,11 +429,14 @@ class SolidBackend {
   }
 
   async removeAppConfiguration(
+    appFolder: string,
     appConfiguration: AppConfiguration
   ): Promise<Boolean> {
-    const fileClient = await import(/* webpackChunkName: "solid-file-client" */  'solid-file-client');
+    const fileClient = await import(
+      /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
+    );
 
-    await fileClient.deleteFile(appConfiguration.url).then(
+    await this.fetcher.webOperation('DELETE', appConfiguration.url).then(
       () => {
         Log.info(`Removed file!`);
       },
@@ -438,7 +445,7 @@ class SolidBackend {
       }
     );
 
-    await fileClient.deleteFile(appConfiguration.object).then(
+    await this.fetcher.webOperation('DELETE', appConfiguration.object).then(
       () => {
         Log.info(`Removed file!`);
       },
@@ -447,23 +454,29 @@ class SolidBackend {
       }
     );
 
-    await fileClient.deleteFile(`${appConfiguration.object}.acl`).then(
-      () => {
-        Log.info(`Removed file!`);
-      },
-      err => {
-        return false;
-      }
-    );
+    await this.fetcher
+      .webOperation('DELETE', `${appConfiguration.object}.acl`)
+      .then(
+        () => {
+          Log.info(`Removed file!`);
+        },
+        err => {
+          return false;
+        }
+      );
 
-    await fileClient.deleteFile(`${appConfiguration.url}.acl`).then(
-      () => {
-        Log.info(`Removed file!`);
-      },
-      err => {
-        return false;
-      }
-    );
+    await this.fetcher
+      .webOperation('DELETE', `${appConfiguration.url}.acl`)
+      .then(
+        () => {
+          Log.info(`Removed file!`);
+        },
+        err => {
+          return false;
+        }
+      );
+
+    const folder = $rdf.sym(appFolder).doc();
 
     return true;
   }

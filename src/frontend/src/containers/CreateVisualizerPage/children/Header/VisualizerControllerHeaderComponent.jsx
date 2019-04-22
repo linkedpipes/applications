@@ -9,7 +9,6 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Paper from '@material-ui/core/Paper';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
 import InputBase from '@material-ui/core/InputBase';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
@@ -28,7 +27,6 @@ type Props = {
   handleCloseEmbedDialog: Function,
   handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
-  fullScreen: any,
   appIri: string,
   selectedVisualizer: Object,
   selectedApplicationTitle: string,
@@ -68,7 +66,6 @@ const VisualizerControllerHeaderComponent = ({
   handleCloseEmbedDialog,
   handleProceedToApplicationClicked,
   handleCopyLinkClicked,
-  fullScreen,
   selectedApplicationTitle,
   selectedVisualizer,
   appIri,
@@ -106,7 +103,7 @@ const VisualizerControllerHeaderComponent = ({
               id="application-title-field"
               placeholder="Enter your application title..."
               onChange={handleAppTitleChanged}
-              margin="normal"
+              margin="dense"
             />
           </Grid>
           <Grid item>
@@ -258,6 +255,4 @@ const VisualizerControllerHeaderComponent = ({
   </div>
 );
 
-export default withMobileDialog()(
-  withStyles(styles)(VisualizerControllerHeaderComponent)
-);
+export default withStyles(styles)(VisualizerControllerHeaderComponent);

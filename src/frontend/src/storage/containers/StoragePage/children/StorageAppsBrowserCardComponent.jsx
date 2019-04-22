@@ -5,7 +5,6 @@ import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
-import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -62,7 +61,8 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationData: Function,
   setApplicationLoaderStatus: Function,
-  history: Object
+  history: Object,
+  applicationsFolder: string
 };
 
 type State = {
@@ -89,12 +89,19 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   };
 
   handleDeleteApp = async () => {
+    const { setApplicationLoaderStatus } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
     const result = await StorageToolbox.removeAppFromStorage(
+      this.props.applicationsFolder,
       this.props.applicationMetadata
     );
     if (result) {
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
+
+    await setApplicationLoaderStatus(false);
   };
 
   handleMenuClose = () => {
@@ -123,7 +130,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       history
     } = this.props;
 
-    setApplicationLoaderStatus(true);
+    await setApplicationLoaderStatus(true);
 
     const appConfigurationResponse = await axios.get(
       applicationMetadata.object
@@ -134,7 +141,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 2000
       });
-      setApplicationLoaderStatus(false);
+      await setApplicationLoaderStatus(false);
     }
     const applicationData = appConfigurationResponse.data.applicationData;
 
@@ -147,12 +154,13 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     handleSetSelectedApplicationTitle(applicationMetadata.title);
     handleSetSelectedApplicationData(applicationData);
     handleSetSelectedVisualizer(selectedVisualiser);
+
+    await setApplicationLoaderStatus(false);
+
     history.push({
       pathname: '/create-app'
     });
     Log.info('test');
-
-    setApplicationLoaderStatus(false);
   };
 
   render() {
@@ -184,7 +192,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
             )}
           />
           <CardActionArea onClick={handleApplicationClicked}>
-            <CardMedia
+            <div
               className={classes.media}
               style={{ backgroundColor: applicationMetadata.cardColor }}
             >
@@ -192,7 +200,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 visualizerType={applicationMetadata.endpoint}
                 style={{ color: 'white', fontSize: '85px' }}
               />
-            </CardMedia>
+            </div>
           </CardActionArea>
           <CardActions className={classes.actions} disableActionSpacing>
             <IconButton aria-label="Share" onClick={handleShareApp}>
@@ -253,6 +261,12 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    applicationsFolder: state.user.applicationsFolder
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
     dispatch(
@@ -284,7 +298,7 @@ const mapDispatchToProps = dispatch => {
 
 export default withRouter(
   connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
   )(withStyles(styles)(StorageAppsBrowserCardComponent))
 );

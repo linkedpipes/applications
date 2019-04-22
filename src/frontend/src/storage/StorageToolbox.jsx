@@ -90,41 +90,45 @@ const saveAppToSolid = async (
   );
 };
 
-const removeAppFromStorage = async appConfiguration => {
-  return await SolidBackend.removeAppConfiguration(appConfiguration);
+const removeAppFromStorage = async (appFolder, appConfiguration) => {
+  return await SolidBackend.removeAppConfiguration(appFolder, appConfiguration);
 };
 
 const loadAppFromSolid = appIri => {
-  import(/* webpackChunkName: "solid-file-client" */  'solid-file-client').then(FileClient => {
-    FileClient.readFile(appIri).then(
-      body => {
-        Log.info(`File content is : ${body}.`, 'StorageToolbox');
-        return body;
-      },
-      err => Log.error(err, 'StorageToolbox')
-    );
-  });
+  import(/* webpackChunkName: "solid-file-client" */ 'solid-file-client').then(
+    FileClient => {
+      FileClient.readFile(appIri).then(
+        body => {
+          Log.info(`File content is : ${body}.`, 'StorageToolbox');
+          return body;
+        },
+        err => Log.error(err, 'StorageToolbox')
+      );
+    }
+  );
 };
 
 const createOrUpdateFolder = (webId, path) => {
   const folderPath = `${GlobalUtils.getLocation(webId).origin}/${path}`;
 
-  import(/* webpackChunkName: "solid-file-client" */  'solid-file-client').then(FileClient => {
-    FileClient.readFolder(folderPath).then(
-      folder => {
-        Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
-      },
-      () => {
-        FileClient.createFolder(folderPath).then(
-          body => {
-            Log.info(`File content is : ${body}.`, 'StorageToolbox');
-            return body;
-          },
-          errCreate => Log.error(errCreate, 'StorageToolbox')
-        );
-      }
-    );
-  });
+  import(/* webpackChunkName: "solid-file-client" */ 'solid-file-client').then(
+    FileClient => {
+      FileClient.readFolder(folderPath).then(
+        folder => {
+          Log.info(`Read ${folder.name}, it has ${folder.files.length} files.`);
+        },
+        () => {
+          FileClient.createFolder(folderPath).then(
+            body => {
+              Log.info(`File content is : ${body}.`, 'StorageToolbox');
+              return body;
+            },
+            errCreate => Log.error(errCreate, 'StorageToolbox')
+          );
+        }
+      );
+    }
+  );
 };
 
 export default {
