@@ -38,7 +38,9 @@ type Props = {
   onHandleSelectDiscoveryClick: Function,
   onHandleSampleClick: Function,
   onHandleSelectPipelineExecutionClick: Function,
-  tabIndex: Number
+  tabIndex: Number,
+  onHandleAppClicked: Function,
+  onHandleShareAppClicked: Function
 };
 
 const styles = theme => ({
@@ -84,7 +86,9 @@ class HomeComponent extends PureComponent<Props> {
       onHandleSampleClick,
       onHandleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick,
-      tabIndex
+      tabIndex,
+      onHandleAppClicked,
+      onHandleShareAppClicked
     } = this.props;
     return (
       <div className={classes.root}>
@@ -131,7 +135,7 @@ class HomeComponent extends PureComponent<Props> {
               <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
                 <Tab label="Discoveries" />
                 <Tab label="Pipelines" />
-                {/* <Tab label="My Applications" /> */}
+                <Tab label="My Applications" />
               </Tabs>
             </AppBar>
             <div
@@ -154,7 +158,11 @@ class HomeComponent extends PureComponent<Props> {
                 />
               )}
               {tabIndex === 2 && (
-                <ApplicationsTable applicationsList={applicationsList} />
+                <ApplicationsTable
+                  applicationsList={applicationsList}
+                  onHandleShareAppClicked={onHandleShareAppClicked}
+                  onHandleAppClicked={onHandleAppClicked}
+                />
               )}
             </div>
           </Grid>

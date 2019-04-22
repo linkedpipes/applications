@@ -12,17 +12,46 @@ type Props = {
   selectedApplication: Object,
   handleSetCurrentApplicationData: Function,
   handleResetCurrentApplicationData: Function,
-  handleResetCurrentApplicationTitle: Function
+  handleResetCurrentApplicationTitle: Function,
+  history: Object
 };
 
 type State = {
-  appTitle: string
+  loadingIsActive: boolean
 };
 
 class CreateVisualizerContainer extends PureComponent<Props, State> {
+  state = {
+    loadingIsActive: false
+  };
+
+  constructor(props) {
+    super(props);
+    (this: any).setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
+      this
+    );
+  }
+
+  componentDidMount() {
+    const { selectedVisualizer, selectedResultGraphIri, history } = this.props;
+
+    if (
+      selectedVisualizer.visualizer.visualizerCode === 'UNDEFINED' &&
+      !selectedResultGraphIri
+    ) {
+      history.push({
+        pathname: '/dashboard'
+      });
+    }
+  }
+
   componentWillUnmount() {
     this.props.handleResetCurrentApplicationData();
     this.props.handleResetCurrentApplicationTitle();
+  }
+
+  setApplicationLoaderStatus(isLoading) {
+    this.setState({ loadingIsActive: isLoading });
   }
 
   render() {
@@ -43,6 +72,8 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         selectedResultGraphIri={selectedResultGraphIri}
         selectedApplication={selectedApplication}
         handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        setApplicationLoaderStatus={this.setApplicationLoaderStatus}
+        loadingIsActive={this.state.loadingIsActive}
       />
     );
   }

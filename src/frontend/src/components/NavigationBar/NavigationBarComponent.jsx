@@ -158,7 +158,7 @@ const NavigationBarComponent = ({
       <Divider />
       <List>
         <Link style={{ textDecoration: 'none' }} to="/dashboard">
-          <ListItem button>
+          <ListItem id="dashboard_navbar_button" button>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
@@ -176,7 +176,7 @@ const NavigationBarComponent = ({
         </Link> */}
 
         <Link style={{ textDecoration: 'none' }} to="/storage">
-          <ListItem button>
+          <ListItem id="storage_navbar_button" button>
             <ListItemIcon>
               <StorageIcon />
             </ListItemIcon>

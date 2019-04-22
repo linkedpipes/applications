@@ -50,41 +50,44 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
 
   async componentDidMount() {
     const { handleSetCurrentApplicationData, isPublished } = this.props;
-    const size = document.getElementById('viz-div').clientHeight;
-    this.setState({ size });
+    const elementVizDiv = document.getElementById('viz-div');
+    if (elementVizDiv && elementVizDiv.clientHeight !== undefined) {
+      const size = elementVizDiv.clientHeight;
+      this.setState({ size });
 
-    if (!isPublished) {
-      handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'chord',
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'CHORD'
+      if (!isPublished) {
+        handleSetCurrentApplicationData({
+          id: uuid.v4(),
+          applicationEndpoint: 'chord',
+          selectedResultGraphIri: this.props.selectedResultGraphIri,
+          visualizerCode: 'CHORD'
+        });
+      }
+
+      const nodesRequest = await VisualizersService.getChordNodes(
+        this.props.selectedResultGraphIri
+      );
+      const nodesResponse = await nodesRequest.data;
+      const nodeUris = nodesResponse.map(node => node.uri);
+      const labels = nodesResponse.map(node => node.label.languageMap.nolang);
+
+      const matrixRequest = await VisualizersService.getChordData(
+        this.props.selectedResultGraphIri,
+        nodeUris
+      );
+      const matrixData = await matrixRequest.data;
+
+      const colors = palette('sol-accent', nodeUris.length).map(
+        color => `#${color}`
+      );
+
+      this.setState({
+        dataLoadingStatus: 'ready',
+        matrix: matrixData,
+        groupColors: colors,
+        groupLabels: labels
       });
     }
-
-    const nodesRequest = await VisualizersService.getChordNodes(
-      this.props.selectedResultGraphIri
-    );
-    const nodesResponse = await nodesRequest.data;
-    const nodeUris = nodesResponse.map(node => node.uri);
-    const labels = nodesResponse.map(node => node.label.languageMap.nolang);
-
-    const matrixRequest = await VisualizersService.getChordData(
-      this.props.selectedResultGraphIri,
-      nodeUris
-    );
-    const matrixData = await matrixRequest.data;
-
-    const colors = palette('sol-accent', nodeUris.length).map(
-      color => `#${color}`
-    );
-
-    this.setState({
-      dataLoadingStatus: 'ready',
-      matrix: matrixData,
-      groupColors: colors,
-      groupLabels: labels
-    });
   }
 
   render() {

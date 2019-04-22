@@ -3,7 +3,8 @@ import React, { PureComponent } from 'react';
 import VisualizerControllerHeaderComponent from './VisualizerControllerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, withWebId } from '@utils';
+import { withWebId } from '@utils';
+import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -16,7 +17,9 @@ type Props = {
   headerParams: { title: string, subtitle?: string },
   history: any,
   selectedVisualizer: Object,
-  selectedApplicationTitle: string
+  selectedApplicationTitle: string,
+  applicationsFolder: string,
+  setApplicationLoaderStatus: Function
 };
 
 type State = {
@@ -36,60 +39,80 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
     width: 400
   };
 
-  handlePublishClicked = () => {
-    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
-    const { handleAppPublished } = this;
+  handlePublishClicked = async () => {
+    const {
+      selectedApplication,
+      selectedApplicationTitle,
+      webId,
+      applicationsFolder,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
-    StorageToolbox.saveAppToSolid(
+    const appConfiguration = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
-      'public/lpapps'
-    ).then(({ applicationIri, applicationEndpoint }, error) => {
-      if (!error) {
-        const publishedUrl = StorageToolbox.appIriToPublishUrl(
-          applicationIri,
-          applicationEndpoint
-        );
-        handleAppPublished(publishedUrl);
-      }
-    });
+      applicationsFolder,
+      true
+    );
+
+    const publishedUrl = StorageToolbox.appIriToPublishUrl(
+      appConfiguration.object,
+      selectedApplication.applicationEndpoint
+    );
+
+    setApplicationLoaderStatus(false);
+    this.handleAppPublished(publishedUrl);
   };
 
-  handleEmbedClicked = () => {
-    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
-    const { handleAppEmbedded } = this;
+  handleEmbedClicked = async () => {
+    const {
+      selectedApplication,
+      selectedApplicationTitle,
+      applicationsFolder,
+      webId,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
-    StorageToolbox.saveAppToSolid(
+    const appConfiguration = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
-      'public/lpapps'
-    ).then(({ applicationIri, applicationEndpoint }, error) => {
-      if (!error) {
-        const publishedUrl = StorageToolbox.appIriToPublishUrl(
-          applicationIri,
-          applicationEndpoint
-        );
-        handleAppEmbedded(publishedUrl);
-      }
-    });
+      applicationsFolder,
+      true
+    );
+
+    const publishedUrl = StorageToolbox.appIriToPublishUrl(
+      appConfiguration.object,
+      selectedApplication.applicationEndpoint
+    );
+
+    setApplicationLoaderStatus(false);
+    this.handleAppEmbedded(publishedUrl);
   };
 
   onHandleAppTitleChanged = e => {
@@ -194,7 +217,8 @@ const mapStateToProps = state => {
     filters: state.visualizers.filters,
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
-    selectedApplicationTitle: state.application.selectedApplicationTitle
+    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    applicationsFolder: state.user.applicationsFolder
   };
 };
 

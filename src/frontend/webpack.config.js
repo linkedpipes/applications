@@ -44,7 +44,8 @@ module.exports = () => {
     entry: [path.join(__dirname, '/src/index.jsx')],
     output: {
       path: path.join(__dirname, '/public'),
-      filename: 'bundle.js'
+      filename: '[name].bundle.js',
+      chunkFilename: '[name].bundle.js'
     },
     resolve: {
       extensions: ['.mjs', '.js', '.jsx'],
@@ -53,6 +54,7 @@ module.exports = () => {
         '@containers': path.resolve(__dirname, './src/containers'),
         '@ducks': path.resolve(__dirname, './src/ducks'),
         '@utils': path.resolve(__dirname, './src/utils'),
+        '@storage': path.resolve(__dirname, './src/storage'),
         '@constants': path.resolve(__dirname, './src/constants'),
         '@layouts': path.resolve(__dirname, './src/layouts'),
         'material-ui': 'material-ui/es'
@@ -98,6 +100,12 @@ module.exports = () => {
     },
     mode: dev ? 'development' : 'production',
     plugins,
-    externals: {}
+    externals: {
+      'node-fetch': 'fetch',
+      'text-encoding': 'TextEncoder',
+      'whatwg-url': 'window',
+      'isomorphic-fetch': 'fetch',
+      '@trust/webcrypto': 'crypto'
+    }
   };
 };

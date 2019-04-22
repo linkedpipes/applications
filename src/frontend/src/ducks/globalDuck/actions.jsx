@@ -7,6 +7,14 @@ const addSelectedVisualizerAction = ({ data } = {}) => {
   };
 };
 
+const setChooseFolderDialogState = ({ state }) => {
+  return {
+    type: types.SET_CHOOSE_FOLDER_DIALOG_STATE,
+    isOpen: state
+  };
+};
+
 export default {
-  addSelectedVisualizerAction
+  addSelectedVisualizerAction,
+  setChooseFolderDialogState
 };
