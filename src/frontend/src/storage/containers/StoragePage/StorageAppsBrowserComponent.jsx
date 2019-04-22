@@ -49,7 +49,7 @@ function StorageAppsBrowserComponent(props: Props) {
       {applicationsMetadata.length !== 0 ? (
         <div className={classes.gridArea}>
           <Grid container spacing={8}>
-            {applicationsMetadata.map(metadata => (
+            {applicationsMetadata.map((metadata, index) => (
               <Grid
                 key={metadata.createdAt}
                 item
@@ -60,7 +60,7 @@ function StorageAppsBrowserComponent(props: Props) {
                 xl={2}
               >
                 <StorageAppsBrowserCardComponent
-                  key={uuid.v4()}
+                  indexNumber={index}
                   applicationMetadata={metadata}
                   setApplicationLoaderStatus={setApplicationLoaderStatus}
                   onHandleApplicationDeleted={onHandleApplicationDeleted}

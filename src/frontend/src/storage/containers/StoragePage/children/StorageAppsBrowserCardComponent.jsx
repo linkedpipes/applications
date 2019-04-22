@@ -62,7 +62,8 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   setApplicationLoaderStatus: Function,
   history: Object,
-  applicationsFolder: string
+  applicationsFolder: string,
+  indexNumber: Number
 };
 
 type State = {
@@ -164,7 +165,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   };
 
   render() {
-    const { classes, applicationMetadata } = this.props;
+    const { classes, applicationMetadata, indexNumber } = this.props;
     const { anchorEl } = this.state;
     const {
       handleMenuClick,
@@ -181,6 +182,9 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               <IconButton
                 aria-owns={anchorEl ? 'simple-menu' : undefined}
                 aria-haspopup="true"
+                id={`more_icon_${indexNumber.toString()}_${
+                  applicationMetadata.title
+                }`}
                 onClick={handleMenuClick}
               >
                 <MoreVertIcon />
@@ -194,6 +198,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
           <CardActionArea onClick={handleApplicationClicked}>
             <div
               className={classes.media}
+              id={`${indexNumber.toString()}_${applicationMetadata.title}`}
               style={{ backgroundColor: applicationMetadata.cardColor }}
             >
               <VisualizerIcon
@@ -214,7 +219,14 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
           open={Boolean(anchorEl)}
           onClose={this.handleMenuClose}
         >
-          <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
+          <MenuItem
+            id={`delete_button_${indexNumber.toString()}_${
+              applicationMetadata.title
+            }`}
+            onClick={handleDeleteApp}
+          >
+            Delete
+          </MenuItem>
         </Menu>
         <Dialog
           open={this.state.open}
