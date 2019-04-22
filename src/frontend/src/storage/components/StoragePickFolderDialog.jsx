@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import StorageBackend from '../StorageBackend';
 import { withWebId } from '@utils';
+import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
   handleUpdateChooseFolderDialogState: Function,
@@ -24,13 +25,15 @@ type Props = {
 
 type State = {
   folderTitle: any,
-  defaultFolderTitle: string
+  defaultFolderTitle: string,
+  loadingIsActive: boolean
 };
 
 class StoragePickFolderDialog extends PureComponent<Props, State> {
   state = {
     folderTitle: undefined,
-    defaultFolderTitle: 'linkedpipes'
+    defaultFolderTitle: 'linkedpipes',
+    loadingIsActive: false
   };
 
   constructor(props) {
@@ -38,17 +41,23 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
     (this: any).handleFolderConfirm = this.handleFolderConfirm.bind(this);
   }
 
+  setApplicationLoaderStatus(isLoading) {
+    this.setState({ loadingIsActive: isLoading });
+  }
+
   handleClickOpen = () => {
     this.props.handleUpdateChooseFolderDialogState(true);
   };
-
-  handleClose = () => {};
 
   handleChangeFolderTitle = event => {
     this.setState({ folderTitle: event.target.value });
   };
 
+  handleClose = () => {};
+
   async handleFolderConfirm() {
+    this.setApplicationLoaderStatus(true);
+
     const folderSelected =
       this.state.folderTitle === undefined
         ? this.state.defaultFolderTitle
@@ -59,6 +68,8 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 5000
       });
+
+      this.setApplicationLoaderStatus(false);
       return;
     }
     const folderUrl = `${Utils.getBaseUrl(this.props.webId) + folder}/`;
@@ -75,9 +86,12 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
         }
       }
     );
+
+    this.setApplicationLoaderStatus(false);
   }
 
   render() {
+    const { loadingIsActive } = this.state;
     return (
       <div>
         <Dialog
@@ -85,29 +99,31 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Choose your folder</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Choose the title of the folder where LinkedPipes Applications
-              Storage is going to store your published applications and
-              configuration. Or press continue to stick to the default title.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              value={this.state.folderTitle}
-              defaultValue={this.state.defaultFolderTitle}
-              onChange={this.handleChangeFolderTitle}
-              id="name"
-              label="Storage folder title"
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleFolderConfirm} color="primary">
-              Choose title
-            </Button>
-          </DialogActions>
+          <LoadingOverlay active={loadingIsActive} spinner>
+            <DialogTitle id="form-dialog-title">Choose your folder</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Choose the title of the folder where LinkedPipes Applications
+                Storage is going to store your published applications and
+                configuration. Or press continue to stick to the default title.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                value={this.state.folderTitle}
+                defaultValue={this.state.defaultFolderTitle}
+                onChange={this.handleChangeFolderTitle}
+                id="name"
+                label="Storage folder title"
+                fullWidth
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleFolderConfirm} color="primary">
+                Choose title
+              </Button>
+            </DialogActions>
+          </LoadingOverlay>
         </Dialog>
       </div>
     );
