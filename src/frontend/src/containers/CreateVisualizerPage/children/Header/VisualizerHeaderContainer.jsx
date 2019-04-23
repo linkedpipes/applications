@@ -1,12 +1,13 @@
 // @flow
 import React, { PureComponent } from 'react';
-import VisualizerControllerHeaderComponent from './VisualizerControllerHeaderComponent';
+import VisualizerControllerHeaderComponent from './VisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
 import { withWebId } from '@utils';
 import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   selectedApplication: any,
@@ -19,7 +20,8 @@ type Props = {
   selectedVisualizer: Object,
   selectedApplicationTitle: string,
   applicationsFolder: string,
-  setApplicationLoaderStatus: Function
+  setApplicationLoaderStatus: Function,
+  handleSetSelectedApplicationMetadata: Function
 };
 
 type State = {
@@ -27,16 +29,18 @@ type State = {
   embedDialogOpen: boolean,
   appIri: string,
   height: number,
-  width: number
+  width: number,
+  currentApplicationMetadata: AppConfiguration
 };
 
-class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
+class VisualizerHeaderContainer extends PureComponent<Props, State> {
   state = {
     publishDialogOpen: false,
     embedDialogOpen: false,
     appIri: '',
     height: 400,
-    width: 400
+    width: 400,
+    currentApplicationMetadata: undefined
   };
 
   handlePublishClicked = async () => {
@@ -60,7 +64,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       return;
     }
 
-    const appConfiguration = await StorageToolbox.saveAppToSolid(
+    const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
@@ -68,8 +72,10 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       true
     );
 
+    this.setState({ currentApplicationMetadata });
+
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      appConfiguration.object,
+      currentApplicationMetadata.object,
       selectedApplication.applicationEndpoint
     );
 
@@ -98,7 +104,7 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       return;
     }
 
-    const appConfiguration = await StorageToolbox.saveAppToSolid(
+    const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
@@ -106,8 +112,10 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
       true
     );
 
+    this.setState({ currentApplicationMetadata });
+
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      appConfiguration.object,
+      currentApplicationMetadata.object,
       selectedApplication.applicationEndpoint
     );
 
@@ -135,10 +143,16 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
 
   handleClosePublishDialog = () => {
     this.setState({ publishDialogOpen: false });
+    this.props.handleSetSelectedApplicationMetadata(
+      this.state.currentApplicationMetadata
+    );
   };
 
   handleCloseEmbedDialog = () => {
     this.setState({ embedDialogOpen: false });
+    this.props.handleSetSelectedApplicationMetadata(
+      this.state.currentApplicationMetadata
+    );
   };
 
   handleProceedToApplicationClicked = () => {
@@ -226,8 +240,12 @@ const mapDispatchToProps = dispatch => {
   const handleAppTitleChanged = applicationTitle =>
     dispatch(applicationActions.setApplicationTitle(applicationTitle));
 
+  const handleSetSelectedApplicationMetadata = applicationMetadata =>
+    dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
+
   return {
-    handleAppTitleChanged
+    handleAppTitleChanged,
+    handleSetSelectedApplicationMetadata
   };
 };
 
@@ -236,6 +254,6 @@ export default withRouter(
     connect(
       mapStateToProps,
       mapDispatchToProps
-    )(VisualizerControllerHeaderContainer)
+    )(VisualizerHeaderContainer)
   )
 );

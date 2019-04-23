@@ -10,6 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
@@ -60,6 +61,7 @@ type Props = {
   onHandleApplicationDeleted: Function,
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationData: Function,
+  handleSetSelectedApplicationMetadata: Function,
   setApplicationLoaderStatus: Function,
   history: Object,
   applicationsFolder: string,
@@ -85,10 +87,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     this.setState({ open: false });
   };
 
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
   handleDeleteApp = async () => {
     const { setApplicationLoaderStatus } = this.props;
 
@@ -103,6 +101,10 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     }
 
     await setApplicationLoaderStatus(false);
+  };
+
+  handleMenuClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
   };
 
   handleMenuClose = () => {
@@ -128,6 +130,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetResultPipelineIri,
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
+      handleSetSelectedApplicationMetadata,
       history
     } = this.props;
 
@@ -154,6 +157,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     handleSetResultPipelineIri(resultGraphIri);
     handleSetSelectedApplicationTitle(applicationMetadata.title);
     handleSetSelectedApplicationData(applicationData);
+    handleSetSelectedApplicationMetadata(applicationMetadata);
     handleSetSelectedVisualizer(selectedVisualiser);
 
     await setApplicationLoaderStatus(false);
@@ -228,6 +232,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
             Delete
           </MenuItem>
         </Menu>
+
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}
@@ -236,6 +241,13 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
           <DialogTitle id="form-dialog-title">
             Share the Application URL
           </DialogTitle>
+
+          <DialogContent>
+            <DialogContentText>
+              Click on the field with link to copy the public view URL to your
+              clipboard.
+            </DialogContentText>
+          </DialogContent>
 
           <DialogContent>
             <CopyToClipboard
@@ -256,8 +268,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 )}
                 autoFocus
                 style={{
-                  textDecoration: 'none',
-                  width: '400px'
+                  textDecoration: 'none'
                 }}
               />
             </CopyToClipboard>
@@ -300,11 +311,15 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationData = applicationData =>
     dispatch(applicationActions.setApplication(applicationData));
 
+  const handleSetSelectedApplicationMetadata = applicationMetadata =>
+    dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
+
   return {
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
-    handleSetSelectedApplicationData
+    handleSetSelectedApplicationData,
+    handleSetSelectedApplicationMetadata
   };
 };
 

@@ -30,6 +30,7 @@ type Props = {
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
+  handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function
 };
 type State = {
@@ -40,6 +41,8 @@ type State = {
 
 class HomeContainer extends PureComponent<Props, State> {
   isMounted = false;
+
+  didUpdateMetadata = false;
 
   state = {
     tabIndex: 0,
@@ -67,8 +70,20 @@ class HomeContainer extends PureComponent<Props, State> {
     loadApplicationsMetadata();
   }
 
+  async componentWillUpdate() {
+    if (
+      this.isMounted &&
+      this.props.userProfile.webId &&
+      !this.didUpdateMetadata
+    ) {
+      this.loadApplicationsMetadata();
+      this.didUpdateMetadata = true;
+    }
+  }
+
   componentWillUnmount() {
     this.isMounted = false;
+    this.didUpdateMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -207,6 +222,7 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSetResultPipelineIri,
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
+      handleSetSelectedApplicationMetadata,
       history
     } = this.props;
 
@@ -233,6 +249,7 @@ class HomeContainer extends PureComponent<Props, State> {
     handleSetResultPipelineIri(resultGraphIri);
     handleSetSelectedApplicationTitle(applicationMetadata.title);
     handleSetSelectedApplicationData(applicationData);
+    handleSetSelectedApplicationMetadata(applicationMetadata);
     handleSetSelectedVisualizer(selectedVisualiser);
 
     await this.setApplicationLoaderStatus(false);
@@ -322,13 +339,17 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationData = applicationData =>
     dispatch(applicationActions.setApplication(applicationData));
 
+  const handleSetSelectedApplicationMetadata = applicationMetadata =>
+    dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
+
   return {
     handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
-    handleSetSelectedApplicationData
+    handleSetSelectedApplicationData,
+    handleSetSelectedApplicationMetadata
   };
 };
 
