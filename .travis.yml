@@ -56,7 +56,7 @@ jobs:
       name: "Frontend"
       before_script:
         - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
         - export PATH="$HOME/.yarn/bin:$PATH"
       cache:
         yarn: true
