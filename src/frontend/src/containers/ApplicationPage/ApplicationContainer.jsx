@@ -20,16 +20,28 @@ type Props = {
 
 type State = {
   applicationType: string,
-  applicationData: Object
+  applicationData: Object,
+  width: number,
+  height: number
 };
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
     applicationType: 'UNDEFINED',
-    applicationData: {}
+    applicationData: {},
+    width: 0,
+    height: 0
   };
 
+  constructor(props) {
+    super(props);
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+  }
+
   componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions.bind(this));
+
     const self = this;
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
@@ -45,6 +57,14 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return <div>No stored data found!</div>;
       });
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  };
 
   getApplication = (applicationType, applicationData) => {
     switch (applicationType) {
@@ -85,16 +105,21 @@ class ApplicationContainer extends PureComponent<Props, State> {
     }
   };
 
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  };
+
   render() {
     const { getApplication } = this;
-    const { applicationType, applicationData } = this.state;
+    const { applicationType, applicationData, width, height } = this.state;
 
     return (
       <div
         id="viz-div"
         style={{
           flex: 1,
-          height: '100vh',
+          width: `${width}px`,
+          height: `${height}px`,
           textAlign: 'center'
         }}
       >
