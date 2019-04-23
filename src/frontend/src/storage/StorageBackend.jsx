@@ -219,6 +219,43 @@ class SolidBackend {
 
   /**
    * Updates a user's profile with the new application folder location.
+   * @param {string} metadataUrl A url to a metadata file.
+   * @param {string} newTitle New title for an application.
+   * @return {boolean} True if updated, false otherwise.
+   */
+  async renameAppConfiguration(
+    metadataUrl: string,
+    newTitle: string
+  ): Promise<boolean> {
+    const metadataFile = $rdf.sym(metadataUrl);
+    const predicate = $rdf.sym(DCT('title'));
+    const title = $rdf.lit(newTitle);
+    const metadata = metadataFile.doc();
+    try {
+      await this.load(metadata);
+    } catch (err) {
+      console.log('Could not load a metadata document.');
+      return false;
+    }
+    const ins = [$rdf.st(metadataFile, predicate, title, metadata)];
+    const del = this.store.statementsMatching(
+      metadataFile,
+      predicate,
+      null,
+      metadata
+    );
+    try {
+      await this.updateResource(metadata.value, ins, del);
+    } catch (err) {
+      Log.error(err);
+      return false;
+    }
+    // this.registerChanges(metadataFile);
+    return true;
+  }
+
+  /**
+   * Updates a user's profile with the new application folder location.
    * @param {string} webId A user's WebID.
    * @param {string} folderUrl An URL of the new application folder.
    * @return {boolean} True if updated, false otherwise.
