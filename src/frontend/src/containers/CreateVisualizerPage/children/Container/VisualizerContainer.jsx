@@ -9,7 +9,6 @@ import {
 } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
-import FiltersComponent from '../Filters';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {} },
@@ -34,6 +33,21 @@ const styles = theme => ({
   card: {},
   input: {}
 });
+
+const getFilters = visualizerCode => {
+  switch (visualizerCode) {
+    case VISUALIZER_TYPE.MAP:
+    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+      return <div>Filters for Google Maps not yet implemented.</div>;
+    }
+    case VISUALIZER_TYPE.TREEMAP:
+      return <div>Basic treemap filters</div>;
+    case VISUALIZER_TYPE.CHORD:
+      return <div>Filters for chord not yet implemented.</div>;
+    default:
+      return <div>No filters available for selected visualizer.</div>;
+  }
+};
 
 const getVisualizer = (
   visualizerCode,
@@ -93,7 +107,7 @@ const getVisualizer = (
 const VisualizerControllerContainer = (props: Props) => (
   <Grid container className={props.classes.root} direction="row" spacing={0}>
     <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
-      <FiltersComponent filters={props.filters} />
+      {getFilters(props.visualizer.visualizerCode)}
     </Grid>
     <Grid id="viz-div" item lg={9} md={8} xs={12}>
       {getVisualizer(
