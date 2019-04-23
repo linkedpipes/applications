@@ -21,7 +21,7 @@ jobs:
     - stage: push-build
       language: node_js
       node_js:
-        - stable
+        - node
       name: "Frontend"
       before_script:
         - cd src/frontend
@@ -52,7 +52,7 @@ jobs:
     - stage: build
       language: node_js
       node_js:
-        - stable
+        - node
       name: "Frontend"
       before_script:
         - cd src/frontend
