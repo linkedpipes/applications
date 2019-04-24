@@ -55,7 +55,7 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerHeaderComponent = ({
+const VisualizerHeaderComponent = ({
   classes,
   handlePublishClicked,
   handleEmbedClicked,
@@ -255,4 +255,4 @@ const VisualizerControllerHeaderComponent = ({
   </div>
 );
 
-export default withStyles(styles)(VisualizerControllerHeaderComponent);
+export default withStyles(styles)(VisualizerHeaderComponent);

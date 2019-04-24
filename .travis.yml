@@ -21,11 +21,11 @@ jobs:
     - stage: push-build
       language: node_js
       node_js:
-        - stable
+        - "11"
       name: "Frontend"
       before_script:
         - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
         - export PATH="$HOME/.yarn/bin:$PATH"
       cache:
         yarn: true
@@ -52,11 +52,11 @@ jobs:
     - stage: build
       language: node_js
       node_js:
-        - stable
+        - "11"
       name: "Frontend"
       before_script:
         - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
         - export PATH="$HOME/.yarn/bin:$PATH"
       cache:
         yarn: true
@@ -184,7 +184,7 @@ jobs:
         - cd src/tests
         - pip3 install -r requirements.txt
       script:
-        - sleep 30 # Hardcoded workaround to wait until data is deployed 
+        - sleep 50 # Hardcoded workaround to wait until data is deployed 
         - python3 e2e_tests.py "$BROWSERSTACK_USERNAME" "$BROWSERSTACK_APIKEY" "$TRAVIS_BUILD_NUMBER" "$TRAVIS_BRANCH"
       
 

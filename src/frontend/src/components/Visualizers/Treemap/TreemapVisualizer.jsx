@@ -120,14 +120,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
-
-    handleSetCurrentApplicationData({
-      id: uuid.v4(),
-      applicationEndpoint: 'treemap',
-      conceptIri: this.props.selectedScheme,
-      selectedResultGraphIri: this.props.selectedResultGraphIri,
-      visualizerCode: 'TREEMAP'
-    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -201,9 +193,9 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   return {
-    selectedScheme: state.filters.selectedScheme
+    selectedScheme: state.filters.selectedScheme || ownProps.selectedScheme
   };
 };
 
