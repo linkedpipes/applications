@@ -67,7 +67,12 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedScheme,
+      selectedResultGraphIri
+    } = this.props;
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
@@ -120,6 +125,9 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
+    if (selectedResultGraphIri && selectedScheme) {
+      this.handleSchemeChange(selectedScheme);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
