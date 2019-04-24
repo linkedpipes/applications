@@ -4,6 +4,7 @@ import globalDuck from './globalDuck';
 import visualizersDuck from './visualizersDuck';
 import userDuck from './userDuck';
 import applicationDuck from './applicationDuck';
+import filtersDuck from './filtersDuck';
 
 export default {
   discoveryDuck,
@@ -11,5 +12,6 @@ export default {
   globalDuck,
   visualizersDuck,
   userDuck,
-  applicationDuck
+  applicationDuck,
+  filtersDuck
 };

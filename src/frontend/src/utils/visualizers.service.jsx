@@ -38,11 +38,11 @@ const VisualizersService = {
   },
 
   getSkosSchemes: async resultGraphIri => {
-    return axios.get('/skos/schemes', { params: { resultGraphIri } });
+    return lpaAxios.get('/skos/schemes', { params: { resultGraphIri } });
   },
 
   getSKOSConcepts: async (resultGraphIri, schemeUri, conceptUri) => {
-    return axios.get('/skos/schemeSubtree', {
+    return lpaAxios.get('/skos/schemeSubtree', {
       params: { resultGraphIri, schemeUri, conceptUri }
     });
   },

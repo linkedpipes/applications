@@ -2,14 +2,10 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
+import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import { connect } from 'react-redux';
 
 type Props = {
   classes: {
@@ -19,13 +15,12 @@ type Props = {
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
-  isPublished: boolean
+  isPublished: boolean,
+  selectedScheme: string
 };
 
 type State = {
   dataLoadingStatus: string,
-  selectedScheme: string,
-  schemes: Array<{ uri: string, label: { languageMap: { en: string } } }>,
   chartData: Array<Array<any>>
 };
 
@@ -45,6 +40,9 @@ const styles = theme => ({
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2
+  },
+  wrapper: {
+    height: '100%'
   }
 });
 
@@ -64,9 +62,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     super(props);
     this.state = {
       dataLoadingStatus: 'loading',
-      chartData: [],
-      selectedScheme: '',
-      schemes: []
+      chartData: []
     };
   }
 
@@ -77,8 +73,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
         applicationEndpoint: 'treemap',
-        conceptIri:
-          'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+        conceptIri: this.props.selectedScheme,
         selectedResultGraphIri: this.props.selectedResultGraphIri,
         visualizerCode: 'TREEMAP'
       });
@@ -101,7 +96,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            this.state.selectedScheme,
+            this.props.selectedScheme,
             this.props.selectedResultGraphIri,
             iri
           );
@@ -126,30 +121,29 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       }
     ];
 
-    // Get the schemes
-    const schemesResponse = await VisualizersService.getSkosSchemes(
-      this.props.selectedResultGraphIri
-    );
-    const schemes = schemesResponse.data;
-    if (schemes.length) {
-      this.setState({ schemes }, () => {
-        this.conceptsFetched.add(schemes[0].uri);
-      });
-    }
-
     handleSetCurrentApplicationData({
       id: uuid.v4(),
       applicationEndpoint: 'treemap',
-      conceptIri: this.state.selectedScheme,
+      conceptIri: this.props.selectedScheme,
       selectedResultGraphIri: this.props.selectedResultGraphIri,
       visualizerCode: 'TREEMAP'
     });
   }
 
-  handleSchemeChange = async event => {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selectedScheme !== this.props.selectedScheme) {
+      this.handleSchemeChange(nextProps.selectedScheme);
+    }
+    return null;
+  }
+
+  handleSchemeChange = async scheme => {
+    if (!(scheme && this.props.selectedResultGraphIri)) {
+      return;
+    }
     this.conceptsFetched.clear();
     const response = await VisualizersService.getSkosScheme(
-      event.target.value,
+      scheme,
       this.props.selectedResultGraphIri
     );
     const headers = [['id', 'parentId', 'size', 'color']];
@@ -158,11 +152,10 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     this.setState(
       {
         dataLoadingStatus: 'ready',
-        chartData,
-        selectedScheme: event.target.value
+        chartData
       },
       () => {
-        this.conceptsFetched.add(this.state.selectedScheme);
+        this.conceptsFetched.add(scheme);
       }
     );
   };
@@ -177,28 +170,11 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   render() {
     const { classes } = this.props;
     return (
-      <div>
-        <FormControl className={classes.formControl}>
-          <Select
-            value={this.state.selectedScheme}
-            onChange={this.handleSchemeChange}
-            input={<Input name="scheme" id="scheme-selector" />}
-            displayEmpty
-            name="scheme"
-            className={classes.selectEmpty}
-          >
-            {this.state.schemes.map(scheme => (
-              <MenuItem value={scheme.uri}>
-                {scheme.label.languageMap.en}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>Selected scheme</FormHelperText>
-        </FormControl>
-        {this.state.selectedScheme &&
+      <div className={classes.wrapper}>
+        {this.props.selectedScheme &&
           (this.state.dataLoadingStatus === 'ready' ? (
             <Chart
-              width={'99%'}
+              height="99%"
               chartType="TreeMap"
               loader={<div>Loading Chart</div>}
               data={this.state.chartData}
@@ -225,4 +201,10 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-export default withStyles(styles)(TreemapVisualizer);
+const mapStateToProps = state => {
+  return {
+    selectedScheme: state.filters.selectedScheme
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(TreemapVisualizer));
