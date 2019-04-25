@@ -36,13 +36,13 @@ class TtlGenerator {
     @NotNull
     static String getTemplateDescription(@NotNull String sparqlEndpointIri,
                                          @NotNull String dataSampleIri,
-                                         @Nullable String namedGraph) {
+                                         @Nullable List<String> namedGraphs) {
         String extractorQuery = EXTRACTOR_QUERY_PROVIDER.get().toString()
         String configurationQuery = CONFIGURATION_QUERY_PROVIDER.get().toString()
 
         return writeModelToString(
                 getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
-                        extractorQuery, configurationQuery, namedGraph))
+                        extractorQuery, configurationQuery, namedGraphs))
     }
 
     @NotNull
@@ -59,7 +59,7 @@ class TtlGenerator {
     @NotNull
     private static Model getTemplateDescriptionModel(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri,
                                                      @NotNull String extractorQuery, @NotNull String configurationQuery,
-                                                     @Nullable String namedGraph) {
+                                                     @Nullable List<String> namedGraphs) {
         ModelBuilder.from {
             namespaces(
                     dataset: LPA.Dataset.uri,
@@ -86,9 +86,11 @@ class TtlGenerator {
                                             (SD.endpoint): resource(sparqlEndpointIri),
                                     )
 
-                                    if (namedGraph != null && !namedGraph.isEmpty()) {
-                                        prop SD.namedGraph, resource(
-                                                (SD.name as Property): resource(namedGraph),
+                                    if (namedGraphs != null && !namedGraphs.isEmpty()) {
+                                        namedGraphs.each( { ng ->
+                                                prop SD.namedGraph, resource(
+                                                        (SD.name as Property): resource(ng),
+                                                ) }
                                         )
                                     }
                                 },

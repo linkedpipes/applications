@@ -6,8 +6,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static com.linkedpipes.lpa.backend.util.Memoizer.memoize;
 
@@ -22,23 +25,21 @@ public class DataSourceController {
     private static final String SPARQL_ENDPOINT_IRI_PARAM = DiscoveryController.SPARQL_ENDPOINT_IRI_PARAM;
     @NotNull
     private static final String DATA_SAMPLE_IRI_PARAM = DiscoveryController.DATA_SAMPLE_IRI_PARAM;
-    @NotNull
-    private static final String NAMED_GRAPH_PARAM = DiscoveryController.NAMED_GRAPH_PARAM;
 
     @NotNull
-    private final TriFunction<String, String, String, ResponseEntity<String>> memoizedGetTemplateDescription = memoize(this::doGetTemplateDescription);
+    private final TriFunction<String, String, List<String>, ResponseEntity<String>> memoizedGetTemplateDescription = memoize(this::doGetTemplateDescription);
 
     @GetMapping(TEMPLATE_DESCRIPTION_PATH)
     public ResponseEntity<String> getTemplateDescription(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                          @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                         @Nullable @RequestParam(value = NAMED_GRAPH_PARAM, required = false) String namedGraph) {
-        return memoizedGetTemplateDescription.apply(sparqlEndpointIri, dataSampleIri, namedGraph);
+                                                         @Nullable @RequestBody List<String> namedGraphs) {
+        return memoizedGetTemplateDescription.apply(sparqlEndpointIri, dataSampleIri, namedGraphs);
     }
 
     private ResponseEntity<String> doGetTemplateDescription(@NotNull String sparqlEndpointIri,
                                                             @NotNull String dataSampleIri,
-                                                            @Nullable String namedGraph) {
-        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointIri, dataSampleIri, namedGraph));
+                                                            @Nullable List<String> namedGraphs) {
+        return ResponseEntity.ok(TtlGenerator.getTemplateDescription(sparqlEndpointIri, dataSampleIri, namedGraphs));
     }
 
 }

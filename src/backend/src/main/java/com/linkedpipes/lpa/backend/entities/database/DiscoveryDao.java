@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.entities.database;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity(name="discovery")
 public class DiscoveryDao implements Serializable {
@@ -30,7 +31,7 @@ public class DiscoveryDao implements Serializable {
     private String dataSampleIri;
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    private String namedGraph;
+    private List<String> namedGraphs;
 
     @ManyToOne
     private UserDao user;
@@ -97,11 +98,11 @@ public class DiscoveryDao implements Serializable {
         return this.dataSampleIri;
     }
 
-    public void setNamedGraph(String namedGraph) {
-        this.namedGraph = namedGraph;
+    public void setNamedGraph(List<String> namedGraphs) {
+        this.namedGraphs = namedGraphs;
     }
 
-    public String getNamedGraph() {
-        return this.namedGraph;
+    public List<String> getNamedGraphs() {
+        return this.namedGraphs;
     }
 }

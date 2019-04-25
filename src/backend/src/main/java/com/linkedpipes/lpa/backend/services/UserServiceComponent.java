@@ -62,13 +62,13 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws UserNotFoundException {
+    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
         d.setSparqlEndpointIri(sparqlEndpointIri);
         d.setDataSampleIri(dataSampleIri);
-        d.setNamedGraph(namedGraph);
+        d.setNamedGraph(namedGraphs);
         user.addDiscovery(d);
         discoveryRepository.save(d);
         repository.save(user);
@@ -135,7 +135,7 @@ public class UserServiceComponent implements UserService {
                 }
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
-                session.namedGraph = d.getNamedGraph();
+                session.namedGraphs = d.getNamedGraphs();
                 profile.discoverySessions.add(session);
             }
         }
