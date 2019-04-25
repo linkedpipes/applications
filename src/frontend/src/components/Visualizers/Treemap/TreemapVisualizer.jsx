@@ -11,7 +11,8 @@ type Props = {
   classes: {
     progress: number,
     formControl: string,
-    selectEmpty: string
+    selectEmpty: string,
+    wrapper: any
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
@@ -78,7 +79,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
         applicationEndpoint: 'treemap',
-        conceptIri: this.props.selectedScheme,
+        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
         selectedResultGraphIri: this.props.selectedResultGraphIri,
         visualizerCode: 'TREEMAP'
       });

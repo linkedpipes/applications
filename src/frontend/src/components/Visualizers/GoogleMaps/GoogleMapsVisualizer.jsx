@@ -35,7 +35,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const {
       propMarkers,
       selectedResultGraphIri,
@@ -55,18 +55,16 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     const self = this;
 
     if (propMarkers.length === 0) {
-      VisualizersService.getMarkers({
-        resultGraphIri: selectedResultGraphIri
-      })
-        .then(response => {
-          if (response !== undefined) {
-            const data = response.data;
-            self.updateMarkersState(data);
-          }
-        })
-        .catch(reason => Log.error(reason.message));
+      const markers = await this.fetchMarkers(selectedResultGraphIri);
+      await this.setState({
+        markers
+      });
+      self.updateMarkersState(markers);
     } else {
-      self.updateMarkersState(propMarkers);
+      await this.setState({
+        markers: propMarkers
+      });
+      await self.updateMarkersState(propMarkers);
     }
   }
 
@@ -74,16 +72,15 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     const response = await VisualizersService.getMarkers({
       resultGraphIri: selectedResultGraphIri
     });
-    const responseMarkers = await response.json();
+    const responseMarkers = response.data;
     // only proceed once second promise is resolved
     return responseMarkers;
   };
 
-  updateMarkersState = markers => {
+  updateMarkersState = async markers => {
     const { handleSetCurrentApplicationData, isPublished } = this.props;
-    this.setState({
-      markers,
-      zoomToMarkers: map => {
+    await this.setState({
+      zoomToMarkers: async map => {
         const bounds = new window.google.maps.LatLngBounds();
         if (map !== null) {
           const childrenArray = map.props.children.props.children;
@@ -99,19 +96,19 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
               }
             });
             map.fitBounds(bounds);
-
-            if (!isPublished) {
-              handleSetCurrentApplicationData({
-                id: uuid.v4(),
-                applicationEndpoint: 'map',
-                markers,
-                visualizerCode: 'MAP'
-              });
-            }
           }
         }
       }
     });
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'map',
+        markers,
+        visualizerCode: 'MAP'
+      });
+    }
   };
 
   render() {
@@ -119,7 +116,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     return (
       <GoogleMap
         ref={zoomToMarkers}
-        defaultZoom={8}
+        defaultZoom={2}
         defaultCenter={{ lat: 50.08804, lng: 14.42076 }}
       >
         <MarkerClusterer averageCenter enableRetinaIcons gridSize={60}>

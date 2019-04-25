@@ -13,11 +13,11 @@ import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {} },
-  filters: any,
   visualizer: { visualizerCode: string },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
-  selectedApplication: Object
+  selectedApplication: Object,
+  selectedApplicationMetadata: Object
 };
 
 const styles = theme => ({
@@ -59,24 +59,20 @@ const getVisualizer = (
   selectedResultGraphIri,
   selectedApplication,
   handleSetCurrentApplicationData,
+  selectedApplicationMetadata,
   classes
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-      return (
-        <GoogleMapsVisualizer
-          propMarkers={[]}
-          selectedResultGraphIri={selectedResultGraphIri}
-          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
-        />
-      );
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-      const markers = selectedApplication.markers
-        ? selectedApplication.markers
-        : [];
+      const markers =
+        selectedApplication && selectedApplication.markers
+          ? selectedApplication.markers
+          : [];
       return (
         <GoogleMapsVisualizer
           propMarkers={markers}
+          isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
@@ -86,6 +82,7 @@ const getVisualizer = (
       return (
         <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
@@ -93,6 +90,7 @@ const getVisualizer = (
       return (
         <ChordVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
@@ -123,6 +121,7 @@ const VisualizerControllerContainer = (props: Props) => (
         props.selectedResultGraphIri,
         props.selectedApplication,
         props.handleSetCurrentApplicationData,
+        props.selectedApplicationMetadata,
         props.classes
       )}
     </Grid>
