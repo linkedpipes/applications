@@ -4,10 +4,12 @@ import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
+import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.arq.querybuilder.SelectBuilder;
+import org.apache.jena.arq.querybuilder.ConstructBuilder;
+import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/query/MarkerQuery.scala
-public class MarkerQueryProvider extends SelectSparqlQueryProvider {
+public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
 
     private Map<String, List<ValueFilter>> filters;
 
@@ -45,7 +47,7 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    protected SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
+    protected ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
                 .addPrefix(Prefixes.SKOS_PREFIX, SKOS.getURI())
                 .addPrefix(Prefixes.SCHEMA_PREFIX, Schema.uri)
@@ -54,21 +56,21 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    protected SelectBuilder addVars(@NotNull SelectBuilder builder) {
+    protected ConstructBuilder addConstructs(@NotNull ConstructBuilder builder) {
         return builder
-                .addVar(VAR_SUBJECT)
-                .addVar(VAR_LATITUDE)
-                .addVar(VAR_LONGITUDE)
-                .addVar(VAR_PREF_LABEL)
-                .addVar(VAR_LABEL)
-                .addVar(VAR_NOTATION)
-                .addVar(VAR_NAME)
-                .addVar(VAR_DESCRIPTION);
+                .addConstruct(VAR_SUBJECT, Schema.geo, VAR_GEO)
+                .addConstruct(VAR_GEO, Schema.latitude, VAR_LATITUDE)
+                .addConstruct(VAR_GEO, Schema.longitude, VAR_LONGITUDE)
+                .addConstruct(VAR_SUBJECT, SKOS.prefLabel, VAR_PREF_LABEL)
+                .addConstruct(VAR_SUBJECT, RDFS.label, VAR_LABEL)
+                .addConstruct(VAR_SUBJECT, SKOS.notation, VAR_NOTATION)
+                .addConstruct(VAR_SUBJECT, Schema.name, VAR_NAME)
+                .addConstruct(VAR_SUBJECT, Schema.description, VAR_DESCRIPTION);
     }
 
     @NotNull
     @Override
-    protected SelectBuilder addWheres(@NotNull SelectBuilder builder) {
+    protected ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
         return builder
                 .addWhere(VAR_SUBJECT, Schema.geo, VAR_GEO)
                 .addWhere(VAR_GEO, Schema.latitude, VAR_LATITUDE)
@@ -77,7 +79,7 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    protected SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+    protected ConstructBuilder addOptionals(@NotNull ConstructBuilder builder) {
         return builder
                 .addOptional(VAR_SUBJECT, SKOS.prefLabel, VAR_PREF_LABEL)
                 .addOptional(VAR_SUBJECT, RDFS.label, VAR_LABEL)
@@ -88,7 +90,7 @@ public class MarkerQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    protected SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
+    protected ConstructBuilder addFilters(@NotNull ConstructBuilder builder) throws ParseException {
         VariableGenerator varGen = new VariableGenerator();
         for (Map.Entry<String, List<ValueFilter>> pair : filters.entrySet()) {
             String v = varGen.getVariable();
