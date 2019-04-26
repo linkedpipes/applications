@@ -46,6 +46,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private PipelineInformationRepository pipelineRepository;
 
+    @Autowired
+    private DiscoveryNamedGraphRepository ngRepository;
+
     @NotNull @Override @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserProfile addUserIfNotPresent(String webId) {
         List<UserDao> users = repository.findByWebId(webId);
@@ -68,7 +71,12 @@ public class UserServiceComponent implements UserService {
         d.setDiscoveryStarted(discoveryId, new Date());
         d.setSparqlEndpointIri(sparqlEndpointIri);
         d.setDataSampleIri(dataSampleIri);
-        d.setNamedGraph(namedGraphs);
+        for (String namedGraph : namedGraphs) {
+            DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+            ng.setNamedGraph(namedGraph);
+            d.addNamedGraph(ng);
+            ngRepository.save(ng);
+        }
         user.addDiscovery(d);
         discoveryRepository.save(d);
         repository.save(user);
@@ -135,7 +143,10 @@ public class UserServiceComponent implements UserService {
                 }
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
-                session.namedGraphs = d.getNamedGraphs();
+                session.namedGraphs = new ArrayList<>();
+                for (DiscoveryNamedGraphDao ng : d.getNamedGraphs()) {
+                    session.namedGraphs.add(ng.getNamedGraph());
+                }
                 profile.discoverySessions.add(session);
             }
         }

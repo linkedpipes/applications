@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -101,7 +102,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
             session.sparqlEndpointIri = d.getSparqlEndpointIri();
             session.dataSampleIri = d.getDataSampleIri();
-            session.namedGraphs = d.getNamedGraphs();
+            session.namedGraphs = new ArrayList<>();
+            for (DiscoveryNamedGraphDao ng : d.getNamedGraphs()) {
+                session.namedGraphs.add(ng.getNamedGraph());
+            }
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
         }
     }
@@ -273,7 +277,10 @@ public class ExecutorServiceComponent implements ExecutorService {
                     if (dao != null) {
                         report.sparqlEndpointIri = dao.getSparqlEndpointIri();
                         report.dataSampleIri = dao.getDataSampleIri();
-                        report.namedGraphs = dao.getNamedGraphs();
+                        report.namedGraphs = new ArrayList<>();
+                        for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
+                            report.namedGraphs.add(ng.getNamedGraph());
+                        }
                     } else {
                         report.sparqlEndpointIri = null;
                         report.dataSampleIri = null;
@@ -330,7 +337,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             if (dao != null) {
                 report.sparqlEndpointIri = dao.getSparqlEndpointIri();
                 report.dataSampleIri = dao.getDataSampleIri();
-                report.namedGraphs = dao.getNamedGraphs();
+                report.namedGraphs = new ArrayList<>();
+                for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
+                    report.namedGraphs.add(ng.getNamedGraph());
+                }
             } else {
                 report.sparqlEndpointIri = null;
                 report.dataSampleIri = null;
