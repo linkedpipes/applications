@@ -68,6 +68,7 @@ const CreateVisualizerComponent = ({
       selectedResultGraphIri={selectedResultGraphIri}
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
       selectedApplication={selectedApplication}
+      selectedApplicationMetadata={selectedApplicationMetadata}
     />
   </LoadingOverlay>
 );
