@@ -23,10 +23,6 @@ import java.util.Map;
 public class GeoService {
 
     public List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) {
-        if (filters == null) {
-            filters = Collections.emptyMap();
-        }
-
         ConstructSparqlQueryProvider provider = new MarkerQueryProvider(filters);
         System.out.println(provider.get(graphIri));
         return JenaUtils.withQueryExecution(provider.get(graphIri), new MarkerExtractor()::extract);

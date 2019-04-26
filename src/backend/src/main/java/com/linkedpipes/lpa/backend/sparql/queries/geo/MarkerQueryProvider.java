@@ -5,10 +5,8 @@ import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
-import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.vocabulary.RDFS;
@@ -33,8 +31,6 @@ public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_NOTATION = var("sn");
     public static final String VAR_NAME = var("st");
     public static final String VAR_DESCRIPTION = var("sd");
-
-    public static final String[] LABEL_VARIABLES = {VAR_LABEL, VAR_PREF_LABEL, VAR_NAME, VAR_NOTATION};
 
     public MarkerQueryProvider(Map<String, List<ValueFilter>> filters){
         //remove "active" filters, as we want to filter out triples that satisfy non-active properties
