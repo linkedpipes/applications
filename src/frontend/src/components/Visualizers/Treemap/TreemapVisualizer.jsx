@@ -2,17 +2,22 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
+import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
+import { connect } from 'react-redux';
 
 type Props = {
   classes: {
-    progress: number
+    progress: number,
+    formControl: string,
+    selectEmpty: string,
+    wrapper: any
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
-  isPublished: boolean
+  isPublished: boolean,
+  selectedScheme: string
 };
 
 type State = {
@@ -29,6 +34,16 @@ const styles = theme => ({
   progress: {
     margin: theme.spacing.unit * 2,
     alignItems: 'center'
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 120
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2
+  },
+  wrapper: {
+    height: '100%'
   }
 });
 
@@ -46,38 +61,40 @@ const transformData = data => {
 class TreemapVisualizer extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { dataLoadingStatus: 'loading', chartData: [] };
+    this.state = {
+      dataLoadingStatus: 'loading',
+      chartData: []
+    };
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedScheme,
+      selectedResultGraphIri
+    } = this.props;
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
         applicationEndpoint: 'treemap',
-        conceptIri:
-          'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
         selectedResultGraphIri: this.props.selectedResultGraphIri,
         visualizerCode: 'TREEMAP'
       });
     }
 
     this.conceptsFetched = new Set();
-    // Add the root to the list of fetched data
-    this.conceptsFetched.add(
-      'http://linked.opendata.cz/resource/concept-scheme/cpv-2008'
-    );
+
     this.chartEvents = [
       {
         eventName: 'select',
         callback: async ({ chartWrapper }) => {
           // The first row in the data is the headers row. Ignore if got chosen
-          Log.info(chartWrapper.getChart().getSelection(), 'TreemapVisualizer');
           const index = chartWrapper.getChart().getSelection()[0].row;
           if (!index) return;
           const selectedItem = this.state.chartData[index + 1];
-          Log.info(selectedItem, 'TreemapVisualizer');
           const iri = selectedItem[0].v;
 
           // If data for this conceptIri has been fetched, then return
@@ -85,7 +102,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+            this.props.selectedScheme,
             this.props.selectedResultGraphIri,
             iri
           );
@@ -109,53 +126,86 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
+    if (selectedResultGraphIri && selectedScheme) {
+      this.handleSchemeChange(selectedScheme);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selectedScheme !== this.props.selectedScheme) {
+      this.handleSchemeChange(nextProps.selectedScheme);
+    }
+    return null;
+  }
+
+  handleSchemeChange = async scheme => {
+    if (!(scheme && this.props.selectedResultGraphIri)) {
+      return;
+    }
+    this.conceptsFetched.clear();
     const response = await VisualizersService.getSkosScheme(
-      'http://linked.opendata.cz/resource/concept-scheme/cpv-2008',
+      scheme,
       this.props.selectedResultGraphIri
     );
     const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.data;
     const chartData = headers.concat(transformData(jsonData));
-    this.setState({
-      dataLoadingStatus: 'ready',
-      chartData
-    });
-  }
-
-  conceptsFetched: Set<string>;
+    this.setState(
+      {
+        dataLoadingStatus: 'ready',
+        chartData
+      },
+      () => {
+        this.conceptsFetched.add(scheme);
+      }
+    );
+  };
 
   chartEvents: Array<{
     eventName: string,
     callback: ({ chartWrapper: any }) => Function
   }>;
 
+  conceptsFetched: Set<string>;
+
   render() {
     const { classes } = this.props;
-    return this.state.dataLoadingStatus === 'ready' ? (
-      <Chart
-        height="99%"
-        chartType="TreeMap"
-        loader={<div>Loading Chart</div>}
-        data={this.state.chartData}
-        chartEvents={this.chartEvents}
-        options={{
-          headerHeight: 20,
-          fontColor: 'black',
-          showScale: true,
-          maxDepth: 1,
-          highlightOnMouseOver: true,
-          minHighlightColor: '#8c6bb1',
-          midHighlightColor: '#9ebcda',
-          maxHighlightColor: '#edf8fb',
-          minColor: '#009688',
-          midColor: '#f7f7f7',
-          maxColor: '#ee8100'
-        }}
-      />
-    ) : (
-      <CircularProgress className={classes.progress} />
+    return (
+      <div className={classes.wrapper}>
+        {this.props.selectedScheme &&
+          (this.state.dataLoadingStatus === 'ready' ? (
+            <Chart
+              height="99%"
+              chartType="TreeMap"
+              loader={<div>Loading Chart</div>}
+              data={this.state.chartData}
+              chartEvents={this.chartEvents}
+              options={{
+                headerHeight: 20,
+                fontColor: 'black',
+                showScale: true,
+                maxDepth: 1,
+                highlightOnMouseOver: true,
+                minHighlightColor: '#8c6bb1',
+                midHighlightColor: '#9ebcda',
+                maxHighlightColor: '#edf8fb',
+                minColor: '#009688',
+                midColor: '#f7f7f7',
+                maxColor: '#ee8100'
+              }}
+            />
+          ) : (
+            <CircularProgress className={classes.progress} />
+          ))}
+      </div>
     );
   }
 }
 
-export default withStyles(styles)(TreemapVisualizer);
+const mapStateToProps = (state, ownProps) => {
+  return {
+    selectedScheme: state.filters.selectedScheme || ownProps.selectedScheme
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(TreemapVisualizer));
