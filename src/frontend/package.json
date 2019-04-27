@@ -45,7 +45,7 @@
     "react-dom": "16.8.6",
     "react-emoji-render": "0.6.0",
     "react-error-boundary": "1.2.5",
-    "react-google-charts": "3.0.11",
+    "react-google-charts": "3.0.12",
     "react-google-maps": "9.4.5",
     "react-loading-overlay": "^1.0.1",
     "react-pure-lifecycle": "3.0.0",

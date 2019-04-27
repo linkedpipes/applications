@@ -7389,10 +7389,10 @@ react-event-listener@^0.6.2:
     prop-types "^15.6.0"
     warning "^4.0.1"
 
-react-google-charts@3.0.11:
-  version "3.0.11"
-  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-3.0.11.tgz#f948c97257cf6af375d016e07c47e430f123176a"
-  integrity sha512-ExxnHOeaSpZB+gi8wqgXNzmzDo5LR1n950ZXSQ1kKm7OlxkL+pRo0f/5sXkuTe8ZCmVE7pYzABI48/YjAbDw8g==
+react-google-charts@3.0.12:
+  version "3.0.12"
+  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-3.0.12.tgz#e74a20cff33a6737c77eaae6d4926ba6a9b43542"
+  integrity sha512-+jzK34PpQJ2hLpj3qOVBTHX1eS9JIuP7rQwNlU5KTXExHJpxNbGBYmNLmMeZCbsipkz3V6cN7uI4QG+SNG/9OQ==
   dependencies:
     react-load-script "^0.0.6"
 
