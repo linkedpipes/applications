@@ -2,20 +2,16 @@ os: "linux"
 dist: xenial
 
 stages:
-  - name: push-build
-    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
-  - name: build
-    if: type = pull_request OR commit_message =~ /(\[Travis\])/
+  # - name: push-build
+  #   if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
+  # - name: build
+  #   if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
     if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-Deploy\])/
   - name: e2e_tests
     if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-E2E\])/
-
-env:
-  global:
-    - PGPORT=5433
 
 jobs:
   include:
@@ -93,6 +89,9 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
+      env:
+        global:
+          - PGPORT=5433
       services:
         - postgresql
       before_install:
@@ -119,6 +118,9 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
+      env:
+        global:
+          - PGPORT=5433
       services:
         - postgresql
         - docker
@@ -141,7 +143,9 @@ jobs:
         - postgresql
         - docker
       env:
-        - DOCKER_COMPOSE_VERSION=1.23.2
+        global:
+              - PGPORT=5433
+              - DOCKER_COMPOSE_VERSION=1.23.2
       before_install:
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
