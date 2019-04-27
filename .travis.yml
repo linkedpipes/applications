@@ -36,7 +36,7 @@ jobs:
         - yarn run build
     - name: "Backend"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -68,7 +68,7 @@ jobs:
 
     - name: "Backend"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -84,7 +84,7 @@ jobs:
     - stage: tests
       name: "Backend unit tests"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -116,7 +116,7 @@ jobs:
 
     - name: "Backend integration tests"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
