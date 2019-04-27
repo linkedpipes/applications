@@ -94,9 +94,9 @@ jobs:
           - PGPORT=5433
       services:
         - postgresql
-      before_install:
-        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-        - sudo /etc/init.d/postgresql restart
+      # before_install:
+      #   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+      #   - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -124,9 +124,9 @@ jobs:
       services:
         - postgresql
         - docker
-      before_install:
-        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-        - sudo /etc/init.d/postgresql restart
+      # before_install:
+      #   - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+      #   - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
