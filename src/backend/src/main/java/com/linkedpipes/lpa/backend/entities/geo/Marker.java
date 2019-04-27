@@ -1,13 +1,15 @@
 package com.linkedpipes.lpa.backend.entities.geo;
 
+import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
+
 public class Marker {
 
     public String uri;
     public Coordinates coordinates;
-    public String label;
+    public LocalizedValue label;
     public String description;
 
-    public Marker(String uriIn, Coordinates coordinatesIn, String labelIn, String descriptionIn){
+    public Marker(String uriIn, Coordinates coordinatesIn, LocalizedValue labelIn, String descriptionIn){
         uri = uriIn;
         coordinates = coordinatesIn;
         label = labelIn;
