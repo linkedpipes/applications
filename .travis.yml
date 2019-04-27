@@ -2,10 +2,10 @@ os: "linux"
 dist: xenial
 
 stages:
-  # - name: push-build
-  #   if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
-  # - name: build
-  #   if: type = pull_request OR commit_message =~ /(\[Travis\])/
+  - name: push-build
+    if: type != pull_request AND branch NOT IN (master, develop) AND commit_message !~ /(\[Travis\])/ AND commit_message !~ /(\[Travis-E2E\])/
+  - name: build
+    if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: tests
     if: type = pull_request OR commit_message =~ /(\[Travis\])/
   - name: deploy
@@ -31,6 +31,7 @@ jobs:
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
+        
     - name: "Backend"
       language: java
       jdk: openjdk11
@@ -156,7 +157,6 @@ jobs:
     - stage: e2e_tests
       name: "E2E testing of whole LPA platform"
       cache: pip
-      dist: xenial   # required for Python >= 3.7
       language: python
       python:
         - "3.7"
