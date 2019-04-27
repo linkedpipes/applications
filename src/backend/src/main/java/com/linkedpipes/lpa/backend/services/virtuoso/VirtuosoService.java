@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.annotation.PostConstruct;
@@ -56,7 +57,7 @@ public class VirtuosoService {
             }
 
             log.info("Done!");
-        } catch (IOException e) {
+        } catch (IOException|HttpClientErrorException e) {
             log.error("Failed to fill Virtuoso with test data!", e);
         }
     }
