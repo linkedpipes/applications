@@ -17,7 +17,9 @@ type Props = {
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   selectedApplication: Object,
-  selectedApplicationMetadata: Object
+  selectedApplicationMetadata: Object,
+  height: number,
+  width: number
 };
 
 const styles = theme => ({
@@ -60,7 +62,9 @@ const getVisualizer = (
   selectedApplication,
   handleSetCurrentApplicationData,
   selectedApplicationMetadata,
-  classes
+  classes,
+  width,
+  height
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
@@ -92,6 +96,7 @@ const getVisualizer = (
           selectedResultGraphIri={selectedResultGraphIri}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          size={height + width}
         />
       );
     case VISUALIZER_TYPE.UNDEFINED:
@@ -107,25 +112,29 @@ const getVisualizer = (
   }
 };
 
-const VisualizerControllerContainer = (props: Props) => (
-  <Grid container className={props.classes.root} direction="row" spacing={0}>
-    <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
-      {getFilters(
-        props.visualizer.visualizerCode,
-        props.selectedResultGraphIri
-      )}
+const VisualizerControllerContainer = (props: Props) => {
+  return (
+    <Grid container className={props.classes.root} direction="row" spacing={0}>
+      <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
+        {getFilters(
+          props.visualizer.visualizerCode,
+          props.selectedResultGraphIri
+        )}
+      </Grid>
+      <Grid id="viz-div" item lg={9} md={8} xs={12}>
+        {getVisualizer(
+          props.visualizer.visualizerCode,
+          props.selectedResultGraphIri,
+          props.selectedApplication,
+          props.handleSetCurrentApplicationData,
+          props.selectedApplicationMetadata,
+          props.classes,
+          props.width,
+          props.height
+        )}
+      </Grid>
     </Grid>
-    <Grid id="viz-div" item lg={9} md={8} xs={12}>
-      {getVisualizer(
-        props.visualizer.visualizerCode,
-        props.selectedResultGraphIri,
-        props.selectedApplication,
-        props.handleSetCurrentApplicationData,
-        props.selectedApplicationMetadata,
-        props.classes
-      )}
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export default withStyles(styles)(VisualizerControllerContainer);
