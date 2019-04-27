@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.services.geo;
 
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import com.linkedpipes.lpa.backend.entities.geo.Polygon;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.GeoPropertiesExtractor;
@@ -19,7 +20,7 @@ import java.util.Map;
 //synonymous to https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/GeoServiceImpl.scala
 public class GeoService {
 
-    public static List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) {
+    public static List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) throws LpAppsException {
         if (filters == null) {
             filters = Collections.emptyMap();
         }
@@ -29,7 +30,7 @@ public class GeoService {
         return JenaUtils.withQueryExecution(provider.get(graphIri), MarkerExtractor::extract);
     }
 
-    public static List<Property> getProperties(String graphIri) {
+    public static List<Property> getProperties(String graphIri) throws LpAppsException {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), new GeoPropertiesExtractor()::extract);
     }

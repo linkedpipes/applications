@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.MapQueryData;
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.services.geo.GeoService;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
@@ -28,7 +29,7 @@ public class MapVisualizerController {
      */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
-                                                   @RequestBody(required = false) MapQueryData mapQueryData) {
+                                                   @RequestBody(required = false) MapQueryData mapQueryData) throws LpAppsException {
 
         if(mapQueryData == null)
             mapQueryData = new MapQueryData();
@@ -44,7 +45,7 @@ public class MapVisualizerController {
     }
 
     @GetMapping("/api/map/properties")
-    public ResponseEntity<List<Property>> getProperties(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) {
+    public ResponseEntity<List<Property>> getProperties(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
         return ResponseEntity.ok(GeoService.getProperties(graphIri));
     }
 
