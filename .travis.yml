@@ -93,14 +93,11 @@ jobs:
         directories:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
-      addons:
-        postgresql: "10"
-        apt:
-          packages:
-            - postgresql-10
-            - postgresql-client-10
       services:
         - postgresql
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -118,12 +115,6 @@ jobs:
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
-      addons:
-        postgresql: "10"
-        apt:
-          packages:
-            - postgresql-10
-            - postgresql-client-10
       cache:
         directories:
           - $HOME/.gradle/caches/
@@ -131,6 +122,9 @@ jobs:
       services:
         - postgresql
         - docker
+      before_install:
+        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
