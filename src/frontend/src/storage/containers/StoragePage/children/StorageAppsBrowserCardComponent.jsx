@@ -1,23 +1,22 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
-import GridListTile from '@material-ui/core/GridListTile';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
-import { VISUALIZER_TYPE } from '@constants';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { StorageToolbox, getBeautifiedVisualizerTitle } from '@utils';
+import { getBeautifiedVisualizerTitle, Log } from '@utils';
+import { AppConfiguration } from '../../../models';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -27,22 +26,24 @@ import { globalActions } from '@ducks/globalDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import StorageToolbox from '../../../StorageToolbox';
+import ShareIcon from '@material-ui/icons/Share';
+import axios from 'axios';
 
 const styles = {
-  root: {
-    justifyContent: 'center'
-  },
   card: {
-    height: '100%',
-    width: '200px',
-    display: 'flex',
-    flexDirection: 'column'
+    height: '280',
+    width: '190',
+    flexDirection: 'column',
+    marginRight: 5
   },
-  cardContent: {
-    flexGrow: 1
-  },
+
   media: {
-    objectFit: 'cover'
+    textAlign: 'center'
+  },
+
+  actions: {
+    display: 'flex'
   }
 };
 
@@ -51,21 +52,20 @@ type Props = {
     root: {},
     card: {},
     cardContent: {},
-    media: {}
+    media: {},
+    actions: {}
   },
-  singleTileData: {
-    applicationTitle: string,
-    applicationIri: string,
-    applicationConfigurationIri: string,
-    applicationConfigurationLabel: string,
-    applicationData: Object
-  },
+  applicationMetadata: AppConfiguration,
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   onHandleApplicationDeleted: Function,
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationData: Function,
-  history: Object
+  handleSetSelectedApplicationMetadata: Function,
+  setApplicationLoaderStatus: Function,
+  history: Object,
+  applicationsFolder: string,
+  indexNumber: Number
 };
 
 type State = {
@@ -73,7 +73,7 @@ type State = {
   anchorEl: any
 };
 
-class StorageAppsBrowserCard extends PureComponent<Props, State> {
+class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
     open: false,
     anchorEl: undefined
@@ -87,34 +87,24 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     this.setState({ open: false });
   };
 
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  handleDeleteApp = async () => {
+    const { setApplicationLoaderStatus } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
+    const result = await StorageToolbox.removeAppFromStorage(
+      this.props.applicationsFolder,
+      this.props.applicationMetadata
+    );
+    if (result) {
+      this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
+    }
+
+    await setApplicationLoaderStatus(false);
   };
 
-  handleDeleteApp = () => {
-    const { onHandleApplicationDeleted } = this.props;
-    const applicationConfigurationIri = this.props.singleTileData
-      .applicationConfigurationIri;
-    const applicationConfigurationLabel = this.props.singleTileData
-      .applicationConfigurationLabel;
-    const self = this;
-    StorageToolbox.removeAppFromStorage(applicationConfigurationIri).then(
-      error => {
-        if (!error) {
-          self.setState({ anchorEl: null });
-          onHandleApplicationDeleted(applicationConfigurationLabel);
-          toast.success('Deleted application!', {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 2000
-          });
-        } else {
-          toast.error('Error! Unable to delete published application!', {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 2000
-          });
-        }
-      }
-    );
+  handleMenuClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
   };
 
   handleMenuClose = () => {
@@ -132,34 +122,54 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
     });
   };
 
-  handleApplicationClicked = () => {
+  handleApplicationClicked = async () => {
     const {
+      setApplicationLoaderStatus,
+      applicationMetadata,
       handleSetSelectedVisualizer,
       handleSetResultPipelineIri,
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
-      singleTileData,
+      handleSetSelectedApplicationMetadata,
       history
     } = this.props;
-    const applicationData = singleTileData.applicationData;
+
+    await setApplicationLoaderStatus(true);
+
+    const appConfigurationResponse = await axios.get(
+      applicationMetadata.object
+    );
+
+    if (appConfigurationResponse.status !== 200) {
+      toast.error('Error, unable to load!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+      await setApplicationLoaderStatus(false);
+    }
+    const applicationData = appConfigurationResponse.data.applicationData;
+
     const resultGraphIri = applicationData.selectedResultGraphIri;
-    const selectedApplicationTitle = singleTileData.applicationTitle;
     const selectedVisualiser = {
       visualizer: { visualizerCode: applicationData.visualizerCode }
     };
 
     handleSetResultPipelineIri(resultGraphIri);
-    handleSetSelectedApplicationTitle(selectedApplicationTitle);
+    handleSetSelectedApplicationTitle(applicationMetadata.title);
     handleSetSelectedApplicationData(applicationData);
+    handleSetSelectedApplicationMetadata(applicationMetadata);
     handleSetSelectedVisualizer(selectedVisualiser);
+
+    await setApplicationLoaderStatus(false);
 
     history.push({
       pathname: '/create-app'
     });
+    Log.info('test');
   };
 
   render() {
-    const { classes, singleTileData } = this.props;
+    const { classes, applicationMetadata, indexNumber } = this.props;
     const { anchorEl } = this.state;
     const {
       handleMenuClick,
@@ -169,48 +179,60 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
       handleCopyLinkClicked
     } = this;
     return (
-      <GridListTile>
+      <Fragment>
         <Card className={classes.card}>
           <CardHeader
             action={
               <IconButton
                 aria-owns={anchorEl ? 'simple-menu' : undefined}
                 aria-haspopup="true"
+                id={`more_icon_${indexNumber.toString()}_${
+                  applicationMetadata.title
+                }`}
                 onClick={handleMenuClick}
               >
                 <MoreVertIcon />
               </IconButton>
             }
+            title={applicationMetadata.title}
+            subheader={getBeautifiedVisualizerTitle(
+              applicationMetadata.endpoint
+            )}
           />
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={this.handleMenuClose}
-          >
-            <MenuItem onClick={handleShareApp}>Share</MenuItem>
-            <MenuItem onClick={handleDeleteApp}>Delete</MenuItem>
-          </Menu>
-          <CardActionArea
-            onClick={handleApplicationClicked}
-            style={{ textAlign: 'center' }}
-          >
-            <VisualizerIcon
-              visualizerType={VISUALIZER_TYPE.MAP}
-              style={{ color: 'white', fontSize: '85px' }}
-            />
-            <CardContent className={classes.cardContent}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {singleTileData.applicationTitle}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="h2">
-                {getBeautifiedVisualizerTitle(
-                  singleTileData.applicationData.visualizerCode
-                )}
-              </Typography>
-            </CardContent>
+          <CardActionArea onClick={handleApplicationClicked}>
+            <div
+              className={classes.media}
+              id={`${indexNumber.toString()}_${applicationMetadata.title}`}
+              style={{ backgroundColor: applicationMetadata.cardColor }}
+            >
+              <VisualizerIcon
+                visualizerType={applicationMetadata.endpoint}
+                style={{ color: 'white', fontSize: '85px' }}
+              />
+            </div>
           </CardActionArea>
+          <CardActions className={classes.actions} disableActionSpacing>
+            <IconButton aria-label="Share" onClick={handleShareApp}>
+              <ShareIcon />
+            </IconButton>
+          </CardActions>
         </Card>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={this.handleMenuClose}
+        >
+          <MenuItem
+            id={`delete_button_${indexNumber.toString()}_${
+              applicationMetadata.title
+            }`}
+            onClick={handleDeleteApp}
+          >
+            Delete
+          </MenuItem>
+        </Menu>
+
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}
@@ -221,8 +243,18 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
           </DialogTitle>
 
           <DialogContent>
+            <DialogContentText>
+              Click on the field with link to copy the public view URL to your
+              clipboard.
+            </DialogContentText>
+          </DialogContent>
+
+          <DialogContent>
             <CopyToClipboard
-              text={singleTileData.applicationIri}
+              text={StorageToolbox.appIriToPublishUrl(
+                applicationMetadata.object,
+                applicationMetadata.endpoint
+              )}
               onCopy={handleCopyLinkClicked}
             >
               <TextField
@@ -230,11 +262,13 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
                 label="Click to copy"
                 variant="outlined"
                 fullWidth
-                value={singleTileData.applicationIri}
+                value={StorageToolbox.appIriToPublishUrl(
+                  applicationMetadata.object,
+                  applicationMetadata.endpoint
+                )}
                 autoFocus
                 style={{
-                  textDecoration: 'none',
-                  width: '400px'
+                  textDecoration: 'none'
                 }}
               />
             </CopyToClipboard>
@@ -245,10 +279,16 @@ class StorageAppsBrowserCard extends PureComponent<Props, State> {
             </Button>
           </DialogActions>
         </Dialog>
-      </GridListTile>
+      </Fragment>
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    applicationsFolder: state.user.applicationsFolder
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
@@ -271,17 +311,21 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationData = applicationData =>
     dispatch(applicationActions.setApplication(applicationData));
 
+  const handleSetSelectedApplicationMetadata = applicationMetadata =>
+    dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
+
   return {
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
-    handleSetSelectedApplicationData
+    handleSetSelectedApplicationData,
+    handleSetSelectedApplicationMetadata
   };
 };
 
 export default withRouter(
   connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
-  )(withStyles(styles)(StorageAppsBrowserCard))
+  )(withStyles(styles)(StorageAppsBrowserCardComponent))
 );

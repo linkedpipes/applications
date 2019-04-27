@@ -1,11 +1,13 @@
 // @flow
 import React, { PureComponent } from 'react';
-import VisualizerControllerHeaderComponent from './VisualizerControllerHeaderComponent';
+import VisualizerControllerHeaderComponent from './VisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, withWebId } from '@utils';
+import { withWebId } from '@utils';
+import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   selectedApplication: any,
@@ -16,7 +18,10 @@ type Props = {
   headerParams: { title: string, subtitle?: string },
   history: any,
   selectedVisualizer: Object,
-  selectedApplicationTitle: string
+  selectedApplicationTitle: string,
+  applicationsFolder: string,
+  setApplicationLoaderStatus: Function,
+  handleSetSelectedApplicationMetadata: Function
 };
 
 type State = {
@@ -24,72 +29,98 @@ type State = {
   embedDialogOpen: boolean,
   appIri: string,
   height: number,
-  width: number
+  width: number,
+  currentApplicationMetadata: AppConfiguration
 };
 
-class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
+class VisualizerHeaderContainer extends PureComponent<Props, State> {
   state = {
     publishDialogOpen: false,
     embedDialogOpen: false,
     appIri: '',
     height: 400,
-    width: 400
+    width: 400,
+    currentApplicationMetadata: undefined
   };
 
-  handlePublishClicked = () => {
-    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
-    const { handleAppPublished } = this;
+  handlePublishClicked = async () => {
+    const {
+      selectedApplication,
+      selectedApplicationTitle,
+      webId,
+      applicationsFolder,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
-    StorageToolbox.saveAppToSolid(
+    const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
-      'public/lpapps'
-    ).then(({ applicationIri, applicationEndpoint }, error) => {
-      if (!error) {
-        const publishedUrl = StorageToolbox.appIriToPublishUrl(
-          applicationIri,
-          applicationEndpoint
-        );
-        handleAppPublished(publishedUrl);
-      }
-    });
+      applicationsFolder,
+      true
+    );
+
+    this.setState({ currentApplicationMetadata });
+
+    const publishedUrl = StorageToolbox.appIriToPublishUrl(
+      currentApplicationMetadata.object,
+      selectedApplication.applicationEndpoint
+    );
+
+    setApplicationLoaderStatus(false);
+    this.handleAppPublished(publishedUrl);
   };
 
-  handleEmbedClicked = () => {
-    const { selectedApplication, selectedApplicationTitle, webId } = this.props;
-    const { handleAppEmbedded } = this;
+  handleEmbedClicked = async () => {
+    const {
+      selectedApplication,
+      selectedApplicationTitle,
+      applicationsFolder,
+      webId,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    setApplicationLoaderStatus(true);
 
     if (selectedApplicationTitle === '') {
       toast.error('Please, provide application title!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 5000
       });
+
+      setApplicationLoaderStatus(false);
       return;
     }
 
-    StorageToolbox.saveAppToSolid(
+    const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
       selectedApplicationTitle,
       webId,
-      'public/lpapps'
-    ).then(({ applicationIri, applicationEndpoint }, error) => {
-      if (!error) {
-        const publishedUrl = StorageToolbox.appIriToPublishUrl(
-          applicationIri,
-          applicationEndpoint
-        );
-        handleAppEmbedded(publishedUrl);
-      }
-    });
+      applicationsFolder,
+      true
+    );
+
+    this.setState({ currentApplicationMetadata });
+
+    const publishedUrl = StorageToolbox.appIriToPublishUrl(
+      currentApplicationMetadata.object,
+      selectedApplication.applicationEndpoint
+    );
+
+    setApplicationLoaderStatus(false);
+    this.handleAppEmbedded(publishedUrl);
   };
 
   onHandleAppTitleChanged = e => {
@@ -112,10 +143,16 @@ class VisualizerControllerHeaderContainer extends PureComponent<Props, State> {
 
   handleClosePublishDialog = () => {
     this.setState({ publishDialogOpen: false });
+    this.props.handleSetSelectedApplicationMetadata(
+      this.state.currentApplicationMetadata
+    );
   };
 
   handleCloseEmbedDialog = () => {
     this.setState({ embedDialogOpen: false });
+    this.props.handleSetSelectedApplicationMetadata(
+      this.state.currentApplicationMetadata
+    );
   };
 
   handleProceedToApplicationClicked = () => {
@@ -194,7 +231,8 @@ const mapStateToProps = state => {
     filters: state.visualizers.filters,
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
-    selectedApplicationTitle: state.application.selectedApplicationTitle
+    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    applicationsFolder: state.user.applicationsFolder
   };
 };
 
@@ -202,8 +240,12 @@ const mapDispatchToProps = dispatch => {
   const handleAppTitleChanged = applicationTitle =>
     dispatch(applicationActions.setApplicationTitle(applicationTitle));
 
+  const handleSetSelectedApplicationMetadata = applicationMetadata =>
+    dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
+
   return {
-    handleAppTitleChanged
+    handleAppTitleChanged,
+    handleSetSelectedApplicationMetadata
   };
 };
 
@@ -212,6 +254,6 @@ export default withRouter(
     connect(
       mapStateToProps,
       mapDispatchToProps
-    )(VisualizerControllerHeaderContainer)
+    )(VisualizerHeaderContainer)
   )
 );

@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   selectedVisualizer: Object,
@@ -10,19 +11,51 @@ type Props = {
   filters: Object,
   selectedResultGraphIri: string,
   selectedApplication: Object,
+  selectedApplicationMetadata: AppConfiguration,
   handleSetCurrentApplicationData: Function,
   handleResetCurrentApplicationData: Function,
-  handleResetCurrentApplicationTitle: Function
+  handleResetCurrentApplicationTitle: Function,
+  handleResetCurrentApplicationMetadata: Function,
+  history: Object
 };
 
 type State = {
-  appTitle: string
+  loadingIsActive: boolean
 };
 
 class CreateVisualizerContainer extends PureComponent<Props, State> {
+  state = {
+    loadingIsActive: false
+  };
+
+  constructor(props) {
+    super(props);
+    (this: any).setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
+      this
+    );
+  }
+
+  componentDidMount() {
+    const { selectedVisualizer, selectedResultGraphIri, history } = this.props;
+
+    if (
+      selectedVisualizer.visualizer.visualizerCode === 'UNDEFINED' &&
+      !selectedResultGraphIri
+    ) {
+      history.push({
+        pathname: '/dashboard'
+      });
+    }
+  }
+
   componentWillUnmount() {
     this.props.handleResetCurrentApplicationData();
     this.props.handleResetCurrentApplicationTitle();
+    this.props.handleResetCurrentApplicationMetadata();
+  }
+
+  setApplicationLoaderStatus(isLoading) {
+    this.setState({ loadingIsActive: isLoading });
   }
 
   render() {
@@ -32,6 +65,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       filters,
       selectedResultGraphIri,
       selectedApplication,
+      selectedApplicationMetadata,
       handleSetCurrentApplicationData
     } = this.props;
 
@@ -42,7 +76,10 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         filters={filters}
         selectedResultGraphIri={selectedResultGraphIri}
         selectedApplication={selectedApplication}
+        selectedApplicationMetadata={selectedApplicationMetadata}
         handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+        setApplicationLoaderStatus={this.setApplicationLoaderStatus}
+        loadingIsActive={this.state.loadingIsActive}
       />
     );
   }
@@ -54,7 +91,8 @@ const mapStateToProps = state => {
     headerParams: state.globals.headerParams,
     filters: state.visualizers.filters,
     selectedResultGraphIri: state.etl.selectedResultGraphIri,
-    selectedApplication: state.application.selectedApplication
+    selectedApplication: state.application.selectedApplication,
+    selectedApplicationMetadata: state.application.selectedApplicationMetadata
   };
 };
 
@@ -65,12 +103,16 @@ const mapDispatchToProps = dispatch => {
   const handleResetCurrentApplicationData = () =>
     dispatch(applicationActions.resetApplication());
 
+  const handleResetCurrentApplicationMetadata = () =>
+    dispatch(applicationActions.resetApplicationMetadata());
+
   const handleResetCurrentApplicationTitle = () =>
     dispatch(applicationActions.resetApplicationTitle());
 
   return {
     handleSetCurrentApplicationData,
     handleResetCurrentApplicationData,
+    handleResetCurrentApplicationMetadata,
     handleResetCurrentApplicationTitle
   };
 };

@@ -5,7 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import PropTypes from 'prop-types';
 import { withTheme, withStyles } from '@material-ui/core/styles';
 import { ToastContainer } from 'react-toastify';
-import { UserProfileButton } from '@components';
+import UserProfileButton from '../UserProfile';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -158,7 +158,7 @@ const NavigationBarComponent = ({
       <Divider />
       <List>
         <Link style={{ textDecoration: 'none' }} to="/dashboard">
-          <ListItem button>
+          <ListItem id="dashboard_navbar_button" button>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
@@ -176,7 +176,7 @@ const NavigationBarComponent = ({
         </Link> */}
 
         <Link style={{ textDecoration: 'none' }} to="/storage">
-          <ListItem button>
+          <ListItem id="storage_navbar_button" button>
             <ListItemIcon>
               <StorageIcon />
             </ListItemIcon>

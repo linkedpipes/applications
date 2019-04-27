@@ -3,12 +3,8 @@ import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import {
-  Log,
-  AuthenticationService,
-  StorageToolbox,
-  withAuthorization
-} from '@utils';
+import { Log, AuthenticationService, withAuthorization } from '@utils';
+import { StorageToolbox } from '@storage';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';

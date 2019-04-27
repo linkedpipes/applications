@@ -11,21 +11,16 @@ import {
   AboutPage,
   CreateVisualizerPage,
   AuthorizationPage,
-  StoragePage,
   ApplicationPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import {
-  SocketContext,
-  Log,
-  AuthenticationService,
-  StorageToolbox
-} from '@utils';
+import { SocketContext, Log, AuthenticationService } from '@utils';
+import { StoragePage, StorageBackend, StoragePickFolderDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
+import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
-import auth from 'solid-auth-client';
 import { toast } from 'react-toastify';
 
 // Socket URL defaults to window.location
@@ -56,7 +51,9 @@ type Props = {
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
   handleUpdateDiscoverySession: Function,
-  handleUpdateExecutionSession: Function
+  handleUpdateExecutionSession: Function,
+  handleUpdateApplicationsFolder: Function,
+  handleUpdateChooseFolderDialogState: Function
 };
 
 const errorHandler = userId => {
@@ -75,7 +72,6 @@ const errorHandler = userId => {
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
     const {
-      handleSetUserProfile,
       handleAddDiscoverySession,
       handleAddExecutionSession,
       handleUpdateDiscoverySession,
@@ -185,7 +181,20 @@ class AppRouter extends React.PureComponent<Props> {
       }
     });
 
-    auth.trackSession(session => {
+    this.setupSessionTracker();
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners();
+  }
+
+  setupSessionTracker = async () => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const { handleSetUserProfile } = this.props;
+    const self = this;
+    authClient.trackSession(session => {
       if (session) {
         Log.info(session);
         AuthenticationService.getUserProfile(session.webId)
@@ -207,14 +216,23 @@ class AppRouter extends React.PureComponent<Props> {
             Log.error(error, 'HomeContainer');
           });
 
-        StorageToolbox.createOrUpdateFolder(session.webId, 'public/lpapps');
+        self.handleStorageFolder(session.webId);
       }
     });
-  }
+  };
 
-  componentWillUnmount() {
-    socket.removeAllListeners();
-  }
+  handleStorageFolder = async webId => {
+    await StorageBackend.getValidAppFolder(webId)
+      .then(folder => {
+        if (folder) {
+          this.props.handleUpdateApplicationsFolder(folder);
+        }
+      })
+      .catch(err => {
+        Log.error(err, 'AppRouter');
+        this.props.handleUpdateChooseFolderDialogState(true);
+      });
+  };
 
   render() {
     const { classes, userId } = this.props;
@@ -264,6 +282,7 @@ class AppRouter extends React.PureComponent<Props> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
+                <StoragePickFolderDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>
@@ -276,7 +295,8 @@ class AppRouter extends React.PureComponent<Props> {
 const mapStateToProps = state => {
   return {
     userId: state.user.webId,
-    userProfile: state.user
+    userProfile: state.user,
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
   };
 };
 
@@ -296,12 +316,20 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateExecutionSession = executionSession =>
     dispatch(userActions.updateExecutionSession({ session: executionSession }));
 
+  const handleUpdateApplicationsFolder = value =>
+    dispatch(userActions.updateApplicationsFolder({ value }));
+
+  const handleUpdateChooseFolderDialogState = state =>
+    dispatch(globalActions.setChooseFolderDialogState({ state }));
+
   return {
     handleSetUserProfile,
     handleAddDiscoverySession,
     handleAddExecutionSession,
     handleUpdateDiscoverySession,
-    handleUpdateExecutionSession
+    handleUpdateExecutionSession,
+    handleUpdateApplicationsFolder,
+    handleUpdateChooseFolderDialogState
   };
 };
 

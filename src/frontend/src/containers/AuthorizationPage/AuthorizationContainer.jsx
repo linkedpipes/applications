@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
-import { login } from 'solid-auth-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log, withWebId } from '@utils';
@@ -48,6 +47,10 @@ class AuthorizationContainer extends Component {
       }
 
       const ldp = withWebIdStatus ? webIdValue : providerLink;
+
+      const { login } = await import(
+        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+      );
 
       const session = await login(ldp, {
         callbackUri,
