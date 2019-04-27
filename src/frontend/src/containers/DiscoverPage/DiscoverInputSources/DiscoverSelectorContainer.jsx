@@ -3,7 +3,13 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups, SocketContext, Log, withWebId } from '@utils';
+import {
+  DiscoveryService,
+  GlobalUtils,
+  SocketContext,
+  Log,
+  withWebId
+} from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
@@ -175,7 +181,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   handleValidation = rawText => {
-    const matches = extractUrlGroups(rawText);
+    const matches = GlobalUtils.extractUrlGroups(rawText);
     if (matches instanceof Array) {
       rawText = matches.join(',\n');
     }

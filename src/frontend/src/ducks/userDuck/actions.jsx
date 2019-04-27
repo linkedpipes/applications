@@ -25,6 +25,11 @@ const updateExecutionSession = ({ session }) => ({
   session
 });
 
+const updateApplicationsFolder = ({ value }) => ({
+  type: types.UPDATE_APPLICATIONS_FOLDER,
+  value
+});
+
 const setUserProfileAsync = profile => {
   return dispatch =>
     new Promise(resolve => {
@@ -39,5 +44,6 @@ export default {
   updateDiscoverySession,
   addExecutionSession,
   updateExecutionSession,
-  setUserProfileAsync
+  setUserProfileAsync,
+  updateApplicationsFolder
 };

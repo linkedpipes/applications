@@ -88,13 +88,12 @@ services:
       - ./appdata:/appdata
 
   postgres:
-    image: postgres:10.7
+    image: postgres:9.6
     container_name: lpa-postgres
     restart: on-failure
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
-      PGDATA: /tmp
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ports:

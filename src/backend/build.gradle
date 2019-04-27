@@ -144,7 +144,7 @@ task testIntegration(type: Test, group: 'verification') {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5433/lpa'
+    url = 'jdbc:postgresql://localhost:5432/lpa'
     user = 'lpa'
     password = 'example'
 }

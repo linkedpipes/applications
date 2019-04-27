@@ -1,0 +1,5 @@
+const SET_SELECTED_SCHEME = 'SET_SELECTED_SCHEME';
+
+export default {
+  SET_SELECTED_SCHEME
+};

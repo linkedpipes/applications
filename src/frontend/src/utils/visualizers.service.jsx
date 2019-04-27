@@ -37,8 +37,14 @@ const VisualizersService = {
     });
   },
 
-  getSKOSConcepts: async () => {
-    return lpaAxios.get('/skos/schemeSubtree');
+  getSkosSchemes: async resultGraphIri => {
+    return lpaAxios.get('/skos/schemes', { params: { resultGraphIri } });
+  },
+
+  getSKOSConcepts: async (resultGraphIri, schemeUri, conceptUri) => {
+    return lpaAxios.get('/skos/schemeSubtree', {
+      params: { resultGraphIri, schemeUri, conceptUri }
+    });
   },
 
   // Again, should it really be POST?

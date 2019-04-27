@@ -1,3 +1,4 @@
-import VisualizerControllerHeader from './VisualizerControllerHeaderContainer';
+import VisualizerControllerHeader from './VisualizerHeaderContainer';
+import EditVisualizerHeader from './EditVisualizerHeaderContainer';
 
-export default VisualizerControllerHeader;
+export { EditVisualizerHeader, VisualizerControllerHeader };

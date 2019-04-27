@@ -111,19 +111,20 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
         driver.find_element_by_id(
-            "application-title-field").send_keys("Test selenium gmaps app")
+            "application-title-field").send_keys("test_selenium_gmaps_app")
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
 
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[2]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='Dashboard'])[1]/following::div[1]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[1]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='Share'])[1]/following::li[1]").click()
+        self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
+
+        self.custom_wait_clickable_and_click("storage_navbar_button")
+
+        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_gmaps_app")
+
+        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
+
+        time.sleep(5)
 
     def test_chord_flow(self):
         driver = self.driver
@@ -159,19 +160,20 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
         driver.find_element_by_id(
-            "application-title-field").send_keys("Test selenium chord app")
+            "application-title-field").send_keys("test_selenium_chord_app")
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
 
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[2]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='Dashboard'])[1]/following::div[1]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='LPApps Storage'])[1]/following::button[1]").click()
-        driver.find_element_by_xpath(
-            "(.//*[normalize-space(text()) and normalize-space(.)='Share'])[1]/following::li[1]").click()
+        self.custom_wait_clickable_and_click("0_test_selenium_chord_app")
+
+        self.custom_wait_clickable_and_click("storage_navbar_button")
+
+        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_chord_app")
+
+        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_chord_app")
+
+        time.sleep(5)
 
     def is_element_present(self, how, what):
         try:
