@@ -96,7 +96,7 @@
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
     "lint-staged": "8.1.5",
-    "node-sass": "4.11.0",
+    "node-sass": "4.12.0",
     "prettier": "1.17.0",
     "pretty-quick": "1.10.0",
     "reactotron-react-js": "3.0.2",
