@@ -37,7 +37,7 @@ jobs:
         - yarn run build
     - name: "Backend"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -69,7 +69,7 @@ jobs:
 
     - name: "Backend"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -85,7 +85,7 @@ jobs:
     - stage: tests
       name: "Backend unit tests"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -101,9 +101,6 @@ jobs:
             - postgresql-client-10
       services:
         - postgresql
-      before_install:
-        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
@@ -117,7 +114,7 @@ jobs:
 
     - name: "Backend integration tests"
       language: java
-      jdk: openjdk10
+      jdk: openjdk11
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/  
@@ -134,9 +131,6 @@ jobs:
       services:
         - postgresql
         - docker
-      before_install:
-        - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-        - sudo /etc/init.d/postgresql restart
       before_script:
         - cd src/backend
         - psql -c "CREATE DATABASE lpa;" -U postgres
