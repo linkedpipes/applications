@@ -4,6 +4,7 @@ import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
 import com.linkedpipes.lpa.backend.enums.EdgeDirection;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.EdgesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.GraphExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.NodesExtractor;
@@ -31,18 +32,18 @@ public class RgmlService {
      * reason, only one graph should exist in the data set.
      *
      */
-    public Graph getGraph(@Nullable String graphIri) {
+    public Graph getGraph(@Nullable String graphIri) throws LpAppsException {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), GraphExtractor::extract);
     }
 
     /** Get all edges (resources of type rgml:Edge). */
-    public List<Edge> getEdges(@Nullable String graphIri) {
+    public List<Edge> getEdges(@Nullable String graphIri) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new EdgesQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), EdgesExtractor::extract);
     }
 
-    private List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) {
+    private List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) throws LpAppsException {
         if (direction == null)
             return fetchAllEdges(graphIri, nodeUri);
 
@@ -53,33 +54,34 @@ public class RgmlService {
         return fetchAllEdges(graphIri, nodeUri);
     }
 
-    private List<Edge> fetchEdges(@Nullable String graphIri, String nodeUri, EdgeDirection direction){
+    private List<Edge> fetchEdges(@Nullable String graphIri, String nodeUri, EdgeDirection direction) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new IncidentEdgesQueryProvider(nodeUri, direction);
         return JenaUtils.withQueryExecution(provider.get(graphIri), EdgesExtractor::extract);
     }
 
-    private List<Edge> fetchAllEdges(@Nullable String graphIri, String nodeUri) {
+    private List<Edge> fetchAllEdges(@Nullable String graphIri, String nodeUri) throws LpAppsException {
         List<Edge> edges = fetchEdges(graphIri, nodeUri, EdgeDirection.INCOMING);
         edges.addAll(fetchEdges(graphIri, nodeUri, EdgeDirection.OUTGOING));
         return edges;
     }
 
-    public List<Node> getNodes(@Nullable String graphIri, Integer limit, Integer offset) {
+    public List<Node> getNodes(@Nullable String graphIri, Integer limit, Integer offset) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new NodesQueryProvider(limit, offset);
         return JenaUtils.withQueryExecution(provider.get(graphIri), NodesExtractor::extract);
     }
 
-    public List<Node> getNodesByUris(@Nullable String graphIri, List<String> nodeUris) {
+    public List<Node> getNodesByUris(@Nullable String graphIri, List<String> nodeUris) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new NodesQueryProvider(nodeUris);
         return JenaUtils.withQueryExecution(provider.get(graphIri), NodesExtractor::extract);
     }
 
-    public double[][] getMatrix(@Nullable String graphIri, boolean useWeights, @NotNull List<String> nodeUris) {
+    public double[][] getMatrix(@Nullable String graphIri, boolean useWeights, @NotNull List<String> nodeUris) throws LpAppsException {
         Graph graph = getGraph(graphIri);
 
-        List<Edge> edges = nodeUris.stream()
-                .map(uri -> getIncidentEdges(graphIri, graph, uri, null))
-                .collect(joiningLists());
+        List<Edge> edges = new ArrayList<>();
+        for(String nodeUri: nodeUris){
+            edges.addAll(getIncidentEdges(graphIri, graph, nodeUri, null));
+        }
 
         Map<String, Map<String, Double>> matrix = new HashMap<>();
 
