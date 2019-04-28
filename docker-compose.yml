@@ -56,8 +56,6 @@ services:
     ports:
       - "8890:8890"
     restart: on-failure
-    volumes:
-      - ./data/virtuoso:/var/lib/virtuoso/data
 
   discovery:
     image: linkedpipes/applications:discovery
@@ -90,8 +88,6 @@ services:
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
