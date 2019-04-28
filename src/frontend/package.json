@@ -49,7 +49,7 @@
     "react-google-maps": "9.4.5",
     "react-loading-overlay": "^1.0.1",
     "react-pure-lifecycle": "3.0.0",
-    "react-redux": "7.0.2",
+    "react-redux": "7.0.3",
     "react-router-dom": "4.3.1",
     "react-toastify": "5.1.0",
     "recompose": "0.30.0",
