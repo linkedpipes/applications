@@ -226,6 +226,7 @@ const EditVisualizerHeaderComponent = ({
           className={classes.textField}
           color="primary"
           label="Application title"
+          autoComplete="off"
           variant="outlined"
           fullWidth
           value={modifiedSelectedApplicationTitle}
