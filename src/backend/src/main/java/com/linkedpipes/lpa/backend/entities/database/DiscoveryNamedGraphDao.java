@@ -9,12 +9,12 @@ import java.util.List;
 public class DiscoveryNamedGraphDao implements Serializable {
     @Id
     @GeneratedValue
-    private long id;
+    private int id;
 
     @ManyToOne
     private DiscoveryDao discovery;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String namedGraph;
 
     public String getNamedGraph() {
