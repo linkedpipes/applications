@@ -1,5 +1,7 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
@@ -8,6 +10,8 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.atlas.json.JSON;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -100,11 +105,14 @@ public class DiscoveryController {
      * @throws LpAppsException
      */
     @NotNull
-    @PostMapping("/api/pipelines/discoverFromEndpoint")
+    @GetMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
                                                                 @NotNull @RequestParam("webId") String webId,
-                                                                @Nullable @RequestBody List<String> namedGraphs) throws LpAppsException {
+                                                                @Nullable @RequestParam List<String> namedGraphs) throws LpAppsException {
+        if(namedGraphs == null)
+            namedGraphs = new ArrayList<>();
+
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -125,12 +133,12 @@ public class DiscoveryController {
     @NotNull
     private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull List<String> namedGraphs) {
         Method templateDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
-                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, String.class));
+                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, List.class));
 
         return methodIntrospector.getHandlerMethodUri(DataSourceController.class, templateDescriptionMethod)
                 .requestParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
                 .requestParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri)
-                .requestParam(NAMED_GRAPHS_PARAM, namedGraphs)
+                .requestParam(NAMED_GRAPHS_PARAM, StringUtils.join(namedGraphs, ","))
                 .build()
                 .toString();
     }
