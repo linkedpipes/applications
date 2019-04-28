@@ -129,7 +129,6 @@ jobs:
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
       services:
-        - postgresql
         - docker
       env:
         - DOCKER_COMPOSE_VERSION=1.23.2
