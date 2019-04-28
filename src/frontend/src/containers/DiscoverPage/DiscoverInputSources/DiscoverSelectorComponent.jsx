@@ -25,8 +25,9 @@ type Props = {
       margin: string
     },
     textField: {
-      margin: string,
-      width: string
+      flexGrow: 1,
+      width: '100%',
+      marginTop: '1rem'
     },
     card: {
       flexGrow: number
@@ -101,9 +102,6 @@ const DiscoverSelectorComponent = ({
               handleSparqlTextFieldChange={onHandleSetSparqlIri}
               handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
               handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
-              sparqlEndpointIri={sparqlEndpointIri}
-              dataSampleIri={dataSampleIri}
-              namedGraph={namedGraph}
               sparqlTextFieldValue={sparqlTextFieldValue}
               namedTextFieldValue={namedTextFieldValue}
               dataSampleTextFieldValue={dataSampleTextFieldValue}
