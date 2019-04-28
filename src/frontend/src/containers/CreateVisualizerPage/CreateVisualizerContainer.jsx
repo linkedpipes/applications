@@ -20,12 +20,16 @@ type Props = {
 };
 
 type State = {
-  loadingIsActive: boolean
+  loadingIsActive: boolean,
+  width: number,
+  height: number
 };
 
 class CreateVisualizerContainer extends PureComponent<Props, State> {
   state = {
-    loadingIsActive: false
+    loadingIsActive: false,
+    width: 0,
+    height: 0
   };
 
   constructor(props) {
@@ -33,11 +37,13 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     (this: any).setApplicationLoaderStatus = this.setApplicationLoaderStatus.bind(
       this
     );
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
   componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions.bind(this));
     const { selectedVisualizer, selectedResultGraphIri, history } = this.props;
-
     if (
       selectedVisualizer.visualizer.visualizerCode === 'UNDEFINED' &&
       !selectedResultGraphIri
@@ -49,6 +55,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
     this.props.handleResetCurrentApplicationData();
     this.props.handleResetCurrentApplicationTitle();
     this.props.handleResetCurrentApplicationMetadata();
@@ -57,6 +64,10 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingIsActive: isLoading });
   }
+
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  };
 
   render() {
     const {
@@ -80,6 +91,8 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         setApplicationLoaderStatus={this.setApplicationLoaderStatus}
         loadingIsActive={this.state.loadingIsActive}
+        width={this.state.width}
+        height={this.state.height}
       />
     );
   }
