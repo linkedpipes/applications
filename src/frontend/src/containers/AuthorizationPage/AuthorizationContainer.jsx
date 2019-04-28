@@ -6,7 +6,7 @@ import { Log, withWebId } from '@utils';
 
 const providers = {
   Inrupt: 'https://inrupt.net/auth',
-  'Solid Community': 'https://solid.community',
+  'Solid Community': 'https://solid.community/auth',
   '': ''
 };
 
@@ -28,8 +28,22 @@ class AuthorizationContainer extends Component {
     return regex.test(webId);
   };
 
+  login = async (idp, callbackUri) => {
+    const { currentSession, login } = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const session = await currentSession();
+    if (!session)
+      await login(idp, {
+        callbackUri,
+        storage: localStorage
+      });
+    else Log.info(`Logged in as ${session.webId}`);
+    return session;
+  };
+
   // eslint-disable-next-line consistent-return
-  handleSignIn = async event => {
+  handleSignIn = event => {
     try {
       const { withWebIdStatus, providerTitle, webIdFieldValue } = this.state;
       event.preventDefault();
@@ -48,19 +62,10 @@ class AuthorizationContainer extends Component {
 
       const ldp = withWebIdStatus ? webIdValue : providerLink;
 
-      const { login } = await import(
-        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-      );
-
-      const session = await login(ldp, {
-        callbackUri,
-        storage: localStorage
-      });
-
-      if (session) {
-        // eslint-disable-next-line react/no-unused-state
-        return this.setState({ session });
-      }
+      const newSession = this.login(ldp, callbackUri);
+      // eslint-disable-next-line react/no-unused-state
+      this.setState({ newSession });
+      return;
     } catch (error) {
       Log.error(error, 'AuthenticationService'); // eslint-disable-line no-console
     }
