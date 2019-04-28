@@ -84,7 +84,7 @@ services:
       - "8080:8080"
 
   postgres:
-    image: postgres:10.7
+    image: postgres:9.6
     container_name: lpa-postgres
     restart: on-failure
     environment:
