@@ -81,7 +81,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
       }
       case VISUALIZER_TYPE.TREEMAP: {
         const { selectedResultGraphIri, conceptIri } = applicationData;
-        Log.info(applicationData);
         return (
           <TreemapVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
@@ -94,6 +93,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
+            size={this.state.height + this.state.width}
             isPublished
           />
         );
