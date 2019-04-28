@@ -43,8 +43,6 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    // const { } = this.props;
-
     // Get the schemes
     const schemesResponse = await VisualizersService.getSkosSchemes(
       this.props.selectedResultGraphIri
@@ -52,6 +50,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
     const schemes = schemesResponse.data;
     if (schemes.length) {
       this.setState({ schemes });
+      this.props.onSelectedScheme(schemes[0].uri);
     }
   }
 
