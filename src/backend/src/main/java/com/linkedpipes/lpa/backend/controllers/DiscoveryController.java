@@ -1,7 +1,5 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
@@ -11,7 +9,6 @@ import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.atlas.json.JSON;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
