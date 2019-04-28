@@ -48,6 +48,7 @@ services:
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
+      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata
     ports:
       - "8890:8890"
     volumes:
