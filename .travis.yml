@@ -129,10 +129,8 @@ jobs:
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
       services:
-        - postgresql
         - docker
       env:
-        global:
         - DOCKER_COMPOSE_VERSION=1.23.2
       before_install:
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
