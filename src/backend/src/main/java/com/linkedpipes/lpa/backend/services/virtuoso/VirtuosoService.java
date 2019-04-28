@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -71,7 +72,11 @@ public class VirtuosoService {
                 .uriString(Application.getConfig().getString("lpa.virtuoso.crudEndpoint"))
                 .queryParam("graph", LPA.Generated.uri + graphNameSuffix)
                 .build();
-        new RestTemplate().put(uri, entity);
+        try {
+            new RestTemplate().put(uri, entity);
+        } catch (RestClientException e) {
+            log.error("PUT to virtuoso failed", e);
+        }
     }
 
 }
