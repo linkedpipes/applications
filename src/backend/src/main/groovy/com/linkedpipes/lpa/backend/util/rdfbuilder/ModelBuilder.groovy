@@ -46,37 +46,48 @@ class ModelBuilder {
         model
     }
 
-    ModelBuilder namespaces(Map<String, String> namespaces) {
+    void namespaces(Map<String, String> namespaces) {
         model.nsPrefixes = namespaces
-        this
     }
 
     Resource resource(String uri) {
         model.createResource(uri)
     }
 
-    ModelBuilder resource(String uri, Map<Property, Object> properties) {
+    Resource resource(Map<Property, Object> properties) {
+        this.resource {
+            props(properties)
+        }
+    }
+
+    Resource resource(String uri, Map<Property, Object> properties) {
         resource(uri) {
             props(properties)
         }
     }
 
-    ModelBuilder resource(Resource resource, Map<Property, Object> properties) {
+    Resource resource(Resource resource, Map<Property, Object> properties) {
         this.resource(resource) {
             props(properties)
         }
     }
 
-    ModelBuilder resource(String uri, @DelegatesTo(value = ResourceBuilder, strategy = Closure.DELEGATE_FIRST) Closure closure) {
-        ResourceBuilder resourceBuilder = new ResourceBuilder(model, uri)
+    Resource resource(@DelegatesTo(value = ResourceBuilder, strategy = Closure.DELEGATE_FIRST) Closure closure) {
+        ResourceBuilder resourceBuilder = new ResourceBuilder(model)
         delegateTo(resourceBuilder, closure)
-        this
+        resourceBuilder.resource
     }
 
-    ModelBuilder resource(Resource resource, @DelegatesTo(value = ResourceBuilder, strategy = Closure.DELEGATE_FIRST) Closure closure) {
+    Resource resource(String uri, @DelegatesTo(value = ResourceBuilder, strategy = Closure.DELEGATE_FIRST) Closure closure) {
+        ResourceBuilder resourceBuilder = new ResourceBuilder(model, uri)
+        delegateTo(resourceBuilder, closure)
+        resourceBuilder.resource
+    }
+
+    Resource resource(Resource resource, @DelegatesTo(value = ResourceBuilder, strategy = Closure.DELEGATE_FIRST) Closure closure) {
         ResourceBuilder resourceBuilder = new ResourceBuilder(model, resource)
         delegateTo(resourceBuilder, closure)
-        this
+        resourceBuilder.resource
     }
 
     private static void delegateTo(ResourceBuilder resourceBuilder, Closure closure) {

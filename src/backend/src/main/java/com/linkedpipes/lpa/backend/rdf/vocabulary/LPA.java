@@ -21,7 +21,6 @@ public class LPA extends Vocabulary {
 
         public static final String uri = LPA.uri + "generated-data/";
 
-        public static final Resource graph = createResource(uri, "graph");
     }
 
 }

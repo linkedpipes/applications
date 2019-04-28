@@ -28,6 +28,7 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
                 builder.from(graphName);
 
             addWheres(builder);
+            addFilters(builder);
             addOptionals(builder);
             addGroupBy(builder);
             addLimit(builder);
@@ -42,5 +43,10 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
 
     @NotNull
     protected abstract ConstructBuilder addConstructs(@NotNull ConstructBuilder builder);
+
+    @NotNull
+    protected ConstructBuilder addFilters(@NotNull ConstructBuilder builder) throws ParseException {
+        return builder;
+    }
 
 }

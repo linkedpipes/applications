@@ -56,8 +56,7 @@ public class PipelineController {
      */
     @GetMapping("/api/pipeline/export")
     public ResponseEntity<PipelineExportResult> exportPipeline(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
-        PipelineExportResult response = discoveryService.exportPipeline(discoveryId, pipelineUri);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(discoveryService.exportPipeline(discoveryId, pipelineUri));
     }
 
     /**

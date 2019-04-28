@@ -69,6 +69,9 @@ dependencies {
 
 sourceSets {
     main {
+        groovy.srcDirs = ["$projectDir/src/main/groovy", "$projectDir/src/main/java"]
+        java.srcDirs = []
+        
         resources {
             srcDir "src/main/config"
         }
@@ -141,7 +144,7 @@ task testIntegration(type: Test, group: 'verification') {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5433/lpa'
+    url = 'jdbc:postgresql://localhost:5432/lpa'
     user = 'lpa'
     password = 'example'
 }

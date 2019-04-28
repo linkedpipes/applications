@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.visualization.*;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.VisualizationService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,7 @@ public class SkosController {
      * @return
      */
     @GetMapping("/api/skos/schemes")
-    public ResponseEntity<List<Scheme>> getSkosSchemes(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) {
+    public ResponseEntity<List<Scheme>> getSkosSchemes(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
         return ResponseEntity.ok(visualizationService.getSkosSchemes(graphIri));
     }
 
@@ -39,7 +40,7 @@ public class SkosController {
     @NotNull
     @GetMapping("/api/skos/schemeSubtree")
     public ResponseEntity<List<HierarchyNode>> getSkosSchemeSubtree(@Nullable @RequestParam(value = "resultGraphIri", required = false) String resultGraphIri,
-                                                             @NotNull @RequestParam("schemeUri") String schemeUri, @Nullable @RequestParam(value = "conceptUri", required = false) String conceptUri) {
+                                                             @NotNull @RequestParam("schemeUri") String schemeUri, @Nullable @RequestParam(value = "conceptUri", required = false) String conceptUri) throws LpAppsException {
         return ResponseEntity.ok(visualizationService.getSkosSchemeSubtree(resultGraphIri, schemeUri, conceptUri));
     }
 
@@ -49,7 +50,7 @@ public class SkosController {
      * @return
      */
     @GetMapping("/api/skos/concepts")
-    public ResponseEntity<List<Concept>> getSkosConcepts(@RequestParam(value = "resultGraphIri", required = false) String graphIri) {
+    public ResponseEntity<List<Concept>> getSkosConcepts(@RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
         return ResponseEntity.ok(visualizationService.getSkosConcepts(graphIri));
     }
 
@@ -61,7 +62,7 @@ public class SkosController {
      */
     @PostMapping("/api/skos/conceptsCounts")
     public ResponseEntity<List<ConceptCount>> getSkosConceptsCounts(@RequestParam(value = "resultGraphIri", required = false) String graphIri,
-                                                                    @RequestBody ConceptCountRequest countRequest) {
+                                                                    @RequestBody ConceptCountRequest countRequest) throws LpAppsException {
         return ResponseEntity.ok(visualizationService.getSkosConceptsCounts(graphIri, countRequest));
     }
 
