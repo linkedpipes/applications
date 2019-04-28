@@ -61,7 +61,6 @@ services:
     restart: on-failure
     command:
       [
-        "0",
         "-Dldcp.etl.hostname=http://lpa-etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",
