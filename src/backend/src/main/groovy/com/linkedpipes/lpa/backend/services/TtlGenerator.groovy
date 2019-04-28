@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.services
 
+import com.linkedpipes.lpa.backend.Application
 import com.linkedpipes.lpa.backend.entities.DataSource
 import com.linkedpipes.lpa.backend.rdf.Prefixes
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA
@@ -19,6 +20,8 @@ import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class TtlGenerator {
 
@@ -28,9 +31,22 @@ class TtlGenerator {
     private static final SparqlQueryProvider EXTRACTOR_QUERY_PROVIDER = new DefaultDataSourceExtractorQueryProvider()
     private static final SparqlQueryProvider CONFIGURATION_QUERY_PROVIDER = new DefaultDataSourceConfigurationQueryProvider()
 
+    private static final Logger log = LoggerFactory.getLogger(TtlGenerator)
+
     @NotNull
     static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
         return writeModelToString(getDiscoveryConfigModel(dataSourceList))
+    }
+
+    @NotNull
+    private static Model getDiscoveryConfigModel(@NotNull List<DataSource> dataSourceList) {
+        ModelBuilder.from(TtlGenerator.class.getResourceAsStream("base.ttl")) {
+            resource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config") {
+                dataSourceList.uri.each {
+                    prop "https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(it)
+                }
+            }
+        }.build()
     }
 
     @NotNull
@@ -43,17 +59,6 @@ class TtlGenerator {
         return writeModelToString(
                 getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
                         extractorQuery, configurationQuery, namedGraph))
-    }
-
-    @NotNull
-    private static Model getDiscoveryConfigModel(@NotNull List<DataSource> dataSourceList) {
-        ModelBuilder.from(TtlGenerator.class.getResourceAsStream("base.ttl")) {
-            resource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config") {
-                dataSourceList.uri.each {
-                    prop "https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(it)
-                }
-            }
-        }.build()
     }
 
     @NotNull
@@ -102,7 +107,27 @@ class TtlGenerator {
     }
 
     @NotNull
-    private static String writeModelToString(Model model) {
+    static String getVirtuosoServiceDescription(@NotNull String graphName) {
+        def serviceDescription = writeModelToString(
+                getVirtuosoServiceDescriptionModel(graphName))
+        log.debug(String.format("Service description of our Virtuoso server for named graph <%s> is:\n%s", graphName, serviceDescription))
+        return serviceDescription
+    }
+
+    @NotNull
+    private static Model getVirtuosoServiceDescriptionModel(@NotNull String graphName) {
+        ModelBuilder.from(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl")) {
+            String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint")
+            resource(virtuosoEndpoint + "/service", [
+                    (SD.namedGraph): resource(
+                            (SD.name as Property): resource(graphName)
+                    )
+            ])
+        }.build()
+    }
+
+    @NotNull
+    private static String writeModelToString(@NotNull Model model) {
         StringWriter stringWriter = new StringWriter()
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY)
         return stringWriter.toString()
