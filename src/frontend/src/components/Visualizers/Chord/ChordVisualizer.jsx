@@ -100,6 +100,13 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   render() {
+    if (this.state.size < 150) {
+      return (
+        <div>
+          Window too small to draw the visualization. Please resize window.
+        </div>
+      );
+    }
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
     ) : (

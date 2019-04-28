@@ -167,11 +167,11 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
   };
 
   handleChangeWidth = event => {
-    this.setState({ width: event.target.value });
+    this.setState({ width: Math.min(event.target.value, 150) });
   };
 
   handleChangeHeight = event => {
-    this.setState({ height: event.target.value });
+    this.setState({ height: Math.min(event.target.value, 150) });
   };
 
   render() {
