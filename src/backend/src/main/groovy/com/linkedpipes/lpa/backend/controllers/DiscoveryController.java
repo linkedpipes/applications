@@ -105,7 +105,7 @@ public class DiscoveryController {
      * @throws LpAppsException
      */
     @NotNull
-    @GetMapping("/api/pipelines/discoverFromEndpoint")
+    @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
                                                                 @NotNull @RequestParam("webId") String webId,
