@@ -10,29 +10,7 @@ import { withStyles } from '@material-ui/core/styles';
 import DiscoverSelectorFields from './children';
 
 type Props = {
-  classes: {
-    root: {
-      textAlign: string,
-      paddingTop: number,
-      flex: number
-    },
-    gridRoot: {
-      flexGrow: number
-    },
-    itemGrid: {
-      height: string,
-      width: string,
-      margin: string
-    },
-    textField: {
-      flexGrow: 1,
-      width: '100%',
-      marginTop: '1rem'
-    },
-    card: {
-      flexGrow: number
-    }
-  },
+  classes: any,
   dataSampleIri: string,
   dataSampleTextFieldValue: string,
   dataSourcesUris: string,
@@ -51,12 +29,25 @@ type Props = {
 };
 
 const styles = theme => ({
+  root: {
+    textAlign: 'center',
+    paddingTop: theme.spacing.unit * 20,
+    flex: 1
+  },
   gridRoot: {
     flexGrow: 1
+  },
+  itemGrid: {
+    height: '100%',
+    width: '100%',
+    margin: 'auto'
   },
   textField: {
     margin: 'auto',
     width: '100%'
+  },
+  card: {
+    flexGrow: 1
   }
 });
 
@@ -84,11 +75,13 @@ const DiscoverSelectorComponent = ({
         <Grid container spacing={24}>
           <Grid item xs={12} sm={12}>
             <DiscoverSelectorFields
-              classes={classes}
               discoveryIsLoading={discoveryIsLoading}
               handleSparqlTextFieldChange={onHandleSetSparqlIri}
               handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
               handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+              sparqlEndpointIri={sparqlEndpointIri}
+              dataSampleIri={dataSampleIri}
+              namedGraph={namedGraph}
               sparqlTextFieldValue={sparqlTextFieldValue}
               namedTextFieldValue={namedTextFieldValue}
               dataSampleTextFieldValue={dataSampleTextFieldValue}
