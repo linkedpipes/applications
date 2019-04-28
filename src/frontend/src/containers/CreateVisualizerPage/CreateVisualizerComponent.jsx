@@ -21,7 +21,9 @@ type Props = {
   },
   handleSetCurrentApplicationData: Function,
   setApplicationLoaderStatus: Function,
-  loadingIsActive: boolean
+  loadingIsActive: boolean,
+  width: number,
+  height: number
 };
 
 const styles = {
@@ -45,7 +47,9 @@ const CreateVisualizerComponent = ({
   selectedApplicationMetadata,
   handleSetCurrentApplicationData,
   setApplicationLoaderStatus,
-  loadingIsActive
+  loadingIsActive,
+  width,
+  height
 }: Props) => (
   <LoadingOverlay className={classes.root} active={loadingIsActive} spinner>
     {selectedApplicationMetadata ? (
@@ -69,6 +73,8 @@ const CreateVisualizerComponent = ({
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
       selectedApplication={selectedApplication}
       selectedApplicationMetadata={selectedApplicationMetadata}
+      width={width}
+      height={height}
     />
   </LoadingOverlay>
 );

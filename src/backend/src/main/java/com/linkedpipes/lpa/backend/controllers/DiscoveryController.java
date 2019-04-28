@@ -25,6 +25,7 @@ public class DiscoveryController {
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
     @NotNull private final UserService userService;
+    @NotNull
     private final HandlerMethodIntrospector methodIntrospector;
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";

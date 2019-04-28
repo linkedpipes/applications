@@ -7,8 +7,8 @@ import org.apache.jena.rdf.model.Resource
 
 class ResourceBuilder {
 
-    private final Model model
-    private final Resource resource
+    final Model model
+    final Resource resource
 
     ResourceBuilder(Model model) {
         this.model = model

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
+import { VisualizersService, Log } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
@@ -13,7 +13,8 @@ type Props = {
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
-  isPublished: boolean
+  isPublished: boolean,
+  size: number
 };
 
 type State = {
@@ -44,17 +45,24 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       matrix: [],
       groupColors: [],
       groupLabels: [],
-      size: 100
+      size: props.size
     };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const elementVizDiv = document.getElementById('viz-div');
+    if (nextProps.size !== prevState.size && elementVizDiv) {
+      return {
+        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+      };
+    }
+    return null;
   }
 
   async componentDidMount() {
     const { handleSetCurrentApplicationData, isPublished } = this.props;
     const elementVizDiv = document.getElementById('viz-div');
-    if (elementVizDiv && elementVizDiv.clientHeight !== undefined) {
-      const size = elementVizDiv.clientHeight;
-      this.setState({ size });
-
+    if (elementVizDiv) {
       if (!isPublished) {
         handleSetCurrentApplicationData({
           id: uuid.v4(),
@@ -85,7 +93,8 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         dataLoadingStatus: 'ready',
         matrix: matrixData,
         groupColors: colors,
-        groupLabels: labels
+        groupLabels: labels,
+        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
       });
     }
   }
