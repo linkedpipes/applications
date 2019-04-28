@@ -48,14 +48,15 @@ services:
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
-      VIRT_Parameters_CheckpointInterval: 1
     ports:
       - "8890:8890"
     volumes:
       - ./data/virtuoso:/data
+      - ./appdata:/appdata
+      
 
   discovery:
-    image: linkedpipes/applications:discovery
+    image: linkedpipes/applications:discovery_hang_fix
     container_name: lpa-discovery
     restart: on-failure
     command:
@@ -72,11 +73,13 @@ services:
       - "9000:9000"
 
   etl:
-    image: linkedpipes/applications:etl_devel
+    image: linkedpipes/applications:etl_hang_fix
     container_name: lpa-etl
     restart: on-failure
     ports:
       - "8080:8080"
+    volumes:
+      - ./appdata:/appdata
 
   postgres:
     image: postgres:10.7
