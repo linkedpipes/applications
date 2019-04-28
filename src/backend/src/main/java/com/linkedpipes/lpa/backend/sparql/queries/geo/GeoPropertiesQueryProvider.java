@@ -65,6 +65,7 @@ public class GeoPropertiesQueryProvider extends SelectSparqlQueryProvider {
     @NotNull
     @Override
     public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+        //TODO what is the point of having these if we don't return them in projection (addVars method)?
         return builder
                 .addOptional(VAR_SCHEME, SKOS.prefLabel, VAR_PREF_LABEL)
                 .addOptional(VAR_SCHEME, RDFS.label, VAR_RDFS_LABEL)
