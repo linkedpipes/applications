@@ -51,25 +51,12 @@ type Props = {
 };
 
 const styles = theme => ({
-  root: {
-    textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20,
-    flex: 1
-  },
   gridRoot: {
     flexGrow: 1
-  },
-  itemGrid: {
-    height: '100%',
-    width: '100%',
-    margin: 'auto'
   },
   textField: {
     margin: 'auto',
     width: '100%'
-  },
-  card: {
-    flexGrow: 1
   }
 });
 
