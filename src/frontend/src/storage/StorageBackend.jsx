@@ -77,7 +77,8 @@ class SolidBackend {
   async load(document: $rdf.NamedNode, forceReload = true) {
     try {
       return await this.fetcher.load(document, {
-        force: forceReload
+        force: forceReload,
+        clearPreviousData: true
       });
     } catch (err) {
       return Promise.reject(new Error('Could not fetch the document.'));
@@ -154,7 +155,7 @@ class SolidBackend {
           wantedFolders.indexOf(Utils.getLastUrlSegment(subFolder)) !== -1
         );
       });
-    this.registerChanges(folder);
+    // this.registerChanges(folder);
     return subFolders.length >= 1;
   }
 
@@ -192,10 +193,10 @@ class SolidBackend {
       );
 
       await fileClient.createFolder(folderUrl).then(success => {
-        console.log(`Created folder ${folderUrl}.`);
+        Log.info(`Created folder ${folderUrl}.`);
       });
       await fileClient.createFolder(configurationsUrl).then(success => {
-        console.log(`Created folder ${configurationsUrl}.`);
+        Log.info(`Created folder ${configurationsUrl}.`);
       });
       await fileClient
         .updateFile(
@@ -205,13 +206,13 @@ class SolidBackend {
             .toString()
         )
         .then(fileCreated => {
-          console.log(`Created access list ${fileCreated}.`);
+          Log.info(`Created access list ${fileCreated}.`);
         });
       await this.updateAppFolder(webId, folderUrl).then(success => {
-        console.log(`Updated app folder in profile.`);
+        Log.info(`Updated app folder in profile.`);
       });
     } catch (err) {
-      console.log(err);
+      Log.error(err);
       return false;
     }
     return true;
@@ -278,7 +279,7 @@ class SolidBackend {
     } catch (err) {
       return false;
     }
-    this.registerChanges(profile);
+    // this.registerChanges(profile);
     return true;
   }
 
@@ -323,7 +324,7 @@ class SolidBackend {
           .catch(err => console.log(err));
       }
     }
-    this.registerChanges(configurationsFolder);
+    // this.registerChanges(configurationsFolder);
     return configurationsMetadata.sort((a, b) =>
       Utils.sortByDateAsc(a.createdAt, b.createdAt)
     );
@@ -472,48 +473,30 @@ class SolidBackend {
     const fileClient = await import(
       /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
     );
+    try {
+      await fileClient.deleteFile(appConfiguration.url).then(response => {
+        Log.info(appConfiguration.url + ' successfully deleted');
+      });
 
-    await this.fetcher.webOperation('DELETE', appConfiguration.url).then(
-      () => {
-        Log.info(`Removed file!`);
-      },
-      err => {
-        return false;
-      }
-    );
+      await fileClient.deleteFile(appConfiguration.object).then(response => {
+        Log.info(appConfiguration.object + ' successfully deleted');
+      });
 
-    await this.fetcher.webOperation('DELETE', appConfiguration.object).then(
-      () => {
-        Log.info(`Removed file!`);
-      },
-      err => {
-        return false;
-      }
-    );
+      await fileClient
+        .deleteFile(`${appConfiguration.object}.acl`)
+        .then(response => {
+          Log.info(`${appConfiguration.object}.acl` + ' successfully deleted');
+        });
 
-    await this.fetcher
-      .webOperation('DELETE', `${appConfiguration.object}.acl`)
-      .then(
-        () => {
-          Log.info(`Removed file!`);
-        },
-        err => {
-          return false;
-        }
-      );
-
-    await this.fetcher
-      .webOperation('DELETE', `${appConfiguration.url}.acl`)
-      .then(
-        () => {
-          Log.info(`Removed file!`);
-        },
-        err => {
-          return false;
-        }
-      );
-
-    const folder = $rdf.sym(appFolder).doc();
+      await fileClient
+        .deleteFile(`${appConfiguration.url}.acl`)
+        .then(response => {
+          Log.info(`${appConfiguration.url}.acl` + ' successfully deleted');
+        });
+    } catch (err) {
+      console.log('Could not delete a profile document.');
+      return Promise.reject(err);
+    }
 
     return true;
   }

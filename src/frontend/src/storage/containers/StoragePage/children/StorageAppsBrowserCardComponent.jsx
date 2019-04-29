@@ -44,6 +44,12 @@ const styles = {
 
   actions: {
     display: 'flex'
+  },
+
+  textField: {
+    flexGrow: 1,
+    width: '100%',
+    marginTop: '1rem'
   }
 };
 
@@ -53,7 +59,8 @@ type Props = {
     card: {},
     cardContent: {},
     media: {},
-    actions: {}
+    actions: {},
+    textField: {}
   },
   applicationMetadata: AppConfiguration,
   handleSetResultPipelineIri: Function,
@@ -261,15 +268,13 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 color="primary"
                 label="Click to copy"
                 variant="outlined"
+                className={classes.textField}
                 fullWidth
                 value={StorageToolbox.appIriToPublishUrl(
                   applicationMetadata.object,
                   applicationMetadata.endpoint
                 )}
                 autoFocus
-                style={{
-                  textDecoration: 'none'
-                }}
               />
             </CopyToClipboard>
           </DialogContent>
