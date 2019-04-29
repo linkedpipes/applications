@@ -67,7 +67,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     return DiscoveryService.postDiscoverFromEndpoint({
       sparqlEndpointIri: this.props.sparqlEndpointIri,
       dataSampleIri: this.props.dataSampleIri,
-      namedGraph: this.props.namedGraph,
+      namedGraphs: this.props.namedGraph,
       webId: this.props.webId
     }).then(response => {
       return response;
