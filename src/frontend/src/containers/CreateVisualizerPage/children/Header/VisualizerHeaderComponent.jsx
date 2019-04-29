@@ -101,6 +101,7 @@ const VisualizerHeaderComponent = ({
               className={classes.textField}
               variant="outlined"
               id="application-title-field"
+              autoComplete="off"
               placeholder="Enter your application title..."
               onChange={handleAppTitleChanged}
               margin="dense"
