@@ -57,6 +57,7 @@ services:
       - "8890:8890"
     restart: on-failure
     volumes:
+      - ./appdata:/appdata
       - ./data/virtuoso:/data
 
   discovery:
