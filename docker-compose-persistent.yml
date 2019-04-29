@@ -82,6 +82,8 @@ services:
     restart: on-failure
     ports:
       - "8080:8080"
+    volumes:
+      - ./appdata:/appdata
 
   postgres:
     image: postgres:9.6
