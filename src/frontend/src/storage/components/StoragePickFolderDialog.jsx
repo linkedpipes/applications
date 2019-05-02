@@ -13,7 +13,6 @@ import { Utils } from '../utils';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import StorageBackend from '../StorageBackend';
-import { withWebId } from '@utils';
 import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
@@ -73,7 +72,7 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
       return;
     }
     const folderUrl = `${Utils.getBaseUrl(this.props.webId) + folder}/`;
-    await StorageBackend.createAppFolders(this.props.webId, folderUrl).then(
+    await StorageBackend.createAppFolders(this.props.webId, folder).then(
       created => {
         if (created) {
           this.props.handleUpdateApplicationsFolder(folderUrl);
@@ -132,6 +131,7 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
+    webId: state.user.webId,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
   };
 };
@@ -149,9 +149,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withWebId(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(StoragePickFolderDialog)
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(StoragePickFolderDialog);

@@ -8,8 +8,7 @@ import {
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
   SocketContext,
-  Log,
-  withWebId
+  Log
 } from '@utils';
 import { discoverActions } from '../duck';
 
@@ -202,7 +201,8 @@ const mapStateToProps = state => {
     discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     etlExecutionStatus: state.discover.etlExecutionStatus,
-    executions: state.etl.executions
+    executions: state.etl.executions,
+    webId: state.user.webId
   };
 };
 
@@ -250,9 +250,7 @@ const DiscoverPipelinesExecutorContainerWithSocket = props => (
   </SocketContext.Consumer>
 );
 
-export default withWebId(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(DiscoverPipelinesExecutorContainerWithSocket)
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DiscoverPipelinesExecutorContainerWithSocket);

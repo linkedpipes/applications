@@ -3,6 +3,7 @@ import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import { AppConfiguration } from './models';
 import { Log } from '@utils';
+import StorageFileClient from './StorageFileClient';
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
@@ -182,32 +183,34 @@ class SolidBackend {
   /**
    * Creates appropriate application folders on the user's POD.
    * @param {string} webId A user's WebID.
-   * @param {string} folderUrl An URL of the given folder.
+   * @param {string} folderTitle An URL of the given folder.
    * @return {Promise<boolean>} True if the folders were created, false otherwise.
    */
-  async createAppFolders(webId: string, folderUrl: string): Promise<boolean> {
-    const configurationsUrl = `${folderUrl}configurations/`;
-    try {
-      const fileClient = await import(
-        /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
-      );
+  async createAppFolders(webId: string, folderTitle: string): Promise<boolean> {
+    const url = `${Utils.getBaseUrlConcat(webId)}`;
+    const folderUrl = `${url}/${folderTitle}`;
+    const configurationsUrl = `${url}/${folderTitle}`;
 
-      await fileClient.createFolder(folderUrl).then(success => {
+    try {
+      await StorageFileClient.createFolder(url, folderTitle).then(success => {
         Log.info(`Created folder ${folderUrl}.`);
       });
-      await fileClient.createFolder(configurationsUrl).then(success => {
+      await StorageFileClient.createFolder(
+        configurationsUrl,
+        'configurations'
+      ).then(success => {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
-      await fileClient
-        .updateFile(
-          `${folderUrl}.acl`,
-          this.createFolderAccessList(webId, folderUrl, [READ], true, null)
-            .join('\n')
-            .toString()
-        )
-        .then(fileCreated => {
-          Log.info(`Created access list ${fileCreated}.`);
-        });
+      await StorageFileClient.updateItem(
+        folderUrl,
+        '.acl',
+        this.createFolderAccessList(webId, folderUrl, [READ], true, null)
+          .join('\n')
+          .toString(),
+        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      ).then(fileCreated => {
+        Log.info(`Created access list ${fileCreated}.`);
+      });
       await this.updateAppFolder(webId, folderUrl).then(success => {
         Log.info(`Updated app folder in profile.`);
       });
@@ -302,7 +305,7 @@ class SolidBackend {
     }
     if (!folder) return [];
     const configurationsMetadata = [];
-    const configurationsFolder = $rdf.sym(`${folder}configurations/`);
+    const configurationsFolder = $rdf.sym(`${folder}/configurations/`);
     try {
       await this.load(configurationsFolder);
     } catch (err) {
@@ -389,75 +392,83 @@ class SolidBackend {
     color: string,
     allowedUsers: string[]
   ): Promise<AppConfiguration> {
-    const appConfigName = `${appFolder}configurations/${Utils.getName()}.json`;
-    let appConfigFileUrl = `${appConfigName}.ttl`;
-    let appConfigUrl;
+    const appConfigurationFilePath = `${appFolder}/configurations`;
+    const appConfigurationFileTitle = `${Utils.getName()}`;
+    let appConfigurationUrl;
     const created = new Date(Date.now());
     try {
-      const fileClient = await import(
-        /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
-      );
-
-      await fileClient
-        .createFile(appConfigName, appConfigurationFile)
-        .then(fileCreated => {
-          Log.info(`Created image ${fileCreated}.`);
-          appConfigUrl = fileCreated;
-        });
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.json`,
+        appConfigurationFile
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
       const appConfigFileTtl = this.createUploadAppConfigurationStatement(
-        appConfigFileUrl,
-        appConfigUrl,
+        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
+        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
         appTitle,
         appEndpoint,
         webId,
         color,
         created
       );
-      await fileClient
-        .createFile(appConfigFileUrl, appConfigFileTtl.join('\n').toString())
-        .then(fileCreated => {
-          Log.info(`Created image data ${fileCreated}.`);
-          appConfigFileUrl = fileCreated;
-        });
-      await fileClient
-        .createFile(
-          `${appConfigUrl}.acl`,
-          this.createFileAccessList(
-            webId,
-            appConfigUrl,
-            [READ],
-            isPublic,
-            allowedUsers
-          )
-            .join('\n')
-            .toString()
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.json.ttl`,
+        appConfigFileTtl.join('\n').toString()
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.json.acl`,
+        this.createFileAccessList(
+          webId,
+          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
+          [READ],
+          isPublic,
+          allowedUsers
         )
-        .then(fileCreated => {
-          Log.info(`Created access list ${fileCreated}.`);
-        });
-      await fileClient
-        .createFile(
-          `${appConfigFileUrl}.acl`,
-          this.createFileAccessList(
-            webId,
-            appConfigFileUrl,
-            [APPEND, READ],
-            isPublic,
-            allowedUsers
-          )
-            .join('\n')
-            .toString()
+          .join('\n')
+          .toString()
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.json.ttl.acl`,
+        this.createFileAccessList(
+          webId,
+          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
+          [APPEND, READ],
+          isPublic,
+          allowedUsers
         )
-        .then(fileCreated => {
-          Log.info(`Created access list ${fileCreated}.`);
-        });
+          .join('\n')
+          .toString()
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
     } catch (err) {
       Log.info(err);
       return Promise.reject(err);
     }
     return new AppConfiguration(
-      appConfigFileUrl,
-      appConfigUrl,
+      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
+      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
       appTitle,
       appEndpoint,
       webId,
@@ -470,29 +481,32 @@ class SolidBackend {
     appFolder: string,
     appConfiguration: AppConfiguration
   ): Promise<Boolean> {
-    const fileClient = await import(
-      /* webpackChunkName: "solid-file-client" */ 'solid-file-client'
-    );
     try {
-      await fileClient.deleteFile(appConfiguration.url).then(response => {
-        Log.info(appConfiguration.url + ' successfully deleted');
-      });
-
-      await fileClient.deleteFile(appConfiguration.object).then(response => {
-        Log.info(appConfiguration.object + ' successfully deleted');
-      });
-
-      await fileClient
-        .deleteFile(`${appConfiguration.object}.acl`)
-        .then(response => {
-          Log.info(`${appConfiguration.object}.acl` + ' successfully deleted');
-        });
-
-      await fileClient
-        .deleteFile(`${appConfiguration.url}.acl`)
-        .then(response => {
-          Log.info(`${appConfiguration.url}.acl` + ' successfully deleted');
-        });
+      // const filePath = `${Utils.getFolderUrlFromPathUrl(appConfiguration.url)}`;
+      // await StorageFileClient.removeItem(
+      //   filePath,
+      //   `${appConfiguration.title}.json`
+      // ).then(response => {
+      //   Log.info(appConfiguration.url + ' successfully deleted');
+      // });
+      // await StorageFileClient.removeItem(
+      //   filePath,
+      //   `${appConfiguration.title}.json.ttl`
+      // ).then(response => {
+      //   Log.info(appConfiguration.object + ' successfully deleted');
+      // });
+      // await StorageFileClient.removeItem(
+      //   filePath,
+      //   `${appConfiguration.title}.json.acl`
+      // ).then(response => {
+      //   Log.info(`${appConfiguration.object}.acl` + ' successfully deleted');
+      // });
+      // await StorageFileClient.removeItem(
+      //   filePath,
+      //   `${appConfiguration.title}.json.ttl.acl`
+      // ).then(response => {
+      //   Log.info(`${appConfiguration.url}.acl` + ' successfully deleted');
+      // });
     } catch (err) {
       console.log('Could not delete a profile document.');
       return Promise.reject(err);
@@ -503,8 +517,8 @@ class SolidBackend {
 
   /**
    * Creates appropriate RDF statements for the new application configuration to upload.
-   * @param {string} appConfigFileUrl An URL of the new RDF Turtle image file.
-   * @param {string} appConfigUrl An URL of the new image file.
+   * @param {string} appConfigurationMetadataPath An URL of the new RDF Turtle image file.
+   * @param {string} appConfigurationUrl An URL of the new image file.
    * @param {string} appTitle A title of an application configuration.
    * @param {string} appEndpoint An endpoint of application configuration
    * @param {string} user A WebID of the image's creator.
@@ -514,16 +528,16 @@ class SolidBackend {
    */
   // eslint-disable-next-line class-methods-use-this
   createUploadAppConfigurationStatement(
-    appConfigFileUrl: string,
-    appConfigUrl: string,
+    appConfigurationMetadataPath: string,
+    appConfigurationUrl: string,
     appTitle: string,
     appEndpoint: string,
     user: string,
     cardColor: String,
     createdAt: Date
   ): $rdf.Statement[] {
-    const appConfigFile = $rdf.sym(appConfigFileUrl);
-    const appConfig = $rdf.sym(appConfigUrl);
+    const appConfigFile = $rdf.sym(appConfigurationMetadataPath);
+    const appConfig = $rdf.sym(appConfigurationUrl);
     const title = $rdf.lit(appTitle);
     const endpoint = $rdf.lit(appEndpoint);
     const creator = $rdf.sym(user);

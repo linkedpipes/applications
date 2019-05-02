@@ -11,7 +11,21 @@ export default class Utils {
    * @param {String} url A given URL.
    */
   static getBaseUrl(url): String {
-    return url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    const newUrl = url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    return newUrl;
+  }
+
+  static getBaseUrlConcat(url): String {
+    const newUrl = url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    return newUrl.substring(0, newUrl.length - 1);
+  }
+
+  static getFolderUrlFromPathUrl(url): String {
+    const newUrl = url
+      .split('/')
+      .slice(0, -1)
+      .join('/');
+    return newUrl;
   }
 
   /**

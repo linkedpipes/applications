@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Log, withWebId } from '@utils';
+import { Log } from '@utils';
+import authClient from 'solid-auth-client';
+import { connect } from 'react-redux';
 
 const providers = {
   Inrupt: 'https://inrupt.net/auth',
@@ -29,12 +31,9 @@ class AuthorizationContainer extends Component {
   };
 
   login = async (idp, callbackUri) => {
-    const { currentSession, login } = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    const session = await currentSession();
+    const session = await authClient.currentSession();
     if (!session)
-      await login(idp, {
+      await authClient.login(idp, {
         callbackUri,
         storage: localStorage
       });
@@ -111,4 +110,10 @@ class AuthorizationContainer extends Component {
   }
 }
 
-export default withWebId(AuthorizationContainer);
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
+export default connect(mapStateToProps)(AuthorizationContainer);

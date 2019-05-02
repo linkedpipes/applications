@@ -3,7 +3,8 @@ import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { SocketContext, withWebId } from '@utils';
+import { SocketContext } from '@utils';
+import authClient from 'solid-auth-client';
 
 type Props = {
   history: Object,
@@ -48,10 +49,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
 
   performLogout = async () => {
     try {
-      const { logout } = await import(
-        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-      );
-      await logout();
+      await authClient.logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');
       // Clear cookies
@@ -97,6 +95,12 @@ const UserProfileButtonContainerWithSockets = props => (
   </SocketContext.Consumer>
 );
 
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
 
@@ -106,6 +110,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
-)(withRouter(withWebId(UserProfileButtonContainerWithSockets)));
+)(withRouter(UserProfileButtonContainerWithSockets));

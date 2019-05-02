@@ -22,6 +22,7 @@ import { userActions } from '@ducks/userDuck';
 import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
+import authClient from 'solid-auth-client';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -189,9 +190,6 @@ class AppRouter extends React.PureComponent<Props> {
   }
 
   setupSessionTracker = async () => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
     const { handleSetUserProfile } = this.props;
     const self = this;
     authClient.trackSession(session => {

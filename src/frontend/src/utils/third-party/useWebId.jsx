@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useReducer, useEffect, useDebugValue } from 'react';
-import { trackSession } from 'solid-auth-client';
+import authClient from 'solid-auth-client';
 
 // Keep track of the WebID and the state setters tracking it
 let webId = undefined;
@@ -26,7 +26,7 @@ export default function useWebId(reducer = getWebId) {
 }
 
 // Inform subscribers when the WebID changes
-trackSession(session => {
+authClient.trackSession(session => {
   webId = session ? session.webId : null;
   for (const subscriber of subscribers) subscriber(webId);
 });
