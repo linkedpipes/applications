@@ -28,6 +28,11 @@ export default class Utils {
     return newUrl;
   }
 
+  static getFilenameFromPathUrl(url): String {
+    const newUrl = url.substring(url.lastIndexOf('/') + 1);
+    return newUrl;
+  }
+
   /**
    * Gets the last segment of the URL.
    * @param {String} url A given URL.

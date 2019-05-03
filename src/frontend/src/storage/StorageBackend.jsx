@@ -482,31 +482,49 @@ class SolidBackend {
     appConfiguration: AppConfiguration
   ): Promise<Boolean> {
     try {
-      // const filePath = `${Utils.getFolderUrlFromPathUrl(appConfiguration.url)}`;
-      // await StorageFileClient.removeItem(
-      //   filePath,
-      //   `${appConfiguration.title}.json`
-      // ).then(response => {
-      //   Log.info(appConfiguration.url + ' successfully deleted');
-      // });
-      // await StorageFileClient.removeItem(
-      //   filePath,
-      //   `${appConfiguration.title}.json.ttl`
-      // ).then(response => {
-      //   Log.info(appConfiguration.object + ' successfully deleted');
-      // });
-      // await StorageFileClient.removeItem(
-      //   filePath,
-      //   `${appConfiguration.title}.json.acl`
-      // ).then(response => {
-      //   Log.info(`${appConfiguration.object}.acl` + ' successfully deleted');
-      // });
-      // await StorageFileClient.removeItem(
-      //   filePath,
-      //   `${appConfiguration.title}.json.ttl.acl`
-      // ).then(response => {
-      //   Log.info(`${appConfiguration.url}.acl` + ' successfully deleted');
-      // });
+      const folderPath = `${Utils.getFolderUrlFromPathUrl(
+        appConfiguration.url
+      )}`;
+      const metadataFileTitle = `${Utils.getFilenameFromPathUrl(
+        appConfiguration.url
+      )}`;
+      const fileTitle = `${Utils.getFilenameFromPathUrl(
+        appConfiguration.object
+      )}`;
+
+      await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
+        response => {
+          if (response.status === 200) {
+            const filePath = response.url;
+            Log.info(`Removed ${metadataFileTitle} at ${filePath}.`);
+          }
+        }
+      );
+      await StorageFileClient.removeItem(folderPath, fileTitle).then(
+        response => {
+          if (response.status === 200) {
+            const filePath = response.url;
+            Log.info(`Removed ${fileTitle} at ${filePath}.`);
+          }
+        }
+      );
+      await StorageFileClient.removeItem(
+        folderPath,
+        `${metadataFileTitle}.acl`
+      ).then(response => {
+        if (response.status === 200) {
+          const filePath = response.url;
+          Log.info(`Removed ${metadataFileTitle}.acl at ${filePath}.`);
+        }
+      });
+      await StorageFileClient.removeItem(folderPath, `${fileTitle}.acl`).then(
+        response => {
+          if (response.status === 200) {
+            const filePath = response.url;
+            Log.info(`Removed ${fileTitle}.acl ${filePath}.`);
+          }
+        }
+      );
     } catch (err) {
       console.log('Could not delete a profile document.');
       return Promise.reject(err);

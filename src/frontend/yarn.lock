@@ -8261,7 +8261,7 @@ solid-auth-cli@^0.1.12:
     jsonld "^1.4.0"
     n3 "^1.0.3"
 
-solid-auth-client@^2.3.0:
+solid-auth-client@2.3.0, solid-auth-client@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.0.tgz#4bac06984b61981ad9d06f285b8ead6200f21aaa"
   integrity sha512-+9RfqC64oWpH4afoWYhCtieuAziFyWiiW/isB9XEV6N+yb2jZ69UCJxpX7iBCpxK0j36bDeisdbp0zHRp/F46A==

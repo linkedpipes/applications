@@ -1,4 +1,5 @@
-import * as authClient from 'solid-auth-client';
+import authClient from 'solid-auth-client';
+import { Log } from '@utils';
 
 class StorageFileClient {
   folderExists = async (path, folderName) => {
@@ -59,9 +60,10 @@ class StorageFileClient {
   };
 
   removeItem = async (path, itemName) => {
-    const url = this.buildFileUrl(path, itemName);
-
-    const response = await authClient.fetch(url, { method: 'DELETE' });
+    const url = `${path}/${itemName}`;
+    const response = await authClient.fetch(url, {
+      method: 'DELETE'
+    });
     if (response.status === 409 || response.status === 301) {
       // Solid pod returns 409 if the item is a folder and is not empty
       // Solid pod returns 301 if is attempted to read a folder url without
@@ -108,6 +110,7 @@ class StorageFileClient {
     let url =
       fileName === '.acl' ? `${path}${fileName}` : `${path}/${fileName}`;
     while (url.slice(-1) === '/') url = url.slice(0, -1);
+    Log.info(url);
 
     return url;
   };
@@ -142,6 +145,11 @@ class StorageFileClient {
   renameFolder = async (path, oldFolderName, newFolderName) => {
     await this.copyFolder(path, oldFolderName, path, newFolderName);
     return this.removeFolderRecursively(path, oldFolderName);
+  };
+
+  assertSuccessfulResponse = (response: Response) => {
+    if (!response.ok) throw response;
+    return response;
   };
 }
 
