@@ -10,6 +10,7 @@ import {
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
 import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
+import ChordFiltersComponent from '../Filters/children/ChordFilter';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {} },
@@ -50,7 +51,11 @@ const getFilters = (visualizerCode, selectedResultGraphIri) => {
         />
       );
     case VISUALIZER_TYPE.CHORD:
-      return <div>Filters for chord not yet implemented.</div>;
+      return (
+        <ChordFiltersComponent
+          selectedResultGraphIri={selectedResultGraphIri}
+        />
+      );
     default:
       return <div>No filters available for selected visualizer.</div>;
   }
