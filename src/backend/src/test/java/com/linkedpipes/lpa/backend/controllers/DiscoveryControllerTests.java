@@ -65,9 +65,9 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromEndpoint() throws LpAppsException {
+    void testStartDiscoveryFromEndpoint() throws LpAppsException{
         ResponseEntity<?> response = discoveryController.startDiscoveryFromEndpoint(TEST_TREEMAP_SPARQL_IRI,
-                TEST_TREEMAP_DATA_SAMPLE_URI, TEST_TREEMAP_NAMED_GRAPH_URI, USER_ID);
+                TEST_TREEMAP_DATA_SAMPLE_URI, USER_ID, List.of(TEST_TREEMAP_NAMED_GRAPH_URI));
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();

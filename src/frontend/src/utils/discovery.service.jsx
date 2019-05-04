@@ -11,11 +11,11 @@ const DiscoveryService = {
   async postDiscoverFromEndpoint({
     sparqlEndpointIri,
     dataSampleIri,
-    namedGraph,
+    namedGraphs,
     webId
   }) {
     return lpaAxios.post('/pipelines/discoverFromEndpoint', null, {
-      params: { sparqlEndpointIri, dataSampleIri, namedGraph, webId }
+      params: { sparqlEndpointIri, dataSampleIri, namedGraphs, webId }
     });
   },
 
