@@ -5992,7 +5992,7 @@ mime-db@1.40.0, "mime-db@>= 1.40.0 < 2":
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.40.0.tgz#a65057e998db090f732a68f6c276d387d4126c32"
   integrity sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==
 
-mime-types@^2.1.12, mime-types@^2.1.17, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
+mime-types@^2.1.12, mime-types@^2.1.17, mime-types@^2.1.22, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
   version "2.1.24"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.24.tgz#b6f8d0b3e951efb77dedeca194cff6d16f676f81"
   integrity sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==
@@ -7307,7 +7307,7 @@ rdf-canonize@^1.0.2:
     node-forge "^0.8.1"
     semver "^5.6.0"
 
-rdflib@0.20.1:
+rdflib@0.20.1, rdflib@^0.20.1:
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/rdflib/-/rdflib-0.20.1.tgz#e2e8dbff7723f456149881ae5c7e97c3b9757551"
   integrity sha512-5G1t7rURqPdsYE+mjpDW2e9/H19XFMuChTIjPFPtH2tI0fma+xlJYwrSgmd1aOm45SOYKpqwJfTSIvFpmP2n+g==
@@ -7317,17 +7317,6 @@ rdflib@0.20.1:
     n3 "^0.4.1"
     solid-auth-cli "^0.1.12"
     solid-auth-client "^2.3.0"
-    xmldom "^0.1.22"
-
-rdflib@^0.19.1:
-  version "0.19.1"
-  resolved "https://registry.yarnpkg.com/rdflib/-/rdflib-0.19.1.tgz#66141051902c7e7e407b4b61d075461cc0c0a28c"
-  integrity sha512-O7osObhO5o++hsUPGOLTxdNwXRaI6O+uyL98E7yBmqWrQm0AfqUHFBiASb4gN9fYcLD2LLHBxfhJTIWl8VZHUg==
-  dependencies:
-    async "^0.9.x"
-    jsonld "^0.4.5"
-    n3 "^0.4.1"
-    solid-auth-client "^2.2.3"
     xmldom "^0.1.22"
 
 react-chord-diagram@1.0.4:
@@ -8247,7 +8236,7 @@ sockjs@0.3.19:
     faye-websocket "^0.10.0"
     uuid "^3.0.1"
 
-solid-auth-cli@^0.1.12, solid-auth-cli@^0.1.8:
+solid-auth-cli@^0.1.12:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.1.13.tgz#1130dfd8f2a6436cf6f2272960fe0952ea01d946"
   integrity sha512-mRZ4eaWniGd9jLRzSWD3n9EwMfTcmwlfXK5MggIzSQOyXa1XJCWxHnJDL0DWTX5sMi1ovYa6RI4u6TNOzsEZiw==
@@ -8260,7 +8249,19 @@ solid-auth-cli@^0.1.12, solid-auth-cli@^0.1.8:
     jsonld "^1.4.0"
     n3 "^1.0.3"
 
-solid-auth-client@^2.2.14, solid-auth-client@^2.2.3, solid-auth-client@^2.3.0:
+solid-auth-cli@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.2.3.tgz#12b15dedd2f7dfa981c7087e16870368e0046565"
+  integrity sha512-PJd0pmwKFgon1hPngsoFxM0OPZOrJoVPdsvG+TgIHSlRbYimXJFIgMBCezhQQqkjaE+Sa0TaU0dtVmSU7yfyfA==
+  dependencies:
+    "@solid/cli" "^0.1.0"
+    async "^2.6.1"
+    isomorphic-fetch "^2.2.1"
+    jsonld "^1.4.0"
+    n3 "^1.0.3"
+    solid-rest-file "^0.0.5"
+
+solid-auth-client@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.0.tgz#4bac06984b61981ad9d06f285b8ead6200f21aaa"
   integrity sha512-+9RfqC64oWpH4afoWYhCtieuAziFyWiiW/isB9XEV6N+yb2jZ69UCJxpX7iBCpxK0j36bDeisdbp0zHRp/F46A==
@@ -8271,14 +8272,23 @@ solid-auth-client@^2.2.14, solid-auth-client@^2.2.3, solid-auth-client@^2.3.0:
     commander "^2.11.0"
     isomorphic-fetch "^2.2.1"
 
-solid-file-client@0.4.9:
-  version "0.4.9"
-  resolved "https://registry.yarnpkg.com/solid-file-client/-/solid-file-client-0.4.9.tgz#4f0db777528c483bddac8be5f39323b3eeca1adf"
-  integrity sha512-/4KmS52APjvIVea+nWD3spUYiPmq5gE/ze8fP2XufwrTXST3Oh+rRj2zjfQyhFcVXwhrV++MrUcTY/YId/kqwg==
+solid-file-client@0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/solid-file-client/-/solid-file-client-0.5.1.tgz#957919257e61375f31add53ee39137ce565bd27c"
+  integrity sha512-WdLu2loMjjCDDHEn84FtEovA6Qs1998RFWTyPrsTWrwoEyIJ8/xObIHEaJ2uxOwDe6aP1QwHmYFzpMw6A69DZg==
   dependencies:
-    rdflib "^0.19.1"
-    solid-auth-cli "^0.1.8"
-    solid-auth-client "^2.2.14"
+    rdflib "^0.20.1"
+    solid-auth-cli "^0.2.3"
+    solid-auth-client "^2.3.0"
+
+solid-rest-file@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/solid-rest-file/-/solid-rest-file-0.0.5.tgz#510cd485782b26197dab20413254290fc12bd92d"
+  integrity sha512-0UmtKlE2+4T8EcTE2Fi4x88H3E5glryjgFtjyMYKmHDbDIUkEELIu7UiBbIRuuNlXPKu3dqfRyrR2hFpv/l4Iw==
+  dependencies:
+    concat-stream "^2.0.0"
+    mime-types "^2.1.22"
+    node-fetch "^2.3.0"
 
 source-list-map@^2.0.0:
   version "2.0.1"
