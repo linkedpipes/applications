@@ -71,11 +71,13 @@ public class UserServiceComponent implements UserService {
         d.setDiscoveryStarted(discoveryId, new Date());
         d.setSparqlEndpointIri(sparqlEndpointIri);
         d.setDataSampleIri(dataSampleIri);
-        for (String namedGraph : namedGraphs) {
-            DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
-            ng.setNamedGraph(namedGraph);
-            d.addNamedGraph(ng);
-            ngRepository.save(ng);
+        if (namedGraphs != null) {
+            for (String namedGraph : namedGraphs) {
+                DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+                ng.setNamedGraph(namedGraph);
+                d.addNamedGraph(ng);
+                ngRepository.save(ng);
+            }
         }
         user.addDiscovery(d);
         discoveryRepository.save(d);
