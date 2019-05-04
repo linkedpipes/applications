@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.annotations.LazyCollection;
@@ -55,6 +56,7 @@ public class DiscoveryDao implements Serializable {
         this.discoveryId = discoveryId;
         this.started = started;
         this.executing = true;
+        this.namedGraphs = new ArrayList<>();
     }
 
     public String getDiscoveryId() {
