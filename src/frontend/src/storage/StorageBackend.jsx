@@ -1,7 +1,7 @@
 /* eslint-disable */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
-import { AppConfiguration } from './models';
+import { AppConfiguration, Person } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
 
@@ -646,6 +646,8 @@ class SolidBackend {
     }
     const nameLd = this.store.any(user, FOAF('name'), null, profile);
     const name = nameLd ? nameLd.value : '';
+    const emailLd = this.store.any(user, FOAF('mbox'), null, profile);
+    const email = emailLd ? emailLd.value : '';
     let imageLd = this.store.any(user, FOAF('img'), null, profile);
     imageLd = imageLd || this.store.any(user, VCARD('hasPhoto'), null, profile);
     const image = imageLd ? imageLd.value : '/img/icon/empty-profile.svg';

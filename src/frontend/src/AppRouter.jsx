@@ -11,11 +11,13 @@ import {
   AboutPage,
   CreateVisualizerPage,
   AuthorizationPage,
-  ApplicationPage
+  ApplicationPage,
+  UserProfilePage,
+  SettingsPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, AuthenticationService } from '@utils';
-import { StoragePage, StorageBackend, StoragePickFolderDialog } from '@storage';
+import { StoragePage, StorageBackend } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
@@ -190,7 +192,7 @@ class AppRouter extends React.PureComponent<Props> {
   }
 
   setupSessionTracker = async () => {
-    const { handleSetUserProfile } = this.props;
+    const { setupProfileData } = this;
     const self = this;
     authClient.trackSession(session => {
       if (session) {
@@ -207,7 +209,8 @@ class AppRouter extends React.PureComponent<Props> {
             return res.data;
           })
           .then(jsonResponse => {
-            handleSetUserProfile(jsonResponse);
+            setupProfileData(jsonResponse);
+
             socket.emit('join', session.webId);
           })
           .catch(error => {
@@ -217,6 +220,14 @@ class AppRouter extends React.PureComponent<Props> {
         self.handleStorageFolder(session.webId);
       }
     });
+  };
+
+  setupProfileData = async jsonResponse => {
+    const updatedProfileData = jsonResponse;
+    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    updatedProfileData.name = me.name;
+    updatedProfileData.image = me.image;
+    this.props.handleSetUserProfile(updatedProfileData);
   };
 
   handleStorageFolder = async webId => {
@@ -257,6 +268,17 @@ class AppRouter extends React.PureComponent<Props> {
                     component={DiscoverPage}
                     exact
                   />
+                  <PrivateLayout
+                    path="/profile"
+                    component={UserProfilePage}
+                    exact
+                  />
+
+                  <PrivateLayout
+                    path="/settings"
+                    component={SettingsPage}
+                    exact
+                  />
                   <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout path="/dashboard" component={HomePage} exact />
@@ -280,7 +302,6 @@ class AppRouter extends React.PureComponent<Props> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
-                <StoragePickFolderDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>

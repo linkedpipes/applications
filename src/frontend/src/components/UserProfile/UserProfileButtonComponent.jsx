@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import Menu from '@material-ui/core/Menu/Menu';
@@ -10,13 +10,25 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 
+type Props = {
+  anchorElement: Object,
+  onHandleLogoutClicked: Function,
+  onHandleMenuClose: Function,
+  onHandleMenuOpen: Function,
+  profileMenuIsOpen: Function,
+  onHandleOpenProfile: Function,
+  onHandleOpenSettings: Function
+};
+
 const UserProfileButtonComponent = ({
   anchorElement,
   profileMenuIsOpen,
   onHandleMenuClose,
   onHandleMenuOpen,
-  onHandleLogoutClicked
-}) => (
+  onHandleLogoutClicked,
+  onHandleOpenProfile,
+  onHandleOpenSettings
+}: Props) => (
   <div>
     <IconButton color="inherit" onClick={onHandleMenuOpen}>
       <AccountCircle />
@@ -35,13 +47,13 @@ const UserProfileButtonComponent = ({
       open={profileMenuIsOpen}
       onClose={onHandleMenuClose}
     >
-      <MenuItem onClick={onHandleMenuClose}>
+      <MenuItem onClick={onHandleOpenProfile}>
         <ListItemIcon>
           <PersonIcon />
         </ListItemIcon>
         <ListItemText inset primary="Profile" />
       </MenuItem>
-      <MenuItem onClick={onHandleMenuClose}>
+      <MenuItem onClick={onHandleOpenSettings}>
         <ListItemIcon>
           <SettingsIcon />
         </ListItemIcon>
@@ -56,13 +68,5 @@ const UserProfileButtonComponent = ({
     </Menu>
   </div>
 );
-
-UserProfileButtonComponent.propTypes = {
-  anchorElement: PropTypes.any,
-  onHandleLogoutClicked: PropTypes.any,
-  onHandleMenuClose: PropTypes.any,
-  onHandleMenuOpen: PropTypes.any,
-  profileMenuIsOpen: PropTypes.any
-};
 
 export default UserProfileButtonComponent;

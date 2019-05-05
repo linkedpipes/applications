@@ -72,9 +72,25 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.setState({ anchorElement: null });
   };
 
+  handleOpenProfile = () => {
+    this.props.history.push('/profile');
+    this.handleMenuClose();
+  };
+
+  handleOpenSettings = () => {
+    this.props.history.push('/settings');
+    this.handleMenuClose();
+  };
+
   render() {
     const { anchorElement } = this.state;
-    const { handleMenuClose, handleMenuOpen, handleLogout } = this;
+    const {
+      handleMenuClose,
+      handleMenuOpen,
+      handleLogout,
+      handleOpenProfile,
+      handleOpenSettings
+    } = this;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
@@ -84,6 +100,8 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
         onHandleMenuOpen={handleMenuOpen}
         onHandleMenuClose={handleMenuClose}
         onHandleLogoutClicked={handleLogout}
+        onHandleOpenProfile={handleOpenProfile}
+        onHandleOpenSettings={handleOpenSettings}
       />
     );
   }
