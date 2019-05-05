@@ -33,7 +33,9 @@ public class VirtuosoService {
     @NotNull
     private static final Logger log = LoggerFactory.getLogger(VirtuosoService.class);
     @NotNull
-    private static final Pattern RESOURCE_FILENAME_PATTERN = Pattern.compile("^data-(?<graphNameSuffix>.*)\\.ttl$");
+    private static String GRAPH_NAME_SUFFIX = "graphNameSuffix";
+    @NotNull
+    private static final Pattern RESOURCE_FILENAME_PATTERN = Pattern.compile("^data-(?<" + GRAPH_NAME_SUFFIX + ">.*)\\.ttl$");
 
     @Value("classpath*:/com/linkedpipes/lpa/backend/services/virtuoso/data-*.ttl")
     private Resource[] resources;
@@ -52,7 +54,7 @@ public class VirtuosoService {
                     }
 
                     String ttlData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
-                    putTtlToVirtuoso(matcher.group("graphNameSuffix"), ttlData);
+                    putTtlToVirtuoso(matcher.group(GRAPH_NAME_SUFFIX), ttlData);
                 }
             }
 

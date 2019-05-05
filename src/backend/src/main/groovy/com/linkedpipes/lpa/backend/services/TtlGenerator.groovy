@@ -7,7 +7,6 @@ import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD
-import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider
