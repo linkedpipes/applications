@@ -86,10 +86,14 @@ const PipelinesTableComponent = ({
                     'N/A'}
                 </TableCell>
                 <TableCell align="center">
-                  {moment.unix(pipeline.started).format('lll')}
+                  {pipeline.started === -1
+                    ? 'N/A'
+                    : moment.unix(pipeline.started).format('lll')}
                 </TableCell>
                 <TableCell align="center">
-                  {moment.unix(pipeline.finished).format('lll')}
+                  {pipeline.finished === -1
+                    ? 'N/A'
+                    : moment.unix(pipeline.finished).format('lll')}
                 </TableCell>
               </TableRow>
             ))}
