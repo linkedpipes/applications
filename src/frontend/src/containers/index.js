@@ -5,6 +5,8 @@ import { DiscoverPage, discoverReducer } from './DiscoverPage';
 import AboutPage from './AboutPage';
 import NotFoundPage from './NotFoundPage';
 import CreateVisualizerPage from './CreateVisualizerPage';
+import UserProfilePage from './UserProfilePage';
+import SettingsPage from './SettingsPage';
 
 export {
   AuthorizationPage,
@@ -14,5 +16,7 @@ export {
   discoverReducer,
   AboutPage,
   NotFoundPage,
-  CreateVisualizerPage
+  CreateVisualizerPage,
+  UserProfilePage,
+  SettingsPage
 };

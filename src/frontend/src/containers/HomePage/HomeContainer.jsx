@@ -15,7 +15,6 @@ import {
   ETLService,
   ETL_STATUS_TYPE,
   ETL_STATUS_MAP,
-  withWebId,
   withAuthorization
 } from '@utils';
 import axios from 'axios';
@@ -308,7 +307,8 @@ const HomeContainerWithSocket = props => (
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user
+    userProfile: state.user,
+    webId: state.user.webId
   };
 };
 
@@ -354,10 +354,8 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default withAuthorization(
-  withWebId(
-    connect(
-      mapStateToProps,
-      mapDispatchToProps
-    )(HomeContainerWithSocket)
-  )
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(HomeContainerWithSocket)
 );

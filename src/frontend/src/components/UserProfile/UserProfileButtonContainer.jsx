@@ -3,13 +3,11 @@ import React, { PureComponent } from 'react';
 import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { SocketContext, withWebId } from '@utils';
+import { SocketContext, GlobalUtils } from '@utils';
 
 type Props = {
   history: Object,
-  resetReduxStore: Function,
-  socket: Object,
-  webId: string
+  resetReduxStore: Function
 };
 
 type State = {
@@ -24,38 +22,16 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.setState({ anchorElement: event.currentTarget });
   };
 
-  clearCookies = () => {
-    const cookies = document.cookie.split('; ');
-    // eslint-disable-next-line no-plusplus
-    for (let c = 0; c < cookies.length; c++) {
-      const d = window.location.hostname.split('.');
-      while (d.length > 0) {
-        const cookieBase = `${encodeURIComponent(
-          cookies[c].split(';')[0].split('=')[0]
-        )}=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=${d.join(
-          '.'
-        )} ;path=`;
-        const p = window.location.pathname.split('/');
-        document.cookie = `${cookieBase}/`;
-        while (p.length > 0) {
-          document.cookie = cookieBase + p.join('/');
-          p.pop();
-        }
-        d.shift();
-      }
-    }
-  };
-
   performLogout = async () => {
     try {
-      const { logout } = await import(
+      const authClient = await import(
         /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
       );
-      await logout();
+      await authClient.logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');
       // Clear cookies
-      this.clearCookies();
+      GlobalUtils.clearCookies();
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
@@ -64,7 +40,6 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
   };
 
   handleLogout = () => {
-    this.props.socket.emit('leave', this.props.webId);
     this.props.resetReduxStore();
     this.setState({ anchorElement: null });
     this.performLogout();
@@ -74,9 +49,25 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.setState({ anchorElement: null });
   };
 
+  handleOpenProfile = () => {
+    this.props.history.push('/profile');
+    this.handleMenuClose();
+  };
+
+  handleOpenSettings = () => {
+    this.props.history.push('/settings');
+    this.handleMenuClose();
+  };
+
   render() {
     const { anchorElement } = this.state;
-    const { handleMenuClose, handleMenuOpen, handleLogout } = this;
+    const {
+      handleMenuClose,
+      handleMenuOpen,
+      handleLogout,
+      handleOpenProfile,
+      handleOpenSettings
+    } = this;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
@@ -86,6 +77,8 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
         onHandleMenuOpen={handleMenuOpen}
         onHandleMenuClose={handleMenuClose}
         onHandleLogoutClicked={handleLogout}
+        onHandleOpenProfile={handleOpenProfile}
+        onHandleOpenSettings={handleOpenSettings}
       />
     );
   }
@@ -97,6 +90,12 @@ const UserProfileButtonContainerWithSockets = props => (
   </SocketContext.Consumer>
 );
 
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
 
@@ -106,6 +105,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
-)(withRouter(withWebId(UserProfileButtonContainerWithSockets)));
+)(withRouter(UserProfileButtonContainerWithSockets));

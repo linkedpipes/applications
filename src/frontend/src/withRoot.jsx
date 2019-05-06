@@ -1,10 +1,11 @@
+// @flow
 import React from 'react';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 // A theme with custom primary and secondary color.
 // It's optional.
-const theme = createMuiTheme({
+const darkTheme = createMuiTheme({
   typography: {
     useNextVariants: true,
     fontFamily: ['"Roboto"', 'sans-serif'].join(',')
@@ -23,15 +24,36 @@ const theme = createMuiTheme({
   }
 });
 
-function withRoot(Component) {
-  function WithRoot(props) {
+const lightTheme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+    fontFamily: ['"Roboto"', 'sans-serif'].join(',')
+  },
+  palette: {
+    primary: {
+      // main: "#2196f3"
+      main: '#154168'
+    },
+    secondary: {
+      // main: "#ab003c"
+      main: '#00695c'
+    }
+  }
+});
+
+function withRoot(Component: Object) {
+  function WithRoot(props: Object) {
     // MuiThemeProvider makes the theme available down the React tree
     // thanks to React context.
+    const { colorThemeIsLight } = props;
     return (
-      <MuiThemeProvider theme={theme}>
+      <MuiThemeProvider theme={colorThemeIsLight ? lightTheme : darkTheme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...props} theme={theme} />
+        <Component
+          {...props}
+          theme={colorThemeIsLight ? lightTheme : darkTheme}
+        />
       </MuiThemeProvider>
     );
   }
