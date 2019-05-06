@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { withWebId } from '@utils';
 import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 const styles = () => ({
@@ -36,4 +36,10 @@ PublicLayout.propTypes = {
   webId: PropTypes.any
 };
 
-export default withWebId(withStyles(styles)(PublicLayout));
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(PublicLayout));

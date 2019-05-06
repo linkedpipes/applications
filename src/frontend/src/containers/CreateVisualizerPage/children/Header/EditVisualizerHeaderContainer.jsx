@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { withWebId } from '@utils';
 import { StorageToolbox, StorageBackend } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -311,7 +310,8 @@ const mapStateToProps = state => {
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
     selectedApplicationTitle: state.application.selectedApplicationTitle,
-    applicationsFolder: state.user.applicationsFolder
+    applicationsFolder: state.user.applicationsFolder,
+    webId: state.user.webId
   };
 };
 
@@ -333,10 +333,8 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default withRouter(
-  withWebId(
-    connect(
-      mapStateToProps,
-      mapDispatchToProps
-    )(EditVisualizerHeaderContainer)
-  )
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(EditVisualizerHeaderContainer)
 );

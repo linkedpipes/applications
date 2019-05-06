@@ -5,6 +5,21 @@ const setUserProfile = profile => ({
   profile
 });
 
+const setUserWebId = value => ({
+  type: types.SET_USER_WEBID,
+  value
+});
+
+const setSolidName = value => ({
+  type: types.SET_USER_SOLID_NAME,
+  value
+});
+
+const setSolidImage = value => ({
+  type: types.SET_USER_SOLID_IMAGE,
+  value
+});
+
 const addDiscoverySession = ({ session }) => ({
   type: types.ADD_DISCOVERY_SESSION,
   session
@@ -40,6 +55,9 @@ const setUserProfileAsync = profile => {
 
 export default {
   setUserProfile,
+  setUserWebId,
+  setSolidName,
+  setSolidImage,
   addDiscoverySession,
   updateDiscoverySession,
   addExecutionSession,

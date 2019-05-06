@@ -3,13 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-  DiscoveryService,
-  GlobalUtils,
-  SocketContext,
-  Log,
-  withWebId
-} from '@utils';
+import { DiscoveryService, GlobalUtils, SocketContext, Log } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
@@ -262,7 +256,8 @@ const mapStateToProps = state => {
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
-    namedGraph: state.discover.namedGraph
+    namedGraph: state.discover.namedGraph,
+    webId: state.user.webId
   };
 };
 
@@ -303,4 +298,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withWebId(DiscoverSelectorContainerWithSocket));
+)(DiscoverSelectorContainerWithSocket);

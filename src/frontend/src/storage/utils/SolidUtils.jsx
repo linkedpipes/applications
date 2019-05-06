@@ -1,3 +1,6 @@
+import * as rdflib from 'rdflib';
+import { FolderItem, FileItem } from '../models';
+
 export default class Utils {
   /**
    * Generates a new name.
@@ -11,7 +14,102 @@ export default class Utils {
    * @param {String} url A given URL.
    */
   static getBaseUrl(url): String {
-    return url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    const newUrl = url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    return newUrl;
+  }
+
+  static getBaseUrlConcat(url): String {
+    const newUrl = url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
+    return newUrl.substring(0, newUrl.length - 1);
+  }
+
+  static text2graph(
+    text: string,
+    baseUrl: string,
+    contentType: string = ''
+  ): Promise<rdflib.IndexedFormula> {
+    contentType = contentType || this.guessFileType(baseUrl);
+    const graph = rdflib.graph();
+
+    // eslint-disable-next-line no-unused-vars
+    return new Promise((resolve, reject) => {
+      rdflib.parse(text, graph, baseUrl, contentType, () => {});
+      resolve(graph);
+    });
+  }
+
+  static getSizeByGraph = async (
+    graph: rdflib.IndexedFormula,
+    subjectName: string
+  ) => {
+    const subjectNode = rdflib.sym(subjectName);
+    const nsSize = rdflib.sym('http://www.w3.org/ns/posix/stat#size');
+    const size = graph.any(subjectNode, nsSize, undefined, undefined);
+
+    return size && 'value' in size ? size.value : undefined;
+  };
+
+  static async isFolder(
+    graph: rdflib.IndexedFormula,
+    baseUrl: string
+  ): boolean {
+    const folderNode = rdflib.sym(baseUrl);
+    const isAnInstanceOfClass = rdflib.sym(
+      'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+    );
+    const types = graph.each(
+      folderNode,
+      isAnInstanceOfClass,
+      undefined,
+      undefined
+    );
+    return Object.values(types).some(
+      ({ value }) => value.match('ldp#BasicContainer') !== null
+    );
+  }
+
+  static getFolderItems = async (
+    graph: rdflib.IndexedFormula,
+    subj: string
+  ) => {
+    const files: FileItem[] = [];
+    const folders: FolderItem[] = [];
+
+    graph
+      .each(
+        rdflib.sym(subj),
+        rdflib.sym('http://www.w3.org/ns/ldp#contains'),
+        undefined,
+        undefined
+      )
+      .forEach(async item => {
+        const url = item.value;
+        const size = this.getSizeByGraph(graph, url);
+
+        const isFolder = await this.isFolder(graph, url);
+
+        if (isFolder) {
+          folders.push(new FolderItem(url, size));
+        } else {
+          files.push(new FileItem(url, size));
+          files.push(new FileItem(`${url}.acl`, size));
+        }
+      });
+
+    return { files, folders };
+  };
+
+  static getFolderUrlFromPathUrl(url): String {
+    const newUrl = url
+      .split('/')
+      .slice(0, -1)
+      .join('/');
+    return newUrl;
+  }
+
+  static getFilenameFromPathUrl(url): String {
+    const newUrl = url.substring(url.lastIndexOf('/') + 1);
+    return newUrl;
   }
 
   /**
@@ -20,6 +118,26 @@ export default class Utils {
    */
   static getLastUrlSegment(url): String {
     return url ? url.match(/([^/]*)\/*$/)[1] : '';
+  }
+
+  static guessFileType(url: String): String {
+    const ext = url.replace(/.*\./, '');
+    if (ext.match(/\/$/)) return 'dir';
+    if (ext.match(/(md|markdown)/)) return 'text/markdown';
+    if (ext.match(/html/)) return 'text/html';
+    if (ext.match(/xml/)) return 'text/xml';
+    if (ext.match(/ttl/)) return 'text/turtle';
+    if (ext.match(/n3/)) return 'text/n3';
+    if (ext.match(/rq/)) return 'application/sparql';
+    if (ext.match(/css/)) return 'text/css';
+    if (ext.match(/txt/)) return 'text/plain';
+    if (ext.match(/json/)) return 'application/json';
+    if (ext.match(/js/)) return 'application/javascript';
+    if (ext.match(/(png|gif|jpeg|tif)/)) return 'image';
+    if (ext.match(/(mp3|aif|ogg)/)) return 'audio';
+    if (ext.match(/(avi|mp4|mpeg)/)) return 'video';
+    /* default */
+    return 'text/turtle';
   }
 
   /**

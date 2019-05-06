@@ -8,7 +8,7 @@ import { ETLService, ETL_STATUS_MAP, ETL_STATUS_TYPE } from './etl.service';
 import GlobalUtils from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
-import { withAuthorization, withWebId } from './third-party';
+import { withAuthorization } from './third-party';
 
 export {
   VisualizersService,
@@ -21,6 +21,5 @@ export {
   getBeautifiedVisualizerTitle,
   Log,
   GlobalUtils,
-  withAuthorization,
-  withWebId
+  withAuthorization
 };
