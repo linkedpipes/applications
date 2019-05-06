@@ -221,6 +221,29 @@ class SolidBackend {
     return true;
   }
 
+  async createAppFolderForCopying(
+    webId: string,
+    folderTitle: string
+  ): Promise<boolean> {
+    const url = `${Utils.getBaseUrlConcat(webId)}`;
+    const folderUrl = `${url}/${folderTitle}`;
+    const configurationsUrl = `${url}/${folderTitle}`;
+
+    try {
+      await StorageFileClient.createFolder(url, folderTitle).then(success => {
+        Log.info(`Created folder ${folderUrl}.`);
+      });
+
+      await this.updateAppFolder(webId, folderUrl).then(success => {
+        Log.info(`Updated app folder in profile.`);
+      });
+    } catch (err) {
+      Log.error(err);
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Updates a user's profile with the new application folder location.
    * @param {string} metadataUrl A url to a metadata file.
@@ -475,6 +498,61 @@ class SolidBackend {
       color,
       created
     );
+  }
+
+  async deepCopy(src, dest, options, indent) {
+    indent = indent || '';
+    options = options || {};
+    console.log(indent + 'from ' + src + '\n' + indent + 'to ' + dest);
+    src = typeof src === 'string' ? $rdf.sym(src) : src;
+    dest = typeof dest === 'string' ? $rdf.sym(dest) : dest;
+    src.uri = src.uri.match(/\/$/) ? src.uri : src.uri + '/';
+    dest.uri = dest.uri.match(/\/$/) ? dest.uri : dest.uri + '/';
+    const self = this;
+    let promises = [];
+    return new Promise(function(resolve, reject) {
+      function mapURI(src, dest, x) {
+        if (!x.uri.startsWith(src.uri)) {
+          throw new Error("source '" + x + "' is not in tree " + src);
+        }
+        return self.store.sym(dest.uri + x.uri.slice(src.uri.length));
+      }
+      self.fetcher
+        .load(src)
+        .then(function(response) {
+          if (!response.ok)
+            throw new Error(
+              'Error reading container ' + src + ' : ' + response.status
+            );
+          let contents = self.store.each(src, LDP('contains'));
+          for (let i = 0; i < contents.length; i++) {
+            let here = contents[i];
+            let there = mapURI(src, dest, here);
+            if (self.store.holds(here, RDF('type'), LDP('Container'))) {
+              promises.push(self.deepCopy(here, there, options, indent + '  '));
+            } else {
+              // copy a leaf
+              console.log('copying ' + there.value);
+              /*
+            complains if no type, but then ignores what it is set to???
+          */
+              let type = 'text/turtle';
+              promises.push(
+                self.fetcher.webCopy(here, there, { contentType: type })
+              );
+            }
+          }
+          Promise.all(promises)
+            .then(resolve('Copying Successful'))
+            .catch(function(e) {
+              console.log('Overall promise rejected: ' + e);
+              reject(e);
+            });
+        })
+        .catch(function(error) {
+          reject('Load error: ' + error);
+        });
+    });
   }
 
   async removeAppConfiguration(

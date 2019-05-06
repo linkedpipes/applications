@@ -15,7 +15,7 @@ export const withAuthorization = (Component, Loader) =>
       render() {
         switch (this.props.webId) {
           case undefined:
-            return Loader || null;
+            return Loader || <Redirect to={'/login'} />;
           case null:
             return <Redirect to={'/login'} />;
           default:

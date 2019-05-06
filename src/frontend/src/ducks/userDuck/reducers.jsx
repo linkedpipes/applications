@@ -2,17 +2,42 @@ import types from './types';
 import update from 'immutability-helper';
 
 const INITIAL_STATE = {
-  webId: '',
+  webId: undefined,
   applicationsFolder: '',
   applications: [],
   discoverySessions: [],
-  pipelineExecutions: []
+  pipelineExecutions: [],
+  name: '',
+  image: undefined
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case types.SET_USER_PROFILE:
-      return action.profile;
+      return {
+        ...state,
+        applications: action.profile.applications,
+        discoverySessions: action.profile.discoverySessions,
+        pipelineExecutions: action.profile.pipelineExecutions
+      };
+
+    case types.SET_USER_WEBID:
+      return {
+        ...state,
+        webId: action.value
+      };
+
+    case types.SET_USER_SOLID_NAME:
+      return {
+        ...state,
+        name: action.value
+      };
+
+    case types.SET_USER_SOLID_IMAGE:
+      return {
+        ...state,
+        image: action.value
+      };
 
     case types.ADD_DISCOVERY_SESSION:
       return {

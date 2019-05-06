@@ -34,10 +34,13 @@ class AuthorizationContainer extends Component {
     const session = await authClient.currentSession();
     if (!session)
       await authClient.login(idp, {
-        callbackUri,
+        // callbackUri,
         storage: localStorage
       });
-    else Log.info(`Logged in as ${session.webId}`);
+    else {
+      Log.info(`Logged in as ${session.webId}`);
+      this.login(idp, callbackUri);
+    }
     return session;
   };
 

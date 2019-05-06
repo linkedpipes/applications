@@ -46,10 +46,15 @@ const styles = theme => ({
 
 type Props = {
   classes: Object,
-  userProfile: Object
+  userProfile: Object,
+  onHandleLogoutClicked: Function
 };
 
-const UserProfilePageContainer = ({ classes, userProfile }: Props) => {
+const UserProfilePageContainer = ({
+  classes,
+  userProfile,
+  onHandleLogoutClicked
+}: Props) => {
   return (
     <main className={classes.main}>
       <CssBaseline />
@@ -79,7 +84,6 @@ const UserProfilePageContainer = ({ classes, userProfile }: Props) => {
             <Input name="name" value={userProfile.name} id="name" />
           </FormControl>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
@@ -88,9 +92,9 @@ const UserProfilePageContainer = ({ classes, userProfile }: Props) => {
             Update Profile
           </Button>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
+            onClick={onHandleLogoutClicked}
             color="primary"
             className={classes.submit}
           >

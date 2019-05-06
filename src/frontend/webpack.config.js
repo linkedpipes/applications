@@ -78,11 +78,11 @@ module.exports = () => {
         }
       ]
     },
-    // optimization: {
-    //   splitChunks: {
-    //     chunks: 'all'
-    //   }
-    // },
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
+    },
     devtool: dev ? 'inline-source-map' : 'source-map',
     devServer: {
       index: 'index.html',

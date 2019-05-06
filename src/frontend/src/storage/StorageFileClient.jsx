@@ -1,5 +1,6 @@
 import authClient from 'solid-auth-client';
 import { Log } from '@utils';
+import { Utils } from './utils';
 
 class StorageFileClient {
   folderExists = async (path, folderName) => {
@@ -14,19 +15,21 @@ class StorageFileClient {
   };
 
   fetchFile = async (path, fileName = '') => {
-    const url = this.buildFileUrl(path, fileName);
+    const url = `${path}/${fileName}`;
     return authClient.fetch(url).then(this.assertSuccessfulResponse);
   };
 
   fetchFolder = async (path, folderName = '') => {
-    const url = this.buildFolderUrl(path, folderName);
+    const url = `${path}/${folderName}`;
     return authClient
       .fetch(url, { headers: { Accept: 'text/turtle' } })
       .then(this.assertSuccessfulResponse);
   };
 
   createFolder = async (path, folderName) => {
-    // if (await this.folderExists(path, folderName)) return new Response();
+    if (await this.folderExists(path, folderName)) return new Response();
+
+    Log.info(`creating folder at ${path}/${folderName}`);
 
     return this.createItem(
       path,
@@ -37,6 +40,7 @@ class StorageFileClient {
   };
 
   createFile = async (path, fileName, content) => {
+    Log.info(`creating file at ${path}/${fileName}`);
     return this.createItem(
       path,
       fileName,
@@ -92,6 +96,17 @@ class StorageFileClient {
     return new Response();
   };
 
+  readFolder = async (path: string, folderName?: string) => {
+    const url = `${path}/${folderName}`;
+
+    const response = await this.fetchFolder(path, folderName);
+    const folderRDF = await response.text();
+    const graph = await Utils.text2graph(folderRDF, url, 'text/turtle');
+    const folderItems = Utils.getFolderItems(graph, url);
+
+    return folderItems;
+  };
+
   removeFolderRecursively = async (path, folderName) => {
     await this.removeFolderContents(path, folderName);
     return this.removeItem(path, folderName);
@@ -103,7 +118,7 @@ class StorageFileClient {
   };
 
   buildFolderUrl = async (path, folderName = '') => {
-    return `${this.buildFileUrl(path, folderName)}/`;
+    return `${path}/${folderName}/`;
   };
 
   buildFileUrl = async (path, fileName = '') => {
@@ -121,13 +136,13 @@ class StorageFileClient {
     destinationPath,
     destinationName
   ) => {
-    const destinationUrl = this.buildFileUrl(destinationPath, destinationName);
-
+    const destinationUrl = `${destinationPath}/${destinationName}`;
     const fileResponse = await this.fetchFile(originPath, originName);
     const content =
       fileResponse.headers.get('Content-Type') === 'application/json'
         ? await fileResponse.text()
         : await fileResponse.blob();
+    Log.info(content);
 
     return authClient
       .fetch(destinationUrl, {
@@ -145,6 +160,39 @@ class StorageFileClient {
   renameFolder = async (path, oldFolderName, newFolderName) => {
     await this.copyFolder(path, oldFolderName, path, newFolderName);
     return this.removeFolderRecursively(path, oldFolderName);
+  };
+
+  copyFolder = async (
+    originPath: string,
+    originName: string,
+    destinationPath: string,
+    destinationName: string
+  ) => {
+    await this.createFolder(destinationPath, destinationName);
+
+    const { files, folders } = await this.readFolder(originPath, originName);
+
+    const promises = [
+      ...files.map(({ name }) =>
+        this.copyFile(
+          `${originPath}/${originName}`,
+          name,
+          `${destinationPath}/${destinationName}`,
+          name
+        )
+      ),
+      ...folders.map(({ name }) =>
+        this.copyFolder(
+          `${originPath}/${originName}`,
+          name,
+          `${destinationPath}/${destinationName}`,
+          name
+        )
+      )
+    ];
+
+    await Promise.all(promises);
+    return new Response();
   };
 
   assertSuccessfulResponse = (response: Response) => {

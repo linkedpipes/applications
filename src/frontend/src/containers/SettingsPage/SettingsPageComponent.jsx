@@ -76,7 +76,7 @@ const SettingsPageComponent = ({
               readOnly
               id="Web ID"
               name="appFolder"
-              value={userProfile.webId}
+              value={userProfile.applicationsFolder}
             />
           </FormControl>
           <FormControlLabel
@@ -84,7 +84,6 @@ const SettingsPageComponent = ({
             label="Switch dark theme"
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
@@ -93,7 +92,6 @@ const SettingsPageComponent = ({
             Change folder
           </Button>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"

@@ -12,7 +12,10 @@ type Props = {
 };
 
 class SettingsPageContainer extends PureComponent<Props> {
-  componentDidMount() {}
+  constructor(props) {
+    super(props);
+    (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
+  }
 
   handleChangeFolder() {
     const { handleUpdateChooseFolderDialogState } = this.props;
