@@ -39,7 +39,7 @@ const styles = theme => ({
   }
 });
 
-class ChordFiltersComponent extends React.PureComponent<Props, State> {
+class ChordFiltersComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -82,6 +82,7 @@ class ChordFiltersComponent extends React.PureComponent<Props, State> {
 
   conceptsFetched: Set<string>;
 
+  // todo: add switch to define whether it is editable by users
   render() {
     const { classes } = this.props;
     return (
@@ -122,7 +123,7 @@ const mapDispatchToProps = dispatch => {
   const onApplyFilter = nodes =>
     dispatch(
       filtersActions.setSelectedNodes(
-        nodes.filter(node => node.checked).map(node => node.uri)
+        new Set(nodes.filter(node => node.checked).map(node => node.uri))
       )
     );
   return {

@@ -14,7 +14,8 @@ type Props = {
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
-  size: number
+  size: number,
+  selectedNodes: Set<string>
 };
 
 type State = {
@@ -37,6 +38,14 @@ const styles = theme => ({
   }
 });
 
+const eqSet = (as, bs) => {
+  if (!as || !bs) return false;
+  if (as.size !== bs.size) return false;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const a of as) if (!bs.has(a)) return false;
+  return true;
+};
+
 class ChordVisualizer extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -45,18 +54,8 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       matrix: [],
       groupColors: [],
       groupLabels: [],
-      size: props.size
+      size: 500
     };
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const elementVizDiv = document.getElementById('viz-div');
-    if (nextProps.size !== prevState.size && elementVizDiv) {
-      return {
-        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
-      };
-    }
-    return null;
   }
 
   async componentDidMount() {
@@ -99,14 +98,50 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     }
   }
 
-  render() {
-    if (this.state.size < 150) {
-      return (
-        <div>
-          Window too small to draw the visualization. Please resize window.
-        </div>
+  async componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (
+      this.props.selectedNodes &&
+      !eqSet(prevProps.selectedNodes, this.props.selectedNodes)
+    ) {
+      // Fetch data
+      const nodesRequest = await VisualizersService.getChordNodes(
+        this.props.selectedResultGraphIri
       );
+      const nodesResponse = await nodesRequest.data;
+      const labels = nodesResponse
+        .filter(node => this.props.selectedNodes.has(node.uri))
+        .map(node => node.label.languageMap.nolang);
+
+      const matrixRequest = await VisualizersService.getChordData(
+        this.props.selectedResultGraphIri,
+        [...this.props.selectedNodes]
+      );
+      const matrixData = await matrixRequest.data;
+
+      const colors = palette('sol-accent', labels.length).map(
+        color => `#${color}`
+      );
+
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        dataLoadingStatus: 'ready',
+        matrix: matrixData,
+        groupColors: colors,
+        groupLabels: labels
+      });
     }
+    const elementVizDiv = document.getElementById('viz-div');
+    if (elementVizDiv && prevProps.size !== this.props.size) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+      });
+    }
+  }
+
+  render() {
+    const size = Math.max(this.state.size, 150);
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
     ) : (
@@ -116,8 +151,8 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         matrix={this.state.matrix}
         componentId={1}
         labelColors={this.state.groupLabels.map(() => 'whitesmoke')}
-        height={this.state.size}
-        width={this.state.size}
+        height={size}
+        width={size}
         style={{ font: '10px sans-serif' }}
       />
     );

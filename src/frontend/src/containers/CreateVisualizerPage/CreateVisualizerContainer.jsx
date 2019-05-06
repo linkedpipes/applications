@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import { Log } from '@utils';
 
 type Props = {
   selectedVisualizer: Object,
@@ -16,7 +17,8 @@ type Props = {
   handleResetCurrentApplicationData: Function,
   handleResetCurrentApplicationTitle: Function,
   handleResetCurrentApplicationMetadata: Function,
-  history: Object
+  history: Object,
+  selectedNodes?: Set<string>
 };
 
 type State = {
@@ -66,7 +68,10 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
   }
 
   updateWindowDimensions = () => {
-    this.setState({ width: window.innerWidth, height: window.innerHeight });
+    this.setState(
+      { width: window.innerWidth, height: window.innerHeight },
+      () => Log.info(`H: ${this.state.height} W: ${this.state.width}`)
+    );
   };
 
   render() {
@@ -77,7 +82,8 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       selectedResultGraphIri,
       selectedApplication,
       selectedApplicationMetadata,
-      handleSetCurrentApplicationData
+      handleSetCurrentApplicationData,
+      selectedNodes
     } = this.props;
 
     return (
@@ -93,6 +99,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         loadingIsActive={this.state.loadingIsActive}
         width={this.state.width}
         height={this.state.height}
+        selectedNodes={selectedNodes}
       />
     );
   }
@@ -105,7 +112,8 @@ const mapStateToProps = state => {
     filters: state.visualizers.filters,
     selectedResultGraphIri: state.etl.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
-    selectedApplicationMetadata: state.application.selectedApplicationMetadata
+    selectedApplicationMetadata: state.application.selectedApplicationMetadata,
+    selectedNodes: state.filters.nodes
   };
 };
 
