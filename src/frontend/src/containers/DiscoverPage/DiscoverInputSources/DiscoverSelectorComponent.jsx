@@ -10,28 +10,7 @@ import { withStyles } from '@material-ui/core/styles';
 import DiscoverSelectorFields from './children';
 
 type Props = {
-  classes: {
-    root: {
-      textAlign: string,
-      paddingTop: number,
-      flex: number
-    },
-    gridRoot: {
-      flexGrow: number
-    },
-    itemGrid: {
-      height: string,
-      width: string,
-      margin: string
-    },
-    textField: {
-      margin: string,
-      width: string
-    },
-    card: {
-      flexGrow: number
-    }
-  },
+  classes: any,
   dataSampleIri: string,
   dataSampleTextFieldValue: string,
   dataSourcesUris: string,
@@ -96,7 +75,6 @@ const DiscoverSelectorComponent = ({
         <Grid container spacing={24}>
           <Grid item xs={12} sm={12}>
             <DiscoverSelectorFields
-              classes={classes}
               discoveryIsLoading={discoveryIsLoading}
               handleSparqlTextFieldChange={onHandleSetSparqlIri}
               handleDataSampleTextFieldChange={onHandleSetDataSampleIri}

@@ -46,6 +46,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private PipelineInformationRepository pipelineRepository;
 
+    @Autowired
+    private DiscoveryNamedGraphRepository ngRepository;
+
     @NotNull @Override @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserProfile addUserIfNotPresent(String webId) {
         List<UserDao> users = repository.findByWebId(webId);
@@ -62,13 +65,20 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws UserNotFoundException {
+    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
         d.setSparqlEndpointIri(sparqlEndpointIri);
         d.setDataSampleIri(dataSampleIri);
-        d.setNamedGraph(namedGraph);
+        if (namedGraphs != null) {
+            for (String namedGraph : namedGraphs) {
+                DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+                ng.setNamedGraph(namedGraph);
+                d.addNamedGraph(ng);
+                ngRepository.save(ng);
+            }
+        }
         user.addDiscovery(d);
         discoveryRepository.save(d);
         repository.save(user);
@@ -135,7 +145,10 @@ public class UserServiceComponent implements UserService {
                 }
                 session.sparqlEndpointIri = d.getSparqlEndpointIri();
                 session.dataSampleIri = d.getDataSampleIri();
-                session.namedGraph = d.getNamedGraph();
+                session.namedGraphs = new ArrayList<>();
+                for (DiscoveryNamedGraphDao ng : d.getNamedGraphs()) {
+                    session.namedGraphs.add(ng.getNamedGraph());
+                }
                 profile.discoverySessions.add(session);
             }
         }

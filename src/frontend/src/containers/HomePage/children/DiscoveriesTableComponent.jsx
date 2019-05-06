@@ -101,10 +101,14 @@ const DiscoveriesTableComponent = ({
                 </TableCell>
                 <TableCell align="center">{discovery.namedGraph}</TableCell>
                 <TableCell align="center">
-                  {moment.unix(discovery.started).format('lll')}
+                  {discovery.started === -1
+                    ? 'N/A'
+                    : moment.unix(discovery.started).format('lll')}
                 </TableCell>
                 <TableCell align="center">
-                  {moment.unix(discovery.started).format('lll')}
+                  {discovery.finished === -1
+                    ? 'N/A'
+                    : moment.unix(discovery.finished).format('lll')}
                 </TableCell>
               </TableRow>
             ))}

@@ -63,12 +63,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     });
   };
 
-  postStartFromSparqlEndpoint = async instance => {
+  postStartFromSparqlEndpoint = async () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: instance.props.sparqlEndpointIri,
-      dataSampleIri: instance.props.dataSampleIri,
-      namedGraph: instance.props.namedGraph,
-      webId: instance.props.webId
+      sparqlEndpointIri: this.props.sparqlEndpointIri,
+      dataSampleIri: this.props.dataSampleIri,
+      namedGraphs: this.props.namedGraph,
+      webId: this.props.webId
     }).then(response => {
       return response;
     });
@@ -86,7 +86,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         return response;
       });
     }
-    return this.postStartFromSparqlEndpoint(instance);
+
+    return this.postStartFromSparqlEndpoint();
   };
 
   handleProcessStartDiscovery = () => {

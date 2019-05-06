@@ -7,6 +7,14 @@ const setSelectedScheme = scheme => {
   };
 };
 
+const setSelectedNodes = nodes => {
+  return {
+    type: types.SET_SELECTED_NODES,
+    nodes
+  };
+};
+
 export default {
-  setSelectedScheme
+  setSelectedScheme,
+  setSelectedNodes
 };

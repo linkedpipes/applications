@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -67,9 +69,9 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable String namedGraph) throws LpAppsException, UserNotFoundException {
+    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraph);
+        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
         return discovery;
     }
 
@@ -80,8 +82,8 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
-    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws LpAppsException, UserNotFoundException {
-        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraph);  //this inserts discovery in DB and sets flags
+    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
@@ -100,7 +102,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
             session.sparqlEndpointIri = d.getSparqlEndpointIri();
             session.dataSampleIri = d.getDataSampleIri();
-            session.namedGraph = d.getNamedGraph();
+            session.namedGraphs = new ArrayList<>();
+            for (DiscoveryNamedGraphDao ng : d.getNamedGraphs()) {
+                session.namedGraphs.add(ng.getNamedGraph());
+            }
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
         }
     }
@@ -272,11 +277,14 @@ public class ExecutorServiceComponent implements ExecutorService {
                     if (dao != null) {
                         report.sparqlEndpointIri = dao.getSparqlEndpointIri();
                         report.dataSampleIri = dao.getDataSampleIri();
-                        report.namedGraph = dao.getNamedGraph();
+                        report.namedGraphs = new ArrayList<>();
+                        for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
+                            report.namedGraphs.add(ng.getNamedGraph());
+                        }
                     } else {
                         report.sparqlEndpointIri = null;
                         report.dataSampleIri = null;
-                        report.namedGraph = null;
+                        report.namedGraphs = null;
                     }
 
                     try {
@@ -299,7 +307,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 report.finished = -1;
                 report.sparqlEndpointIri = null;
                 report.dataSampleIri = null;
-                report.namedGraph = null;
+                report.namedGraphs = null;
                 try {
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -329,11 +337,14 @@ public class ExecutorServiceComponent implements ExecutorService {
             if (dao != null) {
                 report.sparqlEndpointIri = dao.getSparqlEndpointIri();
                 report.dataSampleIri = dao.getDataSampleIri();
-                report.namedGraph = dao.getNamedGraph();
+                report.namedGraphs = new ArrayList<>();
+                for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
+                    report.namedGraphs.add(ng.getNamedGraph());
+                }
             } else {
                 report.sparqlEndpointIri = null;
                 report.dataSampleIri = null;
-                report.namedGraph = null;
+                report.namedGraphs = null;
             }
 
             try {

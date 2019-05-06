@@ -54,7 +54,10 @@ class ApplicationContainer extends PureComponent<Props, State> {
       })
       .catch(err => {
         Log.error(err, 'ApplicationContainer');
-        return <div>No stored data found!</div>;
+        self.setState({
+          applicationType: VISUALIZER_TYPE.UNDEFINED,
+          applicationData: undefined
+        });
       });
   }
 
@@ -98,10 +101,17 @@ class ApplicationContainer extends PureComponent<Props, State> {
           />
         );
       }
+      case VISUALIZER_TYPE.UNDEFINED: {
+        return (
+          <Typography variant="h2" gutterBottom>
+            Application was deleted...
+          </Typography>
+        );
+      }
       default:
         return (
           <Typography variant="h2" gutterBottom>
-            Loading Application..
+            Loading Application...
           </Typography>
         );
     }
@@ -122,7 +132,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           flex: 1,
           width: `${width}px`,
           height: `${height}px`,
-          textAlign: 'center'
+          textAlign: 'center',
+          overflow: 'hidden'
         }}
       >
         {getApplication(applicationType, applicationData)}
