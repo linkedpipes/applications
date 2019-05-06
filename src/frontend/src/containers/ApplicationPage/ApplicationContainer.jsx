@@ -8,14 +8,15 @@ import {
 } from '@components';
 import { withRouter } from 'react-router-dom';
 import { Log } from '@utils';
+import { globalActions } from '@ducks/globalDuck';
+import { connect } from 'react-redux';
 import axios from 'axios';
 // eslint-disable-next-line import/order
 import Typography from '@material-ui/core/Typography';
 
-const queryString = require('query-string');
-
 type Props = {
-  location: Object
+  location: Object,
+  setColorTheme: Function
 };
 
 type State = {
@@ -38,11 +39,18 @@ class ApplicationContainer extends PureComponent<Props, State> {
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions.bind(this));
 
+    this.props.setColorTheme(true);
+
     const self = this;
+
+    const queryString = await import(
+      /* webpackChunkName: "query-string" */ 'query-string'
+    );
+
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
     axios
@@ -59,7 +67,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
           applicationData: undefined
         });
       });
-  }
+  };
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
@@ -141,4 +149,18 @@ class ApplicationContainer extends PureComponent<Props, State> {
   }
 }
 
-export default withRouter(ApplicationContainer);
+const mapDispatchToProps = dispatch => {
+  const setColorTheme = isLight =>
+    dispatch(globalActions.setLightColorTheme(isLight));
+
+  return {
+    setColorTheme
+  };
+};
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(ApplicationContainer)
+);

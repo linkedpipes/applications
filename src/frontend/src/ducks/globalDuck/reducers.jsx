@@ -5,7 +5,8 @@ const INITIAL_STATE = {
     title: ''
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
-  chooseFolderDialogIsOpen: false
+  chooseFolderDialogIsOpen: false,
+  colorThemeIsLight: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -19,6 +20,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         chooseFolderDialogIsOpen: action.isOpen
+      };
+
+    case types.SET_LIGHT_COLOR_THEME:
+      return {
+        ...state,
+        colorThemeIsLight: action.value
       };
 
     default:

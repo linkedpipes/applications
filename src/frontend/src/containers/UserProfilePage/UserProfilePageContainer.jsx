@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import UserProfilePageComponent from './UserProfilePageComponent';
 import { connect } from 'react-redux';
 import { withAuthorization, GlobalUtils } from '@utils';
-import authClient from 'solid-auth-client';
 
 type Props = {
   userProfile: Object,
@@ -16,6 +15,9 @@ class UserProfilePageContainer extends PureComponent<Props> {
     await this.props.resetReduxStore();
 
     try {
+      const authClient = await import(
+        /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+      );
       await authClient.logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');

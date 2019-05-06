@@ -3,7 +3,6 @@ import AuthorizationComponent from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log } from '@utils';
-import authClient from 'solid-auth-client';
 import { connect } from 'react-redux';
 
 const providers = {
@@ -31,6 +30,9 @@ class AuthorizationContainer extends Component {
   };
 
   login = async (idp, callbackUri) => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     const session = await authClient.currentSession();
     if (!session)
       await authClient.login(idp, {

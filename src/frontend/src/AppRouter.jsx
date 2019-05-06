@@ -24,7 +24,6 @@ import { userActions } from '@ducks/userDuck';
 import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import authClient from 'solid-auth-client';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -58,7 +57,8 @@ type Props = {
   handleUpdateApplicationsFolder: Function,
   handleUpdateChooseFolderDialogState: Function,
   handleSetSolidImage: Function,
-  handleSetSolidName: Function
+  handleSetSolidName: Function,
+  handleSetUserWebId: Function
 };
 
 const errorHandler = userId => {
@@ -105,11 +105,15 @@ class AppRouter extends React.PureComponent<Props> {
   };
 
   setupSessionTracker = async () => {
-    const { setupProfileData } = this;
+    const { handleSetUserWebId, handleUpdateApplicationsFolder } = this.props;
     const self = this;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
     authClient.trackSession(session => {
       if (session) {
-        self.props.handleSetUserWebId(session.webId);
+        handleSetUserWebId(session.webId);
         Log.info(session);
         self.startSocketListeners();
         AuthenticationService.getUserProfile(session.webId)
@@ -124,7 +128,7 @@ class AppRouter extends React.PureComponent<Props> {
             return res.data;
           })
           .then(async jsonResponse => {
-            setupProfileData(jsonResponse);
+            self.setupProfileData(jsonResponse);
 
             socket.emit('join', session.webId);
 
@@ -141,9 +145,7 @@ class AppRouter extends React.PureComponent<Props> {
                     ? session.webId.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1]
                     : '';
                   newUrl = newUrl.substring(0, newUrl.length - 1);
-                  self.props.handleUpdateApplicationsFolder(
-                    `${newUrl}/linkedpipes`
-                  );
+                  handleUpdateApplicationsFolder(`${newUrl}/linkedpipes`);
                 } else {
                   toast.error('Error creating app folders, try again.', {
                     position: toast.POSITION.TOP_RIGHT,
@@ -154,14 +156,14 @@ class AppRouter extends React.PureComponent<Props> {
             });
 
             if (folder) {
-              self.props.handleUpdateApplicationsFolder(folder);
+              handleUpdateApplicationsFolder(folder);
             }
           })
           .catch(error => {
             Log.error(error, 'HomeContainer');
           });
 
-        self.handleStorageFolder(session.webId);
+        this.handleStorageFolder(session.webId);
       } else {
         socket.removeAllListeners();
       }
@@ -354,6 +356,7 @@ const mapStateToProps = state => {
   return {
     userId: state.user.webId,
     userProfile: state.user,
+    colorThemeIsLight: state.globals.colorThemeIsLight,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
   };
 };

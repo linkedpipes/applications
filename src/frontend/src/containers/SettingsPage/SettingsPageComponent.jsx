@@ -49,13 +49,15 @@ const styles = theme => ({
 type Props = {
   classes: Object,
   userProfile: Object,
-  onHandleChangeFolder: Function
+  onHandleChangeFolder: Function,
+  onHandleChangeColorTheme: Function
 };
 
 const SettingsPageComponent = ({
   classes,
   userProfile,
-  onHandleChangeFolder
+  onHandleChangeFolder,
+  onHandleChangeColorTheme
 }: Props) => {
   return (
     <main className={classes.main}>
@@ -80,7 +82,13 @@ const SettingsPageComponent = ({
             />
           </FormControl>
           <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
+            control={
+              <Checkbox
+                onChange={onHandleChangeColorTheme}
+                value="remember"
+                color="primary"
+              />
+            }
             label="Switch dark theme"
           />
           <Button

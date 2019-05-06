@@ -1,4 +1,3 @@
-import authClient from 'solid-auth-client';
 import { Log } from '@utils';
 import { Utils } from './utils';
 
@@ -16,11 +15,17 @@ class StorageFileClient {
 
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     return authClient.fetch(url).then(this.assertSuccessfulResponse);
   };
 
   fetchFolder = async (path, folderName = '') => {
     const url = `${path}/${folderName}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     return authClient
       .fetch(url, { headers: { Accept: 'text/turtle' } })
       .then(this.assertSuccessfulResponse);
@@ -60,11 +65,17 @@ class StorageFileClient {
       body: content
     };
 
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     return authClient.fetch(path, request);
   };
 
   removeItem = async (path, itemName) => {
     const url = `${path}/${itemName}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
     const response = await authClient.fetch(url, {
       method: 'DELETE'
     });
@@ -143,6 +154,10 @@ class StorageFileClient {
         ? await fileResponse.text()
         : await fileResponse.blob();
     Log.info(content);
+
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
 
     return authClient
       .fetch(destinationUrl, {
