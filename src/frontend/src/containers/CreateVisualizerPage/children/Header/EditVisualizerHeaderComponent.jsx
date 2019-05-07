@@ -9,13 +9,15 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Paper from '@material-ui/core/Paper';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
 import InputBase from '@material-ui/core/InputBase';
 import Typography from '@material-ui/core/Typography';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { getBeautifiedVisualizerTitle } from '@utils';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
@@ -26,16 +28,28 @@ type Props = {
   embedDialogOpen: boolean,
   handleClosePublishDialog: Function,
   handleCloseEmbedDialog: Function,
-  handleProceedToApplicationClicked: Function,
   handleCopyLinkClicked: Function,
-  fullScreen: any,
   appIri: string,
   selectedVisualizer: Object,
-  selectedApplicationTitle: string,
   handleChangeHeight: Function,
   handleChangeWidth: Function,
   height: number,
-  width: number
+  width: number,
+  selectedApplicationMetadata: AppConfiguration,
+  deleteAppDialogOpen: boolean,
+  handleDeleteApp: Function,
+  handleDeleteAppDismissed: Function,
+  handleDeleteAppConfirmed: Function,
+  handleDeleteAppClicked: Function,
+  handleMenuClose: Function,
+  handleMenuClick: Function,
+  anchorEl: Object,
+  modifiedSelectedApplicationTitle: string,
+  handleRenameFieldChanged: Function,
+  handleOpenRenameDialog: Function,
+  handleCloseRenameDialog: Function,
+  handleRenameConfirmed: Function,
+  renameDialogOpen: boolean
 };
 
 const styles = theme => ({
@@ -57,7 +71,7 @@ const styles = theme => ({
   }
 });
 
-const VisualizerControllerHeaderComponent = ({
+const EditVisualizerHeaderComponent = ({
   classes,
   handlePublishClicked,
   handleEmbedClicked,
@@ -66,16 +80,28 @@ const VisualizerControllerHeaderComponent = ({
   embedDialogOpen,
   handleClosePublishDialog,
   handleCloseEmbedDialog,
-  handleProceedToApplicationClicked,
   handleCopyLinkClicked,
-  fullScreen,
-  selectedApplicationTitle,
   selectedVisualizer,
   appIri,
   height,
   width,
   handleChangeHeight,
-  handleChangeWidth
+  handleChangeWidth,
+  selectedApplicationMetadata,
+  deleteAppDialogOpen,
+  handleDeleteApp,
+  handleDeleteAppDismissed,
+  handleDeleteAppConfirmed,
+  handleDeleteAppClicked,
+  handleMenuClose,
+  handleMenuClick,
+  anchorEl,
+  modifiedSelectedApplicationTitle,
+  handleRenameFieldChanged,
+  handleOpenRenameDialog,
+  handleCloseRenameDialog,
+  handleRenameConfirmed,
+  renameDialogOpen
 }: Props) => (
   <div className={classes.root}>
     <Paper className={classes.header} position="static" color="default">
@@ -100,20 +126,21 @@ const VisualizerControllerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
-              value={selectedApplicationTitle}
+              value={selectedApplicationMetadata.title}
               className={classes.textField}
+              readOnly
               variant="outlined"
-              id="application-title-field"
+              id="edit-application-title-field"
               placeholder="Enter your application title..."
               onChange={handleAppTitleChanged}
-              margin="normal"
+              margin="dense"
             />
           </Grid>
           <Grid item>
             <Typography align="center" variant="h6">
               {selectedVisualizer
                 ? getBeautifiedVisualizerTitle(
-                    selectedVisualizer.visualizer.visualizerCode
+                    selectedApplicationMetadata.endpoint
                   )
                 : 'Unkown visualizer type'}
             </Typography>
@@ -122,39 +149,116 @@ const VisualizerControllerHeaderComponent = ({
         <Grid container spacing={16} justify="center">
           <Grid item>
             <Button
-              id="create-app-publish-button"
-              variant="contained"
+              id="edit-app-publish-button"
+              variant="outlined"
               color="primary"
-              onClick={handlePublishClicked}
+              onClick={handleOpenRenameDialog}
             >
-              Publish
+              Rename
             </Button>
           </Grid>
           <Grid item>
             <Button
               variant="outlined"
               color="primary"
-              onClick={handleEmbedClicked}
+              onClick={handleMenuClick}
             >
-              Embed
+              Share
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleDeleteAppClicked}
+            >
+              Delete
             </Button>
           </Grid>
         </Grid>
       </Grid>
     </Paper>
+
+    <Menu
+      id="simple-menu"
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handlePublishClicked}>Get Published URL</MenuItem>
+      <MenuItem onClick={handleEmbedClicked}>Get Embed URL</MenuItem>
+      <MenuItem onClick={handleDeleteApp}>Access control</MenuItem>
+    </Menu>
+
+    <Dialog
+      open={deleteAppDialogOpen}
+      aria-labelledby="responsive-dialog-title"
+    >
+      <DialogTitle id="delete-responsive-dialog-title">
+        {'Are you sure you want to unpublish and delete the application?'}
+      </DialogTitle>
+      <DialogActions>
+        <Button onClick={handleDeleteAppDismissed} color="primary" autoFocus>
+          No
+        </Button>
+        <Button onClick={handleDeleteAppConfirmed} color="primary" autoFocus>
+          Yes
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+    <Dialog
+      open={renameDialogOpen}
+      onClose={handleCloseRenameDialog}
+      aria-labelledby="responsive-dialog-title"
+    >
+      <DialogTitle id="responsive-dialog-title">
+        {'Provide a new title for your application!'}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Modify the title and hit Rename button. Click cancel to close the
+          dialog and revert changes.
+        </DialogContentText>
+      </DialogContent>
+      <DialogContent>
+        <TextField
+          className={classes.textField}
+          color="primary"
+          label="Application title"
+          autoComplete="off"
+          variant="outlined"
+          fullWidth
+          value={modifiedSelectedApplicationTitle}
+          onChange={handleRenameFieldChanged}
+          autoFocus
+          style={{
+            textDecoration: 'none'
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseRenameDialog} color="primary" autoFocus>
+          Close
+        </Button>
+        <Button onClick={handleRenameConfirmed} color="primary" autoFocus>
+          Rename
+        </Button>
+      </DialogActions>
+    </Dialog>
+
     <Dialog
       open={publishDialogOpen}
       onClose={handleClosePublishDialog}
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">
-        {'Your Application has been Published!'}
+        {'Copy and share your application with the world!'}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Click `Browse Published Apps` to proceed to Application Browser, edit
-          and share your applications. Click on the field with link to copy the
-          public view URL to your clipboard.
+          Click on the field with link to copy the public view URL to your
+          clipboard.
         </DialogContentText>
       </DialogContent>
       <DialogContent>
@@ -177,14 +281,6 @@ const VisualizerControllerHeaderComponent = ({
         <Button onClick={handleClosePublishDialog} color="primary" autoFocus>
           Close
         </Button>
-        <Button
-          onClick={handleProceedToApplicationClicked}
-          color="primary"
-          id="browse-published-button"
-          autoFocus
-        >
-          Browse Published Apps
-        </Button>
       </DialogActions>
     </Dialog>
 
@@ -194,7 +290,7 @@ const VisualizerControllerHeaderComponent = ({
       aria-labelledby="responsive-dialog-title"
     >
       <DialogTitle id="responsive-dialog-title">
-        {'Application published and ready to be embedded'}
+        {'Generate an embed URL'}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -258,6 +354,4 @@ const VisualizerControllerHeaderComponent = ({
   </div>
 );
 
-export default withMobileDialog()(
-  withStyles(styles)(VisualizerControllerHeaderComponent)
-);
+export default withStyles(styles)(EditVisualizerHeaderComponent);

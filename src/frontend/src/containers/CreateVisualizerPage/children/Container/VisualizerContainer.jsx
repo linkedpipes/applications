@@ -9,20 +9,27 @@ import {
 } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
-import FiltersComponent from '../Filters';
+import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
+import ChordFiltersComponent from '../Filters/children/ChordFilter';
 
 type Props = {
-  classes: { root: {}, filterSideBar: {}, containerView: {} },
-  filters: any,
+  classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
   visualizer: { visualizerCode: string },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
-  selectedApplication: Object
+  selectedApplication: Object,
+  selectedApplicationMetadata: Object,
+  height: number,
+  width: number,
+  selectedNodes?: Set<string>
 };
 
 const styles = theme => ({
   root: {
     flex: 1
+  },
+  vizdiv: {
+    overflow: 'hidden'
   },
   containerView: {
     textAlign: 'center',
@@ -35,29 +42,51 @@ const styles = theme => ({
   input: {}
 });
 
+const getFilters = (visualizerCode, selectedResultGraphIri) => {
+  switch (visualizerCode) {
+    case VISUALIZER_TYPE.MAP:
+    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+      return <div>Filters for Google Maps not yet implemented.</div>;
+    }
+    case VISUALIZER_TYPE.TREEMAP:
+      return (
+        <TreemapFiltersComponent
+          selectedResultGraphIri={selectedResultGraphIri}
+        />
+      );
+    case VISUALIZER_TYPE.CHORD:
+      return (
+        <ChordFiltersComponent
+          selectedResultGraphIri={selectedResultGraphIri}
+        />
+      );
+    default:
+      return <div>No filters available for selected visualizer.</div>;
+  }
+};
+
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
   selectedApplication,
   handleSetCurrentApplicationData,
-  classes
+  selectedApplicationMetadata,
+  classes,
+  selectedNodes,
+  width,
+  height
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-      return (
-        <GoogleMapsVisualizer
-          propMarkers={[]}
-          selectedResultGraphIri={selectedResultGraphIri}
-          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
-        />
-      );
     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-      const markers = selectedApplication.markers
-        ? selectedApplication.markers
-        : [];
+      const markers =
+        selectedApplication && selectedApplication.markers
+          ? selectedApplication.markers
+          : [];
       return (
         <GoogleMapsVisualizer
           propMarkers={markers}
+          isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
@@ -67,6 +96,7 @@ const getVisualizer = (
       return (
         <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
@@ -74,7 +104,10 @@ const getVisualizer = (
       return (
         <ChordVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          size={height + width}
+          selectedNodes={selectedNodes}
         />
       );
     case VISUALIZER_TYPE.UNDEFINED:
@@ -90,21 +123,37 @@ const getVisualizer = (
   }
 };
 
-const VisualizerControllerContainer = (props: Props) => (
-  <Grid container className={props.classes.root} direction="row" spacing={0}>
-    <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
-      <FiltersComponent filters={props.filters} />
+const VisualizerControllerContainer = (props: Props) => {
+  return (
+    <Grid container className={props.classes.root} direction="row" spacing={0}>
+      <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
+        {getFilters(
+          props.visualizer.visualizerCode,
+          props.selectedResultGraphIri
+        )}
+      </Grid>
+      <Grid
+        id="viz-div"
+        className={props.classes.vizdiv}
+        item
+        lg={9}
+        md={8}
+        xs={12}
+      >
+        {getVisualizer(
+          props.visualizer.visualizerCode,
+          props.selectedResultGraphIri,
+          props.selectedApplication,
+          props.handleSetCurrentApplicationData,
+          props.selectedApplicationMetadata,
+          props.classes,
+          props.selectedNodes,
+          props.width,
+          props.height
+        )}
+      </Grid>
     </Grid>
-    <Grid id="viz-div" item lg={9} md={8} xs={12}>
-      {getVisualizer(
-        props.visualizer.visualizerCode,
-        props.selectedResultGraphIri,
-        props.selectedApplication,
-        props.handleSetCurrentApplicationData,
-        props.classes
-      )}
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export default withStyles(styles)(VisualizerControllerContainer);

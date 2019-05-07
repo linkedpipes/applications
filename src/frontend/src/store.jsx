@@ -7,6 +7,7 @@ import { etlReducer } from '@ducks/etlDuck';
 import { userReducer } from '@ducks/userDuck';
 import { visualizersReducer } from '@ducks/visualizersDuck';
 import { applicationReducer } from '@ducks/applicationDuck';
+import { filtersReducer } from '@ducks/filtersDuck';
 import thunk from 'redux-thunk';
 import Reactotron from './ReactotronConfig';
 
@@ -36,7 +37,8 @@ const appReducer = combineReducers({
   discovery: discoveryReducer,
   visualizers: visualizersReducer,
   etl: etlReducer,
-  application: applicationReducer
+  application: applicationReducer,
+  filters: filtersReducer
 });
 
 const rootReducer = (state, action) => {

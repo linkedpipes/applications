@@ -8,6 +8,7 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,11 +27,12 @@ public class DiscoveryController {
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
     @NotNull private final UserService userService;
+    @NotNull
     private final HandlerMethodIntrospector methodIntrospector;
 
     static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
     static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
-    static final String NAMED_GRAPH_PARAM = "namedGraph";
+    static final String NAMED_GRAPHS_PARAM = "namedGraphs";
 
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
@@ -94,7 +97,7 @@ public class DiscoveryController {
      * Start discovery of pipelines using data in SPARQL endpoint
      * @param sparqlEndpointIri
      * @param dataSampleIri
-     * @param namedGraph
+     * @param namedGraphs
      * @param webId
      * @return
      * @throws LpAppsException
@@ -103,8 +106,11 @@ public class DiscoveryController {
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                                @NotNull @RequestParam(NAMED_GRAPH_PARAM) String namedGraph,
-                                                                @NotNull @RequestParam("webId") String webId) throws LpAppsException {
+                                                                @NotNull @RequestParam("webId") String webId,
+                                                                @Nullable @RequestParam List<String> namedGraphs) throws LpAppsException {
+        if(namedGraphs == null)
+            namedGraphs = new ArrayList<>();
+
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
         }
@@ -114,23 +120,23 @@ public class DiscoveryController {
 
         try {
             userService.addUserIfNotPresent(webId);
-            String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraph);
+            String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraphs);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId, sparqlEndpointIri, dataSampleIri, namedGraph));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
     @NotNull
-    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull String namedGraph) {
+    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull List<String> namedGraphs) {
         Method templateDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
-                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, String.class));
+                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, List.class));
 
         return methodIntrospector.getHandlerMethodUri(DataSourceController.class, templateDescriptionMethod)
                 .requestParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
                 .requestParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri)
-                .requestParam(NAMED_GRAPH_PARAM, namedGraph)
+                .requestParam(NAMED_GRAPHS_PARAM, StringUtils.join(namedGraphs, ","))
                 .build()
                 .toString();
     }

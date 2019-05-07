@@ -1,5 +1,5 @@
 /* eslint-disable */
-export function urlDomain(url) {
+function urlDomain(url) {
   let hostname;
   // find & remove protocol (http, ftp, etc.) and get hostname
 
@@ -17,7 +17,27 @@ export function urlDomain(url) {
   return hostname;
 }
 
-export function getQueryString(params) {
+function clearCookies() {
+  const cookies = document.cookie.split('; ');
+  // eslint-disable-next-line no-plusplus
+  for (let c = 0; c < cookies.length; c++) {
+    const d = window.location.hostname.split('.');
+    while (d.length > 0) {
+      const cookieBase = `${encodeURIComponent(
+        cookies[c].split(';')[0].split('=')[0]
+      )}=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=${d.join('.')} ;path=`;
+      const p = window.location.pathname.split('/');
+      document.cookie = `${cookieBase}/`;
+      while (p.length > 0) {
+        document.cookie = cookieBase + p.join('/');
+        p.pop();
+      }
+      d.shift();
+    }
+  }
+}
+
+function getQueryString(params) {
   return Object.keys(params)
     .map(k => {
       if (Array.isArray(params[k])) {
@@ -31,23 +51,23 @@ export function getQueryString(params) {
     .join('&');
 }
 
-export function replaceAll(str, search, replacement) {
+function replaceAll(str, search, replacement) {
   const target = str;
   return target.split(search).join(replacement);
 }
 
-export function getLocation(href) {
+function getLocation(href) {
   const l = document.createElement('a');
   l.href = href;
   return l;
 }
 
-export function extractUrlGroups(url) {
+function extractUrlGroups(url) {
   const regex = /(?:http|https):\/\/((?:[\w-]+)(?:[\w-]+)+)(?:[\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gm;
   return url.match(regex);
 }
 
-export function unixTimeConverter(UNIX_timestamp) {
+function unixTimeConverter(UNIX_timestamp) {
   if (UNIX_timestamp === -1 || UNIX_timestamp === undefined) {
     return '-';
   }
@@ -73,8 +93,27 @@ export function unixTimeConverter(UNIX_timestamp) {
   const min = `0${a.getMinutes()}`;
   const sec = `0${a.getSeconds()}`;
 
-  const time = `${hour}:${min.substr(-2)}:${sec.substr(
+  const time = `${month} ${date}, ${year} ${hour}:${min.substr(
     -2
-  )} ${date} ${month} ${year}`;
+  )}:${sec.substr(-2)} `;
   return time;
 }
+
+function randDarkColor() {
+  const letters = '0123456789'.split('');
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 10)];
+  }
+  return color;
+}
+
+export default {
+  randDarkColor,
+  unixTimeConverter,
+  replaceAll,
+  getQueryString,
+  getLocation,
+  extractUrlGroups,
+  urlDomain
+};

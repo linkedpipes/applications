@@ -11,6 +11,6 @@ import java.util.List;
 public interface UserService {
     UserProfile addUserIfNotPresent(String user);
     void addApplication(String user, String solidIri) throws UserNotFoundException, LpAppsException;
-    void setUserDiscovery(String user, String discovery, String sparqlEndpointIri, String dataSampleIri, String namedGraph) throws UserNotFoundException;
+    void setUserDiscovery(String user, String discovery, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraph) throws UserNotFoundException;
     void setUserExecution(String user, String execution, String etlPipelineIri, String visualizer) throws UserNotFoundException;
 }

@@ -11,21 +11,18 @@ import {
   AboutPage,
   CreateVisualizerPage,
   AuthorizationPage,
-  StoragePage,
-  ApplicationPage
+  ApplicationPage,
+  UserProfilePage,
+  SettingsPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import {
-  SocketContext,
-  Log,
-  AuthenticationService,
-  StorageToolbox
-} from '@utils';
+import { SocketContext, Log, AuthenticationService } from '@utils';
+import { StoragePage, StorageBackend } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
+import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
-import auth from 'solid-auth-client';
 import { toast } from 'react-toastify';
 
 // Socket URL defaults to window.location
@@ -56,7 +53,12 @@ type Props = {
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
   handleUpdateDiscoverySession: Function,
-  handleUpdateExecutionSession: Function
+  handleUpdateExecutionSession: Function,
+  handleUpdateApplicationsFolder: Function,
+  handleUpdateChooseFolderDialogState: Function,
+  handleSetSolidImage: Function,
+  handleSetSolidName: Function,
+  handleSetUserWebId: Function
 };
 
 const errorHandler = userId => {
@@ -74,13 +76,109 @@ const errorHandler = userId => {
 
 class AppRouter extends React.PureComponent<Props> {
   componentDidMount() {
+    this.setupSessionTracker();
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners();
+  }
+
+  handleStorageFolder = async webId => {
+    await StorageBackend.getValidAppFolder(webId)
+      .then(folder => {
+        if (folder) {
+          this.props.handleUpdateApplicationsFolder(folder);
+        }
+      })
+      .catch(err => {
+        Log.error(err, 'AppRouter');
+        this.props.handleUpdateChooseFolderDialogState(true);
+      });
+  };
+
+  setupProfileData = async jsonResponse => {
+    const updatedProfileData = jsonResponse;
+    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    this.props.handleSetSolidImage(me.image);
+    this.props.handleSetSolidName(me.name);
+    this.props.handleSetUserProfile(updatedProfileData);
+  };
+
+  setupSessionTracker = async () => {
+    const { handleSetUserWebId, handleUpdateApplicationsFolder } = this.props;
+    const self = this;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    authClient.trackSession(session => {
+      if (session) {
+        handleSetUserWebId(session.webId);
+        Log.info(session);
+        self.startSocketListeners();
+        AuthenticationService.getUserProfile(session.webId)
+          .then(res => {
+            Log.info(
+              'Response from get user profile call:',
+              'AuthenticationService'
+            );
+            Log.info(res, 'AuthenticationService');
+            Log.info(res.data, 'AuthenticationService');
+
+            return res.data;
+          })
+          .then(async jsonResponse => {
+            self.setupProfileData(jsonResponse);
+
+            socket.emit('join', session.webId);
+
+            const folder = await StorageBackend.getValidAppFolder(
+              session.webId
+            ).catch(async error => {
+              Log.error(error, 'HomeContainer');
+              await StorageBackend.createAppFolders(
+                session.webId,
+                'linkedpipes'
+              ).then(created => {
+                if (created) {
+                  let newUrl = session.webId
+                    ? session.webId.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1]
+                    : '';
+                  newUrl = newUrl.substring(0, newUrl.length - 1);
+                  handleUpdateApplicationsFolder(`${newUrl}/linkedpipes`);
+                } else {
+                  toast.error('Error creating app folders, try again.', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000
+                  });
+                }
+              });
+            });
+
+            if (folder) {
+              handleUpdateApplicationsFolder(folder);
+            }
+          })
+          .catch(error => {
+            Log.error(error, 'HomeContainer');
+          });
+
+        this.handleStorageFolder(session.webId);
+      } else {
+        socket.removeAllListeners();
+      }
+    });
+  };
+
+  startSocketListeners() {
     const {
-      handleSetUserProfile,
       handleAddDiscoverySession,
       handleAddExecutionSession,
       handleUpdateDiscoverySession,
       handleUpdateExecutionSession
     } = this.props;
+
+    socket.removeAllListeners();
 
     socket.on('connect', data => {
       Log.warn('Client connected', 'AppRouter');
@@ -184,36 +282,6 @@ class AppRouter extends React.PureComponent<Props> {
         });
       }
     });
-
-    auth.trackSession(session => {
-      if (session) {
-        Log.info(session);
-        AuthenticationService.getUserProfile(session.webId)
-          .then(res => {
-            Log.info(
-              'Response from get user profile call:',
-              'AuthenticationService'
-            );
-            Log.info(res, 'AuthenticationService');
-            Log.info(res.data, 'AuthenticationService');
-
-            return res.data;
-          })
-          .then(jsonResponse => {
-            handleSetUserProfile(jsonResponse);
-            socket.emit('join', session.webId);
-          })
-          .catch(error => {
-            Log.error(error, 'HomeContainer');
-          });
-
-        StorageToolbox.createOrUpdateFolder(session.webId, 'public/lpapps');
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    socket.removeAllListeners();
   }
 
   render() {
@@ -239,6 +307,17 @@ class AppRouter extends React.PureComponent<Props> {
                   <PrivateLayout
                     path="/discover"
                     component={DiscoverPage}
+                    exact
+                  />
+                  <PrivateLayout
+                    path="/profile"
+                    component={UserProfilePage}
+                    exact
+                  />
+
+                  <PrivateLayout
+                    path="/settings"
+                    component={SettingsPage}
                     exact
                   />
                   <PrivateLayout path="/about" component={AboutPage} exact />
@@ -276,13 +355,23 @@ class AppRouter extends React.PureComponent<Props> {
 const mapStateToProps = state => {
   return {
     userId: state.user.webId,
-    userProfile: state.user
+    userProfile: state.user,
+    colorThemeIsLight: state.globals.colorThemeIsLight,
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const handleSetUserProfile = userProfile =>
     dispatch(userActions.setUserProfile(userProfile));
+
+  const handleSetUserWebId = webId => dispatch(userActions.setUserWebId(webId));
+
+  const handleSetSolidName = solidName =>
+    dispatch(userActions.setSolidName(solidName));
+
+  const handleSetSolidImage = solidImage =>
+    dispatch(userActions.setSolidImage(solidImage));
 
   const handleAddDiscoverySession = discoverySession =>
     dispatch(userActions.addDiscoverySession({ session: discoverySession }));
@@ -296,12 +385,23 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateExecutionSession = executionSession =>
     dispatch(userActions.updateExecutionSession({ session: executionSession }));
 
+  const handleUpdateApplicationsFolder = value =>
+    dispatch(userActions.updateApplicationsFolder({ value }));
+
+  const handleUpdateChooseFolderDialogState = state =>
+    dispatch(globalActions.setChooseFolderDialogState({ state }));
+
   return {
     handleSetUserProfile,
+    handleSetUserWebId,
+    handleSetSolidImage,
+    handleSetSolidName,
     handleAddDiscoverySession,
     handleAddExecutionSession,
     handleUpdateDiscoverySession,
-    handleUpdateExecutionSession
+    handleUpdateExecutionSession,
+    handleUpdateApplicationsFolder,
+    handleUpdateChooseFolderDialogState
   };
 };
 

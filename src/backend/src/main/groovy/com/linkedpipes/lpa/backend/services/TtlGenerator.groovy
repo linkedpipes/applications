@@ -1,11 +1,13 @@
 package com.linkedpipes.lpa.backend.services
 
+import com.linkedpipes.lpa.backend.Application
 import com.linkedpipes.lpa.backend.entities.DataSource
 import com.linkedpipes.lpa.backend.rdf.Prefixes
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPD
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPDSparql
 import com.linkedpipes.lpa.backend.rdf.vocabulary.SD
+import com.linkedpipes.lpa.backend.services.DiscoveryServiceComponent;
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceConfigurationQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.DefaultDataSourceExtractorQueryProvider
 import com.linkedpipes.lpa.backend.sparql.queries.SparqlQueryProvider
@@ -18,31 +20,22 @@ import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class TtlGenerator {
 
-    private static final String DATASET_TEMPLATE_TITLE = "Unspecified user-provided dataset template"
     private static final String DATASET_OUTPUT_TITLE = "Unspecified user-provided dataset output"
     private static final String DATASET_CONFIG_TITLE = "Unspecified user-provided dataset default configuration"
 
     private static final SparqlQueryProvider EXTRACTOR_QUERY_PROVIDER = new DefaultDataSourceExtractorQueryProvider()
     private static final SparqlQueryProvider CONFIGURATION_QUERY_PROVIDER = new DefaultDataSourceConfigurationQueryProvider()
 
+    private static final Logger log = LoggerFactory.getLogger(TtlGenerator)
+
     @NotNull
     static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
         return writeModelToString(getDiscoveryConfigModel(dataSourceList))
-    }
-
-    @NotNull
-    static String getTemplateDescription(@NotNull String sparqlEndpointIri,
-                                         @NotNull String dataSampleIri,
-                                         @Nullable String namedGraph) {
-        String extractorQuery = EXTRACTOR_QUERY_PROVIDER.get().toString()
-        String configurationQuery = CONFIGURATION_QUERY_PROVIDER.get().toString()
-
-        return writeModelToString(
-                getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
-                        extractorQuery, configurationQuery, namedGraph))
     }
 
     @NotNull
@@ -57,9 +50,21 @@ class TtlGenerator {
     }
 
     @NotNull
+    static String getTemplateDescription(@NotNull String sparqlEndpointIri,
+                                         @NotNull String dataSampleIri,
+                                         @Nullable List<String> namedGraphs) {
+        String extractorQuery = EXTRACTOR_QUERY_PROVIDER.get().toString()
+        String configurationQuery = CONFIGURATION_QUERY_PROVIDER.get().toString()
+
+        return writeModelToString(
+                getTemplateDescriptionModel(sparqlEndpointIri, dataSampleIri,
+                        extractorQuery, configurationQuery, namedGraphs))
+    }
+
+    @NotNull
     private static Model getTemplateDescriptionModel(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri,
                                                      @NotNull String extractorQuery, @NotNull String configurationQuery,
-                                                     @Nullable String namedGraph) {
+                                                     @Nullable List<String> namedGraphs) {
         ModelBuilder.from {
             namespaces(
                     dataset: LPA.Dataset.uri,
@@ -86,9 +91,11 @@ class TtlGenerator {
                                             (SD.endpoint): resource(sparqlEndpointIri),
                                     )
 
-                                    if (namedGraph != null && !namedGraph.isEmpty()) {
-                                        prop SD.namedGraph, resource(
-                                                (SD.name as Property): resource(namedGraph),
+                                    if (namedGraphs != null && !namedGraphs.isEmpty()) {
+                                        namedGraphs.each( { ng ->
+                                                prop SD.namedGraph, resource(
+                                                        (SD.name as Property): resource(ng),
+                                                ) }
                                         )
                                     }
                                 },
@@ -96,13 +103,33 @@ class TtlGenerator {
                                 (LPD.configurationQuery): configurationQuery,
                         ])
                 )
-                prop DCTerms.title, DATASET_TEMPLATE_TITLE, "en"
+                prop DCTerms.title, DiscoveryServiceComponent.OUR_DATASET_TEMPLATE_TITLE, "en"
             }
         }.build()
     }
 
     @NotNull
-    private static String writeModelToString(Model model) {
+    static String getVirtuosoServiceDescription(@NotNull String graphName) {
+        def serviceDescription = writeModelToString(
+                getVirtuosoServiceDescriptionModel(graphName))
+        log.debug(String.format("Service description of our Virtuoso server for named graph <%s> is:\n%s", graphName, serviceDescription))
+        return serviceDescription
+    }
+
+    @NotNull
+    private static Model getVirtuosoServiceDescriptionModel(@NotNull String graphName) {
+        ModelBuilder.from(DiscoveryServiceComponent.class.getResourceAsStream("virtuoso_sd.ttl")) {
+            String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint")
+            resource(virtuosoEndpoint + "/service", [
+                    (SD.namedGraph): resource(
+                            (SD.name as Property): resource(graphName)
+                    )
+            ])
+        }.build()
+    }
+
+    @NotNull
+    private static String writeModelToString(@NotNull Model model) {
         StringWriter stringWriter = new StringWriter()
         RDFDataMgr.write(stringWriter, model, RDFFormat.TURTLE_PRETTY)
         return stringWriter.toString()

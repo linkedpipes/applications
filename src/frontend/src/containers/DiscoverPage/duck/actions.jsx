@@ -44,21 +44,21 @@ export const setEtlExecutionStatus = value => {
 export const setNamedGraph = namedGraph => {
   return {
     type: types.SET_NAMED_GRAPH,
-    namedGraph
+    value: namedGraph
   };
 };
 
 export const setSparqlEndpointIri = sparqlEndpointIri => {
   return {
     type: types.SET_SPARQL_ENDPOINT_IRI,
-    sparqlEndpointIri
+    value: sparqlEndpointIri
   };
 };
 
 export const setDataSampleIri = dataSampleIri => {
   return {
     type: types.SET_DATA_SAMPLE_IRI,
-    dataSampleIri
+    value: dataSampleIri
   };
 };
 

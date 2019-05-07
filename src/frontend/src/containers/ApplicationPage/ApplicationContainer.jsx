@@ -8,29 +8,49 @@ import {
 } from '@components';
 import { withRouter } from 'react-router-dom';
 import { Log } from '@utils';
+import { globalActions } from '@ducks/globalDuck';
+import { connect } from 'react-redux';
 import axios from 'axios';
 // eslint-disable-next-line import/order
 import Typography from '@material-ui/core/Typography';
 
-const queryString = require('query-string');
-
 type Props = {
-  location: Object
+  location: Object,
+  setColorTheme: Function
 };
 
 type State = {
   applicationType: string,
-  applicationData: Object
+  applicationData: Object,
+  width: number,
+  height: number
 };
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
     applicationType: 'UNDEFINED',
-    applicationData: {}
+    applicationData: {},
+    width: 0,
+    height: 0
   };
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+  }
+
+  componentDidMount = async () => {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions.bind(this));
+
+    this.props.setColorTheme(true);
+
     const self = this;
+
+    const queryString = await import(
+      /* webpackChunkName: "query-string" */ 'query-string'
+    );
+
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
     axios
@@ -42,9 +62,20 @@ class ApplicationContainer extends PureComponent<Props, State> {
       })
       .catch(err => {
         Log.error(err, 'ApplicationContainer');
-        return <div>No stored data found!</div>;
+        self.setState({
+          applicationType: VISUALIZER_TYPE.UNDEFINED,
+          applicationData: undefined
+        });
       });
+  };
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
   }
+
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  };
 
   getApplication = (applicationType, applicationData) => {
     switch (applicationType) {
@@ -60,11 +91,12 @@ class ApplicationContainer extends PureComponent<Props, State> {
         );
       }
       case VISUALIZER_TYPE.TREEMAP: {
-        const selectedResultGraphIri = applicationData.selectedResultGraphIri;
+        const { selectedResultGraphIri, conceptIri } = applicationData;
         return (
           <TreemapVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
+            selectedScheme={conceptIri}
           />
         );
       }
@@ -72,30 +104,44 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
+            size={this.state.height + this.state.width}
             isPublished
           />
+        );
+      }
+      case VISUALIZER_TYPE.UNDEFINED: {
+        return (
+          <Typography variant="h2" gutterBottom>
+            Application was deleted...
+          </Typography>
         );
       }
       default:
         return (
           <Typography variant="h2" gutterBottom>
-            Loading Application..
+            Loading Application...
           </Typography>
         );
     }
   };
 
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  };
+
   render() {
     const { getApplication } = this;
-    const { applicationType, applicationData } = this.state;
+    const { applicationType, applicationData, width, height } = this.state;
 
     return (
       <div
         id="viz-div"
         style={{
           flex: 1,
-          height: '100vh',
-          textAlign: 'center'
+          width: `${width}px`,
+          height: `${height}px`,
+          textAlign: 'center',
+          overflow: 'hidden'
         }}
       >
         {getApplication(applicationType, applicationData)}
@@ -104,4 +150,18 @@ class ApplicationContainer extends PureComponent<Props, State> {
   }
 }
 
-export default withRouter(ApplicationContainer);
+const mapDispatchToProps = dispatch => {
+  const setColorTheme = isLight =>
+    dispatch(globalActions.setLightColorTheme(isLight));
+
+  return {
+    setColorTheme
+  };
+};
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(ApplicationContainer)
+);

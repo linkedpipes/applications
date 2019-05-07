@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, extractUrlGroups, SocketContext, Log, withWebId } from '@utils';
+import { DiscoveryService, GlobalUtils, SocketContext, Log } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
@@ -57,12 +57,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     });
   };
 
-  postStartFromSparqlEndpoint = async instance => {
+  postStartFromSparqlEndpoint = async () => {
     return DiscoveryService.postDiscoverFromEndpoint({
-      sparqlEndpointIri: instance.props.sparqlEndpointIri,
-      dataSampleIri: instance.props.dataSampleIri,
-      namedGraph: instance.props.namedGraph,
-      webId: instance.props.webId
+      sparqlEndpointIri: this.props.sparqlEndpointIri,
+      dataSampleIri: this.props.dataSampleIri,
+      namedGraphs: this.props.namedGraph,
+      webId: this.props.webId
     }).then(response => {
       return response;
     });
@@ -80,7 +80,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         return response;
       });
     }
-    return this.postStartFromSparqlEndpoint(instance);
+
+    return this.postStartFromSparqlEndpoint();
   };
 
   handleProcessStartDiscovery = () => {
@@ -175,7 +176,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   handleValidation = rawText => {
-    const matches = extractUrlGroups(rawText);
+    const matches = GlobalUtils.extractUrlGroups(rawText);
     if (matches instanceof Array) {
       rawText = matches.join(',\n');
     }
@@ -255,7 +256,8 @@ const mapStateToProps = state => {
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
-    namedGraph: state.discover.namedGraph
+    namedGraph: state.discover.namedGraph,
+    webId: state.user.webId
   };
 };
 
@@ -296,4 +298,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withWebId(DiscoverSelectorContainerWithSocket));
+)(DiscoverSelectorContainerWithSocket);

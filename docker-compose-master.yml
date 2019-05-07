@@ -3,11 +3,11 @@ services:
   nginx:
     image: nginx:stable
     container_name: lpa-reverse-proxy
-    restart: on-failure
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "9001:80" # port configure in lpapps server
+      - "9001:80" # port configured in lpapps server
+    restart: on-failure
     depends_on:
       - backend
       - frontend
@@ -17,10 +17,10 @@ services:
     container_name: lpa-backend
     environment:
       SENTRY_ENVIRONMENT: "production"
-    restart: on-failure
     ports:
       - "9005:9005"
       - "9092:9092"
+    restart: on-failure
     depends_on:
       - etl
       - discovery
@@ -38,7 +38,6 @@ services:
   db:
     image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
     container_name: lpa-virtuoso
-    restart: on-failure
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
@@ -48,19 +47,20 @@ services:
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
-      VIRT_Parameters_CheckpointInterval: 1
+      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata
     ports:
       - "8890:8890"
+    restart: on-failure
     volumes:
       - ./data/virtuoso:/data
+      - ./appdata:/appdata
+      
 
   discovery:
-    image: linkedpipes/applications:discovery
+    image: linkedpipes/applications:discovery_hang_fix
     container_name: lpa-discovery
-    restart: on-failure
     command:
       [
-        "0",
         "-Dldcp.etl.hostname=http://lpa-etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",
@@ -68,15 +68,18 @@ services:
     depends_on:
       - db
       - etl
+    restart: on-failure
     ports:
       - "9000:9000"
 
   etl:
-    image: linkedpipes/applications:etl_devel
+    image: linkedpipes/applications:etl_hang_fix
     container_name: lpa-etl
     restart: on-failure
     ports:
       - "8080:8080"
+    volumes:
+      - ./appdata:/appdata
 
   postgres:
     image: postgres:10.7
@@ -85,7 +88,6 @@ services:
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
-      PGDATA: /tmp
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ports:

@@ -31,7 +31,10 @@ axios.interceptors.response.use(
         scope.setLevel('error');
         scope.setExtra('api-call', error.response.data);
         Sentry.captureException(error);
-        Sentry.showReportDialog(); // Only if not production
+
+        if (process.env.NODE_ENV !== 'production') {
+          Sentry.showReportDialog(); // Only if not production
+        }
       });
     }
   }

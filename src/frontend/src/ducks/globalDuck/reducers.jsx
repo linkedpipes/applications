@@ -4,7 +4,9 @@ const INITIAL_STATE = {
   headerParams: {
     title: ''
   },
-  selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } }
+  selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
+  chooseFolderDialogIsOpen: false,
+  colorThemeIsLight: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -13,6 +15,18 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, {
         selectedVisualizer: action.selectedVisualizer
       });
+
+    case types.SET_CHOOSE_FOLDER_DIALOG_STATE:
+      return {
+        ...state,
+        chooseFolderDialogIsOpen: action.isOpen
+      };
+
+    case types.SET_LIGHT_COLOR_THEME:
+      return {
+        ...state,
+        colorThemeIsLight: action.value
+      };
 
     default:
       return { ...state };

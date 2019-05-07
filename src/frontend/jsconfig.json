@@ -6,6 +6,7 @@
       "@containers/*": ["./src/containers/*"],
       "@ducks/*": ["./src/ducks/*"],
       "@utils/*": ["./src/utils/*"],
+      "@storage/*": ["./src/storage/*"],
       "@constants/*": ["./src/constants/*"],
       "@layouts/*": ["./src/layouts/*"]
     }
