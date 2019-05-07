@@ -10,21 +10,26 @@ import {
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
 import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
+import ChordFiltersComponent from '../Filters/children/ChordFilter';
 
 type Props = {
-  classes: { root: {}, filterSideBar: {}, containerView: {} },
+  classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
   visualizer: { visualizerCode: string },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   selectedApplication: Object,
   selectedApplicationMetadata: Object,
   height: number,
-  width: number
+  width: number,
+  selectedNodes?: Set<string>
 };
 
 const styles = theme => ({
   root: {
     flex: 1
+  },
+  vizdiv: {
+    overflow: 'hidden'
   },
   containerView: {
     textAlign: 'center',
@@ -50,7 +55,11 @@ const getFilters = (visualizerCode, selectedResultGraphIri) => {
         />
       );
     case VISUALIZER_TYPE.CHORD:
-      return <div>Filters for chord not yet implemented.</div>;
+      return (
+        <ChordFiltersComponent
+          selectedResultGraphIri={selectedResultGraphIri}
+        />
+      );
     default:
       return <div>No filters available for selected visualizer.</div>;
   }
@@ -63,6 +72,7 @@ const getVisualizer = (
   handleSetCurrentApplicationData,
   selectedApplicationMetadata,
   classes,
+  selectedNodes,
   width,
   height
 ) => {
@@ -97,6 +107,7 @@ const getVisualizer = (
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           size={height + width}
+          selectedNodes={selectedNodes}
         />
       );
     case VISUALIZER_TYPE.UNDEFINED:
@@ -121,7 +132,14 @@ const VisualizerControllerContainer = (props: Props) => {
           props.selectedResultGraphIri
         )}
       </Grid>
-      <Grid id="viz-div" item lg={9} md={8} xs={12}>
+      <Grid
+        id="viz-div"
+        className={props.classes.vizdiv}
+        item
+        lg={9}
+        md={8}
+        xs={12}
+      >
         {getVisualizer(
           props.visualizer.visualizerCode,
           props.selectedResultGraphIri,
@@ -129,6 +147,7 @@ const VisualizerControllerContainer = (props: Props) => {
           props.handleSetCurrentApplicationData,
           props.selectedApplicationMetadata,
           props.classes,
+          props.selectedNodes,
           props.width,
           props.height
         )}

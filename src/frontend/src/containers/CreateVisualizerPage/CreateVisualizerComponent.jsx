@@ -23,7 +23,8 @@ type Props = {
   setApplicationLoaderStatus: Function,
   loadingIsActive: boolean,
   width: number,
-  height: number
+  height: number,
+  selectedNodes?: Set<string>
 };
 
 const styles = {
@@ -48,6 +49,7 @@ const CreateVisualizerComponent = ({
   handleSetCurrentApplicationData,
   setApplicationLoaderStatus,
   loadingIsActive,
+  selectedNodes,
   width,
   height
 }: Props) => (
@@ -75,6 +77,7 @@ const CreateVisualizerComponent = ({
       selectedApplicationMetadata={selectedApplicationMetadata}
       width={width}
       height={height}
+      selectedNodes={selectedNodes}
     />
   </LoadingOverlay>
 );

@@ -2,7 +2,11 @@ package com.linkedpipes.lpa.backend.entities.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity(name="discovery")
 public class DiscoveryDao implements Serializable {
@@ -29,8 +33,9 @@ public class DiscoveryDao implements Serializable {
     @Column(nullable = true, columnDefinition = "TEXT")
     private String dataSampleIri;
 
-    @Column(nullable = true, columnDefinition = "TEXT")
-    private String namedGraph;
+    @OneToMany(mappedBy="discovery")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<DiscoveryNamedGraphDao> namedGraphs;
 
     @ManyToOne
     private UserDao user;
@@ -51,6 +56,7 @@ public class DiscoveryDao implements Serializable {
         this.discoveryId = discoveryId;
         this.started = started;
         this.executing = true;
+        this.namedGraphs = new ArrayList<>();
     }
 
     public String getDiscoveryId() {
@@ -97,11 +103,15 @@ public class DiscoveryDao implements Serializable {
         return this.dataSampleIri;
     }
 
-    public void setNamedGraph(String namedGraph) {
-        this.namedGraph = namedGraph;
+    public void addNamedGraph(DiscoveryNamedGraphDao ng)  {
+        this.namedGraphs.add(ng);
+
+        if (ng.getDiscovery() != this) {
+            ng.setDiscovery(this);
+        }
     }
 
-    public String getNamedGraph() {
-        return this.namedGraph;
+    public List<DiscoveryNamedGraphDao> getNamedGraphs() {
+        return this.namedGraphs;
     }
 }

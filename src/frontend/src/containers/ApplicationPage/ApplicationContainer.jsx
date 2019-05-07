@@ -140,7 +140,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           flex: 1,
           width: `${width}px`,
           height: `${height}px`,
-          textAlign: 'center'
+          textAlign: 'center',
+          overflow: 'hidden'
         }}
       >
         {getApplication(applicationType, applicationData)}
