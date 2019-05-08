@@ -1,20 +1,17 @@
 package com.linkedpipes.lpa.backend.rdf.vocabulary;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 abstract class Vocabulary {
 
-    private static final Model model = ModelFactory.createDefaultModel();
-
     static Resource createResource(String nameSpace, String localName) {
-        return model.createResource(nameSpace + localName);
+        return ResourceFactory.createResource(nameSpace + localName);
     }
 
     static Property createProperty(String nameSpace, String localName) {
-        return model.createProperty(nameSpace, localName);
+        return ResourceFactory.createProperty(nameSpace, localName);
     }
 
 }
