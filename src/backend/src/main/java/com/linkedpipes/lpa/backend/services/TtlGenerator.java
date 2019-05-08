@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * A class for creating RDF data in TTL format
+ */
 public class TtlGenerator {
 
     private static final String DATASET_OUTPUT_TITLE = "Unspecified user-provided dataset output";
@@ -33,16 +36,30 @@ public class TtlGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(TtlGenerator.class);
 
+    /**
+     * Creates a configuration for Discovery by appending specified data sources to the base configuration (base.ttl
+     * resource).
+     *
+     * @param dataSourceList data source to be included in the Discovery configuration
+     * @return a Discovery config
+     */
     @NotNull
     public static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
         ModelBuilder builder = ModelBuilder.from(TtlGenerator.class.getResource("base.ttl"));
         ResourceBuilder config = builder.resource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config");
-        for (DataSource dataSource : dataSourceList) {
-            config.property("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(dataSource.uri));
-        }
+        dataSourceList.forEach(dataSource ->
+                config.property("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(dataSource.uri)));
         return builder.toString();
     }
 
+    /**
+     * Creates a data source template description readable by Discovery.
+     *
+     * @param sparqlEndpointIri the desired endpoint IRI for the default SPARQL service described in the output
+     * @param dataSampleIri     the IRI of the data sample describing the data in the data source
+     * @param namedGraphs       the named graphs specified for the SPARQL endpoint
+     * @return a data source template
+     */
     @NotNull
     public static String getTemplateDescription(@NotNull String sparqlEndpointIri,
                                                 @NotNull String dataSampleIri,
@@ -77,14 +94,21 @@ public class TtlGenerator {
                 .property(SD.endpoint, resource(sparqlEndpointIri));
 
         if (namedGraphs != null && !namedGraphs.isEmpty()) {
-            namedGraphs.forEach(graphName -> defaultService
-                    .resource(SD.namedGraph)
-                    .property(SD.name, resource(graphName)));
+            namedGraphs.forEach(graphName ->
+                    defaultService.resource(SD.namedGraph)
+                            .property(SD.name, resource(graphName)));
         }
 
         return builder.toString();
     }
 
+    /**
+     * Creates a SPARQL service description readable by Discovery, which points to the named graph {@code graphName} in
+     * the application-owned Virtuoso endpoint set by the app configuration.
+     *
+     * @param graphName name of the named graph to specify in the service description
+     * @return a service description
+     */
     @NotNull
     public static String getVirtuosoServiceDescription(@NotNull String graphName) {
         ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"));

@@ -10,6 +10,9 @@ import org.apache.jena.riot.RDFFormat;
 import java.io.StringWriter;
 import java.net.URL;
 
+/**
+ * Convenient wrapper for the general use case of the {@link Model} interface.
+ */
 public class ModelBuilder {
 
     private final Model model = ModelFactory.createDefaultModel();
@@ -34,6 +37,9 @@ public class ModelBuilder {
         return ResourceBuilder.of(resource, model);
     }
 
+    /**
+     * @return TTL-formatted representation of the underlying RDF model
+     */
     @Override
     public String toString() {
         StringWriter stringWriter = new StringWriter();
@@ -41,6 +47,12 @@ public class ModelBuilder {
         return stringWriter.toString();
     }
 
+    /**
+     * Initialize from a TTL-formatted resource.
+     *
+     * @param model the resource to initialize the model from
+     * @return a builder
+     */
     public static ModelBuilder from(URL model) {
         return new ModelBuilder(model);
     }

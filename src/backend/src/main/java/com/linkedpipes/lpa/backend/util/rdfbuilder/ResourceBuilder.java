@@ -5,6 +5,9 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
+/**
+ * A helper class for the {@link ModelBuilder}.
+ */
 public class ResourceBuilder {
 
     private final Resource resource;
