@@ -14,6 +14,20 @@ const setChooseFolderDialogState = ({ state }) => {
   };
 };
 
+const setAccessControlDialogState = ({ state }) => {
+  return {
+    type: types.SET_ACCESS_CONTROL_DIALOG_STATE,
+    isOpen: state
+  };
+};
+
+const setInboxDialogState = state => {
+  return {
+    type: types.SET_INBOX_DIALOG_STATE,
+    isOpen: state
+  };
+};
+
 const setLightColorTheme = isLight => {
   return {
     type: types.SET_LIGHT_COLOR_THEME,
@@ -23,6 +37,8 @@ const setLightColorTheme = isLight => {
 
 export default {
   addSelectedVisualizerAction,
+  setAccessControlDialogState,
   setLightColorTheme,
-  setChooseFolderDialogState
+  setChooseFolderDialogState,
+  setInboxDialogState
 };

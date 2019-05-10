@@ -210,9 +210,34 @@ class StorageFileClient {
     return new Response();
   };
 
+  sendInviteToInbox = async (url, data) => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    return authClient.fetch(url, {
+      method: 'POST',
+      body: data
+    });
+  };
+
   assertSuccessfulResponse = (response: Response) => {
     if (!response.ok) throw response;
     return response;
+  };
+
+  executeSPARQLUpdateForUser = async (url, query) => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    return authClient.fetch(url, {
+      method: 'PATCH',
+      body: query,
+      headers: {
+        'Content-Type': 'application/sparql-update'
+      }
+    });
   };
 }
 

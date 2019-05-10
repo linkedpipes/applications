@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/browser';
 import store from './store';
 import 'normalize.css/normalize.css';
 import AppRouter from './AppRouter';
+import { Log } from '@utils';
 // #if process.env.NODE_ENV !== 'production'
 import './ReactotronConfig';
 // #endif
@@ -26,5 +27,14 @@ const jsx = (
 //   environment: process.env.NODE_ENV,
 //   debug: process.env.NODE_ENV !== 'production'
 // });
+
+Log.info(`
+██╗     ██████╗  █████╗ ██████╗ ██████╗ ███████╗
+██║     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝
+██║     ██████╔╝███████║██████╔╝██████╔╝███████╗
+██║     ██╔═══╝ ██╔══██║██╔═══╝ ██╔═══╝ ╚════██║
+███████╗██║     ██║  ██║██║     ██║     ███████║
+╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝
+`);
 
 render(jsx, document.querySelector('#app'));

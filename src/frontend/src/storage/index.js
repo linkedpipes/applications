@@ -1,7 +1,11 @@
 // Containers
 import { StoragePage } from './containers';
 // Components
-import { StoragePickFolderDialog } from './components';
+import {
+  StoragePickFolderDialog,
+  StorageAccessControlDialog,
+  StorageInboxDialog
+} from './components';
 // Utils
 import StorageToolbox from './StorageToolbox';
 import StorageBackend from './StorageBackend';
@@ -11,7 +15,9 @@ import { AppConfiguration } from './models';
 export {
   StoragePage,
   StoragePickFolderDialog,
+  StorageAccessControlDialog,
   StorageToolbox,
   StorageBackend,
-  AppConfiguration
+  AppConfiguration,
+  StorageInboxDialog
 };

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
-import { AppConfiguration, Person } from './models';
+import { AppConfiguration, Person, Notification } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
 
@@ -16,6 +16,7 @@ const XSD = $rdf.Namespace('http://www.w3.org/2001/XMLSchema#');
 const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
 const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
+const SCHEMA = $rdf.Namespace('http://schema.org/');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
@@ -45,6 +46,7 @@ class SolidBackend {
     this._store = $rdf.graph();
     this._fetcher = new $rdf.Fetcher(this.store);
     this._updater = new $rdf.UpdateManager(this.store);
+    this.alreadyCheckedResources = [];
   }
 
   set store(store) {
@@ -940,6 +942,292 @@ class SolidBackend {
     } catch (err) {
       return Promise.reject(err);
     }
+  }
+
+  sendInviteToInbox(recepientWebId, data) {
+    const inboxUrl = `${Utils.getBaseUrlConcat(recepientWebId)}/inbox`;
+    StorageFileClient.sendInviteToInbox(inboxUrl, data);
+  }
+
+  generateInvitationFile(baseUrl, gameUrl, userWebId, opponentWebId) {
+    const invitationUrl = `${baseUrl}#${Utils.getName()}`;
+    const notification = `<${invitationUrl}> a ${SCHEMA('InviteAction')}.`;
+    const sparqlUpdate = `
+  <${invitationUrl}> a ${SCHEMA('InviteAction')};
+    ${SCHEMA('event')} <${baseUrl}>;
+    ${SCHEMA('agent')} <${userWebId}>;
+    ${SCHEMA('recipient')} <${opponentWebId}>.
+`;
+
+    return {
+      notification,
+      sparqlUpdate
+    };
+  }
+
+  generateResponseToInvitation(
+    baseUrl,
+    invitationUrl,
+    userWebId,
+    opponentWebId,
+    response
+  ) {
+    const rsvpUrl = `${baseUrl}#${Utils.getName()}`;
+
+    let responseUrl;
+
+    if (response === 'yes') {
+      responseUrl = SCHEMA('RsvpResponseYes');
+    } else if (response === 'no') {
+      responseUrl = SCHEMA('RsvpResponseNo');
+    } else {
+      throw new Error(
+        `The parameter "response" expects either "yes" or "no". Instead, "${response}" was provided.`
+      );
+    }
+
+    const notification = `<${invitationUrl}> <${
+      namespaces.schema
+    }result> <${rsvpUrl}>.`;
+    const sparqlUpdate = `
+    <${rsvpUrl}> a ${SCHEMA('RsvpAction')};
+      ${SCHEMA('rsvpResponse')} <${responseUrl}>;
+      ${SCHEMA('agent')} <${userWebId}>;
+      ${SCHEMA('recipient')} <${opponentWebId}>.
+
+    <${invitationUrl}> ${SCHEMA('result')} <${rsvpUrl}>.
+  `;
+
+    return {
+      notification,
+      sparqlUpdate
+    };
+  }
+
+  async storeInvitationFile(fileUrl, invitationSparqlUpdate) {
+    try {
+      await StorageFileClient.executeSPARQLUpdateForUser(
+        fileUrl,
+        `INSERT DATA {${invitationSparqlUpdate}}`
+      );
+    } catch (e) {
+      Log.error(`Could not save invitation for game.`);
+      Log.error(e);
+    }
+  }
+
+  async checkInboxFolder(inboxUrl) {
+    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+    const N3 = require('n3');
+    const Q = require('q');
+    const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const deferred = Q.defer();
+    const newResources = [];
+    const rdfjsSource = await rdfjsSourceFromUrl(inboxUrl, authClient.fetch);
+    const self = this;
+    const engine = newEngine();
+
+    engine
+      .query(
+        `SELECT ?resource {
+      ?resource a <http://www.w3.org/ns/ldp#Resource>.
+    }`,
+        { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+      )
+      .then(function(result) {
+        result.bindingsStream.on('data', data => {
+          data = data.toObject();
+
+          const resource = data['?resource'].value;
+
+          if (self.alreadyCheckedResources.indexOf(resource) === -1) {
+            newResources.push(resource);
+            self.alreadyCheckedResources.push(resource);
+          }
+        });
+
+        result.bindingsStream.on('end', function() {
+          deferred.resolve(newResources);
+        });
+      });
+
+    return deferred.promise;
+  }
+
+  async parseShareInviteNotification(fileurl, userWebId) {
+    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+    const N3 = require('n3');
+    const Q = require('q');
+    const deferred = Q.defer();
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const rdfjsSource = await rdfjsSourceFromUrl(fileurl, authClient.fetch);
+
+    if (rdfjsSource) {
+      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+
+      const engine = newEngine();
+      let invitationFound = false;
+      const self = this;
+
+      engine
+        .query(
+          `SELECT ?invitation {
+    ?invitation a ${SCHEMA('InviteAction')}.
+  }`,
+          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+        )
+        .then(function(result) {
+          result.bindingsStream.on('data', async function(result) {
+            invitationFound = true;
+            result = result.toObject();
+            const invitationUrl = result['?invitation'].value;
+            let appMetadataUrl = await self.getObjectFromPredicateForResource(
+              invitationUrl,
+              SCHEMA('event')
+            );
+
+            Log.info(appMetadataUrl);
+
+            if (!appMetadataUrl) {
+              deferred.resolve(null);
+            } else {
+              appMetadataUrl = appMetadataUrl.value;
+
+              const types = await self.getAllObjectsFromPredicateForResource(
+                appMetadataUrl,
+                SCHEMA('type')
+              );
+
+              var senderWebId = await self.getObjectFromPredicateForResource(
+                invitationUrl,
+                SCHEMA('agent')
+              );
+
+              var recipientWebId = await self.getObjectFromPredicateForResource(
+                invitationUrl,
+                SCHEMA('recipient')
+              );
+
+              if (
+                (!recipientWebId && !senderWebId) ||
+                recipientWebId.value !== userWebId
+              ) {
+                deferred.resolve(null);
+              }
+
+              senderWebId = senderWebId.value;
+              recipientWebId = recipientWebId.value;
+
+              senderWebId, recipientWebId, appMetadataUrl, invitationUrl;
+
+              const notificationObject = new Notification(
+                invitationUrl,
+                senderWebId,
+                recipientWebId,
+                appMetadataUrl
+              );
+
+              deferred.resolve(notificationObject);
+            }
+          });
+
+          result.bindingsStream.on('end', function() {
+            if (!invitationFound) {
+              deferred.resolve(null);
+            }
+          });
+        });
+    } else {
+      deferred.resolve(null);
+    }
+
+    return deferred.promise;
+  }
+
+  async getObjectFromPredicateForResource(url, predicate) {
+    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+    const N3 = require('n3');
+    const Q = require('q');
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const deferred = Q.defer();
+    const rdfjsSource = await rdfjsSourceFromUrl(url, authClient.fetch);
+
+    if (rdfjsSource) {
+      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+      const engine = newEngine();
+
+      engine
+        .query(
+          `SELECT ?o {
+    <${url}> ${predicate} ?o.
+  }`,
+          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+        )
+        .then(function(result) {
+          result.bindingsStream.on('data', function(data) {
+            data = data.toObject();
+
+            deferred.resolve(data['?o']);
+          });
+
+          result.bindingsStream.on('end', function() {
+            deferred.resolve(null);
+          });
+        });
+    } else {
+      deferred.resolve(null);
+    }
+
+    return deferred.promise;
+  }
+
+  async getAllObjectsFromPredicateForResource(url, predicate) {
+    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+    const N3 = require('n3');
+    const Q = require('q');
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const deferred = Q.defer();
+    const rdfjsSource = await rdfjsSourceFromUrl(url, authClient.fetch);
+
+    if (rdfjsSource) {
+      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+      const engine = newEngine();
+      const objects = [];
+
+      engine
+        .query(
+          `SELECT ?o {
+    <${url}> ${predicate} ?o.
+  }`,
+          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+        )
+        .then(function(result) {
+          result.bindingsStream.on('data', function(data) {
+            data = data.toObject();
+
+            objects.push(data['?o']);
+          });
+
+          result.bindingsStream.on('end', function() {
+            deferred.resolve(objects);
+          });
+        });
+    } else {
+      deferred.resolve(null);
+    }
+
+    return deferred.promise;
   }
 }
 

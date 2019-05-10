@@ -6,7 +6,8 @@ import Menu from '@material-ui/core/Menu/Menu';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PersonIcon from '@material-ui/icons/Person';
 import RemoveIcon from '@material-ui/icons/Remove';
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import AccountCircle from '@material-ui/icons/AccountCircleTwoTone';
+import NotificationsIcon from '@material-ui/icons/NotificationsTwoTone';
 import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 
@@ -17,7 +18,8 @@ type Props = {
   onHandleMenuOpen: Function,
   profileMenuIsOpen: Function,
   onHandleOpenProfile: Function,
-  onHandleOpenSettings: Function
+  onHandleOpenSettings: Function,
+  onHandleSetInboxDialogOpen: Function
 };
 
 const UserProfileButtonComponent = ({
@@ -27,9 +29,14 @@ const UserProfileButtonComponent = ({
   onHandleMenuOpen,
   onHandleLogoutClicked,
   onHandleOpenProfile,
-  onHandleOpenSettings
+  onHandleOpenSettings,
+  onHandleSetInboxDialogOpen
 }: Props) => (
   <div>
+    <IconButton color="inherit" onClick={onHandleSetInboxDialogOpen}>
+      <NotificationsIcon />
+    </IconButton>
+
     <IconButton color="inherit" onClick={onHandleMenuOpen}>
       <AccountCircle />
     </IconButton>

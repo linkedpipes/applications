@@ -53,6 +53,11 @@ const setUserProfileAsync = profile => {
     });
 };
 
+const setUserInboxNotifications = inboxNotifications => ({
+  type: types.SET_USER_INBOX_NOTIFCATIONS,
+  value: inboxNotifications
+});
+
 export default {
   setUserProfile,
   setUserWebId,
@@ -63,5 +68,6 @@ export default {
   addExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
-  updateApplicationsFolder
+  updateApplicationsFolder,
+  setUserInboxNotifications
 };

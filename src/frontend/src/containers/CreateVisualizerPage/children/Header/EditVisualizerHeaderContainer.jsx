@@ -1,11 +1,16 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, StorageBackend } from '@storage';
+import {
+  StorageToolbox,
+  StorageBackend,
+  StorageAccessControlDialog
+} from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { globalActions } from '@ducks/globalDuck';
 import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
@@ -21,7 +26,8 @@ type Props = {
   setApplicationLoaderStatus: Function,
   selectedApplicationMetadata: AppConfiguration,
   handleSetSelectedApplicationTitle: Function,
-  handleSetSelectedApplicationMetadata: Function
+  handleSetSelectedApplicationMetadata: Function,
+  handleUpdateAccessControlDialogState: Function
 };
 
 type State = {
@@ -164,6 +170,14 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     }
   };
 
+  handleOpenAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(true);
+  };
+
+  handleCloseAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(false);
+  };
+
   handleOpenRenameDialog = () => {
     this.setState({ renameDialogOpen: true });
   };
@@ -249,6 +263,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       handleRenameConfirmed,
       handleCloseRenameDialog,
       handleOpenRenameDialog,
+      handleOpenAccessControlDialog,
+      handleCloseAccessControlDialog,
       handleRenameFieldChanged
     } = this;
     const {
@@ -263,40 +279,45 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       renameDialogOpen
     } = this.state;
     return (
-      <EditVisualizerHeaderComponent
-        handleAppTitleChanged={onHandleAppTitleChanged}
-        handlePublishClicked={handlePublishClicked}
-        handleEmbedClicked={handleEmbedClicked}
-        headerParams={headerParams}
-        onRefreshSwitchChange={onRefreshSwitchChange}
-        publishDialogOpen={publishDialogOpen}
-        embedDialogOpen={embedDialogOpen}
-        handleClosePublishDialog={handleClosePublishDialog}
-        handleCloseEmbedDialog={handleCloseEmbedDialog}
-        handleProceedToApplicationClicked={handleProceedToApplicationClicked}
-        handleCopyLinkClicked={handleCopyLinkClicked}
-        selectedVisualizer={selectedVisualizer}
-        selectedApplicationTitle={selectedApplicationTitle}
-        appIri={appIri}
-        height={height}
-        width={width}
-        handleChangeWidth={handleChangeWidth}
-        handleChangeHeight={handleChangeHeight}
-        selectedApplicationMetadata={selectedApplicationMetadata}
-        deleteAppDialogOpen={deleteAppDialogOpen}
-        handleMenuClose={handleMenuClose}
-        anchorEl={anchorEl}
-        handleMenuClick={handleMenuClick}
-        handleDeleteAppClicked={handleDeleteAppClicked}
-        handleDeleteAppDismissed={handleDeleteAppDismissed}
-        handleDeleteAppConfirmed={handleDeleteAppConfirmed}
-        modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
-        handleRenameFieldChanged={handleRenameFieldChanged}
-        handleOpenRenameDialog={handleOpenRenameDialog}
-        handleCloseRenameDialog={handleCloseRenameDialog}
-        handleRenameConfirmed={handleRenameConfirmed}
-        renameDialogOpen={renameDialogOpen}
-      />
+      <Fragment>
+        <EditVisualizerHeaderComponent
+          handleAppTitleChanged={onHandleAppTitleChanged}
+          handlePublishClicked={handlePublishClicked}
+          handleEmbedClicked={handleEmbedClicked}
+          headerParams={headerParams}
+          onRefreshSwitchChange={onRefreshSwitchChange}
+          publishDialogOpen={publishDialogOpen}
+          embedDialogOpen={embedDialogOpen}
+          handleClosePublishDialog={handleClosePublishDialog}
+          handleCloseEmbedDialog={handleCloseEmbedDialog}
+          handleProceedToApplicationClicked={handleProceedToApplicationClicked}
+          handleCopyLinkClicked={handleCopyLinkClicked}
+          selectedVisualizer={selectedVisualizer}
+          selectedApplicationTitle={selectedApplicationTitle}
+          appIri={appIri}
+          height={height}
+          width={width}
+          handleChangeWidth={handleChangeWidth}
+          handleChangeHeight={handleChangeHeight}
+          selectedApplicationMetadata={selectedApplicationMetadata}
+          deleteAppDialogOpen={deleteAppDialogOpen}
+          handleMenuClose={handleMenuClose}
+          anchorEl={anchorEl}
+          handleMenuClick={handleMenuClick}
+          handleDeleteAppClicked={handleDeleteAppClicked}
+          handleDeleteAppDismissed={handleDeleteAppDismissed}
+          handleDeleteAppConfirmed={handleDeleteAppConfirmed}
+          modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
+          handleOpenAccessControlDialog={handleOpenAccessControlDialog}
+          handleCloseAccessControlDialog={handleCloseAccessControlDialog}
+          handleRenameFieldChanged={handleRenameFieldChanged}
+          handleOpenRenameDialog={handleOpenRenameDialog}
+          handleCloseRenameDialog={handleCloseRenameDialog}
+          handleRenameConfirmed={handleRenameConfirmed}
+          renameDialogOpen={renameDialogOpen}
+        />
+        <StorageAccessControlDialog />
+      </Fragment>
     );
   }
 }
@@ -325,10 +346,14 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationTitle = applicationTitle =>
     dispatch(applicationActions.setApplicationTitle(applicationTitle));
 
+  const handleUpdateAccessControlDialogState = state =>
+    dispatch(globalActions.setAccessControlDialogState({ state }));
+
   return {
     handleAppTitleChanged,
     handleSetSelectedApplicationMetadata,
-    handleSetSelectedApplicationTitle
+    handleSetSelectedApplicationTitle,
+    handleUpdateAccessControlDialogState
   };
 };
 

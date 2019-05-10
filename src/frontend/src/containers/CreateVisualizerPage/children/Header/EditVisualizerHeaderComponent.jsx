@@ -37,7 +37,6 @@ type Props = {
   width: number,
   selectedApplicationMetadata: AppConfiguration,
   deleteAppDialogOpen: boolean,
-  handleDeleteApp: Function,
   handleDeleteAppDismissed: Function,
   handleDeleteAppConfirmed: Function,
   handleDeleteAppClicked: Function,
@@ -49,6 +48,7 @@ type Props = {
   handleOpenRenameDialog: Function,
   handleCloseRenameDialog: Function,
   handleRenameConfirmed: Function,
+  handleOpenAccessControlDialog: Function,
   renameDialogOpen: boolean
 };
 
@@ -89,10 +89,10 @@ const EditVisualizerHeaderComponent = ({
   handleChangeWidth,
   selectedApplicationMetadata,
   deleteAppDialogOpen,
-  handleDeleteApp,
   handleDeleteAppDismissed,
   handleDeleteAppConfirmed,
   handleDeleteAppClicked,
+  handleOpenAccessControlDialog,
   handleMenuClose,
   handleMenuClick,
   anchorEl,
@@ -187,7 +187,9 @@ const EditVisualizerHeaderComponent = ({
     >
       <MenuItem onClick={handlePublishClicked}>Get Published URL</MenuItem>
       <MenuItem onClick={handleEmbedClicked}>Get Embed URL</MenuItem>
-      <MenuItem onClick={handleDeleteApp}>Access control</MenuItem>
+      <MenuItem onClick={handleOpenAccessControlDialog}>
+        Access control
+      </MenuItem>
     </Menu>
 
     <Dialog

@@ -7,7 +7,7 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageBackend } from '@storage';
+import { StorageBackend, StorageToolbox, StorageInboxDialog } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -26,11 +26,13 @@ type Props = {
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   socket: Object,
+  webId: Object,
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
-  handleSetSelectedApplicationTitle: Function
+  handleSetSelectedApplicationTitle: Function,
+  handleSetUserInboxNotifications: Function
 };
 type State = {
   tabIndex: number,
@@ -60,13 +62,15 @@ class HomeContainer extends PureComponent<Props, State> {
     const {
       setupDiscoveryListeners,
       setupEtlExecutionsListeners,
-      loadApplicationsMetadata
+      loadApplicationsMetadata,
+      checkInbox
     } = this;
     this.isMounted = true;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
+    checkInbox();
   }
 
   async componentWillUpdate() {
@@ -89,6 +93,26 @@ class HomeContainer extends PureComponent<Props, State> {
     this.setState({ loadingAppIsActive: isLoading });
   }
 
+  checkInbox = async () => {
+    const { webId, handleSetUserInboxNotifications } = this.props;
+    const inboxUrl = 'https://aorumbayev4.solid.community/inbox/';
+    const updates = await StorageToolbox.getInboxMessages(inboxUrl);
+    const notifications = [];
+
+    await Promise.all(
+      updates.map(async fileUrl => {
+        const notification = await StorageToolbox.readShareInviteNotification(
+          fileUrl,
+          webId
+        );
+        Log.info(notification);
+        notifications.push(notification);
+      })
+    );
+
+    handleSetUserInboxNotifications(notifications);
+  };
+
   loadApplicationsMetadata = async () => {
     const { userProfile } = this.props;
     const webId = userProfile.webId;
@@ -101,7 +125,6 @@ class HomeContainer extends PureComponent<Props, State> {
 
       if (this.isMounted) {
         this.setState({ applicationsMetadata: metadata });
-
         Log.info(metadata, 'HomeContainer');
       }
     }
@@ -294,6 +317,7 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandleAppClicked={handleAppClicked}
           onHandleShareAppClicked={handleShareAppClicked}
         />
+        <StorageInboxDialog />
       </LoadingOverlay>
     );
   }
@@ -342,6 +366,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
+  const handleSetUserInboxNotifications = inboxNotifications =>
+    dispatch(userActions.setUserInboxNotifications(inboxNotifications));
+
   return {
     handleSetUserProfile,
     onInputExampleClicked,
@@ -349,7 +376,8 @@ const mapDispatchToProps = dispatch => {
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata
+    handleSetSelectedApplicationMetadata,
+    handleSetUserInboxNotifications
   };
 };
 

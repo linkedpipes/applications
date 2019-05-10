@@ -4,10 +4,12 @@ import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { SocketContext, GlobalUtils } from '@utils';
+import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
   history: Object,
-  resetReduxStore: Function
+  resetReduxStore: Function,
+  handleSetInboxDialogState: Function
 };
 
 type State = {
@@ -59,6 +61,11 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.handleMenuClose();
   };
 
+  handleSetInboxDialogOpen = () => {
+    const { handleSetInboxDialogState } = this.props;
+    handleSetInboxDialogState(true);
+  };
+
   render() {
     const { anchorElement } = this.state;
     const {
@@ -66,7 +73,8 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       handleMenuOpen,
       handleLogout,
       handleOpenProfile,
-      handleOpenSettings
+      handleOpenSettings,
+      handleSetInboxDialogOpen
     } = this;
     const profileMenuIsOpen = Boolean(anchorElement);
 
@@ -79,6 +87,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
         onHandleLogoutClicked={handleLogout}
         onHandleOpenProfile={handleOpenProfile}
         onHandleOpenSettings={handleOpenSettings}
+        onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
       />
     );
   }
@@ -99,8 +108,12 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
 
+  const handleSetInboxDialogState = isOpen =>
+    dispatch(globalActions.setInboxDialogState(isOpen));
+
   return {
-    resetReduxStore
+    resetReduxStore,
+    handleSetInboxDialogState
   };
 };
 
