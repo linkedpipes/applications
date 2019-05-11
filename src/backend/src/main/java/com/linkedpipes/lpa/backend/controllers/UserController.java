@@ -1,7 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.entities.profile.*;
+import com.linkedpipes.lpa.backend.entities.profile.UserProfile;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.UserService;
@@ -12,9 +11,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("!disableDB")
@@ -29,8 +28,7 @@ public class UserController {
 
     @NotNull
     @PostMapping("/api/user")
-    public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value="webId", required=true) String user)
-                    throws LpAppsException {
+    public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value = "webId", required = true) String user) {
         try {
             return ResponseEntity.ok(userService.addUserIfNotPresent(user));
         } catch(org.springframework.dao.CannotAcquireLockException | org.hibernate.exception.LockAcquisitionException e) {
@@ -39,7 +37,6 @@ public class UserController {
         }
     }
 
-    @NotNull
     @PostMapping("/api/user/application")
     public void addApplication(@NotNull @RequestParam(value="webId", required=true) String user,
                                                       @NotNull @RequestParam(value="solidIri", required=true) String solidIri)

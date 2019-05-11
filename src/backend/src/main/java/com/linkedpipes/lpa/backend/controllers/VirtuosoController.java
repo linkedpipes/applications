@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@SuppressWarnings("unused")
 public class VirtuosoController {
 
     public static final String GRAPH_NAME_PREFIX = "https://applications.linkedpipes.com/graph/";
