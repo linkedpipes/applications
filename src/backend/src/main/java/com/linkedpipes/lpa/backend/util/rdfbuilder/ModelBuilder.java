@@ -26,7 +26,7 @@ public class ModelBuilder {
 
     public ModelBuilder namespace(String prefix, String uri) {
         model.setNsPrefix(prefix, uri);
-        return null;
+        return this;
     }
 
     public ResourceBuilder resource(String uri) {
