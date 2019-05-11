@@ -40,7 +40,7 @@
     "query-string": "6.5.0",
     "rdflib": "0.20.1",
     "react": "16.8.6",
-    "react-chord-diagram": "1.0.4",
+    "react-chord-diagram": "1.2.0",
     "react-copy-to-clipboard": "5.0.1",
     "react-dom": "16.8.6",
     "react-emoji-render": "0.6.0",
