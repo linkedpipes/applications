@@ -7,6 +7,13 @@ export const incrementActiveStep = value => {
   };
 };
 
+export const setActiveStep = value => {
+  return {
+    type: types.SET_ACTIVE_STEP,
+    value
+  };
+};
+
 export const decrementActiveStep = value => {
   return {
     type: types.DECREMENT_ACTIVE_STEP,
@@ -65,6 +72,7 @@ export const setDataSampleIri = dataSampleIri => {
 export default {
   incrementActiveStep,
   decrementActiveStep,
+  setActiveStep,
   resetActiveStep,
   setSelectedInputExample,
   resetSelectedInputExample,
