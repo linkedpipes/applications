@@ -153,8 +153,6 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
-        self.custom_wait_clickable_and_click(element_id="button-0-pipeline")
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
