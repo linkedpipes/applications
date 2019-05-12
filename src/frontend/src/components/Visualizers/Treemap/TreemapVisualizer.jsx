@@ -6,6 +6,7 @@ import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
 
 type Props = {
   classes: {
@@ -89,6 +90,14 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
     this.chartEvents = [
       {
+        eventName: 'ready',
+        callback: ({ chartWrapper }) => {
+          this.handleGoUpClick = () => {
+            chartWrapper.getChart().goUpAndDraw();
+          };
+        }
+      },
+      {
         eventName: 'select',
         callback: async ({ chartWrapper }) => {
           // The first row in the data is the headers row. Ignore if got chosen
@@ -161,6 +170,8 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     );
   };
 
+  handleGoUpClick = () => {};
+
   chartEvents: Array<{
     eventName: string,
     callback: ({ chartWrapper: any }) => Function
@@ -174,26 +185,36 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       <div className={classes.wrapper}>
         {this.props.selectedScheme &&
           (this.state.dataLoadingStatus === 'ready' ? (
-            <Chart
-              height="99%"
-              chartType="TreeMap"
-              loader={<div>Loading Chart</div>}
-              data={this.state.chartData}
-              chartEvents={this.chartEvents}
-              options={{
-                headerHeight: 20,
-                fontColor: 'black',
-                showScale: true,
-                maxDepth: 1,
-                highlightOnMouseOver: true,
-                minHighlightColor: '#8c6bb1',
-                midHighlightColor: '#9ebcda',
-                maxHighlightColor: '#edf8fb',
-                minColor: '#009688',
-                midColor: '#f7f7f7',
-                maxColor: '#ee8100'
-              }}
-            />
+            <div className={classes.wrapper}>
+              <Button
+                onClick={this.handleGoUpClick}
+                variant="contained"
+                size="medium"
+                color="primary"
+              >
+                Go up one level
+              </Button>
+              <Chart
+                height="99%"
+                chartType="TreeMap"
+                loader={<div>Loading Chart</div>}
+                data={this.state.chartData}
+                chartEvents={this.chartEvents}
+                options={{
+                  headerHeight: 20,
+                  fontColor: 'black',
+                  showScale: true,
+                  maxDepth: 1,
+                  highlightOnMouseOver: true,
+                  minHighlightColor: '#8c6bb1',
+                  midHighlightColor: '#9ebcda',
+                  maxHighlightColor: '#edf8fb',
+                  minColor: '#009688',
+                  midColor: '#f7f7f7',
+                  maxColor: '#ee8100'
+                }}
+              />
+            </div>
           ) : (
             <CircularProgress className={classes.progress} />
           ))}
