@@ -5,6 +5,7 @@ import { globalActions } from '@ducks/globalDuck';
 import { discoverActions } from '../../duck';
 import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
+import GoogleAnalytics from 'react-ga'
 
 class DiscoverVisualizerPickerContainer extends PureComponent {
   addVisualizer = visualizerData => {
@@ -18,6 +19,12 @@ class DiscoverVisualizerPickerContainer extends PureComponent {
   onSelectVisualizer = () => {
     const self = this;
     const { visualizerData } = self.props;
+
+    GoogleAnalytics.event({
+      category: 'Discovery',
+      action: 'Selected visualizer : step 2'
+    });
+
     Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
     self.addVisualizer(visualizerData).then(() => {
       self.props.onNextClicked();
