@@ -1,12 +1,24 @@
-import PropTypes from 'prop-types';
+// @flow
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
+import { etlActions } from '@ducks/etlDuck';
 import { discoverActions } from '../../duck';
 import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
+import { toast } from 'react-toastify';
 
-class DiscoverVisualizerPickerContainer extends PureComponent {
+type Props = {
+  cardIndex: number,
+  visualizerData: Object,
+  handleSetSelectedPipelineId: Function,
+  onAddSelectedVisualizer: Function,
+  dataSourceGroups: Object,
+  onNextClicked: Function,
+  setPipelineExecutorStep: Function
+};
+
+class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
   addVisualizer = visualizerData => {
     const self = this;
     return new Promise(resolve => {
@@ -18,10 +30,35 @@ class DiscoverVisualizerPickerContainer extends PureComponent {
   onSelectVisualizer = () => {
     const self = this;
     const { visualizerData } = self.props;
+    const dataSourceGroups = visualizerData.dataSourceGroups;
     Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
     self.addVisualizer(visualizerData).then(() => {
-      self.props.onNextClicked();
+      if (dataSourceGroups.length === 1) {
+        self.handleSelectPipeline(dataSourceGroups[0]);
+      } else {
+        self.props.onNextClicked();
+      }
     });
+  };
+
+  handleSelectPipeline = datasourceAndPipelines => {
+    const { handleSetSelectedPipelineId, setPipelineExecutorStep } = this.props;
+    const pipelines = datasourceAndPipelines.pipelines;
+    pipelines.sort((a, b) => a.minimalIteration < b.minimalIteration);
+    const pipelineWithMinIterations = pipelines[0];
+    const pipelineId = pipelineWithMinIterations.id;
+
+    handleSetSelectedPipelineId(pipelineId);
+    setPipelineExecutorStep();
+
+    toast.info(
+      `Automatically skipping pipeline selection since
+      only one pipeline group discovered.`,
+      {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 4000
+      }
+    );
   };
 
   render() {
@@ -38,6 +75,15 @@ class DiscoverVisualizerPickerContainer extends PureComponent {
 
 const mapDispatchToProps = dispatch => {
   const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
+  const setPipelineExecutorStep = () =>
+    dispatch(discoverActions.setActiveStep(3));
+
+  const handleSetSelectedPipelineId = pipelineId =>
+    dispatch(
+      etlActions.setPipelineIdAction({
+        id: pipelineId
+      })
+    );
 
   const onAddSelectedVisualizer = visualizerData =>
     dispatch(
@@ -48,13 +94,10 @@ const mapDispatchToProps = dispatch => {
 
   return {
     onNextClicked,
-    onAddSelectedVisualizer
+    setPipelineExecutorStep,
+    onAddSelectedVisualizer,
+    handleSetSelectedPipelineId
   };
-};
-
-DiscoverVisualizerPickerContainer.propTypes = {
-  cardIndex: PropTypes.any,
-  visualizerData: PropTypes.any
 };
 
 export default connect(
