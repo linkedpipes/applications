@@ -18,9 +18,18 @@ export const samples = [
   {
     id: uuid.v4(),
     type: 'ttlFile',
-    label: 'GoogleMaps Sample',
+    label: 'GoogleMaps Sample (File)',
     fileUrl:
       'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
+  },
+  {
+    id: uuid.v4(),
+    type: 'sparqlEndpoint',
+    label: 'GoogleMaps Sample',
+    sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
+    namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
+    dataSampleIri:
+      'https://gist.githubusercontent.com/Ponsietta/1cfcc9cc018c11e39afe1553d0b3f25f/raw/a90b4a34e2edb6097a16f983518f1fee573e8113/ruian-test-buildings_map_sample.ttl'
   },
   {
     id: uuid.v4(),
