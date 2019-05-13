@@ -33,9 +33,15 @@ public class VirtuosoController {
         return ResponseEntity.ok(TtlGenerator.getVirtuosoServiceDescription(GRAPH_NAME_PREFIX + graphId));
     }
 
+    /**
+     * Check if a named graph exists in our Virtuoso db
+     * @param graphName - full URI identifying the named graph
+     * @return
+     * @throws LpAppsException
+     */
     @GetMapping("api/virtuoso/graphExists")
-    public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphId") String graphId) throws LpAppsException {
-        boolean exists = virtuosoService.checkNamedGraphExists(graphId);
+    public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphName") String graphName) throws LpAppsException {
+        boolean exists = virtuosoService.checkNamedGraphExists(graphName);
         if (exists)
             return ResponseEntity.ok("");
 
