@@ -125,7 +125,7 @@ const getVisualizer = (
 
 const VisualizerControllerContainer = (props: Props) => {
   return (
-    <Grid container className={props.classes.root} direction="row" spacing={0}>
+    <Grid container className={props.classes.root} direction="row" spacing={40}>
       <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
         {getFilters(
           props.visualizer.visualizerCode,
