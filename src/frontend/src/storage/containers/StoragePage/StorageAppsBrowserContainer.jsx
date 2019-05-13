@@ -22,8 +22,6 @@ type State = {
 class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   isMounted = false;
 
-  didLoadInitialMetadata = false;
-
   didUpdateMetadata = false;
 
   state = {
@@ -44,12 +42,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 
   async componentWillUpdate() {
-    if (
-      this.isMounted &&
-      this.didLoadInitialMetadata &&
-      this.props.webId &&
-      !this.didUpdateMetadata
-    ) {
+    if (this.isMounted && this.props.webId && !this.didUpdateMetadata) {
       this.loadStoredApplications();
       this.didUpdateMetadata = true;
     }
@@ -58,7 +51,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.isMounted = false;
     this.didUpdateMetadata = false;
-    this.didLoadInitialMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -76,9 +68,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
       if (this.isMounted) {
         this.setState({ applicationsMetadata: metadata });
         Log.info(metadata, 'StorageAppsBrowserContainer');
-        if (!this.didLoadInitialMetadata) {
-          this.didLoadInitialMetadata = true;
-        }
       }
     }
   };
