@@ -82,12 +82,23 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+    * Log a discovery onto user, notify discovery started via sockets and
+    * start status polling.
+    */
     private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
 
+    /**
+    * Get discovery status, pull discovery out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: discoveryAdded
+    * - message type: DiscoverySession
+    */
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
         DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
@@ -119,6 +130,13 @@ public class ExecutorServiceComponent implements ExecutorService {
         return execution;
     }
 
+    /**
+    * Get execution status, pull execution out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: executionAdded
+    * - message type: PipelineExecution
+    */
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
@@ -133,6 +151,19 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the ETL and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: executionIri
+     * - event name: executionStatus
+     * - message type: EtlStatusReport
+     */
     private void startEtlStatusPolling(String executionIri) throws LpAppsException {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
@@ -250,6 +281,19 @@ public class ExecutorServiceComponent implements ExecutorService {
         Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the Discovery and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: discoveryId
+     * - event name: discoveryStatus
+     * - message type: DiscoveryStatusReport
+     */
     private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
         Runnable checker = () -> {
             DiscoveryDao dao = null;

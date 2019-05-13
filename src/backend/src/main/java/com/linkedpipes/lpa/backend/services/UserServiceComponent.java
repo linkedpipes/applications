@@ -49,6 +49,16 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryNamedGraphRepository ngRepository;
 
+    /**
+    * Returns the user's profile. If user doesn't exist yet we add them.
+    *
+    * As SOLID is used for authentication, on the backend side there's a fully
+    * transparent way of adding a new user.
+    *
+    * Returned is a user's profile containing all user's discoveries and
+    * executions along with their status (as currently stored in the DB by
+    * the ExecutorService)
+    */
     @NotNull @Override @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserProfile addUserIfNotPresent(String webId) {
         List<UserDao> users = repository.findByWebId(webId);
@@ -119,6 +129,11 @@ public class UserServiceComponent implements UserService {
         repository.save(user);
     }
 
+    /**
+    * Fetch everything we know about this user: all applications, all
+    * discoveries (inc. named graphs used) and all executions and return it
+    * in one object.
+    */
     private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
