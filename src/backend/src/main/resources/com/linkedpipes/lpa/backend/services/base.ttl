@@ -18,6 +18,7 @@
 
       # original: https://discovery.linkedpipes.com/resource/transformer/wikidata-coordinate-location-to-schema-geocoordinates/template
       <https://gist.github.com/ivan-lattak/e3d3cb874034b750c51b803bcee2989f/raw/1dff3640951299672abfb35f2b392547fcc8f00a/wikidata-coordinate-location-to-schema-geocoordinates>,
+      <https://gist.githubusercontent.com/Ponsietta/e8b3e15feb866d68ff6affb601281aca/raw/fee5aa4e3824f9287e96c78e8a01911a9527b997/skos-concept-with-opengis-geom-to-skos-primarySubject>,
 
       <https://discovery.linkedpipes.com/resource/transformer/geo-pos-to-schema-geocoordinates/template>,
       <https://discovery.linkedpipes.com/resource/transformer/geosparql-aswkt-to-schema-geocoordinates/template>,
@@ -251,8 +252,7 @@
     <https://discovery.linkedpipes.com/vocabulary/discovery/hasTransformer>
 	  <https://discovery.linkedpipes.com/resource/transformer/wikidata-coordinate-location-to-schema-geocoordinates/template>,
       <https://discovery.linkedpipes.com/resource/transformer/geo-pos-to-schema-geocoordinates/template>,
-	  <https://discovery.linkedpipes.com/resource/transformer/geosparql-aswkt-to-schema-geocoordinates/template>,
-	  <https://gist.githubusercontent.com/Ponsietta/e8b3e15feb866d68ff6affb601281aca/raw/fee5aa4e3824f9287e96c78e8a01911a9527b997/skos-concept-with-opengis-geom-to-skos-primarySubject> .
+	  <https://discovery.linkedpipes.com/resource/transformer/geosparql-aswkt-to-schema-geocoordinates/template> .
 
 <https://discovery.linkedpipes.com/resource/transformer-group/all-and-generated/schema.org/geo> a <https://discovery.linkedpipes.com/vocabulary/discovery/TransformerGroup> ;
     <https://discovery.linkedpipes.com/vocabulary/discovery/hasTransformer>
