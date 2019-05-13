@@ -2,7 +2,6 @@
 import React, { PureComponent } from 'react';
 import HomeComponent from './HomeComponent';
 import { connect } from 'react-redux';
-import { userActions } from '@ducks/userDuck';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
@@ -41,6 +40,8 @@ type State = {
 class HomeContainer extends PureComponent<Props, State> {
   isMounted = false;
 
+  didLoadInitialMetadata = false;
+
   didUpdateMetadata = false;
 
   state = {
@@ -62,20 +63,21 @@ class HomeContainer extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
-    this.isMounted = true;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
+    this.isMounted = true;
   }
 
   async componentWillUpdate() {
     if (
       this.isMounted &&
+      this.didLoadInitialMetadata &&
       this.props.userProfile.webId &&
       !this.didUpdateMetadata
     ) {
-      this.loadApplicationsMetadata();
+      await this.loadApplicationsMetadata();
       this.didUpdateMetadata = true;
     }
   }
@@ -83,6 +85,7 @@ class HomeContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.isMounted = false;
     this.didUpdateMetadata = false;
+    this.didLoadInitialMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -101,6 +104,10 @@ class HomeContainer extends PureComponent<Props, State> {
 
       if (this.isMounted) {
         this.setState({ applicationsMetadata: metadata });
+
+        if (!this.didLoadInitialMetadata) {
+          this.didLoadInitialMetadata = true;
+        }
 
         Log.info(metadata, 'HomeContainer');
       }
@@ -316,9 +323,6 @@ const mapDispatchToProps = dispatch => {
   const onInputExampleClicked = sample =>
     dispatch(discoverActions.setSelectedInputExample(sample));
 
-  const handleSetUserProfile = userProfile =>
-    dispatch(userActions.setUserProfileAsync(userProfile));
-
   const handleSetResultPipelineIri = resultGraphIri =>
     dispatch(
       etlActions.addSelectedResultGraphIriAction({
@@ -343,7 +347,6 @@ const mapDispatchToProps = dispatch => {
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
   return {
-    handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
