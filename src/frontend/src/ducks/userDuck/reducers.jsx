@@ -21,16 +21,6 @@ const userReducer = (state = INITIAL_STATE, action) => {
         pipelineExecutions: action.profile.pipelineExecutions
       };
 
-    case types.SET_SOLID_USER_PROFILE:
-      return {
-        ...state,
-        applications: action.profile.applications,
-        discoverySessions: action.profile.discoverySessions,
-        pipelineExecutions: action.profile.pipelineExecutions,
-        name: action.solidUsername,
-        image: action.solidImage
-      };
-
     case types.SET_USER_WEBID:
       return {
         ...state,

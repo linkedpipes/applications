@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { StorageAppsBrowserCardComponent } from './children';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import Emoji from 'react-emoji-render';
+import uuid from 'uuid';
 
 const styles = () => ({
   root: {
