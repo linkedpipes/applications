@@ -99,14 +99,6 @@ const SettingsPageComponent = ({
           >
             Change folder
           </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Change password
-          </Button>
         </form>
       </Paper>
     </main>
