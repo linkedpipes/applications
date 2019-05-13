@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.profile.UserProfile;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
@@ -34,6 +35,23 @@ public class UserController {
         } catch(org.springframework.dao.CannotAcquireLockException | org.hibernate.exception.LockAcquisitionException e) {
             logger.warn("Error storing user, will retry once");
             return ResponseEntity.ok(userService.addUserIfNotPresent(user));
+        }
+    }
+
+    @NotNull
+    @PostMapping("/api/user/color")
+    public ResponseEntity<UserProfile> setColorScheme(
+        @NotNull @RequestParam(value="webId", required=true) String user,
+        @NotNull @RequestParam(value="color", required=true) String color
+    ) throws LpAppsException {
+        try {
+            userService.addUserIfNotPresent(user);
+            UserProfile p = userService.setUserColorScheme(user, color);
+            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("colorChanged", color);
+            return ResponseEntity.ok(p);
+        } catch(UserNotFoundException e) {
+          logger.error("User not found: " + user);
+          throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 

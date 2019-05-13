@@ -123,6 +123,7 @@ public class UserServiceComponent implements UserService {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
         profile.applications = new ArrayList<>();
+        profile.color = user.getColor();
         if (user.getApplications() != null) {
             for (ApplicationDao dba : user.getApplications()) {
                 Application app = new Application();
@@ -187,4 +188,13 @@ public class UserServiceComponent implements UserService {
         a.solidIri = solidIri;
         com.linkedpipes.lpa.backend.Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
     }
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile setUserColorScheme(String username, String color) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        user.setColor(color);
+        repository.save(user);
+        return transformUserProfile(user);
+    }
+
 }
