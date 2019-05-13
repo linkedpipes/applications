@@ -9,7 +9,10 @@ const INITIAL_STATE = {
 const applicationReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case types.SET_APPLICATION:
-      return { ...state, selectedApplication: action.value };
+      return {
+        ...state,
+        selectedApplication: { ...state.selectedApplication, ...action.value }
+      };
     case types.SET_APPLICATION_METADATA:
       return { ...state, selectedApplicationMetadata: action.value };
     case types.RESET_APPLICATION_METADATA:
