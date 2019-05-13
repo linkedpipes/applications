@@ -24,6 +24,8 @@ import { userActions } from '@ducks/userDuck';
 import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
+import withTracker from './withTracker';
+import GoogleAnalytics from 'react-ga';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -113,6 +115,8 @@ class AppRouter extends React.PureComponent<Props> {
 
     authClient.trackSession(session => {
       if (session) {
+        GoogleAnalytics.set({ userId: session.webId });
+
         handleSetUserWebId(session.webId);
         Log.info(session);
         self.startSocketListeners();
@@ -294,52 +298,71 @@ class AppRouter extends React.PureComponent<Props> {
               <SocketContext.Provider value={socket}>
                 <Switch>
                   <PublicLayout
-                    component={AuthorizationPage}
+                    component={withTracker(AuthorizationPage)}
                     path="/login"
                     exact
                   />
-                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+
                   <PrivateLayout
-                    path="/create-app"
-                    component={CreateVisualizerPage}
+                    path="/dashboard"
+                    component={withTracker(HomePage)}
                     exact
                   />
+
+                  <PrivateLayout
+                    path="/create-app"
+                    component={withTracker(CreateVisualizerPage)}
+                    exact
+                  />
+
                   <PrivateLayout
                     path="/discover"
                     component={DiscoverPage}
                     exact
                   />
+
                   <PrivateLayout
                     path="/profile"
-                    component={UserProfilePage}
+                    component={withTracker(UserProfilePage)}
                     exact
                   />
 
                   <PrivateLayout
                     path="/settings"
-                    component={SettingsPage}
+                    component={withTracker(SettingsPage)}
                     exact
                   />
-                  <PrivateLayout path="/about" component={AboutPage} exact />
-
-                  <PrivateLayout path="/dashboard" component={HomePage} exact />
 
                   <PrivateLayout
-                    path="/discover"
-                    component={DiscoverPage}
+                    path="/about"
+                    component={withTracker(AboutPage)}
                     exact
                   />
+
                   <PrivateLayout
                     path="/storage"
-                    component={StoragePage}
+                    component={withTracker(StoragePage)}
                     exact
                   />
-                  <PrivateLayout path="/about" component={AboutPage} exact />
 
-                  <PublicLayout path="/404" component={NotFoundPage} exact />
-                  <Route path="/map" component={ApplicationPage} />
-                  <Route path="/treemap" component={ApplicationPage} />
-                  <Route path="/chord" component={ApplicationPage} />
+                  <PublicLayout
+                    path="/404"
+                    component={withTracker(NotFoundPage)}
+                    exact
+                  />
+
+                  <Route path="/map" component={withTracker(ApplicationPage)} />
+
+                  <Route
+                    path="/treemap"
+                    component={withTracker(ApplicationPage)}
+                  />
+
+                  <Route
+                    path="/chord"
+                    component={withTracker(ApplicationPage)}
+                  />
+
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>

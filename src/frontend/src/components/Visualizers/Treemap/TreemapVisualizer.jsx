@@ -60,6 +60,13 @@ const transformData = data => {
 };
 
 class TreemapVisualizer extends React.PureComponent<Props, State> {
+  chartEvents: Array<{
+    eventName: string,
+    callback: ({ chartWrapper: any }) => Function
+  }>;
+
+  conceptsFetched: Set<string>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -171,14 +178,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   };
 
   handleGoUpClick = () => {};
-
-  chartEvents: Array<{
-    eventName: string,
-    callback: ({ chartWrapper: any }) => Function
-  }>;
-
-  conceptsFetched: Set<string>;
-
   render() {
     const { classes } = this.props;
     return (

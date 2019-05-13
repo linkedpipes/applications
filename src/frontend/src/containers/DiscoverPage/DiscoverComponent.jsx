@@ -12,6 +12,7 @@ import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
 import { ETL_STATUS_TYPE } from '@utils';
+import GoogleAnalytics from 'react-ga'
 
 const styles = theme => ({
   root: {
@@ -105,6 +106,12 @@ const DiscoverComponent = ({
                         disabled={
                           etlExecutionStatus !== ETL_STATUS_TYPE.Finished
                         }
+                        onClick={() => {
+                          GoogleAnalytics.event({
+                            category: 'Discovery',
+                            action: 'Pressed create app : step 4'
+                          });
+                        }}
                         component={Link}
                         to="/create-app"
                       >
