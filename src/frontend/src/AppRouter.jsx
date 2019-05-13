@@ -59,6 +59,10 @@ type Props = {
   handleSetUserWebId: Function
 };
 
+type State = {
+  isExternalPath: boolean
+};
+
 const errorHandler = userId => {
   return (error: Error, componentStack: string) => {
     Log.error(componentStack, 'AppRouter');
@@ -72,17 +76,29 @@ const errorHandler = userId => {
   };
 };
 
-class AppRouter extends React.PureComponent<Props> {
-  componentDidMount() {
-    this.setupSessionTracker();
-  }
+class AppRouter extends React.PureComponent<Props, State> {
+  state = {
+    isExternalPath: false
+  };
 
-  componentWillUpdate() {
-    Log.info('Updating component');
+  componentDidMount() {
+    const pathname = window.location.href;
+
+    if (
+      pathname.includes('/map') ||
+      pathname.includes('/treemap') ||
+      pathname.includes('/chord')
+    ) {
+      this.setState({ isExternalPath: true });
+    } else {
+      this.setupSessionTracker();
+    }
   }
 
   componentWillUnmount() {
-    socket.removeAllListeners();
+    if (!this.state.isExternalPath) {
+      socket.removeAllListeners();
+    }
   }
 
   setupProfileData = async jsonResponse => {
