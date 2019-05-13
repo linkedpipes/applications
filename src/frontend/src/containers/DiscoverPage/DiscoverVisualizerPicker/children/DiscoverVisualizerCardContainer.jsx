@@ -7,6 +7,7 @@ import { discoverActions } from '../../duck';
 import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 import { toast } from 'react-toastify';
+import GoogleAnalytics from 'react-ga'
 
 type Props = {
   cardIndex: number,
@@ -30,6 +31,12 @@ class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
   onSelectVisualizer = () => {
     const self = this;
     const { visualizerData } = self.props;
+
+    GoogleAnalytics.event({
+      category: 'Discovery',
+      action: 'Selected visualizer : step 2'
+    });
+
     const dataSourceGroups = visualizerData.dataSourceGroups;
     Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
     self.addVisualizer(visualizerData).then(() => {
