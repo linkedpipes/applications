@@ -15,7 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { getBeautifiedVisualizerTitle, Log } from '@utils';
+import { GlobalUtils, Log } from '@utils';
 import { AppConfiguration } from '../../../models';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
@@ -202,7 +202,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               </IconButton>
             }
             title={applicationMetadata.title}
-            subheader={getBeautifiedVisualizerTitle(
+            subheader={GlobalUtils.getBeautifiedVisualizerTitle(
               applicationMetadata.endpoint
             )}
           />
