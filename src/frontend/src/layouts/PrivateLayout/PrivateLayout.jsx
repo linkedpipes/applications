@@ -3,7 +3,10 @@ import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { withAuthorization } from '@utils';
+import { Log, AuthenticationService, withAuthorization } from '@utils';
+import { StorageToolbox } from '@storage';
+import { userActions } from '@ducks/userDuck';
+import { connect } from 'react-redux';
 import Typography from '@material-ui/core/Typography/Typography';
 
 const styles = theme => ({
@@ -66,4 +69,17 @@ const PrivateLayout = ({
   );
 };
 
-export default withAuthorization(withStyles(styles)(PrivateLayout));
+const mapDispatchToProps = dispatch => {
+  const handleSetUserProfile = userProfile =>
+    dispatch(userActions.setUserProfile(userProfile));
+  return {
+    handleSetUserProfile
+  };
+};
+
+export default withAuthorization(
+  connect(
+    null,
+    mapDispatchToProps
+  )(withStyles(styles)(PrivateLayout))
+);
