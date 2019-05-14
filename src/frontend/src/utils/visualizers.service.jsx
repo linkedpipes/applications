@@ -47,9 +47,8 @@ const VisualizersService = {
     });
   },
 
-  // Again, should it really be POST?
-  getSKOSConceptsCount: async ({ propertyUri, conceptUris }) => {
-    return lpaAxios.post('skos/conceptsCounts', { propertyUri, conceptUris });
+  getGraphExists: async graphName => {
+    return lpaAxios.get('/virtuoso/graphExists', { params: { graphName } });
   }
 };
 

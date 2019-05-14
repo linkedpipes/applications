@@ -6,7 +6,7 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageBackend } from '@storage';
+import { StorageBackend, StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -14,10 +14,12 @@ import {
   ETLService,
   ETL_STATUS_TYPE,
   ETL_STATUS_MAP,
-  withAuthorization
+  withAuthorization,
+  VisualizersService
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   history: { push: any },
@@ -29,11 +31,12 @@ type Props = {
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
-  handleSetSelectedApplicationTitle: Function
+  handleSetSelectedApplicationTitle: Function,
+  applicationsFolder: String
 };
 type State = {
   tabIndex: number,
-  applicationsMetadata: [],
+  applicationsMetadata: Array<AppConfiguration>,
   loadingAppIsActive: boolean
 };
 
@@ -248,22 +251,73 @@ class HomeContainer extends PureComponent<Props, State> {
     const applicationData = appConfigurationResponse.data.applicationData;
 
     const resultGraphIri = applicationData.selectedResultGraphIri;
-    const selectedVisualiser = {
-      visualizer: { visualizerCode: applicationData.visualizerCode }
-    };
 
-    handleSetResultPipelineIri(resultGraphIri);
-    handleSetSelectedApplicationTitle(applicationMetadata.title);
-    handleSetSelectedApplicationData(applicationData);
-    handleSetSelectedApplicationMetadata(applicationMetadata);
-    handleSetSelectedVisualizer(selectedVisualiser);
+    let graphExists = true;
 
-    await this.setApplicationLoaderStatus(false);
-
-    history.push({
-      pathname: '/create-app'
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      graphExists = false;
     });
-    Log.info('test');
+
+    if (graphExists) {
+      const selectedVisualiser = {
+        visualizer: { visualizerCode: applicationData.visualizerCode }
+      };
+
+      handleSetResultPipelineIri(resultGraphIri);
+      handleSetSelectedApplicationTitle(applicationMetadata.title);
+      handleSetSelectedApplicationData(applicationData);
+      handleSetSelectedApplicationMetadata(applicationMetadata);
+      handleSetSelectedVisualizer(selectedVisualiser);
+
+      await this.setApplicationLoaderStatus(false);
+
+      history.push({
+        pathname: '/create-app'
+      });
+    } else {
+      toast.success(
+        'Application data was removed or deleted from the platform,' +
+          'blank metadata will be removed from storage...',
+        {
+          position: toast.POSITION.TOP_RIGHT
+        }
+      );
+      this.handleDeleteApp(applicationMetadata);
+    }
+  };
+
+  handleDeleteApp = async applicationMetadata => {
+    const { setApplicationLoaderStatus } = this;
+
+    await setApplicationLoaderStatus(true);
+
+    const result = await StorageToolbox.removeAppFromStorage(
+      this.props.applicationsFolder,
+      applicationMetadata
+    );
+    if (result) {
+      this.handleApplicationDeleted(applicationMetadata);
+    }
+
+    await setApplicationLoaderStatus(false);
+  };
+
+  handleApplicationDeleted = applicationConfigurationMetadata => {
+    const newApplicationsMetadata = this.state.applicationsMetadata;
+
+    const filteredMetadata = newApplicationsMetadata.filter(value => {
+      return value.url !== applicationConfigurationMetadata.url;
+    });
+
+    toast.success(
+      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 4000
+      }
+    );
+
+    this.setState({ applicationsMetadata: filteredMetadata });
   };
 
   handleShareAppClicked = () => {
@@ -315,6 +369,7 @@ const HomeContainerWithSocket = props => (
 const mapStateToProps = state => {
   return {
     userProfile: state.user,
+    applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };
 };

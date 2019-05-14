@@ -7,7 +7,7 @@ import {
   ChordVisualizer
 } from '@components';
 import { withRouter } from 'react-router-dom';
-import { Log } from '@utils';
+import { Log, VisualizersService } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import axios from 'axios';
@@ -53,7 +53,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
-    const response = await axios.get(applicationIri).catch(err => {
+    const applicationResponse = await axios.get(applicationIri).catch(err => {
       Log.error(err, 'ApplicationContainer');
       self.setState({
         applicationType: VISUALIZER_TYPE.UNDEFINED,
@@ -61,8 +61,17 @@ class ApplicationContainer extends PureComponent<Props, State> {
       });
     });
 
-    const applicationData = response.data.applicationData;
-    const applicationType = applicationData.visualizerCode;
+    const applicationData = applicationResponse.data.applicationData;
+    let applicationType = applicationData.visualizerCode;
+
+    if (applicationType !== VISUALIZER_TYPE.MAP) {
+      await VisualizersService.getGraphExists(
+        applicationData.selectedResultGraphIri
+      ).catch(() => {
+        applicationType = VISUALIZER_TYPE.UNDEFINED;
+      });
+    }
+
     self.setState({ applicationType, applicationData });
   };
 
