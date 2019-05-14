@@ -28,7 +28,7 @@ type State = {
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
-    applicationType: 'UNDEFINED',
+    applicationType: 'Loading',
     applicationData: {},
     width: 0,
     height: 0
@@ -53,20 +53,17 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
-    axios
-      .get(applicationIri)
-      .then(({ data }) => {
-        const applicationData = data.applicationData;
-        const applicationType = applicationData.visualizerCode;
-        self.setState({ applicationType, applicationData });
-      })
-      .catch(err => {
-        Log.error(err, 'ApplicationContainer');
-        self.setState({
-          applicationType: VISUALIZER_TYPE.UNDEFINED,
-          applicationData: undefined
-        });
+    const response = await axios.get(applicationIri).catch(err => {
+      Log.error(err, 'ApplicationContainer');
+      self.setState({
+        applicationType: VISUALIZER_TYPE.UNDEFINED,
+        applicationData: undefined
       });
+    });
+
+    const applicationData = response.data.applicationData;
+    const applicationType = applicationData.visualizerCode;
+    self.setState({ applicationType, applicationData });
   };
 
   componentWillUnmount() {

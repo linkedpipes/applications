@@ -176,13 +176,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
   handleGoUpClick = () => {};
 
-  conceptsFetched: Set<string>;
-
-  chartEvents: Array<{
-    eventName: string,
-    callback: ({ chartWrapper: any }) => Function
-  }>;
-
   render() {
     const { classes } = this.props;
     return (

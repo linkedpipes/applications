@@ -21,7 +21,6 @@ import { StoragePage, StorageBackend } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
-import { globalActions } from '@ducks/globalDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
 import withTracker from './withTracker';
@@ -51,16 +50,17 @@ type Props = {
   userId: ?string,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
-  handleSetUserProfile: Function,
+  handleSetSolidUserProfileAsync: Function,
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
   handleUpdateDiscoverySession: Function,
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
-  handleUpdateChooseFolderDialogState: Function,
-  handleSetSolidImage: Function,
-  handleSetSolidName: Function,
   handleSetUserWebId: Function
+};
+
+type State = {
+  isExternalPath: boolean
 };
 
 const errorHandler = userId => {
@@ -76,34 +76,39 @@ const errorHandler = userId => {
   };
 };
 
-class AppRouter extends React.PureComponent<Props> {
+class AppRouter extends React.PureComponent<Props, State> {
+  state = {
+    isExternalPath: false
+  };
+
   componentDidMount() {
-    this.setupSessionTracker();
+    const pathname = window.location.href;
+
+    if (
+      pathname.includes('/map') ||
+      pathname.includes('/treemap') ||
+      pathname.includes('/chord')
+    ) {
+      this.setState({ isExternalPath: true });
+    } else {
+      this.setupSessionTracker();
+    }
   }
 
   componentWillUnmount() {
-    socket.removeAllListeners();
+    if (!this.state.isExternalPath) {
+      socket.removeAllListeners();
+    }
   }
-
-  handleStorageFolder = async webId => {
-    await StorageBackend.getValidAppFolder(webId)
-      .then(folder => {
-        if (folder) {
-          this.props.handleUpdateApplicationsFolder(folder);
-        }
-      })
-      .catch(err => {
-        Log.error(err, 'AppRouter');
-        this.props.handleUpdateChooseFolderDialogState(true);
-      });
-  };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
     const me = await StorageBackend.getPerson(updatedProfileData.webId);
-    this.props.handleSetSolidImage(me.image);
-    this.props.handleSetSolidName(me.name);
-    this.props.handleSetUserProfile(updatedProfileData);
+    this.props.handleSetSolidUserProfileAsync(
+      updatedProfileData,
+      me.name,
+      me.image
+    );
   };
 
   setupSessionTracker = async () => {
@@ -118,8 +123,10 @@ class AppRouter extends React.PureComponent<Props> {
         GoogleAnalytics.set({ userId: session.webId });
 
         handleSetUserWebId(session.webId);
+
         Log.info(session);
         self.startSocketListeners();
+
         AuthenticationService.getUserProfile(session.webId)
           .then(res => {
             Log.info(
@@ -144,13 +151,7 @@ class AppRouter extends React.PureComponent<Props> {
                 session.webId,
                 'linkedpipes'
               ).then(created => {
-                if (created) {
-                  let newUrl = session.webId
-                    ? session.webId.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1]
-                    : '';
-                  newUrl = newUrl.substring(0, newUrl.length - 1);
-                  handleUpdateApplicationsFolder(`${newUrl}/linkedpipes`);
-                } else {
+                if (!created) {
                   toast.error('Error creating app folders, try again.', {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000
@@ -160,6 +161,7 @@ class AppRouter extends React.PureComponent<Props> {
             });
 
             if (folder) {
+              Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
             }
           })
@@ -167,7 +169,7 @@ class AppRouter extends React.PureComponent<Props> {
             Log.error(error, 'HomeContainer');
           });
 
-        this.handleStorageFolder(session.webId);
+        Log.warn('Called global');
       } else {
         socket.removeAllListeners();
       }
@@ -329,7 +331,7 @@ class AppRouter extends React.PureComponent<Props> {
 
                   <PrivateLayout
                     path="/settings"
-                    component={withTracker(SettingsPage)}
+                    component={SettingsPage}
                     exact
                   />
 
@@ -351,17 +353,11 @@ class AppRouter extends React.PureComponent<Props> {
                     exact
                   />
 
-                  <Route path="/map" component={withTracker(ApplicationPage)} />
+                  <Route path="/map" component={ApplicationPage} />
 
-                  <Route
-                    path="/treemap"
-                    component={withTracker(ApplicationPage)}
-                  />
+                  <Route path="/treemap" component={ApplicationPage} />
 
-                  <Route
-                    path="/chord"
-                    component={withTracker(ApplicationPage)}
-                  />
+                  <Route path="/chord" component={ApplicationPage} />
 
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
@@ -385,16 +381,20 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => {
-  const handleSetUserProfile = userProfile =>
-    dispatch(userActions.setUserProfile(userProfile));
+  const handleSetSolidUserProfileAsync = (
+    userProfile,
+    solidUsername,
+    solidImage
+  ) =>
+    dispatch(
+      userActions.setSolidUserProfileAsync(
+        userProfile,
+        solidUsername,
+        solidImage
+      )
+    );
 
   const handleSetUserWebId = webId => dispatch(userActions.setUserWebId(webId));
-
-  const handleSetSolidName = solidName =>
-    dispatch(userActions.setSolidName(solidName));
-
-  const handleSetSolidImage = solidImage =>
-    dispatch(userActions.setSolidImage(solidImage));
 
   const handleAddDiscoverySession = discoverySession =>
     dispatch(userActions.addDiscoverySession({ session: discoverySession }));
@@ -411,20 +411,21 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateApplicationsFolder = value =>
     dispatch(userActions.updateApplicationsFolder({ value }));
 
-  const handleUpdateChooseFolderDialogState = state =>
-    dispatch(globalActions.setChooseFolderDialogState({ state }));
+  const handleUpdateUserDetails = actions => {
+    Promise.all(actions).then(changes => {
+      dispatch(changes);
+    });
+  };
 
   return {
-    handleSetUserProfile,
+    handleSetSolidUserProfileAsync,
     handleSetUserWebId,
-    handleSetSolidImage,
-    handleSetSolidName,
     handleAddDiscoverySession,
     handleAddExecutionSession,
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
-    handleUpdateChooseFolderDialogState
+    handleUpdateUserDetails
   };
 };
 
