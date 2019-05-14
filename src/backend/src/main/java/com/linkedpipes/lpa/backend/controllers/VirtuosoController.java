@@ -17,12 +17,6 @@ public class VirtuosoController {
     public static final String GRAPH_NAME_PREFIX = "https://applications.linkedpipes.com/graph/";
     private static final String SERVICE_DESCRIPTION_PATH = "/api/virtuoso/serviceDescription";
 
-    @NotNull private final VirtuosoService virtuosoService;
-
-    public VirtuosoController(ApplicationContext context){
-        virtuosoService = context.getBean(VirtuosoService.class);
-    }
-
     /**
      * Get service description of our virtuoso SPARQL endpoint
      * @param graphId
@@ -41,7 +35,7 @@ public class VirtuosoController {
      */
     @GetMapping("api/virtuoso/graphExists")
     public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphName") String graphName) throws LpAppsException {
-        boolean exists = virtuosoService.checkNamedGraphExists(graphName);
+        boolean exists = VirtuosoService.checkNamedGraphExists(graphName);
         if (exists)
             return ResponseEntity.ok("");
 
