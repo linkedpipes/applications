@@ -3,8 +3,6 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
