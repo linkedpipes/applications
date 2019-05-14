@@ -6,7 +6,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { VisualizerIcon } from '@components';
-import { getBeautifiedVisualizerTitle } from '@utils';
+import { GlobalUtils } from '@utils';
 
 const styles = {
   root: {
@@ -43,7 +43,7 @@ const DiscoverVisualizerCardComponent = ({
       />
       <CardContent className={classes.CardContent}>
         <Typography gutterBottom variant="h5" component="h2">
-          {getBeautifiedVisualizerTitle(
+          {GlobalUtils.getBeautifiedVisualizerTitle(
             visualizerData.visualizer.visualizerCode
           )}
         </Typography>

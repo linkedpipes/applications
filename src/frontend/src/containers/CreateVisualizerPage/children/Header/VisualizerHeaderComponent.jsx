@@ -14,7 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getBeautifiedVisualizerTitle } from '@utils';
+import { GlobalUtils } from '@utils';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
@@ -110,7 +110,7 @@ const VisualizerHeaderComponent = ({
           <Grid item>
             <Typography align="center" variant="h6">
               {selectedVisualizer
-                ? getBeautifiedVisualizerTitle(
+                ? GlobalUtils.getBeautifiedVisualizerTitle(
                     selectedVisualizer.visualizer.visualizerCode
                   )
                 : 'Unkown visualizer type'}

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@SuppressWarnings("unused")
+@Profile("!disableDB")
 public class DiscoveryController {
 
     @NotNull private final DiscoveryService discoveryService;
@@ -122,6 +123,8 @@ public class DiscoveryController {
             userService.addUserIfNotPresent(webId);
             String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraphs);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
+            System.out.println(discoveryConfig);
+
             return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);

@@ -47,13 +47,15 @@ const styles = theme => ({
 type Props = {
   classes: Object,
   userProfile: Object,
-  onHandleLogoutClicked: Function
+  onHandleLogoutClicked: Function,
+  onHandlePasswordReset: Function
 };
 
 const UserProfilePageContainer = ({
   classes,
   userProfile,
-  onHandleLogoutClicked
+  onHandleLogoutClicked,
+  onHandlePasswordReset
 }: Props) => {
   return (
     <main className={classes.main}>
@@ -86,10 +88,11 @@ const UserProfilePageContainer = ({
           <Button
             fullWidth
             variant="contained"
+            onClick={onHandlePasswordReset}
             color="primary"
             className={classes.submit}
           >
-            Update Profile
+            Reset Password
           </Button>
           <Button
             fullWidth

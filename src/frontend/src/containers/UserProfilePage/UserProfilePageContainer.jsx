@@ -30,13 +30,26 @@ class UserProfilePageContainer extends PureComponent<Props> {
     }
   };
 
+  performPasswordReset = async () => {
+    const { webId } = this.props.userProfile;
+
+    const domain = GlobalUtils.urlDomain(webId);
+
+    const resetUrl = `https://${domain}/account/password/reset`;
+
+    window.open(resetUrl, '_blank');
+
+    this.performLogout();
+  };
+
   render() {
     const { userProfile } = this.props;
-    const { performLogout } = this;
+    const { performLogout, performPasswordReset } = this;
     return (
       <UserProfilePageComponent
         userProfile={userProfile}
         onHandleLogoutClicked={performLogout}
+        onHandlePasswordReset={performPasswordReset}
       />
     );
   }

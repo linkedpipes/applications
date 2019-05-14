@@ -1,7 +1,4 @@
-import {
-  VisualizersService,
-  getBeautifiedVisualizerTitle
-} from './visualizers.service';
+import { VisualizersService } from './visualizers.service';
 import DiscoveryService from './discovery.service';
 import AuthenticationService from './authentication.service';
 import { ETLService, ETL_STATUS_MAP, ETL_STATUS_TYPE } from './etl.service';
@@ -18,7 +15,6 @@ export {
   ETLService,
   ETL_STATUS_MAP,
   ETL_STATUS_TYPE,
-  getBeautifiedVisualizerTitle,
   Log,
   GlobalUtils,
   withAuthorization

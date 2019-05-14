@@ -6,10 +6,16 @@ import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
-import java.util.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import static java.util.stream.Collectors.toList;
 
 public class MarkerExtractor {
@@ -31,7 +37,9 @@ public class MarkerExtractor {
                             geo.getProperty(Schema.latitude).getDouble(),
                             geo.getProperty(Schema.longitude).getDouble());
 
-                    String description = Optional.ofNullable(geoSubject.getProperty(Schema.description)).map(d -> d.getString()).orElse(null);
+                    String description = Optional.ofNullable(geoSubject.getProperty(Schema.description))
+                            .map(Statement::getString)
+                            .orElse(null);
 
                     LocalizedValue localizedLabel = SparqlUtils.getCombinedLabel(geoSubject, possibleLabels);
                     return new Marker(geoSubject.getURI(), coords, localizedLabel, description);

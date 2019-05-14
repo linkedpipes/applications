@@ -27,7 +27,7 @@ public final class ThrowableUtils {
         throw new UncheckedThrowableWrapper(cause);
     }
 
-    public static <T> T rethrowAsUnchecked(ThrowingSupplier<T> supplier) {
+    public static <T, X extends Throwable> T rethrowAsUnchecked(ThrowingSupplier<T, X> supplier) {
         try {
             return supplier.get();
         } catch (Throwable caught) {
@@ -52,18 +52,6 @@ public final class ThrowableUtils {
      * control flow of the program.
      */
     public static class UnreachableStatementError extends Error {
-    }
-
-    /**
-     * A functional interface for wrapping code which produces objects and may throw.
-     *
-     * @param <T> type of the objects being supplied
-     */
-    @FunctionalInterface
-    public interface ThrowingSupplier<T> {
-
-        T get() throws Throwable;
-
     }
 
 }
