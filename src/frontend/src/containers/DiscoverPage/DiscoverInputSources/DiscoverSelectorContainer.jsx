@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DiscoveryService, GlobalUtils, SocketContext, Log } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
+import GoogleAnalytics from 'react-ga'
 import { discoverActions } from '../duck';
 
 type Props = {
@@ -146,11 +147,16 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           return;
         }
         if (parsedData.status.isFinished) {
+
+          GoogleAnalytics.event({
+            category: 'Discovery',
+            action: 'Processed discovery : step 1'
+          });
+
           self.loadPipelineGroups(discoveryId).then(() => {
             self.setState({
               discoveryIsLoading: false
             });
-
             onNextClicked();
           });
         }

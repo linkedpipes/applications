@@ -47,23 +47,9 @@ const VisualizersService = {
     });
   },
 
-  // Again, should it really be POST?
-  getSKOSConceptsCount: async ({ propertyUri, conceptUris }) => {
-    return lpaAxios.post('skos/conceptsCounts', { propertyUri, conceptUris });
+  getGraphExists: async graphName => {
+    return lpaAxios.get('/virtuoso/graphExists', { params: { graphName } });
   }
 };
 
-// Maybe move to misc/utils?
-const getBeautifiedVisualizerTitle = visualizerId => {
-  if (visualizerId !== undefined) {
-    // eslint-disable-next-line func-names no-useless-escape
-    const removedUnderscore = visualizerId.replace(/_/g, ' ');
-    const capitalized = removedUnderscore.replace(/\w\S*/g, txt => {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-    return capitalized;
-  }
-  return '';
-};
-
-export { VisualizersService, getBeautifiedVisualizerTitle };
+export { VisualizersService };

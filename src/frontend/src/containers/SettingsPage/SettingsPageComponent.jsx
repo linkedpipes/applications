@@ -89,7 +89,7 @@ const SettingsPageComponent = ({
                 color="primary"
               />
             }
-            label="Switch dark theme"
+            label="Light theme"
           />
           <Button
             fullWidth
@@ -98,14 +98,6 @@ const SettingsPageComponent = ({
             onClick={onHandleChangeFolder}
           >
             Change folder
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Change password
           </Button>
         </form>
       </Paper>

@@ -5,14 +5,16 @@ import com.linkedpipes.lpa.backend.util.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.linkedpipes.lpa.backend.util.Memoizer.memoize;
 
 @RestController
-@SuppressWarnings("unused")
 public class DataSourceController {
 
     @NotNull

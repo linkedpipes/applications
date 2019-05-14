@@ -16,7 +16,7 @@ public final class JenaUtils {
 
     public static <R> R withQueryExecution(Query query, Function<QueryExecution, R> action) throws LpAppsException {
         List<String> graphNames = query.getGraphURIs();
-        if(graphNames.size() == 1 && !graphExists(graphNames.get(0))){
+        if (graphNames.size() == 1 && !graphExists(graphNames.get(0))) {
             throw new LpAppsException(HttpStatus.NOT_FOUND, "Named graph does not exist.");
         }
 
@@ -25,7 +25,7 @@ public final class JenaUtils {
         }
     }
 
-    public static boolean graphExists(String graphName){
+    public static boolean graphExists(String graphName) {
         QueryExecution queryExecution = QueryExecutionFactory.sparqlService(ENDPOINT, String.format("ASK WHERE { GRAPH <%s> { ?s ?p ?o } }", graphName));
         return queryExecution.execAsk();
     }

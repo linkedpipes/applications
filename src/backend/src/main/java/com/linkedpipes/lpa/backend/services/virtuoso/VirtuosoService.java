@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.services.virtuoso;
 
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
+import com.linkedpipes.lpa.backend.util.JenaUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +34,16 @@ public class VirtuosoService {
     @NotNull
     private static final Logger log = LoggerFactory.getLogger(VirtuosoService.class);
     @NotNull
-    private static final Pattern RESOURCE_FILENAME_PATTERN = Pattern.compile("^data-(?<graphNameSuffix>.*)\\.ttl$");
+    private static String GRAPH_NAME_SUFFIX = "graphNameSuffix";
+    @NotNull
+    private static final Pattern RESOURCE_FILENAME_PATTERN = Pattern.compile("^data-(?<" + GRAPH_NAME_SUFFIX + ">.*)\\.ttl$");
 
     @Value("classpath*:/com/linkedpipes/lpa/backend/services/virtuoso/data-*.ttl")
     private Resource[] resources;
+
+    public static boolean checkNamedGraphExists(String graphId){
+        return JenaUtils.graphExists(graphId);
+    }
 
     @PostConstruct
     public void createTestData() {
@@ -52,7 +59,7 @@ public class VirtuosoService {
                     }
 
                     String ttlData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
-                    putTtlToVirtuoso(matcher.group("graphNameSuffix"), ttlData);
+                    putTtlToVirtuoso(matcher.group(GRAPH_NAME_SUFFIX), ttlData);
                 }
             }
 
