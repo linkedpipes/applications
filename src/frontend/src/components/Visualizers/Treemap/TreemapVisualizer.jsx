@@ -175,9 +175,18 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
+
+    this.props.handleSetCurrentApplicationData({
+      id: uuid.v4(),
+      applicationEndpoint: 'treemap',
+      conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
+      selectedResultGraphIri: this.props.selectedResultGraphIri,
+      visualizerCode: 'TREEMAP'
+    });
   };
 
   handleGoUpClick = () => {};
+
   render() {
     const { classes } = this.props;
     return (
