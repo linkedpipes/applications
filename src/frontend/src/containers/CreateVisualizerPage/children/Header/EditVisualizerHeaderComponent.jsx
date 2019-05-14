@@ -16,7 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getBeautifiedVisualizerTitle } from '@utils';
+import { GlobalUtils } from '@utils';
 import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
@@ -139,7 +139,7 @@ const EditVisualizerHeaderComponent = ({
           <Grid item>
             <Typography align="center" variant="h6">
               {selectedVisualizer
-                ? getBeautifiedVisualizerTitle(
+                ? GlobalUtils.getBeautifiedVisualizerTitle(
                     selectedApplicationMetadata.endpoint
                   )
                 : 'Unkown visualizer type'}

@@ -94,7 +94,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
       `Removed application:\n${applicationConfigurationMetadata.title}`,
       {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
+        autoClose: 4000
       }
     );
 

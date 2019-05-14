@@ -15,7 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { getBeautifiedVisualizerTitle, Log } from '@utils';
+import { GlobalUtils, VisualizersService } from '@utils';
 import { AppConfiguration } from '../../../models';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
@@ -157,22 +157,38 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     const applicationData = appConfigurationResponse.data.applicationData;
 
     const resultGraphIri = applicationData.selectedResultGraphIri;
-    const selectedVisualiser = {
-      visualizer: { visualizerCode: applicationData.visualizerCode }
-    };
+    let graphExists = true;
 
-    handleSetResultPipelineIri(resultGraphIri);
-    handleSetSelectedApplicationTitle(applicationMetadata.title);
-    handleSetSelectedApplicationData(applicationData);
-    handleSetSelectedApplicationMetadata(applicationMetadata);
-    handleSetSelectedVisualizer(selectedVisualiser);
-
-    await setApplicationLoaderStatus(false);
-
-    history.push({
-      pathname: '/create-app'
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      graphExists = false;
     });
-    Log.info('test');
+
+    if (graphExists) {
+      const selectedVisualiser = {
+        visualizer: { visualizerCode: applicationData.visualizerCode }
+      };
+
+      await handleSetResultPipelineIri(resultGraphIri);
+      await handleSetSelectedApplicationTitle(applicationMetadata.title);
+      await handleSetSelectedApplicationData(applicationData);
+      await handleSetSelectedApplicationMetadata(applicationMetadata);
+      await handleSetSelectedVisualizer(selectedVisualiser);
+
+      await setApplicationLoaderStatus(false);
+
+      history.push({
+        pathname: '/create-app'
+      });
+    } else {
+      toast.success(
+        'Application data was removed or deleted from the platform,' +
+          'blank metadata will be removed from storage...',
+        {
+          position: toast.POSITION.TOP_RIGHT
+        }
+      );
+      this.handleDeleteApp();
+    }
   };
 
   render() {
@@ -202,7 +218,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               </IconButton>
             }
             title={applicationMetadata.title}
-            subheader={getBeautifiedVisualizerTitle(
+            subheader={GlobalUtils.getBeautifiedVisualizerTitle(
               applicationMetadata.endpoint
             )}
           />
