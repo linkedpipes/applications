@@ -32,7 +32,6 @@ public class Application {
     public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1);
 
     @Bean
-    @SuppressWarnings("unused")
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
@@ -44,7 +43,6 @@ public class Application {
     }
 
     @Bean
-    @SuppressWarnings("unused")
     public ServletContextInitializer sentryServletContextInitializer() {
         return new io.sentry.spring.SentryServletContextInitializer();
     }

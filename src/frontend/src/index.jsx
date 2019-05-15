@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/browser';
 import store from './store';
 import 'normalize.css/normalize.css';
 import AppRouter from './AppRouter';
+import GoogleAnalytics from 'react-ga';
 import { Log } from '@utils';
 // #if process.env.NODE_ENV !== 'production'
 import './ReactotronConfig';
@@ -36,5 +37,7 @@ Log.info(`
 ███████╗██║     ██║  ██║██║     ██║     ███████║
 ╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝
 `);
+
+GoogleAnalytics.initialize('UA-139954974-1');
 
 render(jsx, document.querySelector('#app'));

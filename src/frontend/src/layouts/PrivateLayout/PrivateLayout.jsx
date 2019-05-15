@@ -68,17 +68,4 @@ const PrivateLayout = ({
   );
 };
 
-const mapDispatchToProps = dispatch => {
-  const handleSetUserProfile = userProfile =>
-    dispatch(userActions.setUserProfile(userProfile));
-  return {
-    handleSetUserProfile
-  };
-};
-
-export default withAuthorization(
-  connect(
-    null,
-    mapDispatchToProps
-  )(withStyles(styles)(PrivateLayout))
-);
+export default withAuthorization(withStyles(styles)(PrivateLayout));

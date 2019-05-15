@@ -5,6 +5,13 @@ const setUserProfile = profile => ({
   profile
 });
 
+const setSolidUserProfile = (profile, solidUsername, solidImage) => ({
+  type: types.SET_SOLID_USER_PROFILE,
+  profile,
+  solidUsername,
+  solidImage
+});
+
 const setUserWebId = value => ({
   type: types.SET_USER_WEBID,
   value
@@ -58,6 +65,14 @@ const setUserInboxNotifications = inboxNotifications => ({
   value: inboxNotifications
 });
 
+const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
+  return dispatch =>
+    new Promise(resolve => {
+      dispatch(setSolidUserProfile(profile, solidUsername, solidImage));
+      resolve();
+    });
+};
+
 export default {
   setUserProfile,
   setUserWebId,
@@ -68,6 +83,7 @@ export default {
   addExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
-  updateApplicationsFolder,
+  updateApplicationsFolder
   setUserInboxNotifications
+  setSolidUserProfileAsync,
 };

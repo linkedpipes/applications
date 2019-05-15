@@ -18,7 +18,6 @@ plugins {
 configurations { codacy }
 
 apply plugin: 'java'
-apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
@@ -36,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.5.6'
+    compile fileTree(dir: 'lib', include: '*.jar')
 
     compile 'org.springframework.boot:spring-boot-starter-web'
     runtime 'org.springframework.boot:spring-boot-devtools'
@@ -69,9 +68,6 @@ dependencies {
 
 sourceSets {
     main {
-        groovy.srcDirs = ["$projectDir/src/main/groovy", "$projectDir/src/main/java"]
-        java.srcDirs = []
-        
         resources {
             srcDir "src/main/config"
         }

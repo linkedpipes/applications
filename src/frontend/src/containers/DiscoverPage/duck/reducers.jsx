@@ -20,6 +20,14 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       };
     }
 
+    case types.SET_ACTIVE_STEP: {
+      const { value } = action;
+      return {
+        ...state,
+        activeStep: value
+      };
+    }
+
     case types.DECREMENT_ACTIVE_STEP: {
       const { value } = action;
       const { activeStep } = state;
