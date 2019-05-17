@@ -6,7 +6,8 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageBackend, StorageToolbox, StorageInboxDialog } from '@storage';
+import { userActions } from '@ducks/userDuck';
+import { StorageBackend, StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -34,7 +35,6 @@ type Props = {
   handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function,
   applicationsFolder: String
-  handleSetUserInboxNotifications: Function
 };
 type State = {
   tabIndex: number,
@@ -66,15 +66,13 @@ class HomeContainer extends PureComponent<Props, State> {
     const {
       setupDiscoveryListeners,
       setupEtlExecutionsListeners,
-      loadApplicationsMetadata,
-      checkInbox
+      loadApplicationsMetadata
     } = this;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
     this.isMounted = true;
-    checkInbox();
   }
 
   async componentWillUpdate() {
@@ -98,26 +96,6 @@ class HomeContainer extends PureComponent<Props, State> {
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingAppIsActive: isLoading });
   }
-
-  checkInbox = async () => {
-    const { webId, handleSetUserInboxNotifications } = this.props;
-    const inboxUrl = 'https://aorumbayev4.solid.community/inbox/';
-    const updates = await StorageToolbox.getInboxMessages(inboxUrl);
-    const notifications = [];
-
-    await Promise.all(
-      updates.map(async fileUrl => {
-        const notification = await StorageToolbox.readShareInviteNotification(
-          fileUrl,
-          webId
-        );
-        Log.info(notification);
-        notifications.push(notification);
-      })
-    );
-
-    handleSetUserInboxNotifications(notifications);
-  };
 
   loadApplicationsMetadata = async () => {
     const { userProfile } = this.props;
@@ -379,7 +357,6 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandleAppClicked={handleAppClicked}
           onHandleShareAppClicked={handleShareAppClicked}
         />
-        <StorageInboxDialog />
       </LoadingOverlay>
     );
   }
@@ -426,17 +403,13 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
-  const handleSetUserInboxNotifications = inboxNotifications =>
-    dispatch(userActions.setUserInboxNotifications(inboxNotifications));
-
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata,
-    handleSetUserInboxNotifications
+    handleSetSelectedApplicationMetadata
   };
 };
 

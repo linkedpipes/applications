@@ -17,7 +17,12 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, AuthenticationService } from '@utils';
-import { StoragePage, StorageBackend } from '@storage';
+import {
+  StoragePage,
+  StorageBackend,
+  StorageToolbox,
+  StorageInboxDialog
+} from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
@@ -56,7 +61,9 @@ type Props = {
   handleUpdateDiscoverySession: Function,
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
-  handleSetUserWebId: Function
+  handleSetUserWebId: Function,
+  handleSetUserInboxNotifications: Function,
+  webId: string
 };
 
 type State = {
@@ -100,6 +107,26 @@ class AppRouter extends React.PureComponent<Props, State> {
       socket.removeAllListeners();
     }
   }
+
+  checkInbox = async () => {
+    const { webId, handleSetUserInboxNotifications } = this.props;
+    const inboxUrl = 'https://aorumbayev4.solid.community/inbox/';
+    const updates = await StorageToolbox.getInboxMessages(inboxUrl);
+    const notifications = [];
+
+    await Promise.all(
+      updates.map(async fileUrl => {
+        const notification = await StorageToolbox.readShareInviteNotification(
+          fileUrl,
+          webId
+        );
+        Log.info(notification);
+        notifications.push(notification);
+      })
+    );
+
+    handleSetUserInboxNotifications(notifications);
+  };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
@@ -362,6 +389,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
+                <StorageInboxDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>
@@ -416,6 +444,9 @@ const mapDispatchToProps = dispatch => {
     });
   };
 
+  const handleSetUserInboxNotifications = inboxNotifications =>
+    dispatch(userActions.setUserInboxNotifications(inboxNotifications));
+
   return {
     handleSetSolidUserProfileAsync,
     handleSetUserWebId,
@@ -424,7 +455,8 @@ const mapDispatchToProps = dispatch => {
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
-    handleUpdateUserDetails
+    handleUpdateUserDetails,
+    handleSetUserInboxNotifications
   };
 };
 

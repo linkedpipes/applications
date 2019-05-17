@@ -83,7 +83,7 @@ export default {
   addExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
-  updateApplicationsFolder
-  setUserInboxNotifications
-  setSolidUserProfileAsync,
+  updateApplicationsFolder,
+  setUserInboxNotifications,
+  setSolidUserProfileAsync
 };

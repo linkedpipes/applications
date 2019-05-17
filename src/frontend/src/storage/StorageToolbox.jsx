@@ -112,6 +112,22 @@ class StorageToolbox {
     );
     dataSync.deleteFileForUser(fileUrl);
   };
+
+  copyFolderRecursively = async (webId, originalFolder, destinationFolder) => {
+    return await StorageBackend.copyFoldersRecursively(
+      webId,
+      originalFolder,
+      destinationFolder
+    );
+  };
+
+  moveFolderRecursively = async (webId, originalFolder, destinationFolder) => {
+    return await StorageBackend.moveFolderRecursively(
+      webId,
+      originalFolder,
+      destinationFolder
+    );
+  };
 }
 
 export default new StorageToolbox();

@@ -197,22 +197,44 @@ class SolidBackend {
       await StorageFileClient.createFolder(url, folderTitle).then(success => {
         Log.info(`Created folder ${folderUrl}.`);
       });
+
+      await StorageFileClient.updateItem(
+        `${folderUrl}/`,
+        '.acl',
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/`,
+          [READ],
+          true,
+          null
+        ),
+        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      ).then(fileCreated => {
+        Log.info(`Created access list ${folderUrl}/.acl`);
+      });
+
       await StorageFileClient.createFolder(
         configurationsUrl,
         'configurations'
       ).then(success => {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
+
       await StorageFileClient.updateItem(
-        folderUrl,
+        `${folderUrl}/configurations/`,
         '.acl',
-        this.createFolderAccessList(webId, folderUrl, [READ], true, null)
-          .join('\n')
-          .toString(),
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/configurations/`,
+          [READ],
+          true,
+          null
+        ),
         '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
       ).then(fileCreated => {
-        Log.info(`Created access list ${fileCreated}.`);
+        Log.info(`Created access list ${folderUrl}/configurations/.acl`);
       });
+
       await this.updateAppFolder(webId, folderUrl).then(success => {
         Log.info(`Updated app folder in profile.`);
       });
@@ -223,27 +245,85 @@ class SolidBackend {
     return true;
   }
 
-  async createAppFolderForCopying(
+  async copyFoldersRecursively(
     webId: string,
-    folderTitle: string
+    originalFolder: string,
+    destinationFolder: string
   ): Promise<boolean> {
-    const url = `${Utils.getBaseUrlConcat(webId)}`;
-    const folderUrl = `${url}/${folderTitle}`;
-    const configurationsUrl = `${url}/${folderTitle}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
 
-    try {
-      await StorageFileClient.createFolder(url, folderTitle).then(success => {
-        Log.info(`Created folder ${folderUrl}.`);
-      });
+    const copyFolderResult = await this.fetcher
+      .recursiveCopy(originalFolder, destinationFolder, {
+        copyACL: true,
+        fetch: authClient.fetch
+      })
+      .then(
+        res => {
+          return true;
+        },
+        e => {
+          Log.err('Error copying : ' + e);
+          return false;
+        }
+      );
 
-      await this.updateAppFolder(webId, folderUrl).then(success => {
-        Log.info(`Updated app folder in profile.`);
-      });
-    } catch (err) {
-      Log.error(err);
-      return false;
-    }
-    return true;
+    const updateProfileLinkResult = await this.updateAppFolder(
+      webId,
+      destinationFolder
+    ).then(success => {
+      return true;
+    });
+
+    return updateProfileLink && copyFolderResult;
+  }
+
+  async moveFolderRecursively(
+    webId: string,
+    originalFolder: string,
+    destinationFolder: string
+  ): Promise<boolean> {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const copySuccess = await this.fetcher
+      .recursiveCopy(originalFolder, destinationFolder, {
+        copyACL: true,
+        fetch: authClient.fetch
+      })
+      .then(
+        res => {
+          return true;
+        },
+        e => {
+          Log.err('Error copying : ' + e);
+          return false;
+        }
+      );
+
+    const removeOldSuccess = await StorageFileClient.removeFolderContents(
+      Utils.getFolderUrlFromPathUrl(originalFolder),
+      Utils.getFilenameFromPathUrl(originalFolder)
+    ).then(
+      res => {
+        return true;
+      },
+      e => {
+        Log.err('Error copying : ' + e);
+        return false;
+      }
+    );
+
+    const updateProfileLinkResult = await this.updateAppFolder(
+      webId,
+      destinationFolder
+    ).then(success => {
+      return true;
+    });
+
+    return removeOldSuccess && copySuccess && updateProfileLinkResult;
   }
 
   /**
@@ -367,7 +447,8 @@ class SolidBackend {
     const fileUrl = $rdf.sym(url);
     const file = fileUrl.doc();
     try {
-      await this.load(file);
+      const response = await this.load(file);
+      Log.info(response);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -432,7 +513,7 @@ class SolidBackend {
           Log.info(`Created file at ${filePath}.`);
         }
       });
-      const appConfigFileTtl = this.createUploadAppConfigurationStatement(
+      const appConfigFileTtl = await this.createUploadAppConfigurationStatement(
         `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
         `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
         appTitle,
@@ -444,7 +525,7 @@ class SolidBackend {
       await StorageFileClient.createFile(
         appConfigurationFilePath,
         `${appConfigurationFileTitle}.json.ttl`,
-        appConfigFileTtl.join('\n').toString()
+        appConfigFileTtl
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
@@ -454,15 +535,13 @@ class SolidBackend {
       await StorageFileClient.createFile(
         appConfigurationFilePath,
         `${appConfigurationFileTitle}.json.acl`,
-        this.createFileAccessList(
+        await this.createFileAccessList(
           webId,
           `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
           [READ],
           isPublic,
           allowedUsers
         )
-          .join('\n')
-          .toString()
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
@@ -472,15 +551,13 @@ class SolidBackend {
       await StorageFileClient.createFile(
         appConfigurationFilePath,
         `${appConfigurationFileTitle}.json.ttl.acl`,
-        this.createFileAccessList(
+        await this.createFileAccessList(
           webId,
           `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
           [APPEND, READ],
           isPublic,
           allowedUsers
         )
-          .join('\n')
-          .toString()
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
@@ -625,7 +702,7 @@ class SolidBackend {
    * @return {$rdf.Statement[]} An array of the image RDF statements.
    */
   // eslint-disable-next-line class-methods-use-this
-  createUploadAppConfigurationStatement(
+  async createUploadAppConfigurationStatement(
     appConfigurationMetadataPath: string,
     appConfigurationUrl: string,
     appTitle: string,
@@ -641,7 +718,8 @@ class SolidBackend {
     const creator = $rdf.sym(user);
     const color = $rdf.lit(cardColor);
     const doc = appConfigFile.doc();
-    return [
+
+    const fileRdf = [
       $rdf.st(appConfigFile, RDF('type'), SIOC('Post'), doc),
       $rdf.st(appConfigFile, FOAF('depiction'), appConfig, doc),
       $rdf.st(appConfigFile, DCT('title'), title, doc),
@@ -654,42 +732,22 @@ class SolidBackend {
         $rdf.lit(createdAt.toISOString(), null, TIME),
         doc
       )
-    ];
-  }
+    ]
+      .join('\n')
+      .toString();
 
-  /**
-   * Creates appropriate RDF statements for the new image to upload.
-   * @param {string} imageFileUrl An URL of the new RDF Turtle image file.
-   * @param {string} imageUrl An URL of the new image file.
-   * @param {string} imageDescription A description of the new image.
-   * @param {string} user A WebID of the image's creator.
-   * @param {Date} createdAt A creation date of the image.
-   * @return {$rdf.Statement[]} An array of the image RDF statements.
-   */
-  createUploadImageStatement(
-    imageFileUrl: string,
-    imageUrl: string,
-    imageDescription: string,
-    user: string,
-    createdAt: Date
-  ): $rdf.Statement[] {
-    const imageFile = $rdf.sym(imageFileUrl);
-    const image = $rdf.sym(imageUrl);
-    const desc = $rdf.lit(imageDescription);
-    const creator = $rdf.sym(user);
-    const doc = imageFile.doc();
-    return [
-      $rdf.st(imageFile, RDF('type'), SIOC('Post'), doc),
-      $rdf.st(imageFile, FOAF('depiction'), image, doc),
-      $rdf.st(imageFile, DCT('description'), desc, doc),
-      $rdf.st(imageFile, DCT('creator'), creator, doc),
-      $rdf.st(
-        imageFile,
-        DCT('created'),
-        $rdf.lit(createdAt.toISOString(), null, TIME),
-        doc
-      )
-    ];
+    const newStore = $rdf.graph();
+
+    $rdf.parse(fileRdf, newStore, appConfigurationMetadataPath);
+
+    const response = await $rdf.serialize(
+      null,
+      newStore,
+      appConfigurationMetadataPath,
+      'text/turtle'
+    );
+
+    return response;
   }
 
   /**
@@ -785,21 +843,35 @@ class SolidBackend {
    * @param {string[]} allowedUsers An array of the user's which are allowed to access the folder.
    * @return {$rdf.Statement[]} An array of the access list RDF statements.
    */
-  createFolderAccessList(
+  async createFolderAccessList(
     webId: string,
     folderUrl: string,
     modes: $rdf.NamedNode[],
     isPublic: boolean,
     allowedUsers: string[]
   ): $rdf.Statement[] {
-    return this.createAccessList(
+    const folderAcl = this.createAccessList(
       webId,
       folderUrl,
       modes,
       isPublic,
       allowedUsers,
       true
+    )
+      .join('\n')
+      .toString();
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(folderAcl, newStore, folderUrl);
+    const response = await $rdf.serialize(
+      null,
+      newStore,
+      `${folderUrl}.acl`,
+      'text/turtle'
     );
+
+    return response;
   }
 
   /**
@@ -811,21 +883,35 @@ class SolidBackend {
    * @param {string[]} allowedUsers An array of the user's which are allowed to access the file.
    * @return {$rdf.Statement[]} An array of the access list RDF statements.
    */
-  createFileAccessList(
+  async createFileAccessList(
     webId: string,
     fileUrl: string,
     modes: $rdf.NamedNode[],
     isPublic: boolean,
     allowedUsers: string[]
   ): $rdf.Statement[] {
-    return this.createAccessList(
+    const fileAcl = this.createAccessList(
       webId,
       fileUrl,
       modes,
       isPublic,
       allowedUsers,
       false
+    )
+      .join('\n')
+      .toString();
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(fileAcl, newStore, fileUrl);
+    const response = await $rdf.serialize(
+      null,
+      newStore,
+      `${fileUrl}.acl`,
+      'text/turtle'
     );
+
+    return response;
   }
 
   /**
@@ -884,6 +970,7 @@ class SolidBackend {
         );
       });
     }
+
     return acl;
   }
 

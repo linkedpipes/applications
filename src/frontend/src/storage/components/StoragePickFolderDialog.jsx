@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import StorageBackend from '../StorageBackend';
 import { Log } from '@utils';
 import LoadingOverlay from 'react-loading-overlay';
+import StorageToolbox from '@storage/StorageToolbox';
 
 type Props = {
   handleUpdateChooseFolderDialogState: Function,
@@ -73,6 +74,8 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
   async handleFolderMove() {
     this.setApplicationLoaderStatus(true);
 
+    const { currentApplicationsFolder } = this.props;
+
     const folderSelected =
       this.state.folderTitle === undefined
         ? this.state.defaultFolderTitle
@@ -87,20 +90,24 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
       this.setApplicationLoaderStatus(false);
       return;
     }
-    const folderUrl = `${Utils.getBaseUrl(this.props.webId) + folder}/`;
-    await StorageBackend.createAppFolders(this.props.webId, folder).then(
-      created => {
-        if (created) {
-          this.props.handleUpdateApplicationsFolder(folderUrl);
-          this.props.handleUpdateChooseFolderDialogState(false);
-        } else {
-          toast.error('Error creating app folders, try again.', {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 5000
-          });
-        }
+    const destinationFolderUrl = `${Utils.getBaseUrl(this.props.webId) +
+      folder}`;
+
+    await StorageToolbox.moveFolderRecursively(
+      this.props.webId,
+      currentApplicationsFolder,
+      destinationFolderUrl
+    ).then(created => {
+      if (created) {
+        this.props.handleUpdateApplicationsFolder(destinationFolderUrl);
+        this.props.handleUpdateChooseFolderDialogState(false);
+      } else {
+        toast.error('Error creating app folders, try again.', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000
+        });
       }
-    );
+    });
 
     this.setApplicationLoaderStatus(false);
   }
@@ -124,21 +131,17 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
       this.setApplicationLoaderStatus(false);
       return;
     }
-    const folderUrl = `${Utils.getBaseUrl(this.props.webId) + folder}`;
+    const destinationFolderUrl = `${Utils.getBaseUrl(this.props.webId) +
+      folder}`;
 
-    await StorageBackend.createAppFolderForCopying(
+    await StorageToolbox.copyFolderRecursively(
       this.props.webId,
-      folder
+      currentApplicationsFolder,
+      destinationFolderUrl
     ).then(created => {
       if (created) {
-        StorageBackend.deepCopy(currentApplicationsFolder, folderUrl).then(
-          () => {
-            Log.info(`Copied ${currentApplicationsFolder} to ${folderUrl}.`);
-            this.props.handleUpdateApplicationsFolder(folderUrl);
-            this.props.handleUpdateChooseFolderDialogState(false);
-          },
-          err => Log.error(err)
-        );
+        this.props.handleUpdateApplicationsFolder(destinationFolderUrl);
+        this.props.handleUpdateChooseFolderDialogState(false);
       } else {
         toast.error('Error creating app folders, try again.', {
           position: toast.POSITION.TOP_RIGHT,
@@ -200,8 +203,12 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
               <DialogContentText>
                 Choose the folder in your Personal Storage Space where
                 LinkedPipes Applications Storage is going to store your
-                published applications and configuration. Press `New`, to simply
-                create a new folder.
+                published applications and configuration. Press `Move`, to move
+                current configurations into new folder. Press `Copy` to copy the
+                current configurations into new folder. Press `Update`, to
+                simply create a new folder, (if folder already exists,
+                application will just switch to it and load any existing
+                configurations in that folder).
               </DialogContentText>
               <TextField
                 autoFocus
@@ -217,14 +224,14 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
               <Button onClick={this.handleClose} color="primary">
                 Cancel
               </Button>
-              {/* <Button onClick={this.handleFolderMove} color="primary">
+              <Button onClick={this.handleFolderMove} color="primary">
                 Move
               </Button>
               <Button onClick={this.handleFolderCopy} color="primary">
                 Copy
-              </Button> */}
+              </Button>
               <Button onClick={this.handleFolderConfirm} color="primary">
-                New
+                Update
               </Button>
             </DialogActions>
           </LoadingOverlay>
@@ -233,10 +240,6 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
     );
   }
 }
-
-// Press `Move`, to move
-// current configurations into new folder. Press `Copy` to copy the
-// current configurations into new folder.
 
 const mapStateToProps = state => {
   return {
