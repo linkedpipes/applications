@@ -41,9 +41,6 @@ public class UserServiceComponent implements UserService {
     private ExecutionRepository executionRepository;
 
     @Autowired
-    private ApplicationRepository applicationRepository;
-
-    @Autowired
     private PipelineInformationRepository pipelineRepository;
 
     @Autowired
@@ -122,14 +119,6 @@ public class UserServiceComponent implements UserService {
     private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
-        profile.applications = new ArrayList<>();
-        if (user.getApplications() != null) {
-            for (ApplicationDao dba : user.getApplications()) {
-                Application app = new Application();
-                app.solidIri = dba.getSolidIri();
-                profile.applications.add(app);
-            }
-        }
 
         profile.discoverySessions = new ArrayList<>();
         if (user.getDiscoveries() != null) {
@@ -174,17 +163,4 @@ public class UserServiceComponent implements UserService {
         return profile;
     }
 
-    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException, LpAppsException {
-        UserDao user = getUser(username);
-        ApplicationDao app = new ApplicationDao();
-        app.setSolidIri(solidIri);
-        user.addApplication(app);
-        applicationRepository.save(app);
-        repository.save(user);
-
-        Application a = new Application();
-        a.solidIri = solidIri;
-        com.linkedpipes.lpa.backend.Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
-    }
 }

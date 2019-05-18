@@ -4,7 +4,6 @@ import java.util.List;
 public class UserProfile {
     public String webId;
 
-    public List<Application> applications;
     public List<DiscoverySession> discoverySessions;
     public List<PipelineExecution> pipelineExecutions;
 
