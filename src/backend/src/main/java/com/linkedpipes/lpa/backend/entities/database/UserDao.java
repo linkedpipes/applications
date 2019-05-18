@@ -32,6 +32,13 @@ public class UserDao implements Serializable {
         return this.discoveries;
     }
 
+    public void removeDiscovery(DiscoveryDao discovery) {
+        this.discoveries.remove(discovery);
+        if (discovery.getUser() == this) {
+            discovery.setUser(null);
+        }
+    }
+
     public void addExecution(ExecutionDao execution) {
         this.executions.add(execution);
         if (execution.getUser() != this) {

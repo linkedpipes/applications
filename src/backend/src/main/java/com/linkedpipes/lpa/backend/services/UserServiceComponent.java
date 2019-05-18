@@ -163,7 +163,7 @@ public class UserServiceComponent implements UserService {
         return profile;
     }
 
-    @NotNull @Override
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
     public UserProfile deleteExecution(final String username, final String executionIri) throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
@@ -176,7 +176,28 @@ public class UserServiceComponent implements UserService {
 
         if (toDelete != null) {
             user.removeExecution(toDelete);
+
             executionRepository.delete(toDelete);
+            repository.save(user);
+        }
+
+        return transformUserProfile(user);
+    }
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile deleteDiscovery(final String username, final String discoveryId) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        DiscoveryDao toDelete = null;
+        for (DiscoveryDao discovery : user.getDiscoveries()) {
+            if (discovery.getDiscoveryId().equals(discoveryId)) {
+                toDelete = discovery;
+                break;
+            }
+        }
+
+        if (toDelete != null) {
+            user.removeDiscovery(toDelete);
+            discoveryRepository.delete(toDelete);
             repository.save(user);
         }
 

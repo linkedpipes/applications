@@ -39,13 +39,26 @@ public class UserController {
     }
 
     @NotNull
-    @DeleteMapping
+    @DeleteMapping("/api/user/execution")
     public ResponseEntity<UserProfile> deleteExecution(
         @NotNull @RequestParam(value = "webId", required = true) String user,
         @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
         throws LpAppsException {
         try {
             return ResponseEntity.ok(userService.deleteExecution(user, executionIri));
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        }
+    }
+
+    @NotNull
+    @DeleteMapping("/api/user/discovery")
+    public ResponseEntity<UserProfile> deleteDiscovery(
+        @NotNull @RequestParam(value = "webId", required = true) String user,
+        @NotNull @RequestParam(value = "discoveryId", required = true) String discoveryId)
+        throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.deleteDiscovery(user, discoveryId));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
