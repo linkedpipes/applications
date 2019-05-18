@@ -11,9 +11,6 @@ import java.util.function.Supplier;
 public abstract class SparqlQueryProvider<B extends AbstractQueryBuilder<B>> implements Supplier<Query> {
 
     @NotNull
-    protected static final String VAR_GRAPH = var("graph");
-
-    @NotNull
     protected static String var(@NotNull String variableName) {
         if (variableName.isEmpty()) {
             throw new IllegalArgumentException("variableName");
