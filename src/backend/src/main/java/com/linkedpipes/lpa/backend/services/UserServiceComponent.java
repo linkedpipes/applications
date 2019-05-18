@@ -163,4 +163,23 @@ public class UserServiceComponent implements UserService {
         return profile;
     }
 
+    @NotNull @Override
+    public UserProfile deleteExecution(final String username, final String executionIri) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        ExecutionDao toDelete = null;
+        for (ExecutionDao execution : user.getExecutions()) {
+            if (execution.getExecutionIri().equals(executionIri)) {
+                toDelete = execution;
+                break;
+            }
+        }
+
+        if (toDelete != null) {
+            user.removeExecution(toDelete);
+            executionRepository.delete(toDelete);
+            repository.save(user);
+        }
+
+        return transformUserProfile(user);
+    }
 }

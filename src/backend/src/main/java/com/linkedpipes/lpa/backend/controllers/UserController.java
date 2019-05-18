@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +35,19 @@ public class UserController {
         } catch(org.springframework.dao.CannotAcquireLockException | org.hibernate.exception.LockAcquisitionException e) {
             logger.warn("Error storing user, will retry once");
             return ResponseEntity.ok(userService.addUserIfNotPresent(user));
+        }
+    }
+
+    @NotNull
+    @DeleteMapping
+    public ResponseEntity<UserProfile> deleteExecution(
+        @NotNull @RequestParam(value = "webId", required = true) String user,
+        @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
+        throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.deleteExecution(user, executionIri));
+        } catch (UserNotFoundException e) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 }

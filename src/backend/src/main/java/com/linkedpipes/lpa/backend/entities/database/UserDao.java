@@ -43,6 +43,13 @@ public class UserDao implements Serializable {
         return this.executions;
     }
 
+    public void removeExecution(ExecutionDao execution) {
+        this.executions.remove(execution);
+        if (execution.getUser() == this) {
+            execution.setUser(null);
+        }
+    }
+
     public String getWebId() {
         return this.webId;
     }
