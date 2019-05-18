@@ -8,10 +8,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addVars(SelectBuilder)} and {@link #addWheres(AbstractQueryBuilder)}.
- * Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link #addOptionals(AbstractQueryBuilder)},
- * {@link #addFilters(SelectBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
+ * Template method design pattern.<br>
+ * <br>
+ * Template methods:
+ * <ul>
+ *     <li>{@link #get()}</li>
+ *     <li>{@link #get(String)}</li>
+ * </ul>
+ *
+ * Mandatory sub-procedures:
+ * <ul>
+ *     <li>{@link #addVars(SelectBuilder)}</li>
+ *     <li>{@link #addWheres(AbstractQueryBuilder)}</li>
+ * </ul>
+ *
+ * Non-mandatory hooks:
+ * <ul>
+ *     <li>{@link #addPrefixes(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addOptionals(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addFilters(SelectBuilder)}</li>
+ *     <li>{@link #addAdditional(AbstractQueryBuilder)}</li>
+ * </ul>
  */
 public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<SelectBuilder> {
 
@@ -24,7 +41,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
             addPrefixes(builder);
             addVars(builder);
 
-            if(graphName != null && !graphName.isEmpty())
+            if (graphName != null && !graphName.isEmpty())
                 builder.from(graphName);
 
             addWheres(builder);

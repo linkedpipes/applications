@@ -8,10 +8,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link
- * #addWheres(AbstractQueryBuilder)}. Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link
- * #addOptionals(AbstractQueryBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
+ * Template method design pattern.<br>
+ * <br>
+ * Template methods:
+ * <ul>
+ *     <li>{@link #get()}</li>
+ *     <li>{@link #get(String)}</li>
+ * </ul>
+ *
+ * Mandatory sub-procedures:
+ * <ul>
+ *     <li>{@link #addConstructs(ConstructBuilder)}</li>
+ *     <li>{@link #addWheres(AbstractQueryBuilder)}</li>
+ * </ul>
+ *
+ * Non-mandatory hooks:
+ * <ul>
+ *     <li>{@link #addPrefixes(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addOptionals(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addFilters(ConstructBuilder)}</li>
+ *     <li>{@link #addGroupBy(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addLimit(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addOffset(AbstractQueryBuilder)}</li>
+ *     <li>{@link #addAdditional(AbstractQueryBuilder)}</li>
+ * </ul>
  */
 public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<ConstructBuilder> {
 
@@ -24,12 +44,12 @@ public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<C
             addPrefixes(builder);
             addConstructs(builder);
 
-            if(graphName != null && !graphName.isEmpty())
+            if (graphName != null && !graphName.isEmpty())
                 builder.from(graphName);
 
             addWheres(builder);
-            addFilters(builder);
             addOptionals(builder);
+            addFilters(builder);
             addGroupBy(builder);
             addLimit(builder);
             addOffset(builder);
