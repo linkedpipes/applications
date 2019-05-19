@@ -30,6 +30,7 @@ import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
 import withTracker from './withTracker';
 import GoogleAnalytics from 'react-ga';
+import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -52,7 +53,7 @@ const styles = () => ({
 
 type Props = {
   classes: any,
-  userId: ?string,
+  webId: ?string,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   handleSetSolidUserProfileAsync: Function,
@@ -70,11 +71,11 @@ type State = {
   isExternalPath: boolean
 };
 
-const errorHandler = userId => {
+const errorHandler = webId => {
   return (error: Error, componentStack: string) => {
     Log.error(componentStack, 'AppRouter');
     Sentry.withScope(scope => {
-      scope.setUser({ id: userId || 'unidentified user' }); // How can we capture WEBID from here
+      scope.setUser({ id: webId || 'unidentified user' }); // How can we capture WEBID from here
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
       Sentry.captureException(error);
@@ -110,19 +111,23 @@ class AppRouter extends React.PureComponent<Props, State> {
 
   checkInbox = async () => {
     const { webId, handleSetUserInboxInvitations } = this.props;
-    const inboxUrl = 'https://aorumbayev4.solid.community/inbox/';
-    const updates = await StorageToolbox.getInboxMessages(inboxUrl);
+    const inboxInvitations = await StorageToolbox.getInboxMessages(webId);
     const invitations = [];
 
     await Promise.all(
-      updates.map(async fileUrl => {
-        const invitation = await StorageToolbox.readShareInvite(fileUrl, webId);
-        Log.info(invitation);
-        invitations.push(invitation);
+      inboxInvitations.map(async fileUrl => {
+        const invitation = await StorageToolbox.readInboxInvite(fileUrl, webId);
+
+        if (invitation instanceof Invitation) {
+          Log.info(invitation);
+          invitations.push(invitation);
+        } else {
+          await StorageToolbox.processAcceptShareInvite(invitation);
+        }
       })
     );
 
-    handleSetUserInboxInvitations(invitations);
+    // handleSetUserInboxInvitations(invitations);
   };
 
   setupProfileData = async jsonResponse => {
@@ -144,7 +149,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
     authClient.trackSession(session => {
       if (session) {
-        GoogleAnalytics.set({ userId: session.webId });
+        GoogleAnalytics.set({ webId: session.webId });
 
         handleSetUserWebId(session.webId);
 
@@ -188,6 +193,7 @@ class AppRouter extends React.PureComponent<Props, State> {
               Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
               await self.checkInbox();
+              setInterval(self.checkInbox, 5000);
             }
           })
           .catch(error => {
@@ -316,10 +322,10 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, userId } = this.props;
+    const { classes, webId } = this.props;
     return (
       <div>
-        <ErrorBoundary onError={errorHandler(userId)}>
+        <ErrorBoundary onError={errorHandler(webId)}>
           <BrowserRouter>
             <div className={classes.root}>
               <SocketContext.Provider value={socket}>
@@ -399,7 +405,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId,
+    webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight
   };

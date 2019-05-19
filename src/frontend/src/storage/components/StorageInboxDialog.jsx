@@ -77,10 +77,18 @@ class StorageInboxDialog extends PureComponent<Props, State> {
     }
   };
 
+  handleSendRejectInvitation = async invitation => {
+    if (invitation) {
+      Log.info(invitation);
+      await StorageToolbox.sendRejectCollaborationInvitation(invitation);
+      Log.info('done');
+    }
+  };
+
   render() {
     const { loadingIsActive } = this.state;
     const { classes, inboxInvitations } = this.props;
-    const { handleSendAcceptInvitation } = this;
+    const { handleSendAcceptInvitation, handleSendRejectInvitation } = this;
     return (
       <div>
         <Dialog
@@ -89,9 +97,7 @@ class StorageInboxDialog extends PureComponent<Props, State> {
           aria-labelledby="form-dialog-title"
         >
           <LoadingOverlay active={loadingIsActive} spinner>
-            <DialogTitle id="form-dialog-title">
-              Inbox invitations
-            </DialogTitle>
+            <DialogTitle id="form-dialog-title">Inbox invitations</DialogTitle>
             <DialogContent>
               <DialogContentText>
                 Browse invitations from your contacts to collaborate on
@@ -118,7 +124,12 @@ class StorageInboxDialog extends PureComponent<Props, State> {
                       secondary={'Secondary text'}
                     />
 
-                    <ListItemSecondaryAction key={`${uuid.v4()}`}>
+                    <ListItemSecondaryAction
+                      onClick={() => {
+                        handleSendRejectInvitation(inboxInvitation);
+                      }}
+                      key={`${uuid.v4()}`}
+                    >
                       <IconButton
                         key={`decline-invite-${uuid.v4()}`}
                         aria-label="Decline"

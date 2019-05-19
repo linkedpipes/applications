@@ -78,6 +78,29 @@ class StorageFileClient {
     return authClient.fetch(path, request);
   };
 
+  removeFile = async (path, itemName) => {
+    const url = `${path}${itemName}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const response = await authClient.fetch(url, {
+      method: 'DELETE'
+    });
+    Log.info(response);
+    if (response.status === 409 || response.status === 301) {
+      // Solid pod returns 409 if the item is a folder and is not empty
+      // Solid pod returns 301 if is attempted to read a folder url without
+      // '/' at the end (from buildFileUrl)
+      return this.removeFolderRecursively(path, itemName);
+    }
+    if (response.status === 404) {
+      // Don't throw if the item didn't exist
+      return response;
+    }
+    this.assertSuccessfulResponse(response);
+    return response;
+  };
+
   removeItem = async (path, itemName) => {
     const url = `${path}/${itemName}`;
     const authClient = await import(
@@ -128,6 +151,11 @@ class StorageFileClient {
   removeFolderRecursively = async (path, folderName) => {
     await this.removeFolderContents(path, folderName);
     return this.removeItem(path, folderName);
+  };
+
+  updateFile = async (path, itemName, content, contentType) => {
+    await this.removeFile(path, itemName);
+    return this.createItem(path, itemName, content, contentType);
   };
 
   updateItem = async (path, itemName, content, contentType) => {

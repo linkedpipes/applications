@@ -2,6 +2,7 @@
 import stringHash from 'string-hash';
 import { Log, GlobalUtils } from '@utils';
 import StorageBackend from './StorageBackend';
+import StorageFileClient from './StorageFileClient'
 import { Utils } from './utils';
 
 const os = require('os');
@@ -52,12 +53,17 @@ class StorageToolbox {
     );
   };
 
-  getInboxMessages = async inboxUrl => {
+  getInboxMessages = async webId => {
+    const inboxUrl = `${Utils.getBaseUrlConcat(webId)}/inbox`;
     return StorageBackend.checkInboxFolder(inboxUrl);
   };
 
-  readShareInvite = async (fileUrl, userWebId) => {
-    return StorageBackend.parseShareInvite(fileUrl, userWebId);
+  readInboxInvite = async (fileUrl, userWebId) => {
+    return StorageBackend.parseInvite(fileUrl, userWebId);
+  };
+
+  processAcceptShareInvite = async acceptedInvitation => {
+    await StorageBackend.processAcceptSharedInvite(acceptedInvitation);
   };
 
   readSharedConfiguration = async fileUrl => {
@@ -98,6 +104,20 @@ class StorageToolbox {
       invitationResponse,
       'application/ld+json'
     );
+
+    await StorageFileClient.removeItem(
+      Utils.getFolderUrlFromPathUrl(invitation.invitationUrl),
+      Utils.getFilenameFromPathUrl(invitation.invitationUrl)
+    ).then(response => {
+      if (response.status === 200) {
+        const filePath = response.url;
+        Log.info(`Removed ${filePath}.`);
+      }
+    });
+  };
+
+  sendRejectCollaborationInvitation = async invitation => {
+    StorageBackend.rejectInvitation(invitation);
   };
 
   getSharedApplicationsMetadata = async (webId: string, appFolder: string) => {

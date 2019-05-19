@@ -10,10 +10,13 @@ export default class Invitation {
 
   object: Object;
 
-  constructor(invitation: Object) {
+  invitationUrl: string;
+
+  constructor(invitation: Object, invitationUrl: string) {
     this.senderWebId = invitation.actor;
     this.recipientWebId = invitation.target;
     this.appMetadataUrl = invitation.object.href;
     this.object = invitation;
+    this.invitationUrl = invitationUrl;
   }
 }

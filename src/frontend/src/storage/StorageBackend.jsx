@@ -5,7 +5,8 @@ import {
   AppConfiguration,
   SharedAppConfiguration,
   Person,
-  Invitation
+  Invitation,
+  AcceptedInvitation
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
@@ -205,7 +206,7 @@ class SolidBackend {
       });
 
       await StorageFileClient.updateItem(
-        `${folderUrl}/`,
+        `${folderUrl}`,
         '.acl',
         await this.createFolderAccessList(
           webId,
@@ -227,7 +228,7 @@ class SolidBackend {
       });
 
       await StorageFileClient.updateItem(
-        `${folderUrl}/configurations/`,
+        `${folderUrl}/configurations`,
         '.acl',
         await this.createFolderAccessList(
           webId,
@@ -1042,6 +1043,17 @@ class SolidBackend {
     StorageFileClient.sendFileToUrl(inboxUrl, data, type);
   }
 
+  rejectInvitation(invitation) {
+    const folderTitle = Utils.getFolderUrlFromPathUrl(invitation.invitationUrl);
+    const inviteTitle = Utils.getFilenameFromPathUrl(invitation.invitationUrl);
+
+    StorageFileClient.removeItem(folderTitle, inviteTitle).then(response => {
+      if (response.status === 200) {
+        Log.info(`Removed ${inviteTitle}.`);
+      }
+    });
+  }
+
   async generateInvitationFile(baseUrl, metadataUrl, userWebId, opponentWebId) {
     const as = require('activitystrea.ms');
 
@@ -1169,10 +1181,10 @@ class SolidBackend {
 
           const resource = data['?resource'].value;
 
-          if (self.alreadyCheckedResources.indexOf(resource) === -1) {
-            newResources.push(resource);
-            self.alreadyCheckedResources.push(resource);
-          }
+          // if (self.alreadyCheckedResources.indexOf(resource) === -1) {
+          newResources.push(resource);
+            // self.alreadyCheckedResources.push(resource);
+          // }
         });
 
         result.bindingsStream.on('end', function() {
@@ -1183,12 +1195,16 @@ class SolidBackend {
     return deferred.promise;
   }
 
-  async parseShareInvite(invitationUrl, userWebId) {
+  async parseInvite(invitationUrl, userWebId) {
     const invitation = await StorageFileClient.fetchJsonLDFromUrl(
       invitationUrl
     );
 
-    return new Invitation(invitation);
+    if (invitation.type === 'Accept') {
+      return new AcceptedInvitation(invitation, invitationUrl);
+    } else {
+      return new Invitation(invitation, invitationUrl);
+    }
   }
 
   async parseSharedConfiguration(configurationUrl) {
@@ -1199,83 +1215,39 @@ class SolidBackend {
     return new SharedAppConfiguration(sharedAppConfiguration);
   }
 
-  async getObjectFromPredicateForResource(url, predicate) {
-    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
-    const N3 = require('n3');
-    const Q = require('q');
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+  async processAcceptSharedInvite(sharedInvitation) {
+    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(
+      sharedInvitation.invitation.appMetadataUrl
     );
-    const deferred = Q.defer();
-    const rdfjsSource = await rdfjsSourceFromUrl(url, authClient.fetch);
-
-    if (rdfjsSource) {
-      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
-      const engine = newEngine();
-
-      engine
-        .query(
-          `SELECT ?o {
-    <${url}> ${predicate} ?o.
-  }`,
-          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
-        )
-        .then(function(result) {
-          result.bindingsStream.on('data', function(data) {
-            data = data.toObject();
-
-            deferred.resolve(data['?o']);
-          });
-
-          result.bindingsStream.on('end', function() {
-            deferred.resolve(null);
-          });
-        });
-    } else {
-      deferred.resolve(null);
-    }
-
-    return deferred.promise;
-  }
-
-  async getAllObjectsFromPredicateForResource(url, predicate) {
-    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
-    const N3 = require('n3');
-    const Q = require('q');
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    const fileMetadataTitle = Utils.getFilenameFromPathUrl(
+      sharedInvitation.invitation.appMetadataUrl
     );
-    const deferred = Q.defer();
-    const rdfjsSource = await rdfjsSourceFromUrl(url, authClient.fetch);
+    const collaboratorWebId = sharedInvitation.senderWebId;
+    const webId = sharedInvitation.recipientWebId;
+    await StorageFileClient.updateFile(
+      fileMetadataFolder,
+      `${fileMetadataTitle}.acl`,
+      await this.createFileAccessList(
+        webId,
+        sharedInvitation.invitation.appMetadataUrl,
+        [READ, WRITE],
+        false,
+        [collaboratorWebId]
+      ),
+      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+    ).then(fileCreated => {
+      Log.info(`Created access list ${fileMetadataTitle}.acl`);
+    });
 
-    if (rdfjsSource) {
-      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
-      const engine = newEngine();
-      const objects = [];
-
-      engine
-        .query(
-          `SELECT ?o {
-    <${url}> ${predicate} ?o.
-  }`,
-          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
-        )
-        .then(function(result) {
-          result.bindingsStream.on('data', function(data) {
-            data = data.toObject();
-
-            objects.push(data['?o']);
-          });
-
-          result.bindingsStream.on('end', function() {
-            deferred.resolve(objects);
-          });
-        });
-    } else {
-      deferred.resolve(null);
-    }
-
-    return deferred.promise;
+    await StorageFileClient.removeItem(
+      Utils.getFolderUrlFromPathUrl(sharedInvitation.invitationUrl),
+      Utils.getFilenameFromPathUrl(sharedInvitation.invitationUrl)
+    ).then(response => {
+      if (response.status === 200) {
+        const filePath = response.url;
+        Log.info(`Removed ${filePath}.`);
+      }
+    });
   }
 
   async createSharedMetadataFromInvite(invitation) {
@@ -1294,7 +1266,7 @@ class SolidBackend {
     });
 
     await StorageFileClient.updateItem(
-      `${folderUrl}/sharedConfigurations/`,
+      `${folderUrl}/sharedConfigurations`,
       '.acl',
       await this.createFolderAccessList(
         webId,
@@ -1305,7 +1277,7 @@ class SolidBackend {
       ),
       '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
     ).then(fileCreated => {
-      Log.info(`Created access list ${folderUrl}/.acl`);
+      Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
     });
 
     const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
