@@ -63,11 +63,36 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.userService = context.getBean(UserService.class);
     }
 
+    /**
+     * Legacy start discovery from input endpoint.
+     * Uses {@link #startDiscoveryFromInput(String, String, String, String, String)}
+     * but sparqlEndpointIri, dataSampleIri and namedGraphs are set to null.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
     }
 
+    /**
+     * Start a discovery using the provided configuration, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @param namedGraphs list of provided named graphs to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
@@ -75,6 +100,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+     * Start a discovery using a configuration located at some IRI, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfigIri configuration IRI passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
@@ -85,6 +121,14 @@ public class ExecutorServiceComponent implements ExecutorService {
     /**
     * Log a discovery onto user, notify discovery started via sockets and
     * start status polling.
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+    * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+    * @param namedGraphs list of provided named graphs to be recorded in the DB
+    * @throws LpAppsException initial discovery status call failed
+    * @throws UserNotFoundException user was not found
     */
     private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
