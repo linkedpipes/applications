@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
+import { VisualizersService } from '@utils';
 import FormControl from '@material-ui/core/FormControl';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
@@ -71,7 +71,6 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     const checked = event.target.checked;
     this.setState(prevState => ({
       nodes: prevState.nodes.map(node => {
-        Log.info(checked);
         if (node.uri === uri) {
           return { ...node, checked };
         }

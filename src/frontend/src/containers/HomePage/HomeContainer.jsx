@@ -2,12 +2,11 @@
 import React, { PureComponent } from 'react';
 import HomeComponent from './HomeComponent';
 import { connect } from 'react-redux';
-import { userActions } from '@ducks/userDuck';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageBackend } from '@storage';
+import { StorageBackend, StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -15,10 +14,12 @@ import {
   ETLService,
   ETL_STATUS_TYPE,
   ETL_STATUS_MAP,
-  withAuthorization
+  withAuthorization,
+  VisualizersService
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
+import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   history: { push: any },
@@ -30,16 +31,19 @@ type Props = {
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
-  handleSetSelectedApplicationTitle: Function
+  handleSetSelectedApplicationTitle: Function,
+  applicationsFolder: String
 };
 type State = {
   tabIndex: number,
-  applicationsMetadata: [],
+  applicationsMetadata: Array<AppConfiguration>,
   loadingAppIsActive: boolean
 };
 
 class HomeContainer extends PureComponent<Props, State> {
   isMounted = false;
+
+  didLoadInitialMetadata = false;
 
   didUpdateMetadata = false;
 
@@ -62,20 +66,21 @@ class HomeContainer extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
-    this.isMounted = true;
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
     loadApplicationsMetadata();
+    this.isMounted = true;
   }
 
   async componentWillUpdate() {
     if (
       this.isMounted &&
+      this.didLoadInitialMetadata &&
       this.props.userProfile.webId &&
       !this.didUpdateMetadata
     ) {
-      this.loadApplicationsMetadata();
+      await this.loadApplicationsMetadata();
       this.didUpdateMetadata = true;
     }
   }
@@ -83,6 +88,7 @@ class HomeContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.isMounted = false;
     this.didUpdateMetadata = false;
+    this.didLoadInitialMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -101,6 +107,10 @@ class HomeContainer extends PureComponent<Props, State> {
 
       if (this.isMounted) {
         this.setState({ applicationsMetadata: metadata });
+
+        if (!this.didLoadInitialMetadata) {
+          this.didLoadInitialMetadata = true;
+        }
 
         Log.info(metadata, 'HomeContainer');
       }
@@ -241,22 +251,73 @@ class HomeContainer extends PureComponent<Props, State> {
     const applicationData = appConfigurationResponse.data.applicationData;
 
     const resultGraphIri = applicationData.selectedResultGraphIri;
-    const selectedVisualiser = {
-      visualizer: { visualizerCode: applicationData.visualizerCode }
-    };
 
-    handleSetResultPipelineIri(resultGraphIri);
-    handleSetSelectedApplicationTitle(applicationMetadata.title);
-    handleSetSelectedApplicationData(applicationData);
-    handleSetSelectedApplicationMetadata(applicationMetadata);
-    handleSetSelectedVisualizer(selectedVisualiser);
+    let graphExists = true;
 
-    await this.setApplicationLoaderStatus(false);
-
-    history.push({
-      pathname: '/create-app'
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      graphExists = false;
     });
-    Log.info('test');
+
+    if (graphExists) {
+      const selectedVisualiser = {
+        visualizer: { visualizerCode: applicationData.visualizerCode }
+      };
+
+      handleSetResultPipelineIri(resultGraphIri);
+      handleSetSelectedApplicationTitle(applicationMetadata.title);
+      handleSetSelectedApplicationData(applicationData);
+      handleSetSelectedApplicationMetadata(applicationMetadata);
+      handleSetSelectedVisualizer(selectedVisualiser);
+
+      await this.setApplicationLoaderStatus(false);
+
+      history.push({
+        pathname: '/create-app'
+      });
+    } else {
+      toast.success(
+        'Application data was removed or deleted from the platform,' +
+          'blank metadata will be removed from storage...',
+        {
+          position: toast.POSITION.TOP_RIGHT
+        }
+      );
+      this.handleDeleteApp(applicationMetadata);
+    }
+  };
+
+  handleDeleteApp = async applicationMetadata => {
+    const { setApplicationLoaderStatus } = this;
+
+    await setApplicationLoaderStatus(true);
+
+    const result = await StorageToolbox.removeAppFromStorage(
+      this.props.applicationsFolder,
+      applicationMetadata
+    );
+    if (result) {
+      this.handleApplicationDeleted(applicationMetadata);
+    }
+
+    await setApplicationLoaderStatus(false);
+  };
+
+  handleApplicationDeleted = applicationConfigurationMetadata => {
+    const newApplicationsMetadata = this.state.applicationsMetadata;
+
+    const filteredMetadata = newApplicationsMetadata.filter(value => {
+      return value.url !== applicationConfigurationMetadata.url;
+    });
+
+    toast.success(
+      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 4000
+      }
+    );
+
+    this.setState({ applicationsMetadata: filteredMetadata });
   };
 
   handleShareAppClicked = () => {
@@ -308,6 +369,7 @@ const HomeContainerWithSocket = props => (
 const mapStateToProps = state => {
   return {
     userProfile: state.user,
+    applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };
 };
@@ -315,9 +377,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   const onInputExampleClicked = sample =>
     dispatch(discoverActions.setSelectedInputExample(sample));
-
-  const handleSetUserProfile = userProfile =>
-    dispatch(userActions.setUserProfileAsync(userProfile));
 
   const handleSetResultPipelineIri = resultGraphIri =>
     dispatch(
@@ -343,7 +402,6 @@ const mapDispatchToProps = dispatch => {
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
   return {
-    handleSetUserProfile,
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
