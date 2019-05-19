@@ -47,10 +47,8 @@ public class DiscoveryDao implements Serializable {
     public void setUser(UserDao user) {
         this.user = user;
 
-        if (user != null) {
-            if (!user.getDiscoveries().contains(this)) {
+        if ((user != null) && !user.getDiscoveries().contains(this)) {
                 user.getDiscoveries().add(this);
-            }
         }
     }
 

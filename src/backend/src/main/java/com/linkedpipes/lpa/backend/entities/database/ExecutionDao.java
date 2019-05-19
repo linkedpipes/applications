@@ -41,10 +41,8 @@ public class ExecutionDao implements Serializable {
     public void setUser(UserDao user) {
         this.user = user;
 
-        if (user != null) {
-            if (!user.getExecutions().contains(this)) {
+        if ((user != null) && !user.getExecutions().contains(this)) {
                 user.getExecutions().add(this);
-            }
         }
     }
 
