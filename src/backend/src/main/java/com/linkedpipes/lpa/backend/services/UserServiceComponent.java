@@ -163,6 +163,8 @@ public class UserServiceComponent implements UserService {
     public UserProfile deleteExecution(final String username, final String executionIri) throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
+        PipelineInformationDao pipelineInformationToDelete = null;
+
         for (ExecutionDao execution : user.getExecutions()) {
             if (execution.getExecutionIri().equals(executionIri)) {
                 toDelete = execution;
@@ -173,7 +175,16 @@ public class UserServiceComponent implements UserService {
         if (toDelete != null) {
             user.removeExecution(toDelete);
 
+            if (executionRepository.findExecutionsUsingPipelineNative(toDelete.getPipelineId()).size() == 1) {
+                pipelineInformationToDelete = toDelete.getPipeline();
+            }
+
             executionRepository.delete(toDelete);
+
+            if (pipelineInformationToDelete != null) {
+                pipelineRepository.delete(pipelineInformationToDelete);
+            }
+
             repository.save(user);
         }
 

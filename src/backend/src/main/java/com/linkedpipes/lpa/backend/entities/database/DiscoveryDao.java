@@ -38,6 +38,7 @@ public class DiscoveryDao implements Serializable {
     private List<DiscoveryNamedGraphDao> namedGraphs;
 
     @ManyToOne
+    @JoinColumn(name="user_web_id")
     private UserDao user;
 
     public UserDao getUser() {
