@@ -65,8 +65,8 @@ public class ExecutorServiceComponent implements ExecutorService {
 
     /**
      * Legacy start discovery from input endpoint.
-     * Uses {@link #startDiscoveryFromInput(String, String, String, String, String)}
-     * but sparqlEndpointIri, dataSampleIri and namedGraphs are set to null.
+     * Uses startDiscoveryFromInput but sparqlEndpointIri, dataSampleIri and
+     * namedGraphs are set to null.
      *
      * @param discoveryConfig configuration passed to discovery service
      * @param userId web ID of the user who started the discovery
