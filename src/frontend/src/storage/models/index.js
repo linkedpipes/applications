@@ -1,6 +1,14 @@
 import AppConfiguration from './AppConfiguration';
+import SharedAppConfiguration from './SharedAppConfiguration';
 import Person from './Person';
-import Notification from './Notification';
+import Invitation from './Invitation';
 import { FileItem, FolderItem } from './Item';
 
-export { AppConfiguration, Notification, Person, FileItem, FolderItem };
+export {
+  AppConfiguration,
+  SharedAppConfiguration,
+  Invitation,
+  Person,
+  FileItem,
+  FolderItem
+};

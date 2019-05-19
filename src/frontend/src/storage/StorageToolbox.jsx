@@ -56,8 +56,12 @@ class StorageToolbox {
     return StorageBackend.checkInboxFolder(inboxUrl);
   };
 
-  readShareInviteNotification = async (fileUrl, userWebId) => {
-    return StorageBackend.parseShareInviteNotification(fileUrl, userWebId);
+  readShareInvite = async (fileUrl, userWebId) => {
+    return StorageBackend.parseShareInvite(fileUrl, userWebId);
+  };
+
+  readSharedConfiguration = async fileUrl => {
+    return StorageBackend.parseSharedConfiguration(fileUrl);
   };
 
   sendCollaborationInvitation = async (
@@ -65,43 +69,35 @@ class StorageToolbox {
     webId,
     recipientWebId
   ) => {
-    let invitation = StorageBackend.generateInvitationFile(
+    let invitation = await StorageBackend.generateInvitationFile(
       applicationConfiguration.url,
       applicationConfiguration.url,
       webId,
       recipientWebId
     );
 
-    StorageBackend.storeInvitationFile(
-      applicationConfiguration.url,
-      invitation.sparqlUpdate
+    StorageBackend.sendFileToInbox(
+      recipientWebId,
+      invitation,
+      'application/ld+json'
     );
-
-    StorageBackend.sendInviteToInbox(recipientWebId, invitation.notification);
-
-    Log.info(invitation);
   };
 
-  acceptCollaborationInvitation = async notification => {
-    return StorageBackend.acceptCollaborationInvitation(notification);
-  };
+  sendAcceptCollaborationInvitation = async invitation => {
+    await StorageBackend.createSharedMetadataFromInvite(invitation);
 
-  sendAcceptCollaborationInvitation = async notification => {
-    const response = StorageBackend.generateResponseToInvitation(
-      notification,
+    const invitationResponse = await StorageBackend.generateResponseToInvitation(
+      invitation,
       'yes'
     );
-    const metadataUrl = notification.appMetadataUrl;
-    const userWebId = notification.recipientWebId;
-    const invitationUrl = notification.invitationUrl;
-    const recipientWebId = notification.senderWebId;
 
-    StorageBackend.storeInvitationResponseFile(
-      metadataUrl,
-      response.sparqlUpdate
+    const recipientWebId = invitation.senderWebId;
+
+    StorageBackend.sendFileToInbox(
+      recipientWebId,
+      invitationResponse,
+      'application/ld+json'
     );
-
-    StorageBackend.sendInviteToInbox(recipientWebId, response.notification);
   };
 
   getSharedApplicationsMetadata = async (webId: string, appFolder: string) => {
@@ -114,18 +110,17 @@ class StorageToolbox {
 
     await Promise.all(
       updates.map(async fileUrl => {
-        const notification = await self.readShareInviteNotification(
-          fileUrl,
-          webId
-        );
-        Log.info(notification);
-        const appMetadataUrl = notification.appMetadataUrl;
+        const sharedConfiguration = await self.readSharedConfiguration(fileUrl);
+        Log.info(sharedConfiguration);
+        const appMetadataUrl = sharedConfiguration.url;
         const appConfiguration = await StorageBackend.getAppConfigurationMetadata(
           appMetadataUrl
         );
         sharedApplicationsConfigurations.push(appConfiguration);
       })
     );
+
+    Log.info(sharedApplicationsConfigurations);
 
     return sharedApplicationsConfigurations;
   };

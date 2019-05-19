@@ -62,7 +62,7 @@ type Props = {
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
   handleSetUserWebId: Function,
-  handleSetUserInboxNotifications: Function,
+  handleSetUserInboxInvitations: Function,
   webId: string
 };
 
@@ -109,23 +109,20 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   checkInbox = async () => {
-    const { webId, handleSetUserInboxNotifications } = this.props;
+    const { webId, handleSetUserInboxInvitations } = this.props;
     const inboxUrl = 'https://aorumbayev4.solid.community/inbox/';
     const updates = await StorageToolbox.getInboxMessages(inboxUrl);
-    const notifications = [];
+    const invitations = [];
 
     await Promise.all(
       updates.map(async fileUrl => {
-        const notification = await StorageToolbox.readShareInviteNotification(
-          fileUrl,
-          webId
-        );
-        Log.info(notification);
-        notifications.push(notification);
+        const invitation = await StorageToolbox.readShareInvite(fileUrl, webId);
+        Log.info(invitation);
+        invitations.push(invitation);
       })
     );
 
-    handleSetUserInboxNotifications(notifications);
+    handleSetUserInboxInvitations(invitations);
   };
 
   setupProfileData = async jsonResponse => {
@@ -190,6 +187,7 @@ class AppRouter extends React.PureComponent<Props, State> {
             if (folder) {
               Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
+              await self.checkInbox();
             }
           })
           .catch(error => {
@@ -444,8 +442,8 @@ const mapDispatchToProps = dispatch => {
     });
   };
 
-  const handleSetUserInboxNotifications = inboxNotifications =>
-    dispatch(userActions.setUserInboxNotifications(inboxNotifications));
+  const handleSetUserInboxInvitations = inboxInvitations =>
+    dispatch(userActions.setUserInboxInvitations(inboxInvitations));
 
   return {
     handleSetSolidUserProfileAsync,
@@ -456,7 +454,7 @@ const mapDispatchToProps = dispatch => {
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
     handleUpdateUserDetails,
-    handleSetUserInboxNotifications
+    handleSetUserInboxInvitations
   };
 };
 

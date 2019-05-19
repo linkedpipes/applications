@@ -13,6 +13,13 @@ class StorageFileClient {
     }
   };
 
+  fetchJsonLDFromUrl = async url => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    return authClient.fetch(url).then(this.assertSuccessfulResponseWithJson);
+  };
+
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
     const authClient = await import(
@@ -210,20 +217,28 @@ class StorageFileClient {
     return new Response();
   };
 
-  sendInviteToInbox = async (url, data) => {
+  sendFileToUrl = async (url, data, type) => {
     const authClient = await import(
       /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
     );
 
     return authClient.fetch(url, {
       method: 'POST',
-      body: data
+      body: data,
+      headers: {
+        'Content-Type': type
+      }
     });
   };
 
   assertSuccessfulResponse = (response: Response) => {
     if (!response.ok) throw response;
     return response;
+  };
+
+  assertSuccessfulResponseWithJson = (response: Response) => {
+    if (!response.ok) throw response;
+    return response.json();
   };
 
   executeSPARQLUpdateForUser = async (url, query) => {

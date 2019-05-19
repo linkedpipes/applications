@@ -1,7 +1,12 @@
 /* eslint-disable */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
-import { AppConfiguration, Person, Notification } from './models';
+import {
+  AppConfiguration,
+  SharedAppConfiguration,
+  Person,
+  Invitation
+} from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
 
@@ -17,7 +22,7 @@ const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
 const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
 const SCHEMA = $rdf.Namespace('http://schema.org/');
-const STORAGE = $rdf.Namespace('http://example.org/storage/');
+const ACTIVITY_STREAM = $rdf.Namespace('https://www.w3.org/ns/activitystreams');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
@@ -1032,66 +1037,47 @@ class SolidBackend {
     }
   }
 
-  sendInviteToInbox(recipientWebId, data) {
+  sendFileToInbox(recipientWebId, data, type) {
     const inboxUrl = `${Utils.getBaseUrlConcat(recipientWebId)}/inbox`;
-    StorageFileClient.sendInviteToInbox(inboxUrl, data);
+    StorageFileClient.sendFileToUrl(inboxUrl, data, type);
   }
 
-  generateInvitationFile(baseUrl, gameUrl, userWebId, opponentWebId) {
-    const invitationUrl = `${baseUrl}#${Utils.getName()}`;
-    const notification = `<${invitationUrl}> a ${SCHEMA('InviteAction')}.`;
-    const sparqlUpdate = `
-  <${invitationUrl}> a ${SCHEMA('InviteAction')};
-    ${SCHEMA('event')} <${baseUrl}>;
-    ${SCHEMA('agent')} <${userWebId}>;
-    ${SCHEMA('recipient')} <${opponentWebId}>.
-`;
+  async generateInvitationFile(baseUrl, metadataUrl, userWebId, opponentWebId) {
+    const as = require('activitystrea.ms');
 
-    return {
-      notification,
-      sparqlUpdate
-    };
+    return new Promise(resolve => {
+      as.invite()
+        .name('lpapps_invite')
+        .actor(`${userWebId}`)
+        .target(`${opponentWebId}`)
+        .object(as.link().href(`${metadataUrl}`))
+        .publishedNow()
+        .prettyWrite((err, doc) => {
+          if (err) throw err;
+          resolve(doc);
+        });
+    });
   }
 
-  generateResponseToInvitation(notification, response) {
-    if (!notification) {
-      return;
-    }
-    const baseUrl = notification.appMetadataUrl;
-    const invitationUrl = notification.invitationUrl;
-    const userWebId = notification.recipientWebId;
-    const recipientWebId = notification.senderWebId;
-
-    const rsvpUrl = `${baseUrl}#${Utils.getName()}`;
-
-    let responseUrl;
-
-    if (response === 'yes') {
-      responseUrl = SCHEMA('RsvpResponseYes');
-    } else if (response === 'no') {
-      responseUrl = SCHEMA('RsvpResponseNo');
-    } else {
-      throw new Error(
-        `The parameter "response" expects either "yes" or "no". Instead, "${response}" was provided.`
-      );
-    }
-
-    const responseNotification = `<${invitationUrl}> ${SCHEMA(
-      'result'
-    )} <${rsvpUrl}>.`;
-    const sparqlUpdate = `
-    <${rsvpUrl}> a ${SCHEMA('RsvpAction')};
-      ${SCHEMA('rsvpResponse')} <${responseUrl}>;
-      ${SCHEMA('agent')} <${userWebId}>;
-      ${SCHEMA('recipient')} <${recipientWebId}>.
-
-    <${invitationUrl}> ${SCHEMA('result')} <${rsvpUrl}>.
-  `;
-
-    return {
-      responseNotification,
-      sparqlUpdate
-    };
+  generateResponseToInvitation(invitation, response) {
+    const as = require('activitystrea.ms');
+    return new Promise(resolve => {
+      as.import(invitation.object, (err, invitationObject) => {
+        if (err) throw err;
+        else {
+          as.accept()
+            .name('lpapps_invite_response')
+            .actor(`${invitation.recipientWebId}`)
+            .target(`${invitation.senderWebId}`)
+            .object(invitationObject)
+            .publishedNow()
+            .prettyWrite((err, doc) => {
+              if (err) throw err;
+              resolve(doc);
+            });
+        }
+      });
+    });
   }
 
   async storeInvitationFile(fileUrl, invitationSparqlUpdate) {
@@ -1174,9 +1160,7 @@ class SolidBackend {
 
     engine
       .query(
-        `SELECT ?resource {
-      ?resource a <http://www.w3.org/ns/ldp#Resource>.
-    }`,
+        `SELECT ?resource { ?resource a <http://www.w3.org/ns/ldp#Resource>. }`,
         { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
       )
       .then(function(result) {
@@ -1199,98 +1183,20 @@ class SolidBackend {
     return deferred.promise;
   }
 
-  async parseShareInviteNotification(fileUrl, userWebId) {
-    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
-    const N3 = require('n3');
-    const Q = require('q');
-    const deferred = Q.defer();
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+  async parseShareInvite(invitationUrl, userWebId) {
+    const invitation = await StorageFileClient.fetchJsonLDFromUrl(
+      invitationUrl
     );
 
-    const rdfjsSource = await rdfjsSourceFromUrl(fileUrl, authClient.fetch);
+    return new Invitation(invitation);
+  }
 
-    if (rdfjsSource) {
-      const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+  async parseSharedConfiguration(configurationUrl) {
+    const sharedAppConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
+      configurationUrl
+    );
 
-      const engine = newEngine();
-      let invitationFound = false;
-      const self = this;
-
-      engine
-        .query(
-          `SELECT ?invitation {
-    ?invitation a ${SCHEMA('InviteAction')}.
-  }`,
-          { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
-        )
-        .then(function(result) {
-          result.bindingsStream.on('data', async function(result) {
-            invitationFound = true;
-            result = result.toObject();
-            const invitationUrl = result['?invitation'].value;
-            let appMetadataUrl = await self.getObjectFromPredicateForResource(
-              invitationUrl,
-              SCHEMA('event')
-            );
-
-            Log.info(appMetadataUrl);
-
-            if (!appMetadataUrl) {
-              deferred.resolve(null);
-            } else {
-              appMetadataUrl = appMetadataUrl.value;
-
-              const types = await self.getAllObjectsFromPredicateForResource(
-                appMetadataUrl,
-                SCHEMA('type')
-              );
-
-              var senderWebId = await self.getObjectFromPredicateForResource(
-                invitationUrl,
-                SCHEMA('agent')
-              );
-
-              var recipientWebId = await self.getObjectFromPredicateForResource(
-                invitationUrl,
-                SCHEMA('recipient')
-              );
-
-              if (
-                (!recipientWebId && !senderWebId) ||
-                recipientWebId.value !== userWebId
-              ) {
-                deferred.resolve(null);
-              }
-
-              senderWebId = senderWebId.value;
-              recipientWebId = recipientWebId.value;
-
-              senderWebId, recipientWebId, appMetadataUrl, invitationUrl;
-
-              const notificationObject = new Notification(
-                invitationUrl,
-                senderWebId,
-                recipientWebId,
-                appMetadataUrl,
-                fileUrl
-              );
-
-              deferred.resolve(notificationObject);
-            }
-          });
-
-          result.bindingsStream.on('end', function() {
-            if (!invitationFound) {
-              deferred.resolve(null);
-            }
-          });
-        });
-    } else {
-      deferred.resolve(null);
-    }
-
-    return deferred.promise;
+    return new SharedAppConfiguration(sharedAppConfiguration);
   }
 
   async getObjectFromPredicateForResource(url, predicate) {
@@ -1372,8 +1278,8 @@ class SolidBackend {
     return deferred.promise;
   }
 
-  async acceptCollaborationInvitation(notification) {
-    const webId = notification.recipientWebId;
+  async createSharedMetadataFromInvite(invitation) {
+    const webId = invitation.recipientWebId;
     const configurationsFolderTitle = 'sharedConfigurations';
 
     const folderUrl = await this.getValidAppFolder(webId).catch(async error => {
@@ -1387,22 +1293,45 @@ class SolidBackend {
       Log.info(`Created folder ${folderUrl}/${configurationsFolderTitle}.`);
     });
 
-    const originPath = `${Utils.getFolderUrlFromPathUrl(
-      notification.inboxUrl
-    )}`;
-    const originName = `${Utils.getFilenameFromPathUrl(notification.inboxUrl)}`;
+    await StorageFileClient.updateItem(
+      `${folderUrl}/sharedConfigurations/`,
+      '.acl',
+      await this.createFolderAccessList(
+        webId,
+        `${folderUrl}/sharedConfigurations/`,
+        [READ],
+        false,
+        null
+      ),
+      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+    ).then(fileCreated => {
+      Log.info(`Created access list ${folderUrl}/.acl`);
+    });
+
     const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
-    const destinationName = originName;
 
-    await StorageFileClient.copyFile(
-      originPath,
-      originName,
-      destinationPath,
-      destinationName
-    );
+    const as = require('activitystrea.ms');
 
-    await StorageFileClient.removeItem(originPath, originName);
+    const self = this;
+
+    return new Promise(resolve => {
+      as.document()
+        .url(`${invitation.appMetadataUrl}`)
+        .attributedTo(as.person().url(`${invitation.senderWebId}`))
+        .publishedNow()
+        .prettyWrite(async (err, doc) => {
+          if (err) throw err;
+          else {
+            const uniqueFileName = `${Utils.getName()}.jsonld`;
+            await StorageFileClient.createFile(
+              destinationPath,
+              uniqueFileName,
+              doc
+            );
+            resolve(true);
+          }
+        });
+    });
   }
 }
-
 export default new SolidBackend();

@@ -47,7 +47,7 @@ const styles = theme => ({
 type Props = {
   handleSetInboxDialogState: Function,
   inboxDialogIsOpen: boolean,
-  inboxNotifications: [Object],
+  inboxInvitations: [Object],
   webId: String,
   classes: Object
 };
@@ -69,18 +69,18 @@ class StorageInboxDialog extends PureComponent<Props, State> {
     this.props.handleSetInboxDialogState(false);
   };
 
-  handleSendAcceptNotification = async notification => {
-    if (notification) {
-      Log.info(notification);
-      await StorageToolbox.acceptCollaborationInvitation(notification);
+  handleSendAcceptInvitation = async invitation => {
+    if (invitation) {
+      Log.info(invitation);
+      await StorageToolbox.sendAcceptCollaborationInvitation(invitation);
       Log.info('done');
     }
   };
 
   render() {
     const { loadingIsActive } = this.state;
-    const { classes, inboxNotifications } = this.props;
-    const { handleSendAcceptNotification } = this;
+    const { classes, inboxInvitations } = this.props;
+    const { handleSendAcceptInvitation } = this;
     return (
       <div>
         <Dialog
@@ -90,19 +90,19 @@ class StorageInboxDialog extends PureComponent<Props, State> {
         >
           <LoadingOverlay active={loadingIsActive} spinner>
             <DialogTitle id="form-dialog-title">
-              Inbox notifications
+              Inbox invitations
             </DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Browse notifications from your contacts to collaborate on
+                Browse invitations from your contacts to collaborate on
                 applications that they have created.
               </DialogContentText>
               <List dense>
-                {inboxNotifications.map(inboxNotification => (
+                {inboxInvitations.map(inboxInvitation => (
                   <ListItem dense key={`${uuid.v4()}`}>
                     <div
                       onClick={() => {
-                        handleSendAcceptNotification(inboxNotification);
+                        handleSendAcceptInvitation(inboxInvitation);
                       }}
                     >
                       <IconButton
@@ -151,7 +151,7 @@ const mapStateToProps = state => {
     currentApplicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId,
     inboxDialogIsOpen: state.globals.inboxDialogIsOpen,
-    inboxNotifications: state.user.inboxNotifications,
+    inboxInvitations: state.user.inboxInvitations,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata
   };
 };

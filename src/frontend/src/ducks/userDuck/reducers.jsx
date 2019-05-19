@@ -9,7 +9,7 @@ const INITIAL_STATE = {
   pipelineExecutions: [],
   name: '',
   image: undefined,
-  inboxNotifications: []
+  inboxInvitations: []
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -112,10 +112,10 @@ const userReducer = (state = INITIAL_STATE, action) => {
         applicationsFolder: action.value
       };
 
-    case types.SET_USER_INBOX_NOTIFCATIONS:
+    case types.SET_USER_INBOX_INVITATIONS:
       return {
         ...state,
-        inboxNotifications: action.value
+        inboxInvitations: action.value
       };
 
     default:

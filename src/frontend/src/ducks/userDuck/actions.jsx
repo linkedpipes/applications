@@ -60,9 +60,9 @@ const setUserProfileAsync = profile => {
     });
 };
 
-const setUserInboxNotifications = inboxNotifications => ({
-  type: types.SET_USER_INBOX_NOTIFCATIONS,
-  value: inboxNotifications
+const setUserInboxInvitations = inboxInvitations => ({
+  type: types.SET_USER_INBOX_INVITATIONS,
+  value: inboxInvitations
 });
 
 const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
@@ -84,6 +84,6 @@ export default {
   updateExecutionSession,
   setUserProfileAsync,
   updateApplicationsFolder,
-  setUserInboxNotifications,
+  setUserInboxInvitations,
   setSolidUserProfileAsync
 };
