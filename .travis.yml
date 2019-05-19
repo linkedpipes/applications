@@ -172,10 +172,9 @@ jobs:
         - cd src/backend
         - ./gradlew javadoc
         - rm -rf /tmp/javadoc
-        - cd /tmp
-        - git clone --quiet --branch=gh-pages --depth=1 https://${GH_TOKEN}@github.com/linkedpipes/applications gh-pages > /dev/null
+        - git clone --quiet --branch=gh-pages --depth=1 https://${GH_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
         - mv build/docs/javadoc /tmp/gh-pages/javadoc
-        - cd gh-pages
+        - cd /tmp/gh-pages
         - git add -f .
         - git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
         - git push -fq origin gh-pages > /dev/null
