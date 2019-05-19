@@ -8,10 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This class uses two template methods, {@link #get()} and {@link #getForNamed(String)}.
- * Its mandatory sub-procedures are {@link #addConstructs(ConstructBuilder)} and {@link
- * #addWheres(AbstractQueryBuilder)}. Its non-mandatory hooks are {@link #addPrefixes(AbstractQueryBuilder)}, {@link
- * #addOptionals(AbstractQueryBuilder)}, and {@link #addAdditional(AbstractQueryBuilder)}.
+ * This class uses two template methods, get() and getForNamed(String).
+ * Its mandatory sub-procedures are addConstructs(ConstructBuilder) and
+ * addWheres(AbstractQueryBuilder). Its non-mandatory hooks are
+ * addPrefixes(AbstractQueryBuilder), addOptionals(AbstractQueryBuilder), and
+ * addAdditional(AbstractQueryBuilder).
  */
 public abstract class ConstructSparqlQueryProvider extends SparqlQueryProvider<ConstructBuilder> {
 
