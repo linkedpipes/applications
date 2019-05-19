@@ -172,7 +172,7 @@ jobs:
         - cd src/backend
         - ./gradlew javadoc
         - rm -rf /tmp/javadoc
-        - git clone --quiet --branch=gh-pages --depth=1 https://${GH_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
+        - git clone --quiet --branch=gh-pages --depth=1 https://${GITHUB_ACCESS_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
         - mv build/docs/javadoc /tmp/gh-pages/javadoc
         - cd /tmp/gh-pages
         - git add -f .
