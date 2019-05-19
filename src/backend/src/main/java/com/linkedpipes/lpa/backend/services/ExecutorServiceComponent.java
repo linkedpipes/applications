@@ -98,6 +98,10 @@ public class ExecutorServiceComponent implements ExecutorService {
     * - room: userId
     * - event name: discoveryAdded
     * - message type: DiscoverySession
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @throws LpAppsException request to Discovery failed
     */
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
         DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
@@ -121,6 +125,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Call ETL to execute a pipeline, record execution in the DB, notify
+     * execution started on sockets and start polling for execution status.
+     *
+     * @param etlPipelineIri IRI of the ETL pipeline to execute
+     * @param userId WebID of the user (used to select where to map execution in DB, where to notify on sockets)
+     * @param selectedVisualiser frontend string stored in DB
+     * @return execution iri in JSON object for frontend to use
+     * @throws LpAppsException request to ETL failed
+     * @throws UserNotFoundException user not found
+     */
     @NotNull @Override
     public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
@@ -136,6 +151,10 @@ public class ExecutorServiceComponent implements ExecutorService {
     * - room: userId
     * - event name: executionAdded
     * - message type: PipelineExecution
+    *
+    * @param executionIri executionIri for which to get status
+    * @param userId webId to use for identification of a room where to notify via sockets
+    * @throws LpAppsException request to ETL failed
     */
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
@@ -163,8 +182,10 @@ public class ExecutorServiceComponent implements ExecutorService {
      * - room: executionIri
      * - event name: executionStatus
      * - message type: EtlStatusReport
+     *
+     * @param executionIri execution IRI to poll for
      */
-    private void startEtlStatusPolling(String executionIri) throws LpAppsException {
+    private void startEtlStatusPolling(String executionIri) {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
             try {
@@ -293,8 +314,10 @@ public class ExecutorServiceComponent implements ExecutorService {
      * - room: discoveryId
      * - event name: discoveryStatus
      * - message type: DiscoveryStatusReport
+     *
+     * @param discoveryId discovery id to poll for
      */
-    private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
+    private void startDiscoveryStatusPolling(String discoveryId) {
         Runnable checker = () -> {
             DiscoveryDao dao = null;
             try {

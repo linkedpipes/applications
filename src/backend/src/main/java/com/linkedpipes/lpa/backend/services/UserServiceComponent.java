@@ -51,6 +51,9 @@ public class UserServiceComponent implements UserService {
     * Returned is a user's profile containing all user's discoveries and
     * executions along with their status (as currently stored in the DB by
     * the ExecutorService)
+    *
+    * @param webId webId to add / fetch
+    * @return user profile
     */
     @NotNull @Override @Transactional(isolation = Isolation.SERIALIZABLE)
     public UserProfile addUserIfNotPresent(String webId) {
@@ -67,6 +70,16 @@ public class UserServiceComponent implements UserService {
         }
     }
 
+    /**
+     * Add discovery on user profile.
+     *
+     * @param username webId
+     * @param discoveryId discovery ID
+     * @param sparqlEndpointIri SPARQL endpoint IRI as provided by user on frontend
+     * @param dataSampleIri data sample IRI as provided by user on frontend
+     * @param namedGraphs list of IRIs as provided on frontend
+     * @throws UserNotFoundException user was not found in database
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
     public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws UserNotFoundException {
         UserDao user = getUser(username);
