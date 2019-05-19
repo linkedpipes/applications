@@ -63,13 +63,13 @@ class StorageToolbox {
   sendCollaborationInvitation = async (
     applicationConfiguration,
     webId,
-    recepientWebId
+    recipientWebId
   ) => {
     let invitation = StorageBackend.generateInvitationFile(
       applicationConfiguration.url,
       applicationConfiguration.url,
       webId,
-      recepientWebId
+      recipientWebId
     );
 
     StorageBackend.storeInvitationFile(
@@ -77,40 +77,57 @@ class StorageToolbox {
       invitation.sparqlUpdate
     );
 
-    StorageBackend.sendInviteToInbox(recepientWebId, invitation.notification);
+    StorageBackend.sendInviteToInbox(recipientWebId, invitation.notification);
 
     Log.info(invitation);
   };
 
+  acceptCollaborationInvitation = async notification => {
+    return StorageBackend.acceptCollaborationInvitation(notification);
+  };
+
   sendAcceptCollaborationInvitation = async notification => {
-    const response = await StorageBackend.generateResponseToInvitation(
-      userDataUrl,
-      invitationUrl,
-      userWebId,
-      opponentWebId,
+    const response = StorageBackend.generateResponseToInvitation(
+      notification,
       'yes'
     );
+    const metadataUrl = notification.appMetadataUrl;
+    const userWebId = notification.recipientWebId;
+    const invitationUrl = notification.invitationUrl;
+    const recipientWebId = notification.senderWebId;
 
-    dataSync.executeSPARQLUpdateForUser(
-      userDataUrl,
-      `INSERT DATA {
-  <${gameUrl}> a <${namespaces.chess}ChessGame>;
-    <${namespaces.storage}storeIn> <${userDataUrl}>.
-    ChessGame
-    ${response.sparqlUpdate}
-  }`
+    StorageBackend.storeInvitationResponseFile(
+      metadataUrl,
+      response.sparqlUpdate
     );
-    dataSync.executeSPARQLUpdateForUser(
-      userWebId,
-      `INSERT DATA { <${gameUrl}> ${SCHEMA('contributor')} <${userWebId}>; <${
-        namespaces.storage
-      }storeIn> <${userDataUrl}>.}`
+
+    StorageBackend.sendInviteToInbox(recipientWebId, response.notification);
+  };
+
+  getSharedApplicationsMetadata = async (webId: string, appFolder: string) => {
+    const sharedConfigurationsUrl = `${appFolder}/sharedConfigurations`;
+    const updates = await StorageBackend.checkSharedConfigurationsFolder(
+      sharedConfigurationsUrl
     );
-    dataSync.sendToOpponentsInbox(
-      await this.getInboxUrl(opponentWebId),
-      response.notification
+    const sharedApplicationsConfigurations = [];
+    const self = this;
+
+    await Promise.all(
+      updates.map(async fileUrl => {
+        const notification = await self.readShareInviteNotification(
+          fileUrl,
+          webId
+        );
+        Log.info(notification);
+        const appMetadataUrl = notification.appMetadataUrl;
+        const appConfiguration = await StorageBackend.getAppConfigurationMetadata(
+          appMetadataUrl
+        );
+        sharedApplicationsConfigurations.push(appConfiguration);
+      })
     );
-    dataSync.deleteFileForUser(fileUrl);
+
+    return sharedApplicationsConfigurations;
   };
 
   copyFolderRecursively = async (webId, originalFolder, destinationFolder) => {

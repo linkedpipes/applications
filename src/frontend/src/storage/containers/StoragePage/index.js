@@ -1,3 +1,3 @@
-import StoragePage from './StorageAppsBrowserContainer';
+import StoragePage from './StoragePageController';
 
 export default StoragePage;

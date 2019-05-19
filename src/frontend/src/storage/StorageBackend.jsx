@@ -17,6 +17,7 @@ const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
 const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
 const SCHEMA = $rdf.Namespace('http://schema.org/');
+const STORAGE = $rdf.Namespace('http://example.org/storage/');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
@@ -1031,8 +1032,8 @@ class SolidBackend {
     }
   }
 
-  sendInviteToInbox(recepientWebId, data) {
-    const inboxUrl = `${Utils.getBaseUrlConcat(recepientWebId)}/inbox`;
+  sendInviteToInbox(recipientWebId, data) {
+    const inboxUrl = `${Utils.getBaseUrlConcat(recipientWebId)}/inbox`;
     StorageFileClient.sendInviteToInbox(inboxUrl, data);
   }
 
@@ -1052,13 +1053,15 @@ class SolidBackend {
     };
   }
 
-  generateResponseToInvitation(
-    baseUrl,
-    invitationUrl,
-    userWebId,
-    opponentWebId,
-    response
-  ) {
+  generateResponseToInvitation(notification, response) {
+    if (!notification) {
+      return;
+    }
+    const baseUrl = notification.appMetadataUrl;
+    const invitationUrl = notification.invitationUrl;
+    const userWebId = notification.recipientWebId;
+    const recipientWebId = notification.senderWebId;
+
     const rsvpUrl = `${baseUrl}#${Utils.getName()}`;
 
     let responseUrl;
@@ -1073,20 +1076,20 @@ class SolidBackend {
       );
     }
 
-    const notification = `<${invitationUrl}> <${
-      namespaces.schema
-    }result> <${rsvpUrl}>.`;
+    const responseNotification = `<${invitationUrl}> ${SCHEMA(
+      'result'
+    )} <${rsvpUrl}>.`;
     const sparqlUpdate = `
     <${rsvpUrl}> a ${SCHEMA('RsvpAction')};
       ${SCHEMA('rsvpResponse')} <${responseUrl}>;
       ${SCHEMA('agent')} <${userWebId}>;
-      ${SCHEMA('recipient')} <${opponentWebId}>.
+      ${SCHEMA('recipient')} <${recipientWebId}>.
 
     <${invitationUrl}> ${SCHEMA('result')} <${rsvpUrl}>.
   `;
 
     return {
-      notification,
+      responseNotification,
       sparqlUpdate
     };
   }
@@ -1098,9 +1101,60 @@ class SolidBackend {
         `INSERT DATA {${invitationSparqlUpdate}}`
       );
     } catch (e) {
-      Log.error(`Could not save invitation for game.`);
+      Log.error(`Could not save invitation for metadata.`);
       Log.error(e);
     }
+  }
+
+  async storeInvitationResponseFile(fileUrl, invitationResponseSparqlUpdate) {
+    try {
+      await StorageFileClient.executeSPARQLUpdateForUser(
+        fileUrl,
+        `INSERT DATA {${invitationResponseSparqlUpdate}}`
+      );
+    } catch (e) {
+      Log.error(`Could not save invitation response for metadata.`);
+      Log.error(e);
+    }
+  }
+
+  async checkSharedConfigurationsFolder(folderUrl) {
+    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+    const N3 = require('n3');
+    const Q = require('q');
+    const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const deferred = Q.defer();
+    const newResources = [];
+    const rdfjsSource = await rdfjsSourceFromUrl(folderUrl, authClient.fetch);
+    const self = this;
+    const engine = newEngine();
+
+    engine
+      .query(
+        `SELECT ?resource {
+      ?resource a <http://www.w3.org/ns/ldp#Resource>.
+    }`,
+        { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+      )
+      .then(function(result) {
+        result.bindingsStream.on('data', data => {
+          data = data.toObject();
+
+          const resource = data['?resource'].value;
+
+          newResources.push(resource);
+        });
+
+        result.bindingsStream.on('end', function() {
+          deferred.resolve(newResources);
+        });
+      });
+
+    return deferred.promise;
   }
 
   async checkInboxFolder(inboxUrl) {
@@ -1145,7 +1199,7 @@ class SolidBackend {
     return deferred.promise;
   }
 
-  async parseShareInviteNotification(fileurl, userWebId) {
+  async parseShareInviteNotification(fileUrl, userWebId) {
     const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
     const N3 = require('n3');
     const Q = require('q');
@@ -1154,7 +1208,7 @@ class SolidBackend {
       /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
     );
 
-    const rdfjsSource = await rdfjsSourceFromUrl(fileurl, authClient.fetch);
+    const rdfjsSource = await rdfjsSourceFromUrl(fileUrl, authClient.fetch);
 
     if (rdfjsSource) {
       const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
@@ -1218,7 +1272,8 @@ class SolidBackend {
                 invitationUrl,
                 senderWebId,
                 recipientWebId,
-                appMetadataUrl
+                appMetadataUrl,
+                fileUrl
               );
 
               deferred.resolve(notificationObject);
@@ -1315,6 +1370,38 @@ class SolidBackend {
     }
 
     return deferred.promise;
+  }
+
+  async acceptCollaborationInvitation(notification) {
+    const webId = notification.recipientWebId;
+    const configurationsFolderTitle = 'sharedConfigurations';
+
+    const folderUrl = await this.getValidAppFolder(webId).catch(async error => {
+      Log.error(error, 'StorageBackend');
+    });
+
+    await StorageFileClient.createFolder(
+      folderUrl,
+      'sharedConfigurations'
+    ).then(() => {
+      Log.info(`Created folder ${folderUrl}/${configurationsFolderTitle}.`);
+    });
+
+    const originPath = `${Utils.getFolderUrlFromPathUrl(
+      notification.inboxUrl
+    )}`;
+    const originName = `${Utils.getFilenameFromPathUrl(notification.inboxUrl)}`;
+    const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
+    const destinationName = originName;
+
+    await StorageFileClient.copyFile(
+      originPath,
+      originName,
+      destinationPath,
+      destinationName
+    );
+
+    await StorageFileClient.removeItem(originPath, originName);
   }
 }
 

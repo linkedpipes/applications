@@ -14,11 +14,13 @@ export default class Notification {
     invitationUrl: string,
     senderWebId: string,
     recipientWebId: string,
-    appMetadataUrl: string
+    appMetadataUrl: string,
+    inboxUrl: string
   ) {
     this.invitationUrl = invitationUrl;
     this.senderWebId = senderWebId;
     this.recipientWebId = recipientWebId;
     this.appMetadataUrl = appMetadataUrl;
+    this.inboxUrl = inboxUrl;
   }
 }

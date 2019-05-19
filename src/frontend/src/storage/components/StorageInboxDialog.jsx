@@ -7,23 +7,19 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import List from '@material-ui/core/List';
 import { globalActions } from '@ducks/globalDuck';
 import { userActions } from '@ducks/userDuck';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import LoadingOverlay from 'react-loading-overlay';
-import StorageBackend from '../StorageBackend';
 import StorageToolbox from '@storage/StorageToolbox';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-import FolderIcon from '@material-ui/icons/Folder';
 import AcceptIcon from '@material-ui/icons/CheckTwoTone';
 import DeclineIcon from '@material-ui/icons/NotInterestedTwoTone';
+import { Log } from '@utils';
 import uuid from 'uuid';
 
 const styles = theme => ({
@@ -48,22 +44,10 @@ const styles = theme => ({
   }
 });
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250
-    }
-  }
-};
-
 type Props = {
   handleSetInboxDialogState: Function,
   inboxDialogIsOpen: boolean,
   inboxNotifications: [Object],
-  selectedApplicationMetadata: AppConfiguration,
   webId: String,
   classes: Object
 };
@@ -85,9 +69,18 @@ class StorageInboxDialog extends PureComponent<Props, State> {
     this.props.handleSetInboxDialogState(false);
   };
 
+  handleSendAcceptNotification = async notification => {
+    if (notification) {
+      Log.info(notification);
+      await StorageToolbox.acceptCollaborationInvitation(notification);
+      Log.info('done');
+    }
+  };
+
   render() {
     const { loadingIsActive } = this.state;
     const { classes, inboxNotifications } = this.props;
+    const { handleSendAcceptNotification } = this;
     return (
       <div>
         <Dialog
@@ -107,13 +100,18 @@ class StorageInboxDialog extends PureComponent<Props, State> {
               <List dense>
                 {inboxNotifications.map(inboxNotification => (
                   <ListItem dense key={`${uuid.v4()}`}>
-                    <IconButton
-                      key={`accept-invite-${uuid.v4()}`}
-                      aria-label="Accept"
+                    <div
+                      onClick={() => {
+                        handleSendAcceptNotification(inboxNotification);
+                      }}
                     >
-                      <AcceptIcon />
-                    </IconButton>
-
+                      <IconButton
+                        key={`accept-invite-${uuid.v4()}`}
+                        aria-label="Accept"
+                      >
+                        <AcceptIcon />
+                      </IconButton>
+                    </div>
                     <ListItemText
                       key={`${uuid.v4()}`}
                       primary="Single-line item"
