@@ -76,8 +76,17 @@ jobs:
           - $HOME/.gradle/wrapper/
       before_script:
         - cd src/backend
+        - git config --global user.email "travis@travis-ci.org"
+        - git config --global user.name "travis-ci"
       script:
-        - ./gradlew assemble
+        - ./gradlew assemble javadoc
+        - rm -rf /tmp/javadoc
+        - git clone --quiet --branch=gh-pages --depth=1 https://${GITHUB_ACCESS_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
+        - mv build/docs/javadoc /tmp/gh-pages/javadoc
+        - cd /tmp/gh-pages
+        - git add -f .
+        - git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
+        - git push -fq origin gh-pages > /dev/null
 
     - stage: tests
       name: "Backend unit tests"
@@ -164,20 +173,6 @@ jobs:
       script:
         - sleep 90 # Hardcoded workaround to wait until data is deployed
         - python3 e2e_tests.py "$BROWSERSTACK_USERNAME" "$BROWSERSTACK_APIKEY" "$TRAVIS_BUILD_NUMBER" "$TRAVIS_BRANCH"
-    - stage: build
-      name: "Javadoc"
-      script:
-        - git config --global user.email "travis@travis-ci.org"
-        - git config --global user.name "travis-ci"
-        - cd src/backend
-        - ./gradlew javadoc
-        - rm -rf /tmp/javadoc
-        - git clone --quiet --branch=gh-pages --depth=1 https://${GITHUB_ACCESS_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
-        - mv build/docs/javadoc /tmp/gh-pages/javadoc
-        - cd /tmp/gh-pages
-        - git add -f .
-        - git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
-        - git push -fq origin gh-pages > /dev/null
 
 notifications:
   slack:
