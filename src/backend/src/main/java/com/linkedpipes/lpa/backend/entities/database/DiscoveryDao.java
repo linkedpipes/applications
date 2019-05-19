@@ -38,6 +38,7 @@ public class DiscoveryDao implements Serializable {
     private List<DiscoveryNamedGraphDao> namedGraphs;
 
     @ManyToOne
+    @JoinColumn(name="user_web_id")
     private UserDao user;
 
     public UserDao getUser() {
@@ -47,8 +48,8 @@ public class DiscoveryDao implements Serializable {
     public void setUser(UserDao user) {
         this.user = user;
 
-        if (!user.getDiscoveries().contains(this)) {
-            user.getDiscoveries().add(this);
+        if ((user != null) && !user.getDiscoveries().contains(this)) {
+                user.getDiscoveries().add(this);
         }
     }
 

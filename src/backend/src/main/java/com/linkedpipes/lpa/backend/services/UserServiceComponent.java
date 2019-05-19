@@ -6,7 +6,6 @@ import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,9 +26,6 @@ import java.text.SimpleDateFormat;
 @Profile("!disableDB")
 public class UserServiceComponent implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryServiceComponent.class);
-    private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
-            new ObjectMapper()
-                    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
     @Autowired
     private UserRepository repository;
@@ -39,9 +35,6 @@ public class UserServiceComponent implements UserService {
 
     @Autowired
     private ExecutionRepository executionRepository;
-
-    @Autowired
-    private ApplicationRepository applicationRepository;
 
     @Autowired
     private PipelineInformationRepository pipelineRepository;
@@ -122,15 +115,7 @@ public class UserServiceComponent implements UserService {
     private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
-        profile.applications = new ArrayList<>();
-        if (user.getApplications() != null) {
-            for (ApplicationDao dba : user.getApplications()) {
-                Application app = new Application();
-                app.solidIri = dba.getSolidIri();
-                profile.applications.add(app);
-            }
-        }
-
+        profile.color = user.getColor();
         profile.discoverySessions = new ArrayList<>();
         if (user.getDiscoveries() != null) {
             for (DiscoveryDao d : user.getDiscoveries()) {
@@ -175,16 +160,63 @@ public class UserServiceComponent implements UserService {
     }
 
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void addApplication(@NotNull String username, @NotNull String solidIri) throws UserNotFoundException, LpAppsException {
+    public UserProfile deleteExecution(final String username, final String executionIri) throws UserNotFoundException {
         UserDao user = getUser(username);
-        ApplicationDao app = new ApplicationDao();
-        app.setSolidIri(solidIri);
-        user.addApplication(app);
-        applicationRepository.save(app);
-        repository.save(user);
+        ExecutionDao toDelete = null;
+        PipelineInformationDao pipelineInformationToDelete = null;
 
-        Application a = new Application();
-        a.solidIri = solidIri;
-        com.linkedpipes.lpa.backend.Application.SOCKET_IO_SERVER.getRoomOperations(username).sendEvent("applicationAdded", OBJECT_MAPPER.writeValueAsString(a));
+        for (ExecutionDao execution : user.getExecutions()) {
+            if (execution.getExecutionIri().equals(executionIri)) {
+                toDelete = execution;
+                break;
+            }
+        }
+
+        if (toDelete != null) {
+            user.removeExecution(toDelete);
+
+            if (executionRepository.findExecutionsUsingPipelineNative(toDelete.getPipelineId()).size() == 1) {
+                pipelineInformationToDelete = toDelete.getPipeline();
+            }
+
+            executionRepository.delete(toDelete);
+
+            if (pipelineInformationToDelete != null) {
+                pipelineRepository.delete(pipelineInformationToDelete);
+            }
+
+            repository.save(user);
+        }
+
+        return transformUserProfile(user);
     }
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile deleteDiscovery(final String username, final String discoveryId) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        DiscoveryDao toDelete = null;
+        for (DiscoveryDao discovery : user.getDiscoveries()) {
+            if (discovery.getDiscoveryId().equals(discoveryId)) {
+                toDelete = discovery;
+                break;
+            }
+        }
+
+        if (toDelete != null) {
+            user.removeDiscovery(toDelete);
+            discoveryRepository.delete(toDelete);
+            repository.save(user);
+        }
+
+        return transformUserProfile(user);
+    }
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile setUserColorScheme(String username, String color) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        user.setColor(color);
+        repository.save(user);
+        return transformUserProfile(user);
+    }
+
 }

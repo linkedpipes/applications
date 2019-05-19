@@ -29,9 +29,11 @@ public class ExecutionDao implements Serializable {
     private Date finished;
 
     @ManyToOne
+    @JoinColumn(name="user_web_id")
     private UserDao user;
 
     @ManyToOne
+    @JoinColumn(name="pipeline_id", nullable=true)
     private PipelineInformationDao pipeline;
 
     public UserDao getUser() {
@@ -41,8 +43,8 @@ public class ExecutionDao implements Serializable {
     public void setUser(UserDao user) {
         this.user = user;
 
-        if (!user.getExecutions().contains(this)) {
-            user.getExecutions().add(this);
+        if ((user != null) && !user.getExecutions().contains(this)) {
+                user.getExecutions().add(this);
         }
     }
 
@@ -100,5 +102,9 @@ public class ExecutionDao implements Serializable {
 
     public Date getFinished() {
         return this.finished;
+    }
+
+    public long getPipelineId() {
+        return this.pipeline.getId();
     }
 }

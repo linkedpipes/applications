@@ -10,6 +10,7 @@ public class DiscoveryNamedGraphDao implements Serializable {
     private int id;
 
     @ManyToOne
+    @JoinColumn(name="discovery_id")
     private DiscoveryDao discovery;
 
     @Column(nullable = true, columnDefinition = "TEXT")
