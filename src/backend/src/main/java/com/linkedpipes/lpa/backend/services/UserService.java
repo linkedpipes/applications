@@ -12,4 +12,5 @@ public interface UserService {
     void setUserExecution(String user, String execution, String etlPipelineIri, String visualizer) throws UserNotFoundException;
     UserProfile deleteExecution(String user, String executionIri) throws UserNotFoundException;
     UserProfile deleteDiscovery(String user, String discoveryId) throws UserNotFoundException;
+    UserProfile setUserColorScheme(String user, String color) throws UserNotFoundException;
 }

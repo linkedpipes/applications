@@ -115,7 +115,7 @@ public class UserServiceComponent implements UserService {
     private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
-
+        profile.color = user.getColor();
         profile.discoverySessions = new ArrayList<>();
         if (user.getDiscoveries() != null) {
             for (DiscoveryDao d : user.getDiscoveries()) {
@@ -210,4 +210,13 @@ public class UserServiceComponent implements UserService {
 
         return transformUserProfile(user);
     }
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile setUserColorScheme(String username, String color) throws UserNotFoundException {
+        UserDao user = getUser(username);
+        user.setColor(color);
+        repository.save(user);
+        return transformUserProfile(user);
+    }
+
 }
