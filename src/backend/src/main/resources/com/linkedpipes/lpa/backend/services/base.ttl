@@ -10,6 +10,7 @@
 	  #<https://discovery.linkedpipes.com/resource/application/timeline-periods-with-labels/template>,
       <https://discovery.linkedpipes.com/resource/application/map/template>,
       <https://discovery.linkedpipes.com/resource/application/map-labeled-points/template>,
+      <https://gist.github.com/ivan-lattak/d5698fa9ab140586768d46d8d16b4d00/raw/6c430599dc9517a91e0f519c0f818ef984552c8f/map-advanced-filters>,
       #<https://discovery.linkedpipes.com/resource/application/dcterms/template>,
       <https://gist.githubusercontent.com/Ponsietta/fc490bc45c3a285b5faaa9816114bfca/raw/276f3d19c14e201d90b7c5f38b1f10ccdfc66ff0/treemap_template.ttl>,
       <https://gist.githubusercontent.com/ivan-lattak/b483b9a92c5141b7a126fb073b878565/raw/969504830ae06dd7a23b90cdc8ab9c9847baa3de/chord_template.ttl>,
