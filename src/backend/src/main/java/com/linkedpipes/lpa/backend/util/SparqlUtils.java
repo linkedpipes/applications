@@ -5,7 +5,9 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
@@ -17,8 +19,13 @@ public class SparqlUtils {
         }
         return uri.endsWith(">") ? uri : uri + ">";
     }
+
     public static String formatLabel(String label) {
         return "'" + label + "'";
+    }
+
+    public static String formatXSDDate(Date date){
+        return "xsd:date(\"" + (new SimpleDateFormat("yyyy-MM-dd" ).format(date)) + "\")";
     }
 
     public static LocalizedValue getCombinedLabel(Resource resource, Property... labelProperties) {
