@@ -17,7 +17,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
-import StorageBackend from '../StorageBackend';
 import StorageToolbox from '@storage/StorageToolbox';
 import AppConfiguration from '@storage/models/AppConfiguration';
 
@@ -86,7 +85,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
   fetchAvailableWebIds = async () => {
     const { webId } = this.props;
     if (webId) {
-      const availableWebIds = await StorageBackend.getFriends(webId);
+      const availableWebIds = await StorageToolbox.getFriends(webId);
       if (availableWebIds.length > 0) {
         this.setState({
           availableWebIds

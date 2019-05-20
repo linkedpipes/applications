@@ -17,12 +17,7 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, AuthenticationService } from '@utils';
-import {
-  StoragePage,
-  StorageBackend,
-  StorageToolbox,
-  StorageInboxDialog
-} from '@storage';
+import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
@@ -54,8 +49,7 @@ const styles = () => ({
 type Props = {
   classes: any,
   webId: ?string,
-  // eslint-disable-next-line react/no-unused-prop-types
-  userProfile: Object,
+  // eslint-disable-ne
   handleSetSolidUserProfileAsync: Function,
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
@@ -64,6 +58,9 @@ type Props = {
   handleUpdateApplicationsFolder: Function,
   handleSetUserWebId: Function,
   handleSetUserInboxInvitations: Function,
+  discoverySessions: Array<Object>,
+  pipelineExecutions: Array<Object>,
+  currentInboxInvitations: Array<Object>,
   webId: string
 };
 
@@ -110,7 +107,11 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   checkInbox = async () => {
-    const { webId, handleSetUserInboxInvitations } = this.props;
+    const {
+      webId,
+      handleSetUserInboxInvitations,
+      currentInboxInvitations
+    } = this.props;
     const inboxInvitations = await StorageToolbox.getInboxMessages(webId);
     const invitations = [];
 
@@ -127,12 +128,23 @@ class AppRouter extends React.PureComponent<Props, State> {
       })
     );
 
-    // handleSetUserInboxInvitations(invitations);
+    if (
+      !(
+        currentInboxInvitations.length === invitations.length &&
+        currentInboxInvitations.sort().every((value, index) => {
+          return (
+            value.invitationUrl === invitations.sort()[index].invitationUrl
+          );
+        })
+      )
+    ) {
+      handleSetUserInboxInvitations(invitations);
+    }
   };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
-    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    const me = await StorageToolbox.getPerson(updatedProfileData.webId);
     this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
@@ -172,11 +184,11 @@ class AppRouter extends React.PureComponent<Props, State> {
 
             socket.emit('join', session.webId);
 
-            const folder = await StorageBackend.getValidAppFolder(
+            const folder = await StorageToolbox.getValidAppFolder(
               session.webId
             ).catch(async error => {
               Log.error(error, 'HomeContainer');
-              await StorageBackend.createAppFolders(
+              await StorageToolbox.createAppFolders(
                 session.webId,
                 'linkedpipes'
               ).then(created => {
@@ -272,8 +284,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const parsedData = JSON.parse(data);
       if (parsedData.status.isFinished) {
         socket.emit('leave', parsedData.discoveryId);
-        const userProfile = self.props.userProfile;
-        if (userProfile.discoverySessions.length > 0) {
+        if (self.props.discoverySessions.length > 0) {
           const discoveryRecord = {};
 
           discoveryRecord.discoveryId = parsedData.discoveryId;
@@ -303,8 +314,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const newStatus = parsedData.status.status;
 
       socket.emit('leave', executionIri);
-      const userProfile = self.props.userProfile;
-      if (userProfile.pipelineExecutions.length > 0) {
+      if (self.props.pipelineExecutions.length > 0) {
         const pipelineRecord = {};
         pipelineRecord.status = newStatus;
         pipelineRecord.started = parsedData.started;
@@ -406,7 +416,9 @@ class AppRouter extends React.PureComponent<Props, State> {
 const mapStateToProps = state => {
   return {
     webId: state.user.webId,
-    userProfile: state.user,
+    discoverySessions: state.user.discoverySessions,
+    pipelineExecutions: state.user.pipelineExecutions,
+    currentInboxInvitations: state.user.inboxInvitations,
     colorThemeIsLight: state.globals.colorThemeIsLight
   };
 };

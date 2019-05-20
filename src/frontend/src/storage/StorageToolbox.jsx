@@ -2,7 +2,7 @@
 import stringHash from 'string-hash';
 import { Log, GlobalUtils } from '@utils';
 import StorageBackend from './StorageBackend';
-import StorageFileClient from './StorageFileClient'
+import StorageFileClient from './StorageFileClient';
 import { Utils } from './utils';
 
 const os = require('os');
@@ -105,15 +105,14 @@ class StorageToolbox {
       'application/ld+json'
     );
 
-    await StorageFileClient.removeItem(
-      Utils.getFolderUrlFromPathUrl(invitation.invitationUrl),
-      Utils.getFilenameFromPathUrl(invitation.invitationUrl)
-    ).then(response => {
-      if (response.status === 200) {
-        const filePath = response.url;
-        Log.info(`Removed ${filePath}.`);
+    await StorageBackend.removeInvitation(invitation.invitationUrl).then(
+      response => {
+        if (response.status === 200) {
+          const filePath = response.url;
+          Log.info(`Removed ${filePath}.`);
+        }
       }
-    });
+    );
   };
 
   sendRejectCollaborationInvitation = async invitation => {
@@ -159,6 +158,39 @@ class StorageToolbox {
       originalFolder,
       destinationFolder
     );
+  };
+
+  getAppConfigurationsMetadata = async (
+    webId: string,
+    appFolder: string
+  ): Promise<ApplicationConfiguration[]> => {
+    return await StorageBackend.getAppConfigurationsMetadata(webId, appFolder);
+  };
+
+  getPerson = async (webId: string): Promise<Person> => {
+    return StorageBackend.getPerson(webId);
+  };
+
+  getValidAppFolder = async (webId: string): Promise<string> => {
+    return StorageBackend.getValidAppFolder(webId);
+  };
+
+  createAppFolders = async (
+    webId: string,
+    folderTitle: string
+  ): Promise<boolean> => {
+    return StorageBackend.createAppFolders(webId, folderTitle);
+  };
+
+  renameAppConfiguration = async (
+    metadataUrl: string,
+    newTitle: string
+  ): Promise<boolean> => {
+    return StorageBackend.renameAppConfiguration(metadataUrl, newTitle);
+  };
+
+  getFriends = async (webId: string): Promise<Person[]> => {
+    return StorageBackend.getFriends(webId);
   };
 }
 

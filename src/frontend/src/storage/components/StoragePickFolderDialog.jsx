@@ -12,8 +12,6 @@ import { userActions } from '@ducks/userDuck';
 import { Utils } from '../utils';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-import StorageBackend from '../StorageBackend';
-import { Log } from '@utils';
 import LoadingOverlay from 'react-loading-overlay';
 import StorageToolbox from '@storage/StorageToolbox';
 
@@ -171,7 +169,7 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
       return;
     }
     const folderUrl = `${Utils.getBaseUrl(this.props.webId) + folder}`;
-    await StorageBackend.createAppFolders(this.props.webId, folder).then(
+    await StorageToolbox.createAppFolders(this.props.webId, folder).then(
       created => {
         if (created) {
           this.props.handleUpdateApplicationsFolder(folderUrl);

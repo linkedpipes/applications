@@ -6,8 +6,7 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { userActions } from '@ducks/userDuck';
-import { StorageBackend, StorageToolbox } from '@storage';
+import { StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -102,7 +101,7 @@ class HomeContainer extends PureComponent<Props, State> {
     const webId = userProfile.webId;
     const applicationsFolder = userProfile.applicationsFolder;
     if (webId) {
-      const metadata = await StorageBackend.getAppConfigurationsMetadata(
+      const metadata = await StorageToolbox.getAppConfigurationsMetadata(
         webId,
         applicationsFolder
       );

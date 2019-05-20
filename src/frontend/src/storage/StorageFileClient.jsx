@@ -163,19 +163,6 @@ class StorageFileClient {
     return this.createItem(path, itemName, content, contentType);
   };
 
-  buildFolderUrl = async (path, folderName = '') => {
-    return `${path}/${folderName}/`;
-  };
-
-  buildFileUrl = async (path, fileName = '') => {
-    let url =
-      fileName === '.acl' ? `${path}${fileName}` : `${path}/${fileName}`;
-    while (url.slice(-1) === '/') url = url.slice(0, -1);
-    Log.info(url);
-
-    return url;
-  };
-
   copyFile = async (
     originPath,
     originName,

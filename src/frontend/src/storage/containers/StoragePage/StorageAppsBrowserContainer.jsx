@@ -3,11 +3,11 @@ import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
 import { Log } from '@utils';
-import StorageBackend from '../../StorageBackend';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
+import StorageToolbox from '@storage/StorageToolbox';
 
 type Props = {
   webId: string,
@@ -68,7 +68,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   loadStoredApplications = async () => {
     const { webId, applicationsFolder } = this.props;
     if (webId) {
-      const metadata = await StorageBackend.getAppConfigurationsMetadata(
+      const metadata = await StorageToolbox.getAppConfigurationsMetadata(
         webId,
         applicationsFolder
       );

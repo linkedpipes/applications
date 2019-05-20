@@ -586,61 +586,6 @@ class SolidBackend {
     );
   }
 
-  async deepCopy(src, dest, options, indent) {
-    indent = indent || '';
-    options = options || {};
-    console.log(indent + 'from ' + src + '\n' + indent + 'to ' + dest);
-    src = typeof src === 'string' ? $rdf.sym(src) : src;
-    dest = typeof dest === 'string' ? $rdf.sym(dest) : dest;
-    src.uri = src.uri.match(/\/$/) ? src.uri : src.uri + '/';
-    dest.uri = dest.uri.match(/\/$/) ? dest.uri : dest.uri + '/';
-    const self = this;
-    let promises = [];
-    return new Promise(function(resolve, reject) {
-      function mapURI(src, dest, x) {
-        if (!x.uri.startsWith(src.uri)) {
-          throw new Error("source '" + x + "' is not in tree " + src);
-        }
-        return self.store.sym(dest.uri + x.uri.slice(src.uri.length));
-      }
-      self.fetcher
-        .load(src)
-        .then(function(response) {
-          if (!response.ok)
-            throw new Error(
-              'Error reading container ' + src + ' : ' + response.status
-            );
-          let contents = self.store.each(src, LDP('contains'));
-          for (let i = 0; i < contents.length; i++) {
-            let here = contents[i];
-            let there = mapURI(src, dest, here);
-            if (self.store.holds(here, RDF('type'), LDP('Container'))) {
-              promises.push(self.deepCopy(here, there, options, indent + '  '));
-            } else {
-              // copy a leaf
-              console.log('copying ' + there.value);
-              /*
-            complains if no type, but then ignores what it is set to???
-          */
-              let type = 'text/turtle';
-              promises.push(
-                self.fetcher.webCopy(here, there, { contentType: type })
-              );
-            }
-          }
-          Promise.all(promises)
-            .then(resolve('Copying Successful'))
-            .catch(function(e) {
-              console.log('Overall promise rejected: ' + e);
-              reject(e);
-            });
-        })
-        .catch(function(error) {
-          reject('Load error: ' + error);
-        });
-    });
-  }
-
   async removeAppConfiguration(
     appFolder: string,
     appConfiguration: AppConfiguration
@@ -1092,30 +1037,6 @@ class SolidBackend {
     });
   }
 
-  async storeInvitationFile(fileUrl, invitationSparqlUpdate) {
-    try {
-      await StorageFileClient.executeSPARQLUpdateForUser(
-        fileUrl,
-        `INSERT DATA {${invitationSparqlUpdate}}`
-      );
-    } catch (e) {
-      Log.error(`Could not save invitation for metadata.`);
-      Log.error(e);
-    }
-  }
-
-  async storeInvitationResponseFile(fileUrl, invitationResponseSparqlUpdate) {
-    try {
-      await StorageFileClient.executeSPARQLUpdateForUser(
-        fileUrl,
-        `INSERT DATA {${invitationResponseSparqlUpdate}}`
-      );
-    } catch (e) {
-      Log.error(`Could not save invitation response for metadata.`);
-      Log.error(e);
-    }
-  }
-
   async checkSharedConfigurationsFolder(folderUrl) {
     const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
     const N3 = require('n3');
@@ -1183,7 +1104,7 @@ class SolidBackend {
 
           // if (self.alreadyCheckedResources.indexOf(resource) === -1) {
           newResources.push(resource);
-            // self.alreadyCheckedResources.push(resource);
+          self.alreadyCheckedResources.push(resource);
           // }
         });
 
@@ -1224,30 +1145,30 @@ class SolidBackend {
     );
     const collaboratorWebId = sharedInvitation.senderWebId;
     const webId = sharedInvitation.recipientWebId;
+    const accessListConfiguration = await this.createFileAccessList(
+      webId,
+      sharedInvitation.invitation.appMetadataUrl,
+      [READ, WRITE],
+      false,
+      [collaboratorWebId]
+    );
     await StorageFileClient.updateFile(
-      fileMetadataFolder,
+      `${fileMetadataFolder}/`,
       `${fileMetadataTitle}.acl`,
-      await this.createFileAccessList(
-        webId,
-        sharedInvitation.invitation.appMetadataUrl,
-        [READ, WRITE],
-        false,
-        [collaboratorWebId]
-      ),
+      accessListConfiguration,
       '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
     ).then(fileCreated => {
       Log.info(`Created access list ${fileMetadataTitle}.acl`);
     });
 
-    await StorageFileClient.removeItem(
-      Utils.getFolderUrlFromPathUrl(sharedInvitation.invitationUrl),
-      Utils.getFilenameFromPathUrl(sharedInvitation.invitationUrl)
-    ).then(response => {
-      if (response.status === 200) {
-        const filePath = response.url;
-        Log.info(`Removed ${filePath}.`);
-      }
-    });
+    // await this.removeInvitation(sharedInvitation.invitationUrl).then(
+    //   response => {
+    //     if (response.status === 200) {
+    //       const filePath = response.url;
+    //       Log.info(`Removed ${filePath}.`);
+    //     }
+    //   }
+    // );
   }
 
   async createSharedMetadataFromInvite(invitation) {
@@ -1300,10 +1221,42 @@ class SolidBackend {
               uniqueFileName,
               doc
             );
+            await StorageFileClient.createFile(
+              destinationPath,
+              `${uniqueFileName}.acl`,
+              await self.createFileAccessList(
+                webId,
+                `${destinationPath}/${uniqueFileName}`,
+                [READ],
+                false,
+                undefined
+              )
+            );
             resolve(true);
           }
         });
     });
   }
+
+  async removeInvitation(invitationUrl) {
+    const self = this;
+    return StorageFileClient.removeItem(
+      Utils.getFolderUrlFromPathUrl(invitationUrl),
+      Utils.getFilenameFromPathUrl(invitationUrl)
+    );
+  }
 }
+
+// .then(response => {
+//   if (response.status === 200) {
+//     const filePath = response.url;
+//     if (self.alreadyCheckedResources.indexOf(filePath) !== -1) {
+//       self.alreadyCheckedResources = self.alreadyCheckedResources.filter(
+//         el => el !== filePath
+//       );
+//     }
+//   }
+//   return response;
+// });
+
 export default new SolidBackend();

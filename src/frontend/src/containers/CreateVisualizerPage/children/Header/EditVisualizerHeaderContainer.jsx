@@ -5,7 +5,6 @@ import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
 import {
   StorageToolbox,
-  StorageBackend,
   StorageAccessControlDialog
 } from '@storage';
 import { withRouter } from 'react-router-dom';
@@ -202,7 +201,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(true);
     this.handleCloseRenameDialog();
 
-    const isRenamed = await StorageBackend.renameAppConfiguration(
+    const isRenamed = await StorageToolbox.renameAppConfiguration(
       selectedApplicationMetadata.url,
       modifiedSelectedApplicationTitle
     );
