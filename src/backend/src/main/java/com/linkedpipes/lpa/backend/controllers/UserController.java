@@ -28,6 +28,13 @@ public class UserController {
         this.userService = context.getBean(UserService.class);
     }
 
+
+    /**
+     * Get user profile. If user doesn't exist, it will be added automatically.
+     *
+     * @param user user identifier - currently webId is sent from frontend.
+     * @return user profile in JSON
+     */
     @NotNull
     @PostMapping("/api/user")
     public ResponseEntity<UserProfile> getUser(@NotNull @RequestParam(value = "webId", required = true) String user) {
@@ -39,6 +46,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Delete execution from user profile in DB. If user is not found, 404 is
+     * returned.
+     *
+     * @param user user identifier - currently webId is sent from frontend
+     * @param executionIri IRI of execution to be deleted
+     * @return user profile in JSON after deletion
+     * @throws LpAppsException HTTP 404 when user is not found
+     */
     @NotNull
     @DeleteMapping("/api/user/execution")
     public ResponseEntity<UserProfile> deleteExecution(
@@ -52,6 +68,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Delete discovery from user profile in DB. If user is not found, 404 is
+     * returned.
+     *
+     * @param user user identifier - currently webId is sent from frontend
+     * @param discoveryId ID of discovery to be deleted
+     * @return user profile in JSON after deletion
+     * @throws LpAppsException HTTP 404 when user is not found
+     */
     @NotNull
     @DeleteMapping("/api/user/discovery")
     public ResponseEntity<UserProfile> deleteDiscovery(
@@ -65,6 +90,17 @@ public class UserController {
         }
     }
 
+    /**
+     * Set color scheme on user profile. If user doesn't exist, it will be added
+     * automatically. On successful change, new color is annnounced via sockets.
+     *
+     * Sockets:: room: [webId], event: colorChanged, message: color as string.
+     *
+     * @param user user identifier - currently webId is sent from frontend
+     * @param color new color (arbitrary string up to 255 characters)
+     * @return user profile in JSON after new color is set
+     * @throws LpAppsException HTTP 404 when user is not found (should not happen)
+     */
     @NotNull
     @PostMapping("/api/user/color")
     public ResponseEntity<UserProfile> setColorScheme(

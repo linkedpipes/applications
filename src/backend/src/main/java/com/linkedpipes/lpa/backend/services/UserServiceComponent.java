@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.List;
 import java.text.SimpleDateFormat;
 
+/**
+ * User profile management functionality.
+ */
 @Service
 @Profile("!disableDB")
 public class UserServiceComponent implements UserService {
@@ -42,8 +45,21 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryNamedGraphRepository ngRepository;
 
+    /**
+    * Returns the user's profile. If user doesn't exist yet we add them.
+    *
+    * As SOLID is used for authentication, on the backend side there's a fully
+    * transparent way of adding a new user.
+    *
+    * Returned is a user's profile containing all user's discoveries and
+    * executions along with their status (as currently stored in the DB by
+    * the ExecutorService)
+    *
+    * @param webId webId to add / fetch
+    * @return user profile
+    */
     @NotNull @Override @Transactional(isolation = Isolation.SERIALIZABLE)
-    public UserProfile addUserIfNotPresent(String webId) {
+    public UserProfile addUserIfNotPresent(@NotNull final String webId) {
         List<UserDao> users = repository.findByWebId(webId);
         if (users.size() > 0) {
             return transformUserProfile(users.get(0));
@@ -57,8 +73,24 @@ public class UserServiceComponent implements UserService {
         }
     }
 
+    /**
+     * Add discovery on user profile. Discovery started time is set to current
+     * time.
+     *
+     * @param username webId
+     * @param discoveryId discovery ID
+     * @param sparqlEndpointIri SPARQL endpoint IRI as provided by user on frontend
+     * @param dataSampleIri data sample IRI as provided by user on frontend
+     * @param namedGraphs list of IRIs as provided on frontend
+     * @throws UserNotFoundException user was not found in database
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull String username, @NotNull String discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws UserNotFoundException {
+    public void setUserDiscovery(@NotNull final String username,
+                                 @NotNull final String discoveryId,
+                                 @Nullable final String sparqlEndpointIri,
+                                 @Nullable final String dataSampleIri,
+                                 @Nullable final List<String> namedGraphs)
+                                 throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao d = new DiscoveryDao();
         d.setDiscoveryStarted(discoveryId, new Date());
@@ -77,7 +109,7 @@ public class UserServiceComponent implements UserService {
         repository.save(user);
     }
 
-    private UserDao getUser(String username) throws UserNotFoundException {
+    private UserDao getUser(final String username) throws UserNotFoundException {
         logger.info("Find " + username + " by web ID");
         List<UserDao> users = repository.findByWebId(username);
         UserDao user;
@@ -94,8 +126,24 @@ public class UserServiceComponent implements UserService {
         return user;
     }
 
+    /**
+     * Add execution on user profile.
+     *
+     * If there are more pipeline information records, first one is used.
+     * Execution started time is set to current time.
+     *
+     * @param username webId
+     * @param executionIri ETL execution IRI
+     * @param etlPipelineIri ETL pipeline IRI
+     * @param selectedVisualiser selected visualiser for this execution (cached in DB by frontend)
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserExecution(@NotNull String username, @NotNull String executionIri, @NotNull String etlPipelineIri, String selectedVisualiser) throws UserNotFoundException {
+    public void setUserExecution(@NotNull final String username,
+                                 @NotNull final String executionIri,
+                                 @NotNull final String etlPipelineIri,
+                                 @NotNull final String selectedVisualiser)
+                                 throws UserNotFoundException {
         UserDao user = getUser(username);
         List<PipelineInformationDao> pipelines = pipelineRepository.findByEtlPipelineIri(etlPipelineIri);
         ExecutionDao e = new ExecutionDao();
@@ -112,6 +160,14 @@ public class UserServiceComponent implements UserService {
         repository.save(user);
     }
 
+    /**
+    * Fetch everything we know about this user: all applications, all
+    * discoveries (inc. named graphs used) and all executions and return it
+    * in one object.
+    *
+    * @param user User profile as in the DB
+    * @return user profile to be sent to frontend
+    */
     private UserProfile transformUserProfile(final UserDao user) {
         UserProfile profile = new UserProfile();
         profile.webId = user.getWebId();
@@ -159,8 +215,21 @@ public class UserServiceComponent implements UserService {
         return profile;
     }
 
+    /**
+     * If there's an execution with IRI equal to the provided one on the user
+     * profile, it will be removed.
+     * Also, if there's only one execution of the pipeline that's being deleted,
+     * the pipeline information record is also deleted.
+     *
+     * @param username webId
+     * @param executionIri IRI of execution to be removed from database
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public UserProfile deleteExecution(final String username, final String executionIri) throws UserNotFoundException {
+    public UserProfile deleteExecution(@NotNull final String username,
+                                       @NotNull final String executionIri)
+                                       throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
         PipelineInformationDao pipelineInformationToDelete = null;
@@ -191,8 +260,20 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
+    /**
+     * If there's a discovery with ID equal to the provided one on the user
+     * profile, it will be removed. Keep in mind that named graphs used with
+     * this discovery will be removed as well as there's a DB constraint in place.
+     *
+     * @param username webId
+     * @param discoveryId ID of discovery to be removed from database
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public UserProfile deleteDiscovery(final String username, final String discoveryId) throws UserNotFoundException {
+    public UserProfile deleteDiscovery(@NotNull final String username,
+                                       @NotNull final String discoveryId)
+                                       throws UserNotFoundException {
         UserDao user = getUser(username);
         DiscoveryDao toDelete = null;
         for (DiscoveryDao discovery : user.getDiscoveries()) {
@@ -211,8 +292,18 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
+    /**
+     * Set color scheme chosen by user.
+     *
+     * @param username webId
+     * @param color a string sent by frontend, that will appear on user profile
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public UserProfile setUserColorScheme(String username, String color) throws UserNotFoundException {
+    public UserProfile setUserColorScheme(@NotNull final String username,
+                                          @NotNull final String color)
+                                          throws UserNotFoundException {
         UserDao user = getUser(username);
         user.setColor(color);
         repository.save(user);
