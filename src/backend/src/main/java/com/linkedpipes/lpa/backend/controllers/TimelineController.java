@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.entities.timeline.Instant;
 import com.linkedpipes.lpa.backend.entities.timeline.Interval;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.timeline.TimelineService;
@@ -23,6 +24,11 @@ public class TimelineController {
 
     @GetMapping("/api/timeline/intervals")
     public ResponseEntity<List<Interval>> getIntervals(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
-        return ResponseEntity.ok(timelineService.getIntervals(graphIri));
+        return ResponseEntity.ok(timelineService.getIntervals(graphIri, null, null));
+    }
+
+    @GetMapping("/api/timeline/instants")
+    public ResponseEntity<List<Instant>> getInstants(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
+        return ResponseEntity.ok(timelineService.getInstants(graphIri, null, null));
     }
 }
