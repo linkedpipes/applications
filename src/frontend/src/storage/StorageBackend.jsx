@@ -1161,14 +1161,14 @@ class SolidBackend {
       Log.info(`Created access list ${fileMetadataTitle}.acl`);
     });
 
-    // await this.removeInvitation(sharedInvitation.invitationUrl).then(
-    //   response => {
-    //     if (response.status === 200) {
-    //       const filePath = response.url;
-    //       Log.info(`Removed ${filePath}.`);
-    //     }
-    //   }
-    // );
+    await this.removeInvitation(sharedInvitation.invitationUrl).then(
+      response => {
+        if (response.status === 200) {
+          const filePath = response.url;
+          Log.info(`Removed ${filePath}.`);
+        }
+      }
+    );
   }
 
   async createSharedMetadataFromInvite(invitation) {

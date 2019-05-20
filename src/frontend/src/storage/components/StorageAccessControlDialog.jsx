@@ -19,6 +19,7 @@ import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import StorageToolbox from '@storage/StorageToolbox';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import { toast } from 'react-toastify';
 
 const styles = theme => ({
   root: {
@@ -105,6 +106,16 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
         element.webId
       );
     });
+
+    toast.info(
+      `Invitations sent! Recepients will get access to configurations once they accept the invitation to collaborate...`,
+      {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 4000
+      }
+    );
+
+    this.props.handleUpdateAccessControlDialogState(true);
   };
 
   handleClickOpen = () => {
