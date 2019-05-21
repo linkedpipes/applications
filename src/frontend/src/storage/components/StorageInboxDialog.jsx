@@ -120,8 +120,8 @@ class StorageInboxDialog extends PureComponent<Props, State> {
                     </div>
                     <ListItemText
                       key={`${uuid.v4()}`}
-                      primary="Single-line item"
-                      secondary={'Secondary text'}
+                      primary="Collaboration invite"
+                      secondary={`${inboxInvitation.sender.name}`}
                     />
 
                     <ListItemSecondaryAction

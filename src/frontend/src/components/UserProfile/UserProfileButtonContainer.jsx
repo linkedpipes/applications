@@ -5,12 +5,13 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { SocketContext, GlobalUtils } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
-import GoogleAnalytics from 'react-ga'
+import GoogleAnalytics from 'react-ga';
 
 type Props = {
   history: Object,
   resetReduxStore: Function,
-  handleSetInboxDialogState: Function
+  handleSetInboxDialogState: Function,
+  currentInboxInvitations: Array<Object>
 };
 
 type State = {
@@ -36,7 +37,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       // Clear cookies
       GlobalUtils.clearCookies();
       // Clear google analyics
-      GoogleAnalytics.set({ userId: undefined })
+      GoogleAnalytics.set({ userId: undefined });
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
@@ -79,6 +80,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       handleOpenSettings,
       handleSetInboxDialogOpen
     } = this;
+    const { currentInboxInvitations } = this.props;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
@@ -91,6 +93,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
         onHandleOpenProfile={handleOpenProfile}
         onHandleOpenSettings={handleOpenSettings}
         onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
+        currentInboxInvitations={currentInboxInvitations}
       />
     );
   }
@@ -104,7 +107,8 @@ const UserProfileButtonContainerWithSockets = props => (
 
 const mapStateToProps = state => {
   return {
-    webId: state.user.webId
+    webId: state.user.webId,
+    currentInboxInvitations: state.user.inboxInvitations
   };
 };
 

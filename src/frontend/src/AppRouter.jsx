@@ -125,6 +125,16 @@ class AppRouter extends React.PureComponent<Props, State> {
           invitations.push(invitation);
         } else {
           await StorageToolbox.processAcceptShareInvite(invitation);
+
+          toast.info(
+            `${
+              invitation.sender.name
+            } - accepted your invitation to collaborate!`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
         }
       })
     );
@@ -140,6 +150,13 @@ class AppRouter extends React.PureComponent<Props, State> {
       )
     ) {
       handleSetUserInboxInvitations(invitations);
+
+      if (invitations.length > 0) {
+        toast.info(`New notifications received! Check your inbox.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
     }
   };
 

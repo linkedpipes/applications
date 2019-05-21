@@ -11,6 +11,7 @@ import {
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
+import { StorageBackend } from '.';
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
@@ -284,7 +285,7 @@ class SolidBackend {
       return true;
     });
 
-    return updateProfileLink && copyFolderResult;
+    return updateProfileLinkResult && copyFolderResult;
   }
 
   async moveFolderRecursively(
@@ -1122,10 +1123,18 @@ class SolidBackend {
       invitationUrl
     );
 
+    const sender = await this.getPerson(invitation.actor);
+    const recipient = await this.getPerson(invitation.target);
+
     if (invitation.type === 'Accept') {
-      return new AcceptedInvitation(invitation, invitationUrl);
+      return new AcceptedInvitation(
+        sender,
+        recipient,
+        invitation,
+        invitationUrl
+      );
     } else {
-      return new Invitation(invitation, invitationUrl);
+      return new Invitation(sender, recipient, invitation, invitationUrl);
     }
   }
 
@@ -1143,20 +1152,27 @@ class SolidBackend {
   }
 
   async processAcceptSharedInvite(sharedInvitation) {
-    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(
-      sharedInvitation.invitation.appMetadataUrl
-    );
-    const fileMetadataTitle = Utils.getFilenameFromPathUrl(
-      sharedInvitation.invitation.appMetadataUrl
-    );
+    const metadataUrl = sharedInvitation.invitation.appMetadataUrl;
+    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
+    const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
     const collaboratorWebId = sharedInvitation.senderWebId;
     const webId = sharedInvitation.recipientWebId;
+
+    const currentAccessControl = await this.fetchAccessControlFile(
+      `${metadataUrl}.acl`
+    );
+    const collaboratorWebIds = currentAccessControl.getCollaborators();
+    const isPublic = currentAccessControl.isPublic();
+    if (!collaboratorWebIds.includes(collaboratorWebId)) {
+      collaboratorWebIds.push(collaboratorWebId);
+    }
+
     const accessListConfiguration = await this.createFileAccessList(
       webId,
-      sharedInvitation.invitation.appMetadataUrl,
+      metadataUrl,
       [READ, WRITE],
-      false,
-      [collaboratorWebId]
+      isPublic,
+      collaboratorWebIds
     );
     await StorageFileClient.updateFile(
       `${fileMetadataFolder}/`,

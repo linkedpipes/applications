@@ -124,6 +124,8 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
   };
 
   handleSendInvitation = async () => {
+    this.props.handleUpdateAccessControlDialogState(true);
+
     const { webId, selectedApplicationMetadata } = this.props;
     const { selectedContacts } = this.state;
 
@@ -182,15 +184,24 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
     this.setApplicationLoaderStatus(false);
   };
 
-  handleDeleteAccess = person => () => {
+  handleDeleteAccess = person => async () => {
     this.setApplicationLoaderStatus(true);
 
-    this.setState(state => {
-      const collaborators = [...state.collaborators];
-      const collaboratorToDelete = collaborators.indexOf(person);
-      collaborators.splice(collaboratorToDelete, 1);
-      return { collaborators };
-    });
+    const { webId, selectedApplicationMetadata } = this.props;
+
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const collaborators = [...this.state.collaborators];
+    const collaboratorToDelete = collaborators.indexOf(person);
+    collaborators.splice(collaboratorToDelete, 1);
+
+    await StorageToolbox.updateAccessControl(
+      webId,
+      selectedApplicationMetadata.url,
+      this.state.metadataIsPublic,
+      collaborators
+    );
+
+    this.setState({ collaborators });
 
     this.setApplicationLoaderStatus(false);
   };
