@@ -98,12 +98,13 @@ class AppRouter extends React.PureComponent<Props, State> {
     } else {
       this.setupSessionTracker();
     }
-  }
 
-  componentWillUnmount() {
-    if (!this.state.isExternalPath) {
-      socket.removeAllListeners();
-    }
+    window.onbeforeunload = () => {
+      if (!this.state.isExternalPath) {
+        socket.emit('leave', this.props.webId);
+        socket.removeAllListeners();
+      }
+    };
   }
 
   checkInbox = async () => {
@@ -205,7 +206,7 @@ class AppRouter extends React.PureComponent<Props, State> {
               Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
               await self.checkInbox();
-              setInterval(self.checkInbox, 5000);
+              setInterval(self.checkInbox, 10000);
             }
           })
           .catch(error => {

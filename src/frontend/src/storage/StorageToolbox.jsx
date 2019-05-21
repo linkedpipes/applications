@@ -2,8 +2,9 @@
 import stringHash from 'string-hash';
 import { Log, GlobalUtils } from '@utils';
 import StorageBackend from './StorageBackend';
-import StorageFileClient from './StorageFileClient';
 import { Utils } from './utils';
+import AppConfiguration from './models/AppConfiguration';
+import { AccessControl, Person } from './models';
 
 const os = require('os');
 
@@ -192,6 +193,32 @@ class StorageToolbox {
   getFriends = async (webId: string): Promise<Person[]> => {
     return StorageBackend.getFriends(webId);
   };
+
+  fetchAclFromMetadata = async (metadata: AppConfiguration) => {
+    const metadataAcl = `${metadata.url}.acl`;
+    const accessControlObject = await StorageBackend.fetchAccessControlFile(
+      metadataAcl
+    );
+    return accessControlObject;
+  };
+
+  async getPersons(webIds: string[]): Promise<Person[]> {
+    return StorageBackend.getPersons(webIds);
+  }
+
+  updateAccessControl(
+    webId: string,
+    metadataUrl: string,
+    isPublic: boolean,
+    contacts: Array<Person>
+  ) {
+    return StorageBackend.updateAccessControlFile(
+      webId,
+      metadataUrl,
+      isPublic,
+      contacts
+    );
+  }
 }
 
 export default new StorageToolbox();

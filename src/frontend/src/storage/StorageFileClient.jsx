@@ -20,6 +20,13 @@ class StorageFileClient {
     return authClient.fetch(url).then(this.assertSuccessfulResponseWithJson);
   };
 
+  fetchFileFromUrl = async url => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    return authClient.fetch(url).then(this.assertSuccessfulResponseWithText);
+  };
+
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
     const authClient = await import(
@@ -254,6 +261,11 @@ class StorageFileClient {
   assertSuccessfulResponseWithJson = (response: Response) => {
     if (!response.ok) throw response;
     return response.json();
+  };
+
+  assertSuccessfulResponseWithText = (response: Response) => {
+    if (!response.ok) throw response;
+    return response.text();
   };
 
   executeSPARQLUpdateForUser = async (url, query) => {

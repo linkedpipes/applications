@@ -6,6 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Paper from '@material-ui/core/Paper';
 import { globalActions } from '@ducks/globalDuck';
 import { userActions } from '@ducks/userDuck';
 import { withStyles } from '@material-ui/core/styles';
@@ -14,12 +15,15 @@ import LoadingOverlay from 'react-loading-overlay';
 import Chip from '@material-ui/core/Chip';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import StorageToolbox from '@storage/StorageToolbox';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
+import uuid from 'uuid';
 
 const styles = theme => ({
   root: {
@@ -36,10 +40,16 @@ const styles = theme => ({
     flexWrap: 'wrap'
   },
   chip: {
-    margin: theme.spacing.unit / 4
+    margin: theme.spacing.unit / 2
   },
   noLabel: {
     marginTop: theme.spacing.unit * 3
+  },
+  paper: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    padding: theme.spacing.unit / 2
   }
 });
 
@@ -64,32 +74,50 @@ type Props = {
 
 type State = {
   loadingIsActive: boolean,
-  selectedWebIds: [],
-  availableWebIds: []
+  metadataIsPublic: boolean,
+  selectedContacts: [],
+  availableContacts: [],
+  accessControl: AccessControl,
+  collaborators: []
 };
 
 class StorageAccessControlDialog extends PureComponent<Props, State> {
   state = {
     loadingIsActive: false,
-    selectedWebIds: [],
-    availableWebIds: []
+    metadataIsPublic: true,
+    selectedContacts: [],
+    collaborators: [],
+    accessControl: undefined,
+    availableContacts: []
   };
 
   componentDidMount() {
-    this.fetchAvailableWebIds();
+    this.fetchAvailableContacts();
+    this.fetchCollaborats();
   }
 
   setApplicationLoaderStatus(isLoading) {
     this.setState({ loadingIsActive: isLoading });
   }
 
-  fetchAvailableWebIds = async () => {
+  fetchCollaborats = async () => {
+    const { selectedApplicationMetadata } = this.props;
+    const accessControl = await StorageToolbox.fetchAclFromMetadata(
+      selectedApplicationMetadata
+    );
+    const collaboratorWebIds = accessControl.getCollaborators();
+    const collaborators = await StorageToolbox.getPersons(collaboratorWebIds);
+    const metadataIsPublic = accessControl.isPublic();
+    this.setState({ collaborators, accessControl, metadataIsPublic });
+  };
+
+  fetchAvailableContacts = async () => {
     const { webId } = this.props;
     if (webId) {
-      const availableWebIds = await StorageToolbox.getFriends(webId);
-      if (availableWebIds.length > 0) {
+      const availableContacts = await StorageToolbox.getFriends(webId);
+      if (availableContacts.length > 0) {
         this.setState({
-          availableWebIds
+          availableContacts
         });
       }
     }
@@ -97,9 +125,9 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
 
   handleSendInvitation = async () => {
     const { webId, selectedApplicationMetadata } = this.props;
-    const { selectedWebIds } = this.state;
+    const { selectedContacts } = this.state;
 
-    selectedWebIds.forEach(element => {
+    selectedContacts.forEach(element => {
       StorageToolbox.sendCollaborationInvitation(
         selectedApplicationMetadata,
         webId,
@@ -108,14 +136,15 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
     });
 
     toast.info(
-      `Invitations sent! Recepients will get access to configurations once they accept the invitation to collaborate...`,
+      `Invitations sent! Recepients will get access to configurations
+      once they accept the invitation to collaborate...`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000
       }
     );
 
-    this.props.handleUpdateAccessControlDialogState(true);
+    this.props.handleUpdateAccessControlDialogState(false);
   };
 
   handleClickOpen = () => {
@@ -124,17 +153,52 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
 
   handleShareApp = () => {};
 
-  handleWebIdPick = event => {
-    this.setState({ selectedWebIds: event.target.value });
+  handlePickContact = event => {
+    this.setState({ selectedContacts: event.target.value });
   };
 
   handleClose = () => {
     this.props.handleUpdateAccessControlDialogState(false);
   };
 
+  handleSetMetadataAccess = async event => {
+    this.setApplicationLoaderStatus(true);
+
+    const { webId, selectedApplicationMetadata } = this.props;
+
+    const updatedMetadataStatus = event.target.checked;
+
+    this.setState({
+      metadataIsPublic: updatedMetadataStatus
+    });
+
+    await StorageToolbox.updateAccessControl(
+      webId,
+      selectedApplicationMetadata.url,
+      updatedMetadataStatus,
+      this.state.collaborators
+    );
+
+    this.setApplicationLoaderStatus(false);
+  };
+
+  handleDeleteAccess = person => () => {
+    this.setApplicationLoaderStatus(true);
+
+    this.setState(state => {
+      const collaborators = [...state.collaborators];
+      const collaboratorToDelete = collaborators.indexOf(person);
+      collaborators.splice(collaboratorToDelete, 1);
+      return { collaborators };
+    });
+
+    this.setApplicationLoaderStatus(false);
+  };
+
   render() {
     const { loadingIsActive } = this.state;
     const { classes } = this.props;
+
     return (
       <div>
         <Dialog
@@ -144,8 +208,45 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
         >
           <LoadingOverlay active={loadingIsActive} spinner>
             <DialogTitle id="form-dialog-title">
-              Share and collaborate with your Friends
+              Access Control Settings
             </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Setup global access to an application. Public application is
+                visible to everyone without a need to share with individual
+                collaborators.
+              </DialogContentText>
+              <FormControlLabel
+                control={
+                  <Switch
+                    id="with-web-id-checkbox"
+                    checked={this.state.metadataIsPublic}
+                    onChange={this.handleSetMetadataAccess}
+                    value="checkedA"
+                    color="primary"
+                  />
+                }
+                label="Public access"
+              />
+            </DialogContent>
+            <DialogContent>
+              <DialogContentText>
+                List of collaborators accessing this application. Edit or remove
+                contacts if needed.
+              </DialogContentText>
+              <Paper className={classes.paper}>
+                {this.state.collaborators.map(person => {
+                  return (
+                    <Chip
+                      key={uuid.v4()}
+                      label={person.name}
+                      onDelete={this.handleDeleteAccess(person)}
+                      className={classes.chip}
+                    />
+                  );
+                })}
+              </Paper>
+            </DialogContent>
             <DialogContent>
               <DialogContentText>
                 Choose the webId of your friend, to share access to your
@@ -153,12 +254,14 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
                 control to a file to restrict access.
               </DialogContentText>
               <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="select-multiple-chip">Chip</InputLabel>
+                <InputLabel htmlFor="select-multiple-chip">
+                  Friends and Contacts
+                </InputLabel>
                 <Select
                   multiple
                   fullWidth
-                  value={this.state.selectedWebIds}
-                  onChange={this.handleWebIdPick}
+                  value={this.state.selectedContacts}
+                  onChange={this.handlePickContact}
                   input={<Input id="select-multiple-chip" />}
                   renderValue={selected => (
                     <div className={classes.chips}>
@@ -173,7 +276,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
                   )}
                   MenuProps={MenuProps}
                 >
-                  {this.state.availableWebIds.map(person => (
+                  {this.state.availableContacts.map(person => (
                     <MenuItem key={person.webId} value={person}>
                       {person.name}
                     </MenuItem>
@@ -186,7 +289,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
                 Cancel
               </Button>
               <Button onClick={this.handleSendInvitation} color="primary">
-                Send `Share` Invitation
+                Send Invitation
               </Button>
             </DialogActions>
           </LoadingOverlay>

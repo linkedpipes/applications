@@ -6,7 +6,8 @@ import {
   SharedAppConfiguration,
   Person,
   Invitation,
-  AcceptedInvitation
+  AcceptedInvitation,
+  AccessControl
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
@@ -1133,7 +1134,12 @@ class SolidBackend {
       configurationUrl
     );
 
-    return new SharedAppConfiguration(sharedAppConfiguration);
+    const appMetadataUrl = sharedAppConfiguration.url;
+    const appConfiguration = await this.getAppConfigurationMetadata(
+      appMetadataUrl
+    );
+
+    return new SharedAppConfiguration(sharedAppConfiguration, appConfiguration);
   }
 
   async processAcceptSharedInvite(sharedInvitation) {
@@ -1245,18 +1251,62 @@ class SolidBackend {
       Utils.getFilenameFromPathUrl(invitationUrl)
     );
   }
-}
 
-// .then(response => {
-//   if (response.status === 200) {
-//     const filePath = response.url;
-//     if (self.alreadyCheckedResources.indexOf(filePath) !== -1) {
-//       self.alreadyCheckedResources = self.alreadyCheckedResources.filter(
-//         el => el !== filePath
-//       );
-//     }
-//   }
-//   return response;
-// });
+  async fetchAccessControlFile(aclUrl) {
+    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl);
+    Log.info(response);
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(fetchResponse, newStore, aclUrl, 'text/turtle');
+
+    const response = await new Promise((resolve, reject) => {
+      $rdf.serialize(
+        null,
+        newStore,
+        aclUrl,
+        'application/ld+json',
+        async (err, data) => {
+          if (err) {
+            reject(err);
+          }
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
+        }
+      );
+    });
+
+    return new AccessControl(response, aclUrl);
+  }
+
+  async updateAccessControlFile(
+    webId: string,
+    metadataUrl: string,
+    isPublic: boolean,
+    contacts: Array<Person>
+  ) {
+    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
+    const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
+
+    const accessListConfiguration = await this.createFileAccessList(
+      webId,
+      metadataUrl,
+      [READ, WRITE],
+      isPublic,
+      contacts.map(contact => {
+        return contact.webId;
+      })
+    );
+
+    return await StorageFileClient.updateFile(
+      `${fileMetadataFolder}/`,
+      `${fileMetadataTitle}.acl`,
+      accessListConfiguration,
+      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+    ).then(fileCreated => {
+      Log.info(`Updated access list ${fileMetadataTitle}.acl`);
+    });
+  }
+}
 
 export default new SolidBackend();
