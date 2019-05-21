@@ -144,3 +144,7 @@ flyway {
     user = 'lpa'
     password = 'example'
 }
+
+javadoc {
+    options.addBooleanOption('html5', true)
+}
