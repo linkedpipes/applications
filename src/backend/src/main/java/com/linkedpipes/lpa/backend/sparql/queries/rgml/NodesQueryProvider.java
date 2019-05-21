@@ -7,10 +7,10 @@ import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //Combines implementation of NodesQuery and NodesByUrisQuery in LDVMi
 public class NodesQueryProvider extends ConstructSparqlQueryProvider {
@@ -39,25 +39,28 @@ public class NodesQueryProvider extends ConstructSparqlQueryProvider {
         this.nodeUris = nodeUris;
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addPrefixes(ConstructBuilder builder) {
+    public ConstructBuilder addPrefixes(@NotNull ConstructBuilder builder) {
         return builder
                 .addPrefix(Prefixes.RGML_PREFIX, RGML.uri)
                 .addPrefix(Prefixes.RDF_PREFIX, RDF.getURI())
                 .addPrefix(Prefixes.RDFS_PREFIX, RDFS.getURI());
     }
 
+    @NotNull
     @Override
-    protected ConstructBuilder addConstructs(ConstructBuilder builder) {
+    protected ConstructBuilder addConstructs(@NotNull ConstructBuilder builder) {
         return builder
                 .addConstruct(VAR_NODE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI()))
                 .addConstruct(VAR_NODE, RDFS.label, VAR_LABEL);
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addWheres(ConstructBuilder builder) {
+    public ConstructBuilder addWheres(@NotNull ConstructBuilder builder) {
         builder
-            .addWhere(VAR_NODE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI()));
+                .addWhere(VAR_NODE, RDF.type, SparqlUtils.formatUri(RGML.Node.getURI()));
 
         if(nodeUris != null && !nodeUris.isEmpty()) {
             builder.addWhereValueVar(VAR_NODE, nodeUris.stream().map(uri -> SparqlUtils.formatUri(uri)).toArray());
@@ -67,29 +70,33 @@ public class NodesQueryProvider extends ConstructSparqlQueryProvider {
         //TODO check if nested select clause is required here (refer to LDVMi implementation)
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addOptionals(ConstructBuilder builder) {
+    public ConstructBuilder addOptionals(@NotNull ConstructBuilder builder) {
         return builder
                 .addOptional(VAR_NODE, RDFS.label, VAR_LABEL);
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addGroupBy(ConstructBuilder builder) {
+    public ConstructBuilder addGroupBy(@NotNull ConstructBuilder builder) {
         return builder
                 .addGroupBy(VAR_NODE)
                 .addGroupBy(VAR_LABEL);
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addLimit(ConstructBuilder builder) {
+    public ConstructBuilder addLimit(@NotNull ConstructBuilder builder) {
         if(this.limit != null && this.limit > 0)
             builder.setLimit(this.limit);
 
         return builder;
     }
 
+    @NotNull
     @Override
-    public ConstructBuilder addOffset(ConstructBuilder builder) {
+    public ConstructBuilder addOffset(@NotNull ConstructBuilder builder) {
         if(this.offset != null && this.offset > 0)
             builder.setOffset(this.offset);
 

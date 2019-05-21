@@ -8,6 +8,12 @@ import java.util.List;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+/**
+ * Record on discoveries and parameters used to start them.
+ * We record the time discovery was started and finished as well as
+ * SPARQL endpoint IRI, data sample IRI and list of named graphs.
+ * Discoveries are mapped onto user profile.
+ */
 @Entity(name="discovery")
 public class DiscoveryDao implements Serializable {
 
@@ -38,6 +44,7 @@ public class DiscoveryDao implements Serializable {
     private List<DiscoveryNamedGraphDao> namedGraphs;
 
     @ManyToOne
+    @JoinColumn(name="user_web_id")
     private UserDao user;
 
     public UserDao getUser() {
@@ -47,8 +54,8 @@ public class DiscoveryDao implements Serializable {
     public void setUser(UserDao user) {
         this.user = user;
 
-        if (!user.getDiscoveries().contains(this)) {
-            user.getDiscoveries().add(this);
+        if ((user != null) && !user.getDiscoveries().contains(this)) {
+                user.getDiscoveries().add(this);
         }
     }
 
