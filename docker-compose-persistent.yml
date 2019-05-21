@@ -52,7 +52,8 @@ services:
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
-      VIRT_Parameters_CheckpointInterval: 1
+      VIRT_Parameters_CheckpointInterval: 5
+      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata, /appdata/upload
     ports:
       - "8890:8890"
     restart: on-failure
@@ -61,11 +62,10 @@ services:
       - ./data/virtuoso:/data
 
   discovery:
-    image: linkedpipes/applications:discovery
+    image: linkedpipes/applications:discovery_hang_fix
     container_name: lpa-discovery
     command:
       [
-        "0",
         "-Dldcp.etl.hostname=http://lpa-etl:8080",
         "-Dplay.http.secret.key=yourRandomSecret",
         "-Dpidfile.path=/dev/null",
@@ -78,7 +78,7 @@ services:
       - "9000:9000"
 
   etl:
-    image: linkedpipes/applications:etl_devel
+    image: linkedpipes/applications:etl_hang_fix
     container_name: lpa-etl
     restart: on-failure
     ports:
@@ -101,6 +101,7 @@ services:
   flyway:
     image: boxfuse/flyway
     command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
+    restart: on-failure
     volumes:
       - ./src/backend/src/main/resources/db/migration:/flyway/sql
     depends_on:
