@@ -16,7 +16,7 @@ import {
   SettingsPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log, AuthenticationService } from '@utils';
+import { SocketContext, Log, UserService } from '@utils';
 import { StoragePage, StorageBackend } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
@@ -127,14 +127,14 @@ class AppRouter extends React.PureComponent<Props, State> {
         Log.info(session);
         self.startSocketListeners();
 
-        AuthenticationService.getUserProfile(session.webId)
+        UserService.getUserProfile(session.webId)
           .then(res => {
             Log.info(
               'Response from get user profile call:',
-              'AuthenticationService'
+              'UserService'
             );
-            Log.info(res, 'AuthenticationService');
-            Log.info(res.data, 'AuthenticationService');
+            Log.info(res, 'UserService');
+            Log.info(res.data, 'UserService');
 
             return res.data;
           })

@@ -2,10 +2,14 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
+import UserService from '@utils/user.service';
+import { connect } from 'react-redux';
 
 type Props = {
   discoveriesList: Array<{ id: string, finished: boolean }>,
-  onHandleSelectDiscoveryClick: Function
+  onHandleSelectDiscoveryClick: Function,
+  handleDiscoveryRowDeleteClicked: Function,
+  webId: string
 };
 
 type State = {
@@ -23,16 +27,25 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     this.setState({ selectedDiscovery: {}, open: false });
   };
 
-  handleDiscoveryRowClicked = (discovery: string) => {
+  handleDiscoveryRowClicked = (discovery: Object) => {
     this.setState({
       open: true,
       selectedDiscovery: discovery
     });
   };
 
+  handleDiscoveryRowDeleteClicked = (discovery: Object) => {
+    const { webId } = this.props;
+    UserService.deleteDiscovery(webId, discovery.discoveryId);
+  };
+
   render() {
     const { discoveriesList, onHandleSelectDiscoveryClick } = this.props;
-    const { handleDiscoveryRowClicked, handleClose } = this;
+    const {
+      handleDiscoveryRowClicked,
+      handleClose,
+      handleDiscoveryRowDeleteClicked
+    } = this;
     const { selectedDiscovery, open } = this.state;
     return (
       <div>
@@ -40,6 +53,7 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
           discoveriesList={discoveriesList}
           onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
           onHandleDiscoveryRowClicked={handleDiscoveryRowClicked}
+          onHandleDiscoveryRowDeleteClicked={handleDiscoveryRowDeleteClicked}
         />
         <DiscoveryInformationDialog
           selectedValue={selectedDiscovery}
@@ -51,4 +65,10 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
   }
 }
 
-export default DiscoveriesTableContainer;
+const mapStateToProps = state => {
+  return {
+    webId: state.user.webId
+  };
+};
+
+export default connect(mapStateToProps)(DiscoveriesTableContainer);

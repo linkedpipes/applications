@@ -23,7 +23,8 @@ type Props = {
     finished: number
   }>,
   onHandleSelectDiscoveryClick: Function,
-  onHandleDiscoveryRowClicked: Function
+  onHandleDiscoveryRowClicked: Function,
+  onHandleDiscoveryRowDeleteClicked: Function
 };
 
 const styles = () => ({
@@ -36,6 +37,7 @@ const DiscoveriesTableComponent = ({
   discoveriesList,
   onHandleSelectDiscoveryClick,
   onHandleDiscoveryRowClicked,
+  onHandleDiscoveryRowDeleteClicked,
   classes
 }: Props) => (
   <div>
@@ -51,6 +53,7 @@ const DiscoveriesTableComponent = ({
               <TableCell align="center">Named Graph IRI</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -109,6 +112,24 @@ const DiscoveriesTableComponent = ({
                   {discovery.finished === -1
                     ? 'N/A'
                     : moment.unix(discovery.finished).format('lll')}
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <Button
+                    id={`button_${discovery.discoveryId}`}
+                    size="small"
+                    disabled={!discovery.isFinished}
+                    variant="contained"
+                    color="red"
+                    onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
