@@ -6,7 +6,7 @@ const UserService = {
   },
 
   deleteDiscovery(webId, discoveryId) {
-    return lpaAxios.delete('/user/discovery', null, {
+    return lpaAxios.delete('/user/discovery', {
       params: { webId, discoveryId }
     });
   }

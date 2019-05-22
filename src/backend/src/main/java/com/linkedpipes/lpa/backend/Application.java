@@ -36,7 +36,10 @@ public class Application {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
+                registry.addMapping("/**").allowedHeaders("Content-Type",
+                        "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Authorization",
+                        "X-Requested-With", "requestId", "Correlation-Id")
+                        .allowedMethods("PUT", "POST", "DELETE", "GET")
                         .allowedOrigins(getConfig().getStringList("lpa.allowedOrigins").toArray(new String[0]));
             }
         };
