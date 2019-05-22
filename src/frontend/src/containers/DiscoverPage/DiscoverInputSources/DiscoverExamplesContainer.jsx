@@ -29,7 +29,7 @@ export const samples = [
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
     namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
     dataSampleIri:
-      'https://gist.githubusercontent.com/Ponsietta/1cfcc9cc018c11e39afe1553d0b3f25f/raw/a90b4a34e2edb6097a16f983518f1fee573e8113/ruian-test-buildings_map_sample.ttl'
+      'https://gist.githubusercontent.com/Ponsietta/1cfcc9cc018c11e39afe1553d0b3f25f/raw/266634bcc2b5bb56b5eed8dbcaf69df9f719cf08/ruian-test-buildings_map_sample.ttl'
   },
   {
     id: uuid.v4(),
