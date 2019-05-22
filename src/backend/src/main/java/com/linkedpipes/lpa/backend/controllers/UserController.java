@@ -62,7 +62,9 @@ public class UserController {
         @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
         throws LpAppsException {
         try {
-            return ResponseEntity.ok(userService.deleteExecution(user, executionIri));
+            UserProfile profile = userService.deleteExecution(user, executionIri);
+            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("executionDeleted", executionIri);
+            return ResponseEntity.ok(profile);
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
@@ -84,7 +86,9 @@ public class UserController {
         @NotNull @RequestParam(value = "discoveryId", required = true) String discoveryId)
         throws LpAppsException {
         try {
-            return ResponseEntity.ok(userService.deleteDiscovery(user, discoveryId));
+            UserProfile profile = userService.deleteDiscovery(user, discoveryId);
+            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("discoveryDeleted", discoveryId);
+            return ResponseEntity.ok(profile);
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
