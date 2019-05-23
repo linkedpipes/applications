@@ -247,22 +247,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 }
 
                 if (!executionStatus.status.isPollable()) {
-                    EtlStatusReport report = new EtlStatusReport();
-                    report.status = executionStatus;
-                    report.error = false;
-                    report.timeout = false;
-                    report.executionIri = executionIri;
-                    report.started = executionStatus.getStarted();
-                    report.finished = executionStatus.getFinished();
-
-                    if (pipeline != null) {
-                        report.pipeline = new PipelineExportResult();
-                        report.pipeline.pipelineId = pipeline.getPipelineId();
-                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                    } else {
-                        report.pipeline = null;
-                    }
+                    EtlStatusReport report = EtlStatusReport.createStandardReport(executionStatus, executionIri, pipeline);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
@@ -275,22 +260,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                 }
             } catch (LpAppsException e) {
                 logger.error("Got exception when polling for ETL status.", e);
-                EtlStatusReport report = new EtlStatusReport();
-                report.status = null;
-                report.error = true;
-                report.timeout = false;
-                report.executionIri = executionIri;
-                report.started = -1;
-                report.finished = -1;
-                if (pipeline != null) {
-                    report.pipeline = new PipelineExportResult();
-                    report.pipeline.pipelineId = pipeline.getPipelineId();
-                    report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                    report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                } else {
-                    report.pipeline = null;
-                }
 
+                EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, false, pipeline);
                 try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -307,22 +278,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                 if (e.getStatus() != EtlStatus.FINISHED) {
                     logger.info("Cancelling execution");
-                    EtlStatusReport report = new EtlStatusReport();
-                    report.status = null;
-                    report.error = true;
-                    report.timeout = true;
-                    report.executionIri = executionIri;
-                    report.started = -1;
-                    report.finished = -1;
-                    PipelineInformationDao pipeline = e.getPipeline();
-                    if (pipeline != null) {
-                        report.pipeline = new PipelineExportResult();
-                        report.pipeline.pipelineId = pipeline.getPipelineId();
-                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                    } else {
-                        report.pipeline = null;
-                    }
+                    EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, true, null);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
@@ -378,25 +334,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     }
 
                     logger.info("Reporting discovery finished in room " + discoveryId);
-                    DiscoveryStatusReport report = new DiscoveryStatusReport();
-                    report.discoveryId = discoveryId;
-                    report.status = discoveryStatus;
-                    report.error = false;
-                    report.timeout = false;
-                    report.finished = finished.getTime() / 1000L;
-
-                    if (dao != null) {
-                        report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-                        report.dataSampleIri = dao.getDataSampleIri();
-                        report.namedGraphs = new ArrayList<>();
-                        for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                            report.namedGraphs.add(ng.getNamedGraph());
-                        }
-                    } else {
-                        report.sparqlEndpointIri = null;
-                        report.dataSampleIri = null;
-                        report.namedGraphs = null;
-                    }
+                    DiscoveryStatusReport report = DiscoveryStatusReport.createStandardReport(discoveryId, discoveryStatus, finished, dao);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
@@ -410,15 +348,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
-                DiscoveryStatusReport report = new DiscoveryStatusReport();
-                report.discoveryId = discoveryId;
-                report.status = null;
-                report.error = true;
-                report.timeout = false;
-                report.finished = -1;
-                report.sparqlEndpointIri = null;
-                report.dataSampleIri = null;
-                report.namedGraphs = null;
+                DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, false, dao);
                 try {
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -440,23 +370,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 discoveryRepository.save(d);
                 dao = d;
             }
-            DiscoveryStatusReport report = new DiscoveryStatusReport();
-            report.discoveryId = discoveryId;
-            report.status = null;
-            report.error = false;
-            report.timeout = true;
-            if (dao != null) {
-                report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-                report.dataSampleIri = dao.getDataSampleIri();
-                report.namedGraphs = new ArrayList<>();
-                for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                    report.namedGraphs.add(ng.getNamedGraph());
-                }
-            } else {
-                report.sparqlEndpointIri = null;
-                report.dataSampleIri = null;
-                report.namedGraphs = null;
-            }
+            DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, true, dao);
 
             try {
                 Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
