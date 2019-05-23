@@ -11,29 +11,30 @@ public class EtlStatusReport {
     public PipelineExportResult pipeline;
     public long started, finished;
 
+    private EtlStatusReport(ExecutionStatus status, boolean error, boolean timeout, String executionIri, long started, long finished, PipelineInformationDao pipeline) {
+        this.status = status;
+        this.error = error;
+        this.timeout = timeout;
+        this.executionIri = executionIri;
+        this.started = started;
+        this.finished = finished;
+
+        if (pipeline != null) {
+            this.pipeline = new PipelineExportResult();
+            this.pipeline.pipelineId = pipeline.getPipelineId();
+            this.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
+            this.pipeline.resultGraphIri = pipeline.getResultGraphIri();
+        } else {
+            this.pipeline = null;
+        }
+    }
+
     @NotNull
     public static EtlStatusReport createStandardReport(
             @NotNull ExecutionStatus executionStatus,
             @NotNull String executionIri,
             @Nullable PipelineInformationDao pipeline) {
-        EtlStatusReport report = new EtlStatusReport();
-        report.status = executionStatus;
-        report.error = false;
-        report.timeout = false;
-        report.executionIri = executionIri;
-        report.started = executionStatus.getStarted();
-        report.finished = executionStatus.getFinished();
-
-        if (pipeline != null) {
-            report.pipeline = new PipelineExportResult();
-            report.pipeline.pipelineId = pipeline.getPipelineId();
-            report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-            report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-        } else {
-            report.pipeline = null;
-        }
-
-        return report;
+        return new EtlStatusReport(executionStatus, false, false, executionIri, executionStatus.getStarted(), executionStatus.getFinished(), pipeline);
     }
 
     @NotNull
@@ -41,22 +42,6 @@ public class EtlStatusReport {
             @NotNull String executionIri,
             @NotNull boolean timeout,
             @Nullable PipelineInformationDao pipeline) {
-        EtlStatusReport report = new EtlStatusReport();
-        report.status = null;
-        report.error = true;
-        report.timeout = timeout;
-        report.executionIri = executionIri;
-        report.started = -1;
-        report.finished = -1;
-        if (pipeline != null) {
-            report.pipeline = new PipelineExportResult();
-            report.pipeline.pipelineId = pipeline.getPipelineId();
-            report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-            report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-        } else {
-            report.pipeline = null;
-        }
-
-        return report;
+        return new EtlStatusReport(null, true, timeout, executionIri, -1, -1, pipeline);
     }
 }

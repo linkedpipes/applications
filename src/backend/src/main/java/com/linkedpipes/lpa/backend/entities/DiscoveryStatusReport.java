@@ -17,33 +17,40 @@ public class DiscoveryStatusReport {
     public boolean error, timeout;
     public long finished;
 
+    private DiscoveryStatusReport(
+            @NotNull String discoveryId,
+            @NotNull DiscoveryStatus discoveryStatus,
+            @NotNull boolean error,
+            @NotNull boolean timeout,
+            @Nullable DiscoveryDao dao) {
+        this.discoveryId = discoveryId;
+        this.status = discoveryStatus;
+        this.error = error;
+        this.timeout = timeout;
+        this.finished = -1;
+
+        if (dao != null) {
+            this.sparqlEndpointIri = dao.getSparqlEndpointIri();
+            this.dataSampleIri = dao.getDataSampleIri();
+            this.namedGraphs = new ArrayList<>();
+            for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
+                this.namedGraphs.add(ng.getNamedGraph());
+            }
+        } else {
+            this.sparqlEndpointIri = null;
+            this.dataSampleIri = null;
+            this.namedGraphs = null;
+        }
+    }
+
     @NotNull
     public static DiscoveryStatusReport createStandardReport(
             @NotNull String discoveryId,
             @NotNull DiscoveryStatus discoveryStatus,
             @NotNull Date finished,
             @Nullable DiscoveryDao dao) {
-        DiscoveryStatusReport report = new DiscoveryStatusReport();
-
-        report.discoveryId = discoveryId;
-        report.status = discoveryStatus;
-        report.error = false;
-        report.timeout = false;
+        DiscoveryStatusReport report = new DiscoveryStatusReport(discoveryId, discoveryStatus, false, false, dao);
         report.finished = finished.getTime() / 1000L;
-
-        if (dao != null) {
-            report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-            report.dataSampleIri = dao.getDataSampleIri();
-            report.namedGraphs = new ArrayList<>();
-            for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                report.namedGraphs.add(ng.getNamedGraph());
-            }
-        } else {
-            report.sparqlEndpointIri = null;
-            report.dataSampleIri = null;
-            report.namedGraphs = null;
-        }
-
         return report;
     }
 
@@ -52,23 +59,7 @@ public class DiscoveryStatusReport {
             @NotNull String discoveryId,
             @NotNull boolean timeout,
             @Nullable DiscoveryDao dao) {
-        DiscoveryStatusReport report = new DiscoveryStatusReport();
-        report.discoveryId = discoveryId;
-        report.status = null;
-        report.error = false;
-        report.timeout = timeout;
-        if (dao != null) {
-            report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-            report.dataSampleIri = dao.getDataSampleIri();
-            report.namedGraphs = new ArrayList<>();
-            for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                report.namedGraphs.add(ng.getNamedGraph());
-            }
-        } else {
-            report.sparqlEndpointIri = null;
-            report.dataSampleIri = null;
-            report.namedGraphs = null;
-        }
+        DiscoveryStatusReport report = new DiscoveryStatusReport(discoveryId, null, true, timeout, dao);
         return report;
     }
 }
