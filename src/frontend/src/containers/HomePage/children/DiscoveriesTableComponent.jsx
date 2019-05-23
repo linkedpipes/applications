@@ -9,6 +9,8 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
+import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import uuid from 'uuid';
 import moment from 'moment';
 
@@ -17,13 +19,14 @@ type Props = {
   discoveriesList: Array<{
     discoveryId: string,
     isFinished: boolean,
-    namedGraph: string,
+    namedGraphs: Array<string>,
     sparqlEndpointIri: string,
     started: number,
     finished: number
   }>,
   onHandleSelectDiscoveryClick: Function,
-  onHandleDiscoveryRowClicked: Function
+  onHandleDiscoveryRowClicked: Function,
+  onHandleDiscoveryRowDeleteClicked: Function
 };
 
 const styles = () => ({
@@ -36,6 +39,7 @@ const DiscoveriesTableComponent = ({
   discoveriesList,
   onHandleSelectDiscoveryClick,
   onHandleDiscoveryRowClicked,
+  onHandleDiscoveryRowDeleteClicked,
   classes
 }: Props) => (
   <div>
@@ -51,6 +55,7 @@ const DiscoveriesTableComponent = ({
               <TableCell align="center">Named Graph IRI</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
+              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -99,7 +104,9 @@ const DiscoveriesTableComponent = ({
                 <TableCell align="center">
                   {discovery.sparqlEndpointIri}
                 </TableCell>
-                <TableCell align="center">{discovery.namedGraph}</TableCell>
+                <TableCell align="center">
+                  {discovery.namedGraphs.join(',\n')}
+                </TableCell>
                 <TableCell align="center">
                   {discovery.started === -1
                     ? 'N/A'
@@ -109,6 +116,22 @@ const DiscoveriesTableComponent = ({
                   {discovery.finished === -1
                     ? 'N/A'
                     : moment.unix(discovery.finished).format('lll')}
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    key={`button_${discovery.discoveryId}`}
+                    aria-label="Decline"
+                    onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
+                    disabled={!discovery.isFinished}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

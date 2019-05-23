@@ -15,11 +15,13 @@ import {
   ETL_STATUS_TYPE,
   ETL_STATUS_MAP,
   withAuthorization,
-  VisualizersService
+  VisualizersService,
+  UserService
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import { userActions } from '@ducks/userDuck';
 
 type Props = {
   history: { push: any },
@@ -32,6 +34,8 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function,
+  handleSetUserProfileAsync: Function,
+  webId: string,
   applicationsFolder: String
 };
 type State = {
@@ -327,6 +331,28 @@ class HomeContainer extends PureComponent<Props, State> {
     });
   };
 
+  handlePipelineExecutionRowDeleteClicked = async pipeline => {
+    this.setApplicationLoaderStatus(true);
+
+    const { handleSetUserProfileAsync, webId, socket } = this.props;
+
+    const response = await UserService.deletePipelineExecution(
+      webId,
+      pipeline.executionIri,
+      socket.id
+    );
+    if (response.status === 200) {
+      await this.setApplicationLoaderStatus(false);
+      await handleSetUserProfileAsync(response.data);
+    } else {
+      await this.setApplicationLoaderStatus(false);
+      toast.error('Error! Unable to delete session. Try again later...', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 5000
+      });
+    }
+  };
+
   render() {
     const {
       handleChange,
@@ -334,7 +360,9 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick,
       handleAppClicked,
-      handleShareAppClicked
+      handleShareAppClicked,
+      setApplicationLoaderStatus,
+      handlePipelineExecutionRowDeleteClicked
     } = this;
     const { userProfile } = this.props;
     const { tabIndex, loadingAppIsActive } = this.state;
@@ -354,6 +382,10 @@ class HomeContainer extends PureComponent<Props, State> {
           tabIndex={tabIndex}
           onHandleAppClicked={handleAppClicked}
           onHandleShareAppClicked={handleShareAppClicked}
+          onSetApplicationLoaderStatus={setApplicationLoaderStatus}
+          onHandlePipelineExecutionRowDeleteClicked={
+            handlePipelineExecutionRowDeleteClicked
+          }
         />
       </LoadingOverlay>
     );
@@ -401,13 +433,17 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
+  const handleSetUserProfileAsync = userProfile =>
+    dispatch(userActions.setUserProfileAsync(userProfile));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata
+    handleSetSelectedApplicationMetadata,
+    handleSetUserProfileAsync
   };
 };
 
