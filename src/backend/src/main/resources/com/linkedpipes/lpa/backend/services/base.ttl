@@ -4,15 +4,14 @@
     <https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate>
 
 	  #Apps
-	  #<https://discovery.linkedpipes.com/resource/application/timeline/template>,
-	  #<https://discovery.linkedpipes.com/resource/application/timeline-with-labels/template>,
-	  #<https://discovery.linkedpipes.com/resource/application/timeline-periods/template>,
-	  #<https://discovery.linkedpipes.com/resource/application/timeline-periods-with-labels/template>,
       <https://discovery.linkedpipes.com/resource/application/map/template>,
       <https://discovery.linkedpipes.com/resource/application/map-labeled-points/template>,
-      #<https://discovery.linkedpipes.com/resource/application/dcterms/template>,
       <https://gist.githubusercontent.com/Ponsietta/fc490bc45c3a285b5faaa9816114bfca/raw/276f3d19c14e201d90b7c5f38b1f10ccdfc66ff0/treemap_template.ttl>,
       <https://gist.githubusercontent.com/ivan-lattak/b483b9a92c5141b7a126fb073b878565/raw/969504830ae06dd7a23b90cdc8ab9c9847baa3de/chord_template.ttl>,
+      <https://discovery.linkedpipes.com/resource/application/timeline/template>,
+      <https://discovery.linkedpipes.com/resource/application/timeline-with-labels/template>,
+      <https://gist.githubusercontent.com/Ponsietta/9f512af1afbe9be6783b92e836d1a079/raw/8445ebe8e4cf928658a815f2bc639ee9e0f0742b/timeline-periods_template.ttl>,
+      <https://discovery.linkedpipes.com/resource/application/timeline-periods-with-labels/template>,
 
 	  # Geo
 
