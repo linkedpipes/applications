@@ -138,9 +138,17 @@ class HomeContainer extends PureComponent<Props, State> {
     // eslint-disable-next-line array-callback-return
     userProfile.pipelineExecutions.map(pipelineRecord => {
       const rawStatus = pipelineRecord.status;
-      const status = ETL_STATUS_MAP[rawStatus.statusIri]
-        ? ETL_STATUS_MAP[rawStatus.statusIri]
-        : ETL_STATUS_MAP[rawStatus['@id']];
+
+      let status;
+
+      if (typeof rawStatus.statusIri.attribute !== 'undefined') {
+        status = ETL_STATUS_MAP[rawStatus.statusIri]
+          ? ETL_STATUS_MAP[rawStatus.statusIri]
+          : ETL_STATUS_MAP[rawStatus['@id']];
+      } else {
+        status = ETL_STATUS_TYPE.Unknown;
+      }
+
       if (
         status !== ETL_STATUS_TYPE.Finished &&
         status !== ETL_STATUS_TYPE.Cancelled &&
