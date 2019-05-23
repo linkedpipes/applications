@@ -9,6 +9,8 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
+import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import uuid from 'uuid';
 import moment from 'moment';
 
@@ -17,7 +19,7 @@ type Props = {
   discoveriesList: Array<{
     discoveryId: string,
     isFinished: boolean,
-    namedGraph: string,
+    namedGraphs: Array<string>,
     sparqlEndpointIri: string,
     started: number,
     finished: number
@@ -53,7 +55,7 @@ const DiscoveriesTableComponent = ({
               <TableCell align="center">Named Graph IRI</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
-              <TableCell align="center">Action</TableCell>
+              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -102,7 +104,9 @@ const DiscoveriesTableComponent = ({
                 <TableCell align="center">
                   {discovery.sparqlEndpointIri}
                 </TableCell>
-                <TableCell align="center">{discovery.namedGraph}</TableCell>
+                <TableCell align="center">
+                  {discovery.namedGraphs.join(',\n')}
+                </TableCell>
                 <TableCell align="center">
                   {discovery.started === -1
                     ? 'N/A'
@@ -120,16 +124,14 @@ const DiscoveriesTableComponent = ({
                   scope="row"
                   padding="checkbox"
                 >
-                  <Button
-                    id={`button_${discovery.discoveryId}`}
-                    size="small"
-                    disabled={!discovery.isFinished}
-                    variant="contained"
-                    color="red"
+                  <IconButton
+                    key={`button_${discovery.discoveryId}`}
+                    aria-label="Decline"
                     onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
+                    disabled={!discovery.isFinished}
                   >
-                    Delete
-                  </Button>
+                    <RemoveIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

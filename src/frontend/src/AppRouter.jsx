@@ -47,7 +47,7 @@ const styles = () => ({
 
 type Props = {
   classes: any,
-  userId: ?string,
+  webId: ?string,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   handleSetSolidUserProfileAsync: Function,
@@ -63,11 +63,11 @@ type State = {
   isExternalPath: boolean
 };
 
-const errorHandler = userId => {
+const errorHandler = webId => {
   return (error: Error, componentStack: string) => {
     Log.error(componentStack, 'AppRouter');
     Sentry.withScope(scope => {
-      scope.setUser({ id: userId || 'unidentified user' }); // How can we capture WEBID from here
+      scope.setUser({ id: webId || 'unidentified user' }); // How can we capture WEBID from here
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
       Sentry.captureException(error);
@@ -93,18 +93,19 @@ class AppRouter extends React.PureComponent<Props, State> {
     } else {
       this.setupSessionTracker();
     }
-  }
 
-  componentWillUnmount() {
-    if (!this.state.isExternalPath) {
-      socket.removeAllListeners();
-    }
+    window.onbeforeunload = () => {
+      if (!this.state.isExternalPath) {
+        socket.emit('leave', this.props.webId);
+        socket.removeAllListeners();
+      }
+    };
   }
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
     const me = await StorageBackend.getPerson(updatedProfileData.webId);
-    this.props.handleSetSolidUserProfileAsync(
+    await this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
       me.image
@@ -120,7 +121,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
     authClient.trackSession(session => {
       if (session) {
-        GoogleAnalytics.set({ userId: session.webId });
+        GoogleAnalytics.set({ webId: session.webId });
 
         handleSetUserWebId(session.webId);
 
@@ -129,17 +130,14 @@ class AppRouter extends React.PureComponent<Props, State> {
 
         UserService.getUserProfile(session.webId)
           .then(res => {
-            Log.info(
-              'Response from get user profile call:',
-              'UserService'
-            );
+            Log.info('Response from get user profile call:', 'UserService');
             Log.info(res, 'UserService');
             Log.info(res.data, 'UserService');
 
             return res.data;
           })
           .then(async jsonResponse => {
-            self.setupProfileData(jsonResponse);
+            await self.setupProfileData(jsonResponse);
 
             socket.emit('join', session.webId);
 
@@ -291,10 +289,10 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, userId } = this.props;
+    const { classes, webId } = this.props;
     return (
       <div>
-        <ErrorBoundary onError={errorHandler(userId)}>
+        <ErrorBoundary onError={errorHandler(webId)}>
           <BrowserRouter>
             <div className={classes.root}>
               <SocketContext.Provider value={socket}>
@@ -373,7 +371,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId,
+    webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen

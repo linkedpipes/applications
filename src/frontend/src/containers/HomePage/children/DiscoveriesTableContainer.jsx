@@ -2,13 +2,16 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
-import UserService from '@utils/user.service';
+import { Log, UserService } from '@utils';
+import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
 
 type Props = {
   discoveriesList: Array<{ id: string, finished: boolean }>,
   onHandleSelectDiscoveryClick: Function,
-  handleDiscoveryRowDeleteClicked: Function,
+  onSetApplicationLoaderStatus: Function,
+  handleSetUserProfileAsync: Function,
   webId: string
 };
 
@@ -34,9 +37,29 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     });
   };
 
-  handleDiscoveryRowDeleteClicked = (discovery: Object) => {
-    const { webId } = this.props;
-    UserService.deleteDiscovery(webId, discovery.discoveryId);
+  handleDiscoveryRowDeleteClicked = async (discovery: Object) => {
+    const {
+      webId,
+      onSetApplicationLoaderStatus,
+      handleSetUserProfileAsync
+    } = this.props;
+
+    onSetApplicationLoaderStatus(true);
+
+    const response = await UserService.deleteDiscovery(
+      webId,
+      discovery.discoveryId
+    );
+    if (response.status === 200) {
+      await onSetApplicationLoaderStatus(false);
+      await handleSetUserProfileAsync(response.data);
+    } else {
+      await onSetApplicationLoaderStatus(false);
+      toast.error('Error! Unable to delete session. Try again later...', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 5000
+      });
+    }
   };
 
   render() {
@@ -71,4 +94,14 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(DiscoveriesTableContainer);
+const mapDispatchToProps = dispatch => {
+  const handleSetUserProfileAsync = userProfile =>
+    dispatch(userActions.setUserProfileAsync(userProfile));
+
+  return { handleSetUserProfileAsync };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DiscoveriesTableContainer);

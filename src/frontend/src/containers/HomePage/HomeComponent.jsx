@@ -40,7 +40,8 @@ type Props = {
   onHandleSelectPipelineExecutionClick: Function,
   tabIndex: Number,
   onHandleAppClicked: Function,
-  onHandleShareAppClicked: Function
+  onHandleShareAppClicked: Function,
+  onSetApplicationLoaderStatus: Function
 };
 
 const styles = theme => ({
@@ -88,7 +89,9 @@ class HomeComponent extends PureComponent<Props> {
       onHandleSelectPipelineExecutionClick,
       tabIndex,
       onHandleAppClicked,
-      onHandleShareAppClicked
+      onHandleShareAppClicked,
+      onSetApplicationLoaderStatus,
+      onHandlePipelineExecutionRowDeleteClicked
     } = this.props;
     return (
       <div className={classes.root}>
@@ -147,11 +150,15 @@ class HomeComponent extends PureComponent<Props> {
                 <DiscoveriesTable
                   discoveriesList={discoveriesList}
                   onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
+                  onSetApplicationLoaderStatus={onSetApplicationLoaderStatus}
                 />
               )}
               {tabIndex === 1 && (
                 <PipelinesTable
                   pipelinesList={pipelinesList}
+                  onHandlePipelineExecutionRowDeleteClicked={
+                    onHandlePipelineExecutionRowDeleteClicked
+                  }
                   onHandleSelectPipelineExecutionClick={
                     onHandleSelectPipelineExecutionClick
                   }

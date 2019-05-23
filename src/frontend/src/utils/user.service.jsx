@@ -9,6 +9,12 @@ const UserService = {
     return lpaAxios.delete('/user/discovery', {
       params: { webId, discoveryId }
     });
+  },
+
+  deletePipelineExecution(webId, executionIri) {
+    return lpaAxios.delete('/user/execution', {
+      params: { webId, executionIri }
+    });
   }
 };
 
