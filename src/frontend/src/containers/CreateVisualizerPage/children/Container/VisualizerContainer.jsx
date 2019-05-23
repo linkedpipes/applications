@@ -36,7 +36,7 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 20
   },
   filterSideBar: {
-    overflowY: 'auto'
+    overflowY: 'hidden'
   },
   card: {},
   input: {}

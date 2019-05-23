@@ -7,7 +7,7 @@ import { discoverActions } from '../../duck';
 import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 import { toast } from 'react-toastify';
-import GoogleAnalytics from 'react-ga'
+import GoogleAnalytics from 'react-ga';
 
 type Props = {
   cardIndex: number,
