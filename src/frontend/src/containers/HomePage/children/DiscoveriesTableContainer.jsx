@@ -58,10 +58,13 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
       await handleSetUserProfileAsync(response.data);
     } else {
       await onSetApplicationLoaderStatus(false);
-      toast.error('Error! Unable to delete session. Try again later...', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 5000
-      });
+      toast.error(
+        'Error! Unable to delete discovery session. Try again later...',
+        {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000
+        }
+      );
     }
   };
 

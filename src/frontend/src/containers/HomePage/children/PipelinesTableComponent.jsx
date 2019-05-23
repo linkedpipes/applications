@@ -56,7 +56,7 @@ const PipelinesTableComponent = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {pipelinesList.map(pipeline => (
+            {pipelinesList.map((pipeline, index) => (
               <TableRow key={uuid()}>
                 <TableCell align="center">
                   <Button
@@ -107,6 +107,7 @@ const PipelinesTableComponent = ({
                   padding="checkbox"
                 >
                   <IconButton
+                    id={`delete_execution_session_button_${index}`}
                     key={`button_pipeline_${uuid.v4()}`}
                     aria-label="Decline"
                     onClick={() =>
