@@ -71,7 +71,7 @@ class AuthorizationContainer extends Component {
       this.setState({ newSession });
       return;
     } catch (error) {
-      Log.error(error, 'AuthenticationService'); // eslint-disable-line no-console
+      Log.error(error, 'UserService'); // eslint-disable-line no-console
     }
   };
 

@@ -63,11 +63,36 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.userService = context.getBean(UserService.class);
     }
 
+    /**
+     * Legacy start discovery from input endpoint.
+     * Uses startDiscoveryFromInput but sparqlEndpointIri, dataSampleIri and
+     * namedGraphs are set to null.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
     }
 
+    /**
+     * Start a discovery using the provided configuration, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @param namedGraphs list of provided named graphs to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
@@ -75,6 +100,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+     * Start a discovery using a configuration located at some IRI, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfigIri configuration IRI passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
@@ -82,12 +118,35 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+    * Log a discovery onto user, notify discovery started via sockets and
+    * start status polling.
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+    * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+    * @param namedGraphs list of provided named graphs to be recorded in the DB
+    * @throws LpAppsException initial discovery status call failed
+    * @throws UserNotFoundException user was not found
+    */
     private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
 
+    /**
+    * Get discovery status, pull discovery out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: discoveryAdded
+    * - message type: DiscoverySession
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @throws LpAppsException request to Discovery failed
+    */
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
         DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
@@ -110,6 +169,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Call ETL to execute a pipeline, record execution in the DB, notify
+     * execution started on sockets and start polling for execution status.
+     *
+     * @param etlPipelineIri IRI of the ETL pipeline to execute
+     * @param userId WebID of the user (used to select where to map execution in DB, where to notify on sockets)
+     * @param selectedVisualiser frontend string stored in DB
+     * @return execution iri in JSON object for frontend to use
+     * @throws LpAppsException request to ETL failed
+     * @throws UserNotFoundException user not found
+     */
     @NotNull @Override
     public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
@@ -119,6 +189,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         return execution;
     }
 
+    /**
+    * Get execution status, pull execution out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: executionAdded
+    * - message type: PipelineExecution
+    *
+    * @param executionIri executionIri for which to get status
+    * @param userId webId to use for identification of a room where to notify via sockets
+    * @throws LpAppsException request to ETL failed
+    */
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
@@ -133,7 +214,22 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
-    private void startEtlStatusPolling(String executionIri) throws LpAppsException {
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the ETL and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: executionIri
+     * - event name: executionStatus
+     * - message type: EtlStatusReport
+     *
+     * @param executionIri execution IRI to poll for
+     */
+    private void startEtlStatusPolling(String executionIri) {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
             try {
@@ -250,7 +346,22 @@ public class ExecutorServiceComponent implements ExecutorService {
         Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
-    private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the Discovery and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: discoveryId
+     * - event name: discoveryStatus
+     * - message type: DiscoveryStatusReport
+     *
+     * @param discoveryId discovery id to poll for
+     */
+    private void startDiscoveryStatusPolling(String discoveryId) {
         Runnable checker = () -> {
             DiscoveryDao dao = null;
             try {
