@@ -346,10 +346,13 @@ class HomeContainer extends PureComponent<Props, State> {
       await handleSetUserProfileAsync(response.data);
     } else {
       await this.setApplicationLoaderStatus(false);
-      toast.error('Error! Unable to delete session. Try again later...', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 5000
-      });
+      toast.error(
+        'Error! Unable to delete pipeline execution session. Try again later...',
+        {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000
+        }
+      );
     }
   };
 
