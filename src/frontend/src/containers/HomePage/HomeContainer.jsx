@@ -141,7 +141,7 @@ class HomeContainer extends PureComponent<Props, State> {
 
       let status;
 
-      if (typeof rawStatus.statusIri.attribute !== 'undefined') {
+      if (rawStatus && rawStatus.statusIri) {
         status = ETL_STATUS_MAP[rawStatus.statusIri]
           ? ETL_STATUS_MAP[rawStatus.statusIri]
           : ETL_STATUS_MAP[rawStatus['@id']];

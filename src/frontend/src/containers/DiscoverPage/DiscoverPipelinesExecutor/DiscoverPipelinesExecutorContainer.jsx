@@ -145,7 +145,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
 
         let status;
 
-        if (typeof parsedStatus.statusIri.attribute !== 'undefined') {
+        if (parsedStatus && parsedStatus.statusIri) {
           status = ETL_STATUS_MAP[parsedStatus.statusIri]
             ? ETL_STATUS_MAP[parsedStatus.statusIri]
             : ETL_STATUS_MAP[parsedStatus['@id']];
