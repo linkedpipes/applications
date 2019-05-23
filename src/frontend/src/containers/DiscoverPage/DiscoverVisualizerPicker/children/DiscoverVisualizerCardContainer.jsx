@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { discoverActions } from '../../duck';
-import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 import { toast } from 'react-toastify';
 import GoogleAnalytics from 'react-ga';
@@ -20,6 +19,8 @@ type Props = {
 };
 
 class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
+  disabled: boolean;
+
   addVisualizer = visualizerData => {
     const self = this;
     return new Promise(resolve => {
@@ -28,17 +29,21 @@ class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
     });
   };
 
+  changeDisabled = () => {
+    this.disabled = true;
+  };
+
   onSelectVisualizer = () => {
+    if (this.disabled) return;
+    this.changeDisabled();
     const self = this;
     const { visualizerData } = self.props;
-
     GoogleAnalytics.event({
       category: 'Discovery',
       action: 'Selected visualizer : step 2'
     });
 
     const dataSourceGroups = visualizerData.dataSourceGroups;
-    Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
     self.addVisualizer(visualizerData).then(() => {
       if (dataSourceGroups.length === 1) {
         self.handleSelectPipeline(dataSourceGroups[0]);
