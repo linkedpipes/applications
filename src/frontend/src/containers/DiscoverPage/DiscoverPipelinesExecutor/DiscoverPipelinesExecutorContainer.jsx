@@ -142,9 +142,14 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       } else {
         Log.info(parsedData, 'DiscoverPipelinesExecutorContainer');
         const parsedStatus = parsedData.status.status;
-        let status = ETL_STATUS_MAP[parsedStatus.statusIri]
-          ? ETL_STATUS_MAP[parsedStatus.statusIri]
-          : ETL_STATUS_MAP[parsedStatus['@id']];
+
+        let status;
+
+        if (typeof parsedStatus.statusIri.attribute !== 'undefined') {
+          status = ETL_STATUS_MAP[parsedStatus.statusIri]
+            ? ETL_STATUS_MAP[parsedStatus.statusIri]
+            : ETL_STATUS_MAP[parsedStatus['@id']];
+        }
 
         if (status === undefined) {
           self.setState({
