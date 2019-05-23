@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @Profile("!disableDB")
 public class UserController {
@@ -58,12 +61,20 @@ public class UserController {
     @NotNull
     @DeleteMapping("/api/user/execution")
     public ResponseEntity<UserProfile> deleteExecution(
-        @NotNull @RequestParam(value = "webId", required = true) String user,
-        @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
+        @NotNull @RequestParam(value = "webId") String user,
+        @NotNull @RequestParam(value = "executionIri") String executionIri,
+        @RequestParam(value = "socketId", required = false) String socketId)
         throws LpAppsException {
         try {
             UserProfile profile = userService.deleteExecution(user, executionIri);
-            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("executionDeleted", executionIri);
+
+
+            Map<String,String> socketResponse = new HashMap<>();
+            socketResponse.put("executionIri", executionIri);
+            socketResponse.put("socketId", socketId);
+
+            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("executionDeleted", socketResponse);
+
             return ResponseEntity.ok(profile);
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
@@ -82,12 +93,18 @@ public class UserController {
     @NotNull
     @DeleteMapping("/api/user/discovery")
     public ResponseEntity<UserProfile> deleteDiscovery(
-        @NotNull @RequestParam(value = "webId", required = true) String user,
-        @NotNull @RequestParam(value = "discoveryId", required = true) String discoveryId)
+        @NotNull @RequestParam(value = "webId") String user,
+        @NotNull @RequestParam(value = "discoveryId") String discoveryId,
+        @RequestParam(value = "socketId", required = false) String socketId)
         throws LpAppsException {
         try {
             UserProfile profile = userService.deleteDiscovery(user, discoveryId);
-            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("discoveryDeleted", discoveryId);
+
+            Map<String,String> socketResponse = new HashMap<>();
+            socketResponse.put("discoveryId", discoveryId);
+            socketResponse.put("socketId", socketId);
+
+            Application.SOCKET_IO_SERVER.getRoomOperations(user).sendEvent("discoveryDeleted", socketResponse);
             return ResponseEntity.ok(profile);
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
