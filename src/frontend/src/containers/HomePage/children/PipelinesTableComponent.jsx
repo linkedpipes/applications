@@ -9,6 +9,8 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import { ETL_STATUS_MAP } from '@utils';
 import uuid from 'uuid';
 import moment from 'moment';
@@ -22,7 +24,8 @@ type Props = {
     selectedVisualiser: string
   }>,
   classes: Object,
-  onHandleSelectPipelineExecutionClick: Function
+  onHandleSelectPipelineExecutionClick: Function,
+  onHandlePipelineExecutionRowDeleteClicked: Function
 };
 
 const styles = () => ({
@@ -33,6 +36,7 @@ const styles = () => ({
 
 const PipelinesTableComponent = ({
   onHandleSelectPipelineExecutionClick,
+  onHandlePipelineExecutionRowDeleteClicked,
   pipelinesList,
   classes
 }: Props) => (
@@ -48,10 +52,11 @@ const PipelinesTableComponent = ({
               <TableCell align="center">Status</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
+              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {pipelinesList.map(pipeline => (
+            {pipelinesList.map((pipeline, index) => (
               <TableRow key={uuid()}>
                 <TableCell align="center">
                   <Button
@@ -94,6 +99,29 @@ const PipelinesTableComponent = ({
                   {pipeline.finished === -1
                     ? 'N/A'
                     : moment.unix(pipeline.finished).format('lll')}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_execution_session_button_${index}`}
+                    key={`button_pipeline_${uuid.v4()}`}
+                    aria-label="Decline"
+                    onClick={() =>
+                      onHandlePipelineExecutionRowDeleteClicked(pipeline)
+                    }
+                    disabled={
+                      !(
+                        pipeline.status &&
+                        ETL_STATUS_MAP[pipeline.status['@id']] === 'Finished'
+                      )
+                    }
+                  >
+                    <RemoveIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
