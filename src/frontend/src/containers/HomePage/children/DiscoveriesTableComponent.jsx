@@ -59,7 +59,7 @@ const DiscoveriesTableComponent = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {discoveriesList.map(discovery => (
+            {discoveriesList.map((discovery, index) => (
               <TableRow key={uuid()}>
                 <TableCell
                   align="center"
@@ -125,6 +125,7 @@ const DiscoveriesTableComponent = ({
                   padding="checkbox"
                 >
                   <IconButton
+                    id={`delete_discovery_session_button_${index}`}
                     key={`button_${discovery.discoveryId}`}
                     aria-label="Decline"
                     onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
