@@ -29,14 +29,23 @@ import GoogleAnalytics from 'react-ga';
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
 // BASE_SOCKET_URL is not set
-const socket = io.connect(
-  process.env.BASE_SOCKET_URL ? process.env.BASE_SOCKET_URL : undefined,
-  {
-    reconnection: process.env.SOCKET_RECONNECT
-      ? process.env.SOCKET_RECONNECT
-      : false
-  }
-);
+
+var socket;
+
+const startSocketClient = () => {
+  socket = io.connect(
+    process.env.BASE_SOCKET_URL ? process.env.BASE_SOCKET_URL : undefined,
+    {
+      reconnection: process.env.SOCKET_RECONNECT
+        ? process.env.SOCKET_RECONNECT
+        : false
+    }
+  );
+};
+
+const stopSocketClient = () => {
+  socket.disconnect();
+};
 
 const styles = () => ({
   root: {
@@ -81,6 +90,10 @@ class AppRouter extends React.PureComponent<Props, State> {
     isExternalPath: false
   };
 
+  constructor() {
+    super();
+  }
+
   componentDidMount() {
     const pathname = window.location.href;
 
@@ -95,7 +108,7 @@ class AppRouter extends React.PureComponent<Props, State> {
     }
 
     window.onbeforeunload = () => {
-      if (!this.state.isExternalPath) {
+      if (!this.state.isExternalPath && this.props.webId) {
         socket.emit('leave', this.props.webId);
         socket.removeAllListeners();
       }
@@ -179,25 +192,34 @@ class AppRouter extends React.PureComponent<Props, State> {
       handleAddDiscoverySession,
       handleAddExecutionSession,
       handleUpdateDiscoverySession,
-      handleUpdateExecutionSession
+      handleUpdateExecutionSession,
+      handleDeleteDiscoverySession,
+      handleDeleteExecutionSession
     } = this.props;
 
-    socket.removeAllListeners();
+    if (socket) {
+      // restart if there is an instance already
+      stopSocketClient();
+    }
+    startSocketClient();
 
-    socket.on('connect', data => {
-      Log.warn('Client connected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+    socket.on('connect', () => {
+      if (socket.connected) {
+        Log.info('Client connected', 'AppRouter');
+        Log.info(socket.id, 'AppRouter');
+      }
     });
-    socket.on('disconnect', data => {
-      Log.warn('Client disconnected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+
+    socket.on('disconnect', () => {
+      Log.info('Client disconnected', 'AppRouter');
+      Log.info(socket.id, 'AppRouter');
     });
-    socket.on('reconnect', data => {
-      Log.warn('Client reconnected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+
+    socket.on('reconnect', () => {
+      if (socket.connected) {
+        Log.info('Client reconnected', 'AppRouter');
+        Log.info(socket.id, 'AppRouter');
+      }
     });
 
     socket.on('discoveryAdded', data => {
@@ -207,6 +229,21 @@ class AppRouter extends React.PureComponent<Props, State> {
       const parsedData = JSON.parse(data);
       socket.emit('join', parsedData.discoveryId);
       handleAddDiscoverySession(parsedData);
+    });
+
+    socket.on('discoveryDeleted', data => {
+      Log.info(socket.id);
+      const senderSocketId = data.socketId;
+      const currentSocketId = socket.id;
+
+      if (
+        senderSocketId &&
+        currentSocketId &&
+        senderSocketId !== currentSocketId
+      ) {
+        const discoveryId = data.discoveryId;
+        handleDeleteDiscoverySession(discoveryId);
+      }
     });
 
     const self = this;
@@ -230,6 +267,21 @@ class AppRouter extends React.PureComponent<Props, State> {
 
       socket.emit('join', pipelineRecord.executionIri);
       handleAddExecutionSession(pipelineRecord);
+    });
+
+    socket.on('executionDeleted', data => {
+      Log.info(socket.id);
+      const senderSocketId = data.socketId;
+      const currentSocketId = socket.id;
+
+      if (
+        senderSocketId &&
+        currentSocketId &&
+        senderSocketId !== currentSocketId
+      ) {
+        const executionIri = data.executionIri;
+        handleDeleteExecutionSession(executionIri);
+      }
     });
 
     socket.on('discoveryStatus', data => {
@@ -397,8 +449,14 @@ const mapDispatchToProps = dispatch => {
   const handleAddDiscoverySession = discoverySession =>
     dispatch(userActions.addDiscoverySession({ session: discoverySession }));
 
+  const handleDeleteDiscoverySession = discoveryId =>
+    dispatch(userActions.deleteDiscoverySession({ discoveryId }));
+
   const handleAddExecutionSession = executionSession =>
     dispatch(userActions.addExecutionSession({ session: executionSession }));
+
+  const handleDeleteExecutionSession = executionIri =>
+    dispatch(userActions.deleteExecutionSession({ executionIri }));
 
   const handleUpdateDiscoverySession = discoverySession =>
     dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
@@ -420,6 +478,8 @@ const mapDispatchToProps = dispatch => {
     handleSetUserWebId,
     handleAddDiscoverySession,
     handleAddExecutionSession,
+    handleDeleteDiscoverySession,
+    handleDeleteExecutionSession,
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,

@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
-import { Log, UserService } from '@utils';
+import { Log, UserService, SocketContext } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -12,7 +12,8 @@ type Props = {
   onHandleSelectDiscoveryClick: Function,
   onSetApplicationLoaderStatus: Function,
   handleSetUserProfileAsync: Function,
-  webId: string
+  webId: string,
+  socket: Object
 };
 
 type State = {
@@ -41,14 +42,16 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     const {
       webId,
       onSetApplicationLoaderStatus,
-      handleSetUserProfileAsync
+      handleSetUserProfileAsync,
+      socket
     } = this.props;
 
     onSetApplicationLoaderStatus(true);
 
     const response = await UserService.deleteDiscovery(
       webId,
-      discovery.discoveryId
+      discovery.discoveryId,
+      socket.id
     );
     if (response.status === 200) {
       await onSetApplicationLoaderStatus(false);
@@ -88,6 +91,12 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
   }
 }
 
+const DiscoveriesTableContainerWithSockets = props => (
+  <SocketContext.Consumer>
+    {socket => <DiscoveriesTableContainer {...props} socket={socket} />}
+  </SocketContext.Consumer>
+);
+
 const mapStateToProps = state => {
   return {
     webId: state.user.webId
@@ -104,4 +113,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(DiscoveriesTableContainer);
+)(DiscoveriesTableContainerWithSockets);

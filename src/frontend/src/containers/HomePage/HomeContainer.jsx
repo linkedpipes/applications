@@ -334,11 +334,12 @@ class HomeContainer extends PureComponent<Props, State> {
   handlePipelineExecutionRowDeleteClicked = async pipeline => {
     this.setApplicationLoaderStatus(true);
 
-    const { handleSetUserProfileAsync, webId } = this.props;
+    const { handleSetUserProfileAsync, webId, socket } = this.props;
 
     const response = await UserService.deletePipelineExecution(
       webId,
-      pipeline.executionIri
+      pipeline.executionIri,
+      socket.id
     );
     if (response.status === 200) {
       await this.setApplicationLoaderStatus(false);
