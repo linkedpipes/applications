@@ -14,8 +14,10 @@ const styles = theme => ({
   content: {
     flexFlow: 'column',
     flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto'
+    overflow: 'auto',
+    paddingRight: '2rem',
+    paddingLeft: '2rem',
+    paddingTop: '4rem'
   },
   devBar: {
     fontSize: '1rem',
@@ -49,8 +51,6 @@ const PrivateLayout = ({
         <Fragment>
           <NavigationBar />
           <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <CssBaseline />
             {process.env.NODE_ENV !== 'production' && (
               <div className={classes.devBar}>
                 <Typography variant="subtitle1" noWrap>

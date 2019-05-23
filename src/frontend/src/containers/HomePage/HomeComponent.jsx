@@ -40,7 +40,8 @@ type Props = {
   onHandleSelectPipelineExecutionClick: Function,
   tabIndex: Number,
   onHandleAppClicked: Function,
-  onHandleShareAppClicked: Function
+  onHandleShareAppClicked: Function,
+  onSetApplicationLoaderStatus: Function
 };
 
 const styles = theme => ({
@@ -88,7 +89,9 @@ class HomeComponent extends PureComponent<Props> {
       onHandleSelectPipelineExecutionClick,
       tabIndex,
       onHandleAppClicked,
-      onHandleShareAppClicked
+      onHandleShareAppClicked,
+      onSetApplicationLoaderStatus,
+      onHandlePipelineExecutionRowDeleteClicked
     } = this.props;
     return (
       <div className={classes.root}>
@@ -133,9 +136,9 @@ class HomeComponent extends PureComponent<Props> {
           <Grid item xs={8}>
             <AppBar position="static" color="secondary">
               <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
-                <Tab label="Discoveries" />
-                <Tab label="Pipelines" />
-                <Tab label="My Applications" />
+                <Tab id="discoveries_tab" label="Discoveries" />
+                <Tab id="pipeline_executions_tab" label="Pipelines" />
+                <Tab id="my_applications_tab" label="My Applications" />
               </Tabs>
             </AppBar>
             <div
@@ -147,11 +150,15 @@ class HomeComponent extends PureComponent<Props> {
                 <DiscoveriesTable
                   discoveriesList={discoveriesList}
                   onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
+                  onSetApplicationLoaderStatus={onSetApplicationLoaderStatus}
                 />
               )}
               {tabIndex === 1 && (
                 <PipelinesTable
                   pipelinesList={pipelinesList}
+                  onHandlePipelineExecutionRowDeleteClicked={
+                    onHandlePipelineExecutionRowDeleteClicked
+                  }
                   onHandleSelectPipelineExecutionClick={
                     onHandleSelectPipelineExecutionClick
                   }
