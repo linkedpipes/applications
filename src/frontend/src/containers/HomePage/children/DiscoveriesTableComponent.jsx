@@ -50,12 +50,12 @@ const DiscoveriesTableComponent = ({
             <TableRow key={uuid()}>
               <TableCell align="center">Action</TableCell>
               <TableCell align="center">Info</TableCell>
+              <TableCell align="center">Remove</TableCell>
               <TableCell align="center">Status</TableCell>
               <TableCell align="center">SPARQL IRI</TableCell>
               <TableCell align="center">Named Graph IRI</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
-              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -97,7 +97,21 @@ const DiscoveriesTableComponent = ({
                     Info
                   </Button>
                 </TableCell>
-
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_discovery_session_button_${index}`}
+                    key={`button_${discovery.discoveryId}`}
+                    aria-label="Decline"
+                    onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                </TableCell>
                 <TableCell align="center">
                   {discovery.isFinished ? 'Finished' : 'In progress'}
                 </TableCell>
@@ -116,23 +130,6 @@ const DiscoveriesTableComponent = ({
                   {discovery.finished === -1
                     ? 'N/A'
                     : moment.unix(discovery.finished).format('lll')}
-                </TableCell>
-
-                <TableCell
-                  align="center"
-                  component="th"
-                  scope="row"
-                  padding="checkbox"
-                >
-                  <IconButton
-                    id={`delete_discovery_session_button_${index}`}
-                    key={`button_${discovery.discoveryId}`}
-                    aria-label="Decline"
-                    onClick={() => onHandleDiscoveryRowDeleteClicked(discovery)}
-                    disabled={!discovery.isFinished}
-                  >
-                    <RemoveIcon />
-                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

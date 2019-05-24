@@ -17,13 +17,6 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'ttlFile',
-    label: 'GoogleMaps Sample (File)',
-    fileUrl:
-      'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
-  },
-  {
-    id: uuid.v4(),
     type: 'sparqlEndpoint',
     label: 'GoogleMaps Sample',
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
@@ -46,20 +39,7 @@ class DiscoverExamplesContainer extends PureComponent {
   handleListItemClicked = item => {
     const { onInputExampleClicked } = this.props;
     const inputExample = item;
-    if (item.type === 'ttlFile') {
-      axios
-        .get(item.fileUrl)
-        .then(response => {
-          inputExample.dataSourcesUris = response.data;
-          onInputExampleClicked(inputExample);
-        })
-        .catch(error => {
-          // handle error
-          Log.error(error, 'DiscoverExamplesContainer');
-        });
-    } else {
-      onInputExampleClicked(inputExample);
-    }
+    onInputExampleClicked(inputExample);
   };
 
   render() {
