@@ -173,21 +173,7 @@ class HomeContainer extends PureComponent<Props, State> {
   handleSampleClick = sample => {
     return () => {
       const { onInputExampleClicked, history } = this.props;
-      if (sample.type === 'ttlFile') {
-        axios
-          .get(sample.fileUrl)
-          .then(response => {
-            const sampleWithUris = sample;
-            sampleWithUris.dataSourcesUris = response.data;
-            onInputExampleClicked(sampleWithUris);
-          })
-          .catch(error => {
-            // handle error
-            Log.error(error, 'DiscoverExamplesContainer');
-          });
-      } else {
-        onInputExampleClicked(sample);
-      }
+      onInputExampleClicked(sample);
       history.push('/discover');
     };
   };

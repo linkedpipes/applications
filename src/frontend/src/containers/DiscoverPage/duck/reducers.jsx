@@ -3,7 +3,7 @@ import types from './types';
 const INITIAL_STATE = {
   activeStep: 0,
   etlExecutionStatus: false,
-  dataSourcesUris: '',
+  dataSourcesUris: undefined,
   sparqlEndpointIri: '',
   dataSampleIri: '',
   namedGraph: ''
@@ -44,7 +44,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
     case types.RESET_SELECTED_INPUT_EXAMPLE: {
       return {
         ...state,
-        dataSourcesUris: '',
+        dataSourcesUris: undefined,
         sparqlEndpointIri: '',
         dataSampleIri: '',
         namedGraph: ''
@@ -54,21 +54,11 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
     case types.SET_SELECTED_INPUT_EXAMPLE: {
       const { sample } = action;
       switch (sample.type) {
-        case 'ttlFile': {
-          const { dataSourcesUris } = sample;
-          return {
-            ...state,
-            dataSourcesUris,
-            sparqlEndpointIri: '',
-            dataSampleIri: '',
-            namedGraph: ''
-          };
-        }
         case 'sparqlEndpoint': {
           const { sparqlEndpointIri, dataSampleIri, namedGraph } = sample;
           return {
             ...state,
-            dataSourcesUris: '',
+            dataSourcesUris: undefined,
             sparqlEndpointIri,
             dataSampleIri,
             namedGraph
