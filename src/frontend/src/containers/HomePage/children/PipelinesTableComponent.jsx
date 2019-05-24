@@ -47,12 +47,12 @@ const PipelinesTableComponent = ({
           <TableHead>
             <TableRow key={uuid()}>
               <TableCell align="center">Action</TableCell>
+              <TableCell align="center">Remove</TableCell>
               <TableCell align="center">Execution IRI</TableCell>
               <TableCell align="center">Visualizer Type</TableCell>
               <TableCell align="center">Status</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
-              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -75,6 +75,23 @@ const PipelinesTableComponent = ({
                   >
                     Create App
                   </Button>
+                </TableCell>
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_execution_session_button_${index}`}
+                    key={`button_pipeline_${uuid.v4()}`}
+                    aria-label="Decline"
+                    onClick={() =>
+                      onHandlePipelineExecutionRowDeleteClicked(pipeline)
+                    }
+                  >
+                    <RemoveIcon />
+                  </IconButton>
                 </TableCell>
                 <TableCell align="center">
                   {pipeline.executionIri
@@ -99,29 +116,6 @@ const PipelinesTableComponent = ({
                   {pipeline.finished === -1
                     ? 'N/A'
                     : moment.unix(pipeline.finished).format('lll')}
-                </TableCell>
-                <TableCell
-                  align="center"
-                  component="th"
-                  scope="row"
-                  padding="checkbox"
-                >
-                  <IconButton
-                    id={`delete_execution_session_button_${index}`}
-                    key={`button_pipeline_${uuid.v4()}`}
-                    aria-label="Decline"
-                    onClick={() =>
-                      onHandlePipelineExecutionRowDeleteClicked(pipeline)
-                    }
-                    disabled={
-                      !(
-                        pipeline.status &&
-                        ETL_STATUS_MAP[pipeline.status['@id']] === 'Finished'
-                      )
-                    }
-                  >
-                    <RemoveIcon />
-                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

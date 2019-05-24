@@ -20,7 +20,7 @@ export const samples = [
     type: 'ttlFile',
     label: 'GoogleMaps Sample (File)',
     fileUrl:
-      'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
+      'https://a.uguu.se/iHhkFCJM8d7l_test.ttl'
   },
   {
     id: uuid.v4(),
