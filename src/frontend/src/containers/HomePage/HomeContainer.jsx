@@ -16,7 +16,8 @@ import {
   ETL_STATUS_MAP,
   withAuthorization,
   VisualizersService,
-  UserService
+  UserService,
+  ReactGAWrapper
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
@@ -36,7 +37,8 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetUserProfileAsync: Function,
   webId: string,
-  applicationsFolder: String
+  applicationsFolder: String,
+  location: Object
 };
 type State = {
   tabIndex: number,
@@ -70,6 +72,9 @@ class HomeContainer extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
+
+    const page = this.props.location.pathname;
+    ReactGAWrapper.trackPage(page);
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();

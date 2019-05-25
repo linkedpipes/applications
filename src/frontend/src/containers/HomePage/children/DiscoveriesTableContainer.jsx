@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
-import { Log, UserService, SocketContext } from '@utils';
+import { UserService, SocketContext } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';

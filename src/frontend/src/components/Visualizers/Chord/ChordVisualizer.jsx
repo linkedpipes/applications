@@ -15,7 +15,8 @@ type Props = {
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
   size: number,
-  selectedNodes: Set<string>
+  selectedNodes: Set<string>,
+  theme: Object
 };
 
 type State = {

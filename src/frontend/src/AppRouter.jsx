@@ -23,14 +23,13 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import withTracker from './withTracker';
 import GoogleAnalytics from 'react-ga';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
 // BASE_SOCKET_URL is not set
 
-var socket;
+let socket;
 
 const startSocketClient = () => {
   socket = io.connect(
@@ -65,7 +64,9 @@ type Props = {
   handleUpdateDiscoverySession: Function,
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
-  handleSetUserWebId: Function
+  handleSetUserWebId: Function,
+  handleDeleteDiscoverySession: Function,
+  handleDeleteExecutionSession: Function
 };
 
 type State = {
@@ -80,7 +81,6 @@ const errorHandler = webId => {
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
       Sentry.captureException(error);
-      Sentry.showReportDialog(); // Only if not production
     });
   };
 };
@@ -89,10 +89,6 @@ class AppRouter extends React.PureComponent<Props, State> {
   state = {
     isExternalPath: false
   };
-
-  constructor() {
-    super();
-  }
 
   componentDidMount() {
     const pathname = window.location.href;
@@ -350,20 +346,16 @@ class AppRouter extends React.PureComponent<Props, State> {
               <SocketContext.Provider value={socket}>
                 <Switch>
                   <PublicLayout
-                    component={withTracker(AuthorizationPage)}
+                    component={AuthorizationPage}
                     path="/login"
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/dashboard"
-                    component={withTracker(HomePage)}
-                    exact
-                  />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact />
 
                   <PrivateLayout
                     path="/create-app"
-                    component={withTracker(CreateVisualizerPage)}
+                    component={CreateVisualizerPage}
                     exact
                   />
 
@@ -375,7 +367,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
                   <PrivateLayout
                     path="/profile"
-                    component={withTracker(UserProfilePage)}
+                    component={UserProfilePage}
                     exact
                   />
 
@@ -385,23 +377,15 @@ class AppRouter extends React.PureComponent<Props, State> {
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/about"
-                    component={withTracker(AboutPage)}
-                    exact
-                  />
+                  <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout
                     path="/storage"
-                    component={withTracker(StoragePage)}
+                    component={StoragePage}
                     exact
                   />
 
-                  <PublicLayout
-                    path="/404"
-                    component={withTracker(NotFoundPage)}
-                    exact
-                  />
+                  <PublicLayout path="/404" component={NotFoundPage} exact />
 
                   <Route path="/map" component={ApplicationPage} />
 

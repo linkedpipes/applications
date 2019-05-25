@@ -28,9 +28,11 @@ jobs:
         yarn: true
         directories:
           - src/frontend/node_modules
+          - src/frontend/eslint
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
+        - yarn run eslint
 
     - name: "Backend"
       language: java
@@ -60,9 +62,11 @@ jobs:
         yarn: true
         directories:
           - src/frontend/node_modules
+          - src/frontend/eslint
       script:
         - yarn install --frozen-lockfile --check-files
         - yarn run build
+        - yarn run eslint
 
     - name: "Backend"
       language: java

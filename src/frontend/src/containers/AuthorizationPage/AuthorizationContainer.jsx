@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+// @flow
+import React, { PureComponent } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Log } from '@utils';
+import { Log, ReactGAWrapper } from '@utils';
 import { connect } from 'react-redux';
 
 const providers = {
@@ -11,7 +12,19 @@ const providers = {
   '': ''
 };
 
-class AuthorizationContainer extends Component {
+type Props = {
+  location: Object
+};
+
+type State = {
+  webIdFieldValue: string,
+  withWebIdStatus: boolean,
+  // eslint-disable-next-line react/no-unused-state
+  session: Object,
+  providerTitle: string
+};
+
+class AuthorizationContainer extends PureComponent<Props, State> {
   state = {
     webIdFieldValue: '',
     withWebIdStatus: false,
@@ -20,11 +33,15 @@ class AuthorizationContainer extends Component {
     providerTitle: ''
   };
 
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    ReactGAWrapper.trackPage(page);
+  }
+
   isWebIdValid = webId => {
     const regex = new RegExp(
       /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
-      'i',
-      'g'
+      'ig'
     );
     return regex.test(webId);
   };
@@ -68,7 +85,7 @@ class AuthorizationContainer extends Component {
 
       const newSession = this.login(ldp, callbackUri);
       // eslint-disable-next-line react/no-unused-state
-      this.setState({ newSession });
+      this.setState({ session: newSession });
       return;
     } catch (error) {
       Log.error(error, 'UserService'); // eslint-disable-line no-console

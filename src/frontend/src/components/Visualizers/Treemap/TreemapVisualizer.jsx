@@ -60,6 +60,10 @@ const transformData = data => {
 };
 
 class TreemapVisualizer extends React.PureComponent<Props, State> {
+  conceptsFetched: Set<Object>;
+
+  chartEvents: Array<Object>;
+
   constructor(props: Props) {
     super(props);
     this.state = {

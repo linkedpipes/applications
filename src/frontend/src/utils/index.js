@@ -6,6 +6,7 @@ import GlobalUtils from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
 import { withAuthorization } from './third-party';
+import ReactGAWrapper from './react-ga-tracker';
 
 export {
   VisualizersService,
@@ -17,5 +18,6 @@ export {
   ETL_STATUS_TYPE,
   Log,
   GlobalUtils,
-  withAuthorization
+  withAuthorization,
+  ReactGAWrapper
 };

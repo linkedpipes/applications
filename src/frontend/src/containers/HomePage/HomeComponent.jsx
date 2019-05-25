@@ -41,7 +41,8 @@ type Props = {
   tabIndex: Number,
   onHandleAppClicked: Function,
   onHandleShareAppClicked: Function,
-  onSetApplicationLoaderStatus: Function
+  onSetApplicationLoaderStatus: Function,
+  onHandlePipelineExecutionRowDeleteClicked: Function
 };
 
 const styles = theme => ({
