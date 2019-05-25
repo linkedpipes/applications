@@ -69,7 +69,7 @@ class AuthorizationContainer extends PureComponent<Props, State> {
       event.preventDefault();
 
       const { withWebIdStatus, providerTitle, webIdFieldValue } = this.state;
-      const prevPath = !this.props.location.state.prevPath
+      const prevPath = !this.props.location.state
         ? 'dashboard'
         : this.props.location.state.prevPath;
 
