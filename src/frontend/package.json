@@ -98,7 +98,7 @@
     "lint-staged": "8.1.7",
     "node-sass": "4.12.0",
     "prettier": "1.17.1",
-    "pretty-quick": "1.10.0",
+    "pretty-quick": "1.11.0",
     "reactotron-react-js": "3.2.3",
     "reactotron-redux": "3.1.0",
     "sass-loader": "7.1.0",
