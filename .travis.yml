@@ -31,8 +31,8 @@ jobs:
           - src/frontend/eslint
       script:
         - yarn install --frozen-lockfile --check-files
-        - yarn run build
         - yarn run eslint
+        - yarn run build
 
     - name: "Backend"
       language: java
@@ -65,8 +65,8 @@ jobs:
           - src/frontend/eslint
       script:
         - yarn install --frozen-lockfile --check-files
-        - yarn run build
         - yarn run eslint
+        - yarn run build
 
     - name: "Backend"
       language: java
