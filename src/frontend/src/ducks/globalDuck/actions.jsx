@@ -21,8 +21,16 @@ const setLightColorTheme = isLight => {
   };
 };
 
+const setSelectedHomepageTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_HOMEPAGE_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
 export default {
   addSelectedVisualizerAction,
   setLightColorTheme,
-  setChooseFolderDialogState
+  setChooseFolderDialogState,
+  setSelectedHomepageTabIndex
 };
