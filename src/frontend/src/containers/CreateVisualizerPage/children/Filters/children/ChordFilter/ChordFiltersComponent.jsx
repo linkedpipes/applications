@@ -40,6 +40,8 @@ const styles = theme => ({
 });
 
 class ChordFiltersComponent extends React.Component<Props, State> {
+  conceptsFetched: Set<string>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -78,8 +80,6 @@ class ChordFiltersComponent extends React.Component<Props, State> {
       })
     }));
   };
-
-  conceptsFetched: Set<string>;
 
   // todo: add switch to define whether it is editable by users
   render() {

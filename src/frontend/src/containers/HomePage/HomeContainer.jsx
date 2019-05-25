@@ -15,11 +15,13 @@ import {
   ETL_STATUS_TYPE,
   ETL_STATUS_MAP,
   withAuthorization,
-  VisualizersService
+  VisualizersService,
+  UserService
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import { userActions } from '@ducks/userDuck';
 
 type Props = {
   history: { push: any },
@@ -32,6 +34,8 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function,
+  handleSetUserProfileAsync: Function,
+  webId: string,
   applicationsFolder: String
 };
 type State = {
@@ -134,9 +138,17 @@ class HomeContainer extends PureComponent<Props, State> {
     // eslint-disable-next-line array-callback-return
     userProfile.pipelineExecutions.map(pipelineRecord => {
       const rawStatus = pipelineRecord.status;
-      const status = ETL_STATUS_MAP[rawStatus.statusIri]
-        ? ETL_STATUS_MAP[rawStatus.statusIri]
-        : ETL_STATUS_MAP[rawStatus['@id']];
+
+      let status;
+
+      if (rawStatus && rawStatus.statusIri) {
+        status = ETL_STATUS_MAP[rawStatus.statusIri]
+          ? ETL_STATUS_MAP[rawStatus.statusIri]
+          : ETL_STATUS_MAP[rawStatus['@id']];
+      } else {
+        status = ETL_STATUS_TYPE.Unknown;
+      }
+
       if (
         status !== ETL_STATUS_TYPE.Finished &&
         status !== ETL_STATUS_TYPE.Cancelled &&
@@ -161,21 +173,7 @@ class HomeContainer extends PureComponent<Props, State> {
   handleSampleClick = sample => {
     return () => {
       const { onInputExampleClicked, history } = this.props;
-      if (sample.type === 'ttlFile') {
-        axios
-          .get(sample.fileUrl)
-          .then(response => {
-            const sampleWithUris = sample;
-            sampleWithUris.dataSourcesUris = response.data;
-            onInputExampleClicked(sampleWithUris);
-          })
-          .catch(error => {
-            // handle error
-            Log.error(error, 'DiscoverExamplesContainer');
-          });
-      } else {
-        onInputExampleClicked(sample);
-      }
+      onInputExampleClicked(sample);
       history.push('/discover');
     };
   };
@@ -327,6 +325,31 @@ class HomeContainer extends PureComponent<Props, State> {
     });
   };
 
+  handlePipelineExecutionRowDeleteClicked = async pipeline => {
+    this.setApplicationLoaderStatus(true);
+
+    const { handleSetUserProfileAsync, webId, socket } = this.props;
+
+    const response = await UserService.deletePipelineExecution(
+      webId,
+      pipeline.executionIri,
+      socket.id
+    );
+    if (response.status === 200) {
+      await this.setApplicationLoaderStatus(false);
+      await handleSetUserProfileAsync(response.data);
+    } else {
+      await this.setApplicationLoaderStatus(false);
+      toast.error(
+        'Error! Unable to delete pipeline execution session. Try again later...',
+        {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000
+        }
+      );
+    }
+  };
+
   render() {
     const {
       handleChange,
@@ -334,7 +357,9 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick,
       handleAppClicked,
-      handleShareAppClicked
+      handleShareAppClicked,
+      setApplicationLoaderStatus,
+      handlePipelineExecutionRowDeleteClicked
     } = this;
     const { userProfile } = this.props;
     const { tabIndex, loadingAppIsActive } = this.state;
@@ -354,6 +379,10 @@ class HomeContainer extends PureComponent<Props, State> {
           tabIndex={tabIndex}
           onHandleAppClicked={handleAppClicked}
           onHandleShareAppClicked={handleShareAppClicked}
+          onSetApplicationLoaderStatus={setApplicationLoaderStatus}
+          onHandlePipelineExecutionRowDeleteClicked={
+            handlePipelineExecutionRowDeleteClicked
+          }
         />
       </LoadingOverlay>
     );
@@ -401,13 +430,17 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
+  const handleSetUserProfileAsync = userProfile =>
+    dispatch(userActions.setUserProfileAsync(userProfile));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata
+    handleSetSelectedApplicationMetadata,
+    handleSetUserProfileAsync
   };
 };
 
