@@ -17,7 +17,7 @@ import {
   withAuthorization,
   VisualizersService,
   UserService,
-  ReactGAWrapper
+  GoogleAnalyticsWrapper
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
@@ -74,7 +74,7 @@ class HomeContainer extends PureComponent<Props, State> {
     } = this;
 
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();

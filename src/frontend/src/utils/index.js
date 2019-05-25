@@ -6,7 +6,8 @@ import GlobalUtils from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
 import { withAuthorization } from './third-party';
-import ReactGAWrapper from './react-ga-tracker';
+import GoogleAnalyticsWrapper from './google-analytics-wrapper';
+import AuthenticationService from './authentication.utils';
 
 export {
   VisualizersService,
@@ -19,5 +20,6 @@ export {
   Log,
   GlobalUtils,
   withAuthorization,
-  ReactGAWrapper
+  GoogleAnalyticsWrapper,
+  AuthenticationService
 };

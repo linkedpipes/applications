@@ -2,12 +2,16 @@
 import React, { PureComponent } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { ReactGAWrapper } from '@utils';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 const styles = theme => ({
   root: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20
+    paddingTop: theme.spacing.unit * 20,
+    position: 'absolute',
+    left: '50%',
+    top: '40%',
+    transform: 'translate(-50%, -50%)'
   },
   button: {
     margin: theme.spacing.unit
@@ -25,7 +29,7 @@ type Props = {
 class NotFoundPage extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   render() {

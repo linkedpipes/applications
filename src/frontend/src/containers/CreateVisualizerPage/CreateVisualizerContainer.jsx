@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
 import AppConfiguration from '@storage/models/AppConfiguration';
-import { Log, ReactGAWrapper } from '@utils';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   selectedVisualizer: Object,
@@ -45,7 +45,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
 
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
 
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions.bind(this));

@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import UserProfilePageComponent from './UserProfilePageComponent';
 import { connect } from 'react-redux';
-import { withAuthorization, GlobalUtils, ReactGAWrapper } from '@utils';
+import { withAuthorization, GlobalUtils, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   userProfile: Object,
@@ -14,7 +14,7 @@ type Props = {
 class UserProfilePageContainer extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   performLogout = async () => {

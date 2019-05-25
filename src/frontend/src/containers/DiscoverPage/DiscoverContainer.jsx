@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import DiscoverComponent from './DiscoverComponent';
 import { discoverActions } from './duck';
-import { DiscoveryService, Log, ReactGAWrapper } from '@utils';
+import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions } from '@ducks/discoveryDuck';
 
 type Props = {
@@ -29,7 +29,7 @@ class DiscoverContainer extends PureComponent<Props> {
     } = this.props;
 
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
 
     if (location.state && location.state.discoveryId) {
       Log.info(`Just received ${location.state.discoveryId}`);

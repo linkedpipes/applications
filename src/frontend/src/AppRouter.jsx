@@ -23,7 +23,6 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import GoogleAnalytics from 'react-ga';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -90,7 +89,7 @@ class AppRouter extends React.PureComponent<Props, State> {
     isExternalPath: false
   };
 
-  componentDidMount() {
+  componentDidMount = async () => {
     const pathname = window.location.href;
 
     if (
@@ -100,16 +99,20 @@ class AppRouter extends React.PureComponent<Props, State> {
     ) {
       this.setState({ isExternalPath: true });
     } else {
-      this.setupSessionTracker();
+      await this.setupSessionTracker();
     }
 
     window.onbeforeunload = () => {
-      if (!this.state.isExternalPath && this.props.webId) {
+      if (
+        !this.state.isExternalPath &&
+        this.props.webId &&
+        socket !== undefined
+      ) {
         socket.emit('leave', this.props.webId);
         socket.removeAllListeners();
       }
     };
-  }
+  };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
@@ -130,8 +133,6 @@ class AppRouter extends React.PureComponent<Props, State> {
 
     authClient.trackSession(session => {
       if (session) {
-        GoogleAnalytics.set({ webId: session.webId });
-
         handleSetUserWebId(session.webId);
 
         Log.info(session);
@@ -178,7 +179,10 @@ class AppRouter extends React.PureComponent<Props, State> {
 
         Log.warn('Called global');
       } else {
-        socket.removeAllListeners();
+        // eslint-disable-next-line no-lonely-if
+        if (socket !== undefined) {
+          socket.removeAllListeners();
+        }
       }
     });
   };
@@ -385,7 +389,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                     exact
                   />
 
-                  <PublicLayout path="/404" component={NotFoundPage} exact />
+                  <Route path="/404" component={NotFoundPage} exact />
 
                   <Route path="/map" component={ApplicationPage} />
 

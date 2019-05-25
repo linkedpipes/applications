@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/browser';
 import store from './store';
 import 'normalize.css/normalize.css';
 import AppRouter from './AppRouter';
-import GoogleAnalytics from 'react-ga';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 const myStore = store();
 
@@ -25,6 +25,6 @@ Sentry.init({
   debug: process.env.NODE_ENV !== 'production'
 });
 
-GoogleAnalytics.initialize('UA-139954974-1');
+GoogleAnalyticsWrapper.initialize('UA-139954974-1');
 
 render(jsx, document.querySelector('#app'));

@@ -6,7 +6,7 @@ import { etlActions } from '@ducks/etlDuck';
 import { discoverActions } from '../../duck';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 import { toast } from 'react-toastify';
-import GoogleAnalytics from 'react-ga';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   cardIndex: number,
@@ -35,7 +35,7 @@ class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
   onSelectVisualizer = () => {
     if (this.disabled) return;
 
-    GoogleAnalytics.event({
+    GoogleAnalyticsWrapper.trackEvent({
       category: 'Discovery',
       action: 'Selected visualizer : step 2'
     });

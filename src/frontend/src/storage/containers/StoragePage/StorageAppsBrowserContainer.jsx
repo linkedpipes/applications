@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
-import { Log, ReactGAWrapper } from '@utils';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 import StorageBackend from '../../StorageBackend';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
@@ -41,7 +41,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
 
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
 
     this.loadStoredApplications();
     this.isMounted = true;

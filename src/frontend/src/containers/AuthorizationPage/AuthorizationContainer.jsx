@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import AuthorizationComponent from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Log, ReactGAWrapper } from '@utils';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
 
 const providers = {
@@ -35,7 +35,7 @@ class AuthorizationContainer extends PureComponent<Props, State> {
 
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   isWebIdValid = webId => {
@@ -66,9 +66,14 @@ class AuthorizationContainer extends PureComponent<Props, State> {
   // eslint-disable-next-line consistent-return
   handleSignIn = event => {
     try {
-      const { withWebIdStatus, providerTitle, webIdFieldValue } = this.state;
       event.preventDefault();
-      const callbackUri = `${window.location.origin}/dashboard`;
+
+      const { withWebIdStatus, providerTitle, webIdFieldValue } = this.state;
+      const prevPath = !this.props.location.state.prevPath
+        ? 'dashboard'
+        : this.props.location.state.prevPath;
+
+      const callbackUri = `${window.location.origin}/${prevPath}`;
       const webIdValue = webIdFieldValue;
       const providerLink = providers[providerTitle];
 

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { ReactGAWrapper } from '@utils/';
+import { GoogleAnalyticsWrapper } from '@utils/';
 
 const styles = theme => ({
   root: {
@@ -24,7 +24,7 @@ type Props = {
 class AboutPage extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   render() {

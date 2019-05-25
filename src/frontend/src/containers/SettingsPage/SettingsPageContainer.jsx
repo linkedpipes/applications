@@ -3,7 +3,7 @@ import React, { PureComponent, Fragment } from 'react';
 import SettingsPageComponent from './SettingsPageComponent';
 import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
-import { withAuthorization, ReactGAWrapper } from '@utils';
+import { withAuthorization, GoogleAnalyticsWrapper } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
@@ -23,7 +23,7 @@ class SettingsPageContainer extends PureComponent<Props> {
 
   componentDidMount() {
     const page = this.props.location.pathname;
-    ReactGAWrapper.trackPage(page);
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   handleChangeFolder() {
