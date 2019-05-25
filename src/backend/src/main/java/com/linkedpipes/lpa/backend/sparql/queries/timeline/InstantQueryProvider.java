@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.XSD;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,7 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
     public SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
                 .addPrefix(Prefixes.TIME_PREFIX, Time.uri)
+                .addPrefix(Prefixes.DCTERMS_PREFIX, DCTerms.getURI())
                 .addPrefix(Prefixes.XSD_PREFIX, XSD.getURI());
     }
 
@@ -52,7 +54,8 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
     @Override
     public SelectBuilder addWheres(@NotNull SelectBuilder builder) {
         return builder
-                .addWhere(VAR_INSTANT, Time.inDateTime, VAR_DATE);
+                .addWhere(VAR_INSTANT, DCTerms.date, VAR_DATE);
+                //.addWhere(VAR_INSTANT, Time.inDateTime, VAR_DATE);
     }
 
     @NotNull

@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.sparql.queries.timeline;
 
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
+import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Time;
 import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
@@ -38,6 +39,7 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
     public SelectBuilder addPrefixes(@NotNull SelectBuilder builder) {
         return builder
                 .addPrefix(Prefixes.TIME_PREFIX, Time.uri)
+                .addPrefix(Prefixes.SCHEMA_PREFIX, Schema.uri)
                 .addPrefix(Prefixes.XSD_PREFIX, XSD.getURI());
     }
 
@@ -55,8 +57,10 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
     @Override
     public SelectBuilder addWheres(@NotNull SelectBuilder builder) throws ParseException {
         return builder
-                .addWhere(VAR_INTERVAL, Time.hasBeginning, VAR_START)
-                .addWhere(VAR_INTERVAL, Time.hasEnd, VAR_END);
+                .addWhere(VAR_INTERVAL, Schema.startDate, VAR_START)
+                .addWhere(VAR_INTERVAL, Schema.endDate, VAR_END);
+                //.addWhere(VAR_INTERVAL, Time.hasBeginning, VAR_START)
+                //.addWhere(VAR_INTERVAL, Time.hasEnd, VAR_END);
     }
 
     @NotNull
