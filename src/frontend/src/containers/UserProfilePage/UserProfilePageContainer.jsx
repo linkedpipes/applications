@@ -2,15 +2,21 @@
 import React, { PureComponent } from 'react';
 import UserProfilePageComponent from './UserProfilePageComponent';
 import { connect } from 'react-redux';
-import { withAuthorization, GlobalUtils } from '@utils';
+import { withAuthorization, GlobalUtils, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   userProfile: Object,
   history: Object,
-  resetReduxStore: Function
+  resetReduxStore: Function,
+  location: Object
 };
 
 class UserProfilePageContainer extends PureComponent<Props> {
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+  }
+
   performLogout = async () => {
     await this.props.resetReduxStore();
 

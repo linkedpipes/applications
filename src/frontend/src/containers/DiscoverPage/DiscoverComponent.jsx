@@ -11,8 +11,7 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
-import { ETL_STATUS_TYPE } from '@utils';
-import GoogleAnalytics from 'react-ga'
+import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 
 const styles = theme => ({
   root: {
@@ -107,7 +106,7 @@ const DiscoverComponent = ({
                           etlExecutionStatus !== ETL_STATUS_TYPE.Finished
                         }
                         onClick={() => {
-                          GoogleAnalytics.event({
+                          GoogleAnalyticsWrapper.trackEvent({
                             category: 'Discovery',
                             action: 'Pressed create app : step 4'
                           });

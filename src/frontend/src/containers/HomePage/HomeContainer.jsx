@@ -16,7 +16,8 @@ import {
   ETL_STATUS_MAP,
   withAuthorization,
   VisualizersService,
-  UserService
+  UserService,
+  GoogleAnalyticsWrapper
 } from '@utils';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
@@ -36,10 +37,12 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetUserProfileAsync: Function,
   webId: string,
-  applicationsFolder: String
+  applicationsFolder: String,
+  location: Object,
+  tabIndex: number,
+  handleSetHomepageTabIndex: Function
 };
 type State = {
-  tabIndex: number,
   applicationsMetadata: Array<AppConfiguration>,
   loadingAppIsActive: boolean
 };
@@ -52,7 +55,6 @@ class HomeContainer extends PureComponent<Props, State> {
   didUpdateMetadata = false;
 
   state = {
-    tabIndex: 0,
     applicationsMetadata: [],
     loadingAppIsActive: false
   };
@@ -70,6 +72,9 @@ class HomeContainer extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
+
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
 
     setupDiscoveryListeners();
     setupEtlExecutionsListeners();
@@ -167,7 +172,7 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   handleChange = (event, tabIndex) => {
-    this.setState({ tabIndex });
+    this.props.handleSetHomepageTabIndex(tabIndex);
   };
 
   handleSampleClick = sample => {
@@ -361,8 +366,8 @@ class HomeContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus,
       handlePipelineExecutionRowDeleteClicked
     } = this;
-    const { userProfile } = this.props;
-    const { tabIndex, loadingAppIsActive } = this.state;
+    const { userProfile, tabIndex } = this.props;
+    const { loadingAppIsActive } = this.state;
 
     return (
       <LoadingOverlay active={loadingAppIsActive} spinner>
@@ -399,7 +404,8 @@ const mapStateToProps = state => {
   return {
     userProfile: state.user,
     applicationsFolder: state.user.applicationsFolder,
-    webId: state.user.webId
+    webId: state.user.webId,
+    tabIndex: state.globals.homepageTabIndex
   };
 };
 
@@ -433,6 +439,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetUserProfileAsync = userProfile =>
     dispatch(userActions.setUserProfileAsync(userProfile));
 
+  const handleSetHomepageTabIndex = index =>
+    dispatch(globalActions.setSelectedHomepageTabIndex(index));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -440,7 +449,8 @@ const mapDispatchToProps = dispatch => {
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
     handleSetSelectedApplicationMetadata,
-    handleSetUserProfileAsync
+    handleSetUserProfileAsync,
+    handleSetHomepageTabIndex
   };
 };
 

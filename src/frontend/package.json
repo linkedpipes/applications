@@ -5,6 +5,7 @@
   "author": "Altynbek Orumbayev",
   "license": "MIT",
   "scripts": {
+    "eslint": "eslint --cache --cache-location ./eslint/.eslintcache --no-color --ext .jsx src/",
     "startLocalDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ SOCKET_RECONNECT=false webpack-dev-server --progress",
     "startLocalDevSockets": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server --progress",
     "startLocalProdSockets": "cross-env NODE_ENV=production BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server --progress",
@@ -99,8 +100,6 @@
     "node-sass": "4.12.0",
     "prettier": "1.17.1",
     "pretty-quick": "1.10.0",
-    "reactotron-react-js": "3.2.3",
-    "reactotron-redux": "3.1.0",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
     "webpack": "4.31.0",
