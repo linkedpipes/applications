@@ -60,12 +60,9 @@ const transformData = data => {
 };
 
 class TreemapVisualizer extends React.PureComponent<Props, State> {
-  chartEvents: Array<{
-    eventName: string,
-    callback: ({ chartWrapper: any }) => Function
-  }>;
+  conceptsFetched: Set<Object>;
 
-  conceptsFetched: Set<string>;
+  chartEvents: Array<Object>;
 
   constructor(props: Props) {
     super(props);
@@ -175,9 +172,14 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
+
+    this.props.handleSetCurrentApplicationData({
+      conceptIri: this.props.selectedScheme
+    });
   };
 
   handleGoUpClick = () => {};
+
   render() {
     const { classes } = this.props;
     return (

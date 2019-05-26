@@ -9,7 +9,6 @@ import { visualizersReducer } from '@ducks/visualizersDuck';
 import { applicationReducer } from '@ducks/applicationDuck';
 import { filtersReducer } from '@ducks/filtersDuck';
 import thunk from 'redux-thunk';
-import Reactotron from './ReactotronConfig';
 
 const composeEnhancers =
   // eslint-disable-next-line no-underscore-dangle
@@ -22,13 +21,7 @@ const composeEnhancers =
 
 const middlewares = [thunk, logger];
 
-const enhancer =
-  process.env.NODE_ENV !== 'production'
-    ? composeEnhancers(
-        applyMiddleware(...middlewares),
-        Reactotron.createEnhancer()
-      )
-    : composeEnhancers(applyMiddleware(...middlewares));
+const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 
 const appReducer = combineReducers({
   user: userReducer,

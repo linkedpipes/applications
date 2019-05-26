@@ -89,7 +89,7 @@ const SettingsPageComponent = ({
                 color="primary"
               />
             }
-            label="Switch dark theme"
+            label="Light theme"
           />
           <Button
             fullWidth

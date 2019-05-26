@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
-import { Log } from '@utils';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 import StorageBackend from '../../StorageBackend';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
@@ -11,7 +11,8 @@ import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
   webId: string,
-  applicationsFolder: string
+  applicationsFolder: string,
+  location: Object
 };
 
 type State = {
@@ -21,6 +22,8 @@ type State = {
 
 class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   isMounted = false;
+
+  didLoadInitialMetadata = false;
 
   didUpdateMetadata = false;
 
@@ -37,12 +40,20 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+
     this.loadStoredApplications();
     this.isMounted = true;
   }
 
   async componentWillUpdate() {
-    if (this.isMounted && this.props.webId && !this.didUpdateMetadata) {
+    if (
+      this.isMounted &&
+      this.didLoadInitialMetadata &&
+      this.props.webId &&
+      !this.didUpdateMetadata
+    ) {
       this.loadStoredApplications();
       this.didUpdateMetadata = true;
     }
@@ -51,6 +62,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.isMounted = false;
     this.didUpdateMetadata = false;
+    this.didLoadInitialMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -68,6 +80,9 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
       if (this.isMounted) {
         this.setState({ applicationsMetadata: metadata });
         Log.info(metadata, 'StorageAppsBrowserContainer');
+        if (!this.didLoadInitialMetadata) {
+          this.didLoadInitialMetadata = true;
+        }
       }
     }
   };
@@ -83,7 +98,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
       `Removed application:\n${applicationConfigurationMetadata.title}`,
       {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
+        autoClose: 4000
       }
     );
 

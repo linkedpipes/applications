@@ -5,6 +5,13 @@ const setUserProfile = profile => ({
   profile
 });
 
+const setSolidUserProfile = (profile, solidUsername, solidImage) => ({
+  type: types.SET_SOLID_USER_PROFILE,
+  profile,
+  solidUsername,
+  solidImage
+});
+
 const setUserWebId = value => ({
   type: types.SET_USER_WEBID,
   value
@@ -25,6 +32,11 @@ const addDiscoverySession = ({ session }) => ({
   session
 });
 
+const deleteDiscoverySession = ({ discoveryId }) => ({
+  type: types.DELETE_DISCOVERY_SESSION,
+  discoveryId
+});
+
 const updateDiscoverySession = ({ session }) => ({
   type: types.UPDATE_DISCOVERY_SESSION,
   session
@@ -33,6 +45,11 @@ const updateDiscoverySession = ({ session }) => ({
 const addExecutionSession = ({ session }) => ({
   type: types.ADD_EXECUTION_SESSION,
   session
+});
+
+const deleteExecutionSession = ({ executionIri }) => ({
+  type: types.DELETE_EXECUTION_SESSION,
+  executionIri
 });
 
 const updateExecutionSession = ({ session }) => ({
@@ -53,15 +70,26 @@ const setUserProfileAsync = profile => {
     });
 };
 
+const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
+  return dispatch =>
+    new Promise(resolve => {
+      dispatch(setSolidUserProfile(profile, solidUsername, solidImage));
+      resolve();
+    });
+};
+
 export default {
   setUserProfile,
   setUserWebId,
   setSolidName,
   setSolidImage,
   addDiscoverySession,
+  deleteDiscoverySession,
   updateDiscoverySession,
   addExecutionSession,
+  deleteExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
+  setSolidUserProfileAsync,
   updateApplicationsFolder
 };

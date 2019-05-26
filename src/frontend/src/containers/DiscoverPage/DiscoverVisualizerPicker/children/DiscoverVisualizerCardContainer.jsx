@@ -4,46 +4,55 @@ import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { discoverActions } from '../../duck';
-import { Log } from '@utils';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
 import { toast } from 'react-toastify';
-import GoogleAnalytics from 'react-ga'
+import { GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   cardIndex: number,
   visualizerData: Object,
   handleSetSelectedPipelineId: Function,
   onAddSelectedVisualizer: Function,
-  dataSourceGroups: Object,
   onNextClicked: Function,
   setPipelineExecutorStep: Function
 };
 
 class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
+  disabled: boolean;
+
   addVisualizer = visualizerData => {
-    const self = this;
+    const { onAddSelectedVisualizer } = this.props;
     return new Promise(resolve => {
-      self.props.onAddSelectedVisualizer(visualizerData);
+      onAddSelectedVisualizer(visualizerData);
       resolve();
     });
   };
 
-  onSelectVisualizer = () => {
-    const self = this;
-    const { visualizerData } = self.props;
+  changeDisabled = () => {
+    this.disabled = true;
+  };
 
-    GoogleAnalytics.event({
+  onSelectVisualizer = () => {
+    if (this.disabled) return;
+
+    GoogleAnalyticsWrapper.trackEvent({
       category: 'Discovery',
       action: 'Selected visualizer : step 2'
     });
 
+    this.changeDisabled();
+
+    const { visualizerData, onNextClicked } = this.props;
+
     const dataSourceGroups = visualizerData.dataSourceGroups;
-    Log.info('Selected visualizer', 'DiscoverVisualizerPickerContainer');
+
+    const self = this;
+
     self.addVisualizer(visualizerData).then(() => {
       if (dataSourceGroups.length === 1) {
         self.handleSelectPipeline(dataSourceGroups[0]);
       } else {
-        self.props.onNextClicked();
+        onNextClicked();
       }
     });
   };

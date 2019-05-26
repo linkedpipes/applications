@@ -63,11 +63,36 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.userService = context.getBean(UserService.class);
     }
 
+    /**
+     * Legacy start discovery from input endpoint.
+     * Uses startDiscoveryFromInput but sparqlEndpointIri, dataSampleIri and
+     * namedGraphs are set to null.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
     }
 
+    /**
+     * Start a discovery using the provided configuration, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfig configuration passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @param namedGraphs list of provided named graphs to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
@@ -75,6 +100,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+     * Start a discovery using a configuration located at some IRI, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param discoveryConfigIri configuration IRI passed to discovery service
+     * @param userId web ID of the user who started the discovery
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
@@ -82,12 +118,35 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+    * Log a discovery onto user, notify discovery started via sockets and
+    * start status polling.
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+    * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+    * @param namedGraphs list of provided named graphs to be recorded in the DB
+    * @throws LpAppsException initial discovery status call failed
+    * @throws UserNotFoundException user was not found
+    */
     private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
 
+    /**
+    * Get discovery status, pull discovery out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: discoveryAdded
+    * - message type: DiscoverySession
+    *
+    * @param discoveryId ID of the discovery that was started
+    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @throws LpAppsException request to Discovery failed
+    */
     private void notifyDiscoveryStarted(String discoveryId, String userId) throws LpAppsException {
         DiscoveryStatus discoveryStatus = discoveryService.getDiscoveryStatus(discoveryId);
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
@@ -110,6 +169,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Call ETL to execute a pipeline, record execution in the DB, notify
+     * execution started on sockets and start polling for execution status.
+     *
+     * @param etlPipelineIri IRI of the ETL pipeline to execute
+     * @param userId WebID of the user (used to select where to map execution in DB, where to notify on sockets)
+     * @param selectedVisualiser frontend string stored in DB
+     * @return execution iri in JSON object for frontend to use
+     * @throws LpAppsException request to ETL failed
+     * @throws UserNotFoundException user not found
+     */
     @NotNull @Override
     public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
@@ -119,6 +189,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         return execution;
     }
 
+    /**
+    * Get execution status, pull execution out of DB, compile a report and send
+    * it via sockets:
+    * - room: userId
+    * - event name: executionAdded
+    * - message type: PipelineExecution
+    *
+    * @param executionIri executionIri for which to get status
+    * @param userId webId to use for identification of a room where to notify via sockets
+    * @throws LpAppsException request to ETL failed
+    */
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
@@ -133,7 +214,22 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
-    private void startEtlStatusPolling(String executionIri) throws LpAppsException {
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the ETL and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: executionIri
+     * - event name: executionStatus
+     * - message type: EtlStatusReport
+     *
+     * @param executionIri execution IRI to poll for
+     */
+    private void startEtlStatusPolling(final String executionIri) {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
             try {
@@ -151,22 +247,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                 }
 
                 if (!executionStatus.status.isPollable()) {
-                    EtlStatusReport report = new EtlStatusReport();
-                    report.status = executionStatus;
-                    report.error = false;
-                    report.timeout = false;
-                    report.executionIri = executionIri;
-                    report.started = executionStatus.getStarted();
-                    report.finished = executionStatus.getFinished();
-
-                    if (pipeline != null) {
-                        report.pipeline = new PipelineExportResult();
-                        report.pipeline.pipelineId = pipeline.getPipelineId();
-                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                    } else {
-                        report.pipeline = null;
-                    }
+                    EtlStatusReport report = EtlStatusReport.createStandardReport(executionStatus, executionIri, pipeline);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
@@ -179,22 +260,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                 }
             } catch (LpAppsException e) {
                 logger.error("Got exception when polling for ETL status.", e);
-                EtlStatusReport report = new EtlStatusReport();
-                report.status = null;
-                report.error = true;
-                report.timeout = false;
-                report.executionIri = executionIri;
-                report.started = -1;
-                report.finished = -1;
-                if (pipeline != null) {
-                    report.pipeline = new PipelineExportResult();
-                    report.pipeline.pipelineId = pipeline.getPipelineId();
-                    report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                    report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                } else {
-                    report.pipeline = null;
-                }
 
+                EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, false, pipeline);
                 try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -211,37 +278,15 @@ public class ExecutorServiceComponent implements ExecutorService {
             for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
                 if (e.getStatus() != EtlStatus.FINISHED) {
                     logger.info("Cancelling execution");
-                    EtlStatusReport report = new EtlStatusReport();
-                    report.status = null;
-                    report.error = true;
-                    report.timeout = true;
-                    report.executionIri = executionIri;
-                    report.started = -1;
-                    report.finished = -1;
-                    PipelineInformationDao pipeline = e.getPipeline();
-                    if (pipeline != null) {
-                        report.pipeline = new PipelineExportResult();
-                        report.pipeline.pipelineId = pipeline.getPipelineId();
-                        report.pipeline.etlPipelineIri = pipeline.getEtlPipelineIri();
-                        report.pipeline.resultGraphIri = pipeline.getResultGraphIri();
-                    } else {
-                        report.pipeline = null;
-                    }
+                    EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, true, null);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
                     } catch (LpAppsException ex) {
                         logger.error("Failed to report execution status: " + executionIri, ex);
                     }
-                    try {
-                        etlService.cancelExecution(executionIri);
-                        e.setStatus(EtlStatus.CANCELLED);
-                        // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
-                    } catch (LpAppsException ex) {
-                        logger.warn("Failed to cancel execution " + executionIri, ex);
-                        e.setStatus(EtlStatus.UNKNOWN);
-                    }
-                    executionRepository.save(e);
+
+                    cancelExecution(e, executionIri);
                 }
             }
         };
@@ -250,7 +295,49 @@ public class ExecutorServiceComponent implements ExecutorService {
         Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
     }
 
-    private void startDiscoveryStatusPolling(String discoveryId) throws LpAppsException {
+    private void cancelExecution(final ExecutionDao e, final String executionIri) {
+        try {
+            etlService.cancelExecution(executionIri);
+            e.setStatus(EtlStatus.CANCELLED);
+            // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
+        } catch (LpAppsException ex) {
+            logger.warn("Failed to cancel execution " + executionIri, ex);
+            e.setStatus(EtlStatus.UNKNOWN);
+        }
+        executionRepository.save(e);
+    }
+
+    /**
+     * Cancel an execution identified by IRI.
+     * It will report final status using sockets.
+     * Also, polling thread is still running until the actual ETL status won't
+     * stop being "pollable".
+     *
+     * @param executionIri execution IRI to cancel
+     */
+    @Override
+    public void cancelExecution(final String executionIri) {
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            cancelExecution(e, executionIri);
+        }
+    }
+
+    /**
+     * Create a runnable for status checking and schedule it's periodic execution.
+     * Also schedule a one-time off runnable to stop polling after a while.
+     *
+     * Status is fetched from the Discovery and updated in the database.
+     * If execution is finished we report it via sockets and stop periodic
+     * execution by throwing PollingCompletedException.
+     *
+     * Status message on sockets:
+     * - room: discoveryId
+     * - event name: discoveryStatus
+     * - message type: DiscoveryStatusReport
+     *
+     * @param discoveryId discovery id to poll for
+     */
+    private void startDiscoveryStatusPolling(String discoveryId) {
         Runnable checker = () -> {
             DiscoveryDao dao = null;
             try {
@@ -267,25 +354,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     }
 
                     logger.info("Reporting discovery finished in room " + discoveryId);
-                    DiscoveryStatusReport report = new DiscoveryStatusReport();
-                    report.discoveryId = discoveryId;
-                    report.status = discoveryStatus;
-                    report.error = false;
-                    report.timeout = false;
-                    report.finished = finished.getTime() / 1000L;
-
-                    if (dao != null) {
-                        report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-                        report.dataSampleIri = dao.getDataSampleIri();
-                        report.namedGraphs = new ArrayList<>();
-                        for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                            report.namedGraphs.add(ng.getNamedGraph());
-                        }
-                    } else {
-                        report.sparqlEndpointIri = null;
-                        report.dataSampleIri = null;
-                        report.namedGraphs = null;
-                    }
+                    DiscoveryStatusReport report = DiscoveryStatusReport.createStandardReport(discoveryId, discoveryStatus, finished, dao);
 
                     try {
                         Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId)
@@ -299,15 +368,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
-                DiscoveryStatusReport report = new DiscoveryStatusReport();
-                report.discoveryId = discoveryId;
-                report.status = null;
-                report.error = true;
-                report.timeout = false;
-                report.finished = -1;
-                report.sparqlEndpointIri = null;
-                report.dataSampleIri = null;
-                report.namedGraphs = null;
+                DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, false, dao);
                 try {
                     Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
                 } catch (LpAppsException ex) {
@@ -321,44 +382,41 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
-            Date finished = new Date();
-            DiscoveryDao dao = null;
-            for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                d.setExecuting(false);
-                d.setFinished(finished);
-                discoveryRepository.save(d);
-                dao = d;
-            }
-            DiscoveryStatusReport report = new DiscoveryStatusReport();
-            report.discoveryId = discoveryId;
-            report.status = null;
-            report.error = false;
-            report.timeout = true;
-            if (dao != null) {
-                report.sparqlEndpointIri = dao.getSparqlEndpointIri();
-                report.dataSampleIri = dao.getDataSampleIri();
-                report.namedGraphs = new ArrayList<>();
-                for (DiscoveryNamedGraphDao ng : dao.getNamedGraphs()) {
-                    report.namedGraphs.add(ng.getNamedGraph());
-                }
-            } else {
-                report.sparqlEndpointIri = null;
-                report.dataSampleIri = null;
-                report.namedGraphs = null;
-            }
-
-            try {
-                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
-            } catch (LpAppsException ex) {
-                logger.error("Failed to report discovery status: " + discoveryId, ex);
-            }
-            try {
-                discoveryService.cancelDiscovery(discoveryId);
-            } catch (LpAppsException ex) {
-                logger.warn("Failed to cancel discovery " + discoveryId, ex);
-            }
+            cancelDiscovery(discoveryId);
         };
 
         Application.SCHEDULER.schedule(canceller, DISCOVERY_TIMEOUT_MINS, MINUTES);
+    }
+
+    /**
+     * Update discovery status in DB to finished, send report on sockets,
+     * send cancel discovery call to actually stop it.
+     *
+     * Polling thread is still running until the actual Discovery status won't
+     * be finished.
+     */
+    @Override
+    public void cancelDiscovery(final String discoveryId) {
+        Date finished = new Date();
+        DiscoveryDao dao = null;
+        for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+            d.setExecuting(false);
+            d.setFinished(finished);
+            discoveryRepository.save(d);
+            dao = d;
+        }
+        DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, true, dao);
+
+        try {
+            Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
+        } catch (LpAppsException ex) {
+            logger.error("Failed to report discovery status: " + discoveryId, ex);
+        }
+
+        try {
+            discoveryService.cancelDiscovery(discoveryId);
+        } catch (LpAppsException ex) {
+            logger.warn("Failed to cancel discovery " + discoveryId, ex);
+        }
     }
 }

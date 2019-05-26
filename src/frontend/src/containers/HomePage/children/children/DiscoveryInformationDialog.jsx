@@ -57,8 +57,10 @@ class DiscoveryInformationDialog extends PureComponent<Props> {
             <Typography component={'span'} align="left">{`Data sample IRI: ${
               selectedValue.dataSampleIri
             }`}</Typography>
-            <Typography component={'span'} align="left">{`Named Graph IRI: ${
-              selectedValue.namedGraph
+            <Typography component={'span'} align="left">{`Named Graph IRIs: ${
+              selectedValue.namedGraphs
+                ? selectedValue.namedGraphs.join(',\n')
+                : '–'
             }`}</Typography>
           </DialogContentText>
         </DialogContent>

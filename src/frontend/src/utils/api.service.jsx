@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser';
 
 axios.defaults.baseURL = process.env.BASE_BACKEND_URL || '/api';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+
 axios.interceptors.request.use(
   config => {
     // Do something before request is sent
@@ -26,17 +27,15 @@ axios.interceptors.response.use(
   error => {
     // handle error
     if (error.response) {
-      Log.error(error.response.data.message, 'api.service');
+      Log.error(error.response.data, 'api.service');
       Sentry.withScope(scope => {
         scope.setLevel('error');
         scope.setExtra('api-call', error.response.data);
         Sentry.captureException(error);
-
-        if (process.env.NODE_ENV !== 'production') {
-          Sentry.showReportDialog(); // Only if not production
-        }
       });
     }
+
+    return Promise.reject(error);
   }
 );
 const wrappedAxios = axios;

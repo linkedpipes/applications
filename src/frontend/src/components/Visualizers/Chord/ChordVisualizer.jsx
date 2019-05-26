@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
+import { withStyles, withTheme } from '@material-ui/core/styles';
+import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
@@ -15,7 +15,8 @@ type Props = {
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
   size: number,
-  selectedNodes: Set<string>
+  selectedNodes: Set<string>,
+  theme: Object
 };
 
 type State = {
@@ -35,7 +36,8 @@ const styles = theme => ({
   progress: {
     margin: theme.spacing.unit * 2,
     alignItems: 'center'
-  }
+  },
+  theme
 });
 
 const eqSet = (as, bs) => {
@@ -67,34 +69,67 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           id: uuid.v4(),
           applicationEndpoint: 'chord',
           selectedResultGraphIri: this.props.selectedResultGraphIri,
-          visualizerCode: 'CHORD'
+          visualizerCode: 'CHORD',
+          selectedNodes: this.props.selectedNodes && [
+            ...this.props.selectedNodes
+          ]
         });
       }
 
-      const nodesRequest = await VisualizersService.getChordNodes(
-        this.props.selectedResultGraphIri
-      );
-      const nodesResponse = await nodesRequest.data;
-      const nodeUris = nodesResponse.map(node => node.uri);
-      const labels = nodesResponse.map(node => node.label.languageMap.nolang);
+      if (!this.props.selectedNodes || !this.props.selectedNodes.size) {
+        const nodesRequest = await VisualizersService.getChordNodes(
+          this.props.selectedResultGraphIri
+        );
+        const nodesResponse = await nodesRequest.data;
+        const nodeUris = nodesResponse.map(node => node.uri);
+        const labels = nodesResponse.map(node => node.label.languageMap.nolang);
 
-      const matrixRequest = await VisualizersService.getChordData(
-        this.props.selectedResultGraphIri,
-        nodeUris
-      );
-      const matrixData = await matrixRequest.data;
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          nodeUris
+        );
+        const matrixData = await matrixRequest.data;
 
-      const colors = palette('sol-accent', nodeUris.length).map(
-        color => `#${color}`
-      );
+        const colors = palette('sol-accent', nodeUris.length).map(
+          color => `#${color}`
+        );
 
-      this.setState({
-        dataLoadingStatus: 'ready',
-        matrix: matrixData,
-        groupColors: colors,
-        groupLabels: labels,
-        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
-      });
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels,
+          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+        });
+      } else {
+        // Fetch data
+        const nodesRequest = await VisualizersService.getChordNodes(
+          this.props.selectedResultGraphIri
+        );
+        const nodesResponse = await nodesRequest.data;
+        const labels = nodesResponse
+          .filter(node => this.props.selectedNodes.has(node.uri))
+          .map(node => node.label.languageMap.nolang);
+
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          [...this.props.selectedNodes]
+        );
+        const matrixData = await matrixRequest.data;
+
+        const colors = palette('sol-accent', labels.length).map(
+          color => `#${color}`
+        );
+
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels,
+          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+        });
+      }
     }
   }
 
@@ -130,7 +165,14 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         groupColors: colors,
         groupLabels: labels
       });
+
+      if (!this.props.isPublished) {
+        this.props.handleSetCurrentApplicationData({
+          selectedNodes: [...this.props.selectedNodes]
+        });
+      }
     }
+
     const elementVizDiv = document.getElementById('viz-div');
     if (elementVizDiv && prevProps.size !== this.props.size) {
       // eslint-disable-next-line react/no-did-update-set-state
@@ -141,6 +183,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   render() {
+    const { theme } = this.props;
     const size = Math.max(this.state.size, 150);
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
@@ -150,13 +193,15 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         groupColors={this.state.groupColors}
         matrix={this.state.matrix}
         componentId={1}
-        labelColors={this.state.groupLabels.map(() => 'whitesmoke')}
+        labelColors={this.state.groupLabels.map(
+          () => theme.palette.text.primary
+        )}
         height={size}
         width={size}
-        style={{ font: '10px sans-serif' }}
+        style={{ font: '10px sans-serif', paddingBottom: '0' }}
       />
     );
   }
 }
 
-export default withStyles(styles)(ChordVisualizer);
+export default withStyles(styles)(withTheme()(ChordVisualizer));

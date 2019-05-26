@@ -21,6 +21,16 @@ const userReducer = (state = INITIAL_STATE, action) => {
         pipelineExecutions: action.profile.pipelineExecutions
       };
 
+    case types.SET_SOLID_USER_PROFILE:
+      return {
+        ...state,
+        applications: action.profile.applications,
+        discoverySessions: action.profile.discoverySessions,
+        pipelineExecutions: action.profile.pipelineExecutions,
+        name: action.solidUsername,
+        image: action.solidImage
+      };
+
     case types.SET_USER_WEBID:
       return {
         ...state,
@@ -43,6 +53,14 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         discoverySessions: state.discoverySessions.concat(action.session)
+      };
+
+    case types.DELETE_DISCOVERY_SESSION:
+      return {
+        ...state,
+        discoverySessions: state.discoverySessions.filter(
+          ({ discoveryId }) => discoveryId !== action.discoveryId
+        )
       };
 
     case types.UPDATE_DISCOVERY_SESSION:
@@ -71,6 +89,14 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         pipelineExecutions: state.pipelineExecutions.concat(action.session)
+      };
+
+    case types.DELETE_EXECUTION_SESSION:
+      return {
+        ...state,
+        pipelineExecutions: state.pipelineExecutions.filter(
+          ({ executionIri }) => executionIri !== action.executionIri
+        )
       };
 
     case types.UPDATE_EXECUTION_SESSION:

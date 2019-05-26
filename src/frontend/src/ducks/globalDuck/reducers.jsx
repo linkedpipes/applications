@@ -6,7 +6,8 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
-  colorThemeIsLight: false
+  colorThemeIsLight: false,
+  homepageTabIndex: 0
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -26,6 +27,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         colorThemeIsLight: action.value
+      };
+
+    case types.SET_SELECTED_HOMEPAGE_TAB_INDEX:
+      return {
+        ...state,
+        homepageTabIndex: action.value
       };
 
     default:

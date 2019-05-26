@@ -108,6 +108,18 @@ function randDarkColor() {
   return color;
 }
 
+const getBeautifiedVisualizerTitle = visualizerId => {
+  if (visualizerId !== undefined) {
+    // eslint-disable-next-line func-names no-useless-escape
+    const removedUnderscore = visualizerId.replace(/_/g, ' ');
+    const capitalized = removedUnderscore.replace(/\w\S*/g, txt => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+    return capitalized;
+  }
+  return '';
+};
+
 export default {
   randDarkColor,
   unixTimeConverter,
@@ -115,5 +127,6 @@ export default {
   getQueryString,
   getLocation,
   extractUrlGroups,
-  urlDomain
+  urlDomain,
+  getBeautifiedVisualizerTitle
 };

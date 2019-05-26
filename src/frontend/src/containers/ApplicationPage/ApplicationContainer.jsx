@@ -7,7 +7,7 @@ import {
   ChordVisualizer
 } from '@components';
 import { withRouter } from 'react-router-dom';
-import { Log } from '@utils';
+import { Log, VisualizersService } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import axios from 'axios';
@@ -28,7 +28,7 @@ type State = {
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
-    applicationType: 'UNDEFINED',
+    applicationType: 'Loading',
     applicationData: {},
     width: 0,
     height: 0
@@ -53,20 +53,26 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
     const parsed = queryString.parse(this.props.location.search);
     const applicationIri = parsed.applicationIri;
-    axios
-      .get(applicationIri)
-      .then(({ data }) => {
-        const applicationData = data.applicationData;
-        const applicationType = applicationData.visualizerCode;
-        self.setState({ applicationType, applicationData });
-      })
-      .catch(err => {
-        Log.error(err, 'ApplicationContainer');
-        self.setState({
-          applicationType: VISUALIZER_TYPE.UNDEFINED,
-          applicationData: undefined
-        });
+    const applicationResponse = await axios.get(applicationIri).catch(err => {
+      Log.error(err, 'ApplicationContainer');
+      self.setState({
+        applicationType: VISUALIZER_TYPE.UNDEFINED,
+        applicationData: undefined
       });
+    });
+
+    const applicationData = applicationResponse.data.applicationData;
+    let applicationType = applicationData.visualizerCode;
+
+    if (applicationType !== VISUALIZER_TYPE.MAP) {
+      await VisualizersService.getGraphExists(
+        applicationData.selectedResultGraphIri
+      ).catch(() => {
+        applicationType = VISUALIZER_TYPE.UNDEFINED;
+      });
+    }
+
+    self.setState({ applicationType, applicationData });
   };
 
   componentWillUnmount() {
@@ -105,6 +111,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
             size={this.state.height + this.state.width}
+            selectedNodes={new Set(applicationData.selectedNodes)}
             isPublished
           />
         );

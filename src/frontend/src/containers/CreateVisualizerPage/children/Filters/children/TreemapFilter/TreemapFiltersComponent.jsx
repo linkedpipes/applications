@@ -35,6 +35,8 @@ const styles = theme => ({
 });
 
 class TreemapFiltersComponent extends React.PureComponent<Props, State> {
+  conceptsFetched: Set<string>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -58,8 +60,6 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
     // dispatch set selected scheme
     this.props.onSelectedScheme(event.target.value);
   };
-
-  conceptsFetched: Set<string>;
 
   render() {
     const { classes } = this.props;
