@@ -10,9 +10,6 @@ import static java.util.Map.entry;
  */
 public final class Visualizers {
 
-    private Visualizers() {
-    }
-
     /* Create array explicitly to allow for trailing comma after last array element, which improves diff readability.
      */
     private static final Map.Entry[] mappings = {
@@ -34,4 +31,8 @@ public final class Visualizers {
      */
      @SuppressWarnings("unchecked")
      public static final Map<String, String> map = Map.ofEntries(mappings);
+
+
+     private Visualizers() {
+     }
 }
