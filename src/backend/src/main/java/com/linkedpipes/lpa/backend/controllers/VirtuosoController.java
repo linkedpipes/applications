@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Endpoints directly interacting with our Virtuoso instance.
+ */
 @RestController
 public class VirtuosoController {
 
@@ -31,7 +34,7 @@ public class VirtuosoController {
      * @return 200 OK if graph exists or 404 otherwise
      * @throws LpAppsException
      */
-    @GetMapping("api/virtuoso/graphExists")
+    @GetMapping("/api/virtuoso/graphExists")
     public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphName") String graphName) throws LpAppsException {
         boolean exists = VirtuosoService.checkNamedGraphExists(graphName);
         if (exists)
