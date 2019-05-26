@@ -268,6 +268,9 @@ public class UserServiceComponent implements UserService {
                 VirtuosoService.deleteNamedGraph(graphName);
 
                 executionRepository.delete(toDelete);
+            } else {
+                toDelete.setRemoved(true);
+                executionRepository.save(toDelete);
             }
 
             if (pipelineInformationToDelete != null) {
