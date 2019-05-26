@@ -3,10 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, GlobalUtils, SocketContext, Log } from '@utils';
+import { DiscoveryService, GlobalUtils, SocketContext, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import GoogleAnalytics from 'react-ga';
 import { discoverActions } from '../duck';
 
 type Props = {
@@ -132,7 +131,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           return;
         }
         if (parsedData.status.isFinished) {
-          GoogleAnalytics.event({
+          GoogleAnalyticsWrapper.trackEvent({
             category: 'Discovery',
             action: 'Processed discovery : step 1'
           });

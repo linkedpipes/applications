@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
-import axios from 'axios';
-import { Log } from '@utils';
 
 export const samples = [
   {

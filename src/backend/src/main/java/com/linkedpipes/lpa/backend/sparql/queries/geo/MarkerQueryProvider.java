@@ -36,7 +36,7 @@ public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
         //remove "active" filters, as we want to filter out triples that satisfy non-active properties
         //keep only the ValueFilters that have isActive = false
         Map<String, List<ValueFilter>> effectiveFilters = filters;
-        effectiveFilters.entrySet().forEach(f -> f.getValue().removeIf(vf -> (vf.isActive != null && vf.isActive)));
+        effectiveFilters.forEach((key, value) -> value.removeIf(vf -> (vf.isActive != null && vf.isActive)));
         effectiveFilters.entrySet().removeIf(f -> f.getValue().size() == 0);
         this.filters = effectiveFilters;
     }

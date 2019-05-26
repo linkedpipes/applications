@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
 import { withStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import { withAuthorization } from '@utils';
 import Typography from '@material-ui/core/Typography/Typography';
 

@@ -7,6 +7,7 @@ import { StorageToolbox, StorageBackend } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   selectedApplication: any,
@@ -162,6 +163,12 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
         pathname: '/dashboard'
       });
     }
+
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'CreateApp',
+      action: 'Pressed delete app',
+      label: `type : '${selectedApplicationMetadata.endpoint}'`
+    });
   };
 
   handleOpenRenameDialog = () => {

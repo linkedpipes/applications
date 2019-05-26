@@ -18,7 +18,6 @@ type Props = {
     formControl: string,
     selectEmpty: string
   },
-  nodes: Array<{ label: { languageMap: { nolang: string } }, uri: string }>,
   onApplyFilter: Function
 };
 type State = {

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
 import AppConfiguration from '@storage/models/AppConfiguration';
-import { Log } from '@utils';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   selectedVisualizer: Object,
@@ -18,7 +18,8 @@ type Props = {
   handleResetCurrentApplicationTitle: Function,
   handleResetCurrentApplicationMetadata: Function,
   history: Object,
-  selectedNodes?: Set<string>
+  selectedNodes?: Set<string>,
+  location: Object
 };
 
 type State = {
@@ -43,6 +44,9 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions.bind(this));
     const { selectedVisualizer, selectedResultGraphIri, history } = this.props;

@@ -45,7 +45,7 @@ const styles = theme => ({
 const getFilters = (visualizerCode, selectedResultGraphIri) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
       return <div>Filters for Google Maps not yet implemented.</div>;
     }
     case VISUALIZER_TYPE.TREEMAP:
@@ -78,7 +78,7 @@ const getVisualizer = (
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
       const markers =
         selectedApplication && selectedApplication.markers
           ? selectedApplication.markers
