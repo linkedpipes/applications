@@ -3,6 +3,9 @@ package com.linkedpipes.lpa.backend.entities.database;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import com.linkedpipes.lpa.backend.entities.EtlStatus;
 
 @Entity(name="execution")
@@ -28,6 +31,9 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = true)
     private Date finished;
 
+    @Column(nullable = false)
+    private boolean removed = false;
+
     @ManyToOne
     @JoinColumn(name="user_web_id")
     private UserDao user;
@@ -35,6 +41,30 @@ public class ExecutionDao implements Serializable {
     @ManyToOne
     @JoinColumn(name="pipeline_id", nullable=true)
     private PipelineInformationDao pipeline;
+
+    @OneToMany(mappedBy="execution")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<ApplicationDao> applications;
+
+    public List<ApplicationDao> getApplications() {
+        return this.applications;
+    }
+
+    public void addApplication(final ApplicationDao app) {
+        this.applications.add(app);
+
+        if (this != app.getExecution()) {
+            app.setExecution(this);
+        }
+    }
+
+    public void removeApplication(final ApplicationDao app) {
+        this.applications.remove(app);
+
+        if (this == app.getExecution()) {
+            app.setExecution(null);
+        }
+    }
 
     public UserDao getUser() {
         return user;
@@ -106,5 +136,13 @@ public class ExecutionDao implements Serializable {
 
     public long getPipelineId() {
         return this.pipeline.getId();
+    }
+
+    public boolean isRemoved() {
+        return this.removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 }

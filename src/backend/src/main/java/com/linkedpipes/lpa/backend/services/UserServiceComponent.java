@@ -45,6 +45,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryNamedGraphRepository ngRepository;
 
+    @Autowired
+    private ApplicationRepository appRepository;
+
     /**
     * Returns the user's profile. If user doesn't exist yet we add them.
     *
@@ -212,6 +215,16 @@ public class UserServiceComponent implements UserService {
             }
         }
 
+        profile.applications = new ArrayList<>();
+        if (user.getApplications() != null) {
+            for (ApplicationDao application : user.getApplications()) {
+                Application app = new Application();
+                app.solidIri = application.getSolidIri();
+                app.executionAvailable = (application.getExecution() != null) && (!application.getExecution().isRemoved());
+                profile.applications.add(app);
+            }
+        }
+
         return profile;
     }
 
@@ -248,7 +261,14 @@ public class UserServiceComponent implements UserService {
                 pipelineInformationToDelete = toDelete.getPipeline();
             }
 
-            executionRepository.delete(toDelete);
+            if (toDelete.getApplications().isEmpty()) {
+                //no applications
+                logger.info("Delete from virtuoso");
+                //TODO: delete graph from virtuoso
+                //graph name: toDelete.getPipeline().getResultGraphIri()
+
+                executionRepository.delete(toDelete);
+            }
 
             if (pipelineInformationToDelete != null) {
                 pipelineRepository.delete(pipelineInformationToDelete);
@@ -307,6 +327,57 @@ public class UserServiceComponent implements UserService {
         UserDao user = getUser(username);
         user.setColor(color);
         repository.save(user);
+        return transformUserProfile(user);
+    }
+
+    @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile addApplication(String username, String executionIri, String solidIri) throws UserNotFoundException {
+        UserDao user = getUser(username);
+
+        for (ExecutionDao e : user.getExecutions()) {
+            if (e.getExecutionIri().equals(executionIri)) {
+                ApplicationDao app = new ApplicationDao();
+                app.setSolidIri(solidIri);
+                e.addApplication(app);
+                user.addApplication(app);
+
+                repository.save(user);
+                executionRepository.save(e);
+                appRepository.save(app);
+                break;
+            }
+        }
+
+        return transformUserProfile(user);
+    }
+
+    @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile deleteApplication(String username, String solidIri) throws UserNotFoundException {
+        UserDao user = getUser(username);
+
+        for (ApplicationDao app : user.getApplications()) {
+            if (app.getSolidIri().equals(solidIri)) {
+                ExecutionDao execution = app.getExecution();
+                if (null != execution) {
+                    if (execution.isRemoved()) {
+                        //execution was already removed
+                        //TODO: remove graph from Virtuoso
+                        //graph name: app.getExecution().getPipeline().getResultGraphIri()
+
+                        executionRepository.delete(execution);
+                    } else {
+                        execution.removeApplication(app);
+                        executionRepository.save(execution);
+                    }
+                }
+
+                user.removeApplication(app);
+                appRepository.delete(app);
+                repository.save(user);
+                break;
+            }
+        }
+
         return transformUserProfile(user);
     }
 

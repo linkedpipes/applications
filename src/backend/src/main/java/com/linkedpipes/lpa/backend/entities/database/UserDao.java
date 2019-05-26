@@ -26,6 +26,28 @@ public class UserDao implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ExecutionDao> executions;
 
+    @OneToMany(mappedBy="user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<ApplicationDao> applications;
+
+    public void addApplication(final ApplicationDao app) {
+        this.applications.add(app);
+        if (app.getUser() != this) {
+            app.setUser(this);
+        }
+    }
+
+    public List<ApplicationDao> getApplications() {
+        return this.applications;
+    }
+
+    public void removeApplication(final ApplicationDao app) {
+        this.applications.remove(app);
+        if (app.getUser() == this) {
+            app.setUser(null);
+        }
+    }
+
     public void addDiscovery(final DiscoveryDao discovery) {
         this.discoveries.add(discovery);
         if (discovery.getUser() != this) {
@@ -56,6 +78,7 @@ public class UserDao implements Serializable {
     }
 
     public void removeExecution(final ExecutionDao execution) {
+        execution.setRemoved(true);
         this.executions.remove(execution);
         if (execution.getUser() == this) {
             execution.setUser(null);
