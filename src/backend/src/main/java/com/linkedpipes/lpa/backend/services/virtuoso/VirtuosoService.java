@@ -41,8 +41,12 @@ public class VirtuosoService {
     @Value("classpath*:/com/linkedpipes/lpa/backend/services/virtuoso/data-*.ttl")
     private Resource[] resources;
 
-    public static boolean checkNamedGraphExists(String graphId){
-        return JenaUtils.graphExists(graphId);
+    public static boolean checkNamedGraphExists(String graphName){
+        return JenaUtils.graphExists(graphName);
+    }
+
+    public static void deleteNamedGraph(String graphName){
+        JenaUtils.deleteGraph(graphName);
     }
 
     @PostConstruct
