@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
+import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -262,10 +263,9 @@ public class UserServiceComponent implements UserService {
             }
 
             if (toDelete.getApplications().isEmpty()) {
-                //no applications
-                logger.info("Delete from virtuoso");
-                //TODO: delete graph from virtuoso
-                //graph name: toDelete.getPipeline().getResultGraphIri()
+                //no applications - delete from virtuoso
+                String graphName = toDelete.getPipeline().getResultGraphIri();
+                VirtuosoService.deleteNamedGraph(graphName);
 
                 executionRepository.delete(toDelete);
             }
@@ -361,8 +361,8 @@ public class UserServiceComponent implements UserService {
                 if (null != execution) {
                     if (execution.isRemoved()) {
                         //execution was already removed
-                        //TODO: remove graph from Virtuoso
-                        //graph name: app.getExecution().getPipeline().getResultGraphIri()
+                        String graphName = app.getExecution().getPipeline().getResultGraphIri();
+                        VirtuosoService.deleteNamedGraph(graphName);
 
                         executionRepository.delete(execution);
                     } else {
