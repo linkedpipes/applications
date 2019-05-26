@@ -229,7 +229,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param executionIri execution IRI to poll for
      */
-    private void startEtlStatusPolling(String executionIri) {
+    private void startEtlStatusPolling(final String executionIri) {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
             try {
@@ -285,21 +285,41 @@ public class ExecutorServiceComponent implements ExecutorService {
                     } catch (LpAppsException ex) {
                         logger.error("Failed to report execution status: " + executionIri, ex);
                     }
-                    try {
-                        etlService.cancelExecution(executionIri);
-                        e.setStatus(EtlStatus.CANCELLED);
-                        // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
-                    } catch (LpAppsException ex) {
-                        logger.warn("Failed to cancel execution " + executionIri, ex);
-                        e.setStatus(EtlStatus.UNKNOWN);
-                    }
-                    executionRepository.save(e);
+
+                    cancelExecution(e, executionIri);
                 }
             }
         };
 
         logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
         Application.SCHEDULER.schedule(canceller, ETL_TIMEOUT_MINS, MINUTES);
+    }
+
+    private void cancelExecution(final ExecutionDao e, final String executionIri) {
+        try {
+            etlService.cancelExecution(executionIri);
+            e.setStatus(EtlStatus.CANCELLED);
+            // technically this should go to cancelling and then cancelled by ETL, but we don't care anymore
+        } catch (LpAppsException ex) {
+            logger.warn("Failed to cancel execution " + executionIri, ex);
+            e.setStatus(EtlStatus.UNKNOWN);
+        }
+        executionRepository.save(e);
+    }
+
+    /**
+     * Cancel an execution identified by IRI.
+     * It will report final status using sockets.
+     * Also, polling thread is still running until the actual ETL status won't
+     * stop being "pollable".
+     *
+     * @param executionIri execution IRI to cancel
+     */
+    @Override
+    public void cancelExecution(final String executionIri) {
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            cancelExecution(e, executionIri);
+        }
     }
 
     /**
@@ -362,28 +382,41 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         Runnable canceller = () -> {
             checkerHandle.cancel(false);
-            Date finished = new Date();
-            DiscoveryDao dao = null;
-            for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
-                d.setExecuting(false);
-                d.setFinished(finished);
-                discoveryRepository.save(d);
-                dao = d;
-            }
-            DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, true, dao);
-
-            try {
-                Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
-            } catch (LpAppsException ex) {
-                logger.error("Failed to report discovery status: " + discoveryId, ex);
-            }
-            try {
-                discoveryService.cancelDiscovery(discoveryId);
-            } catch (LpAppsException ex) {
-                logger.warn("Failed to cancel discovery " + discoveryId, ex);
-            }
+            cancelDiscovery(discoveryId);
         };
 
         Application.SCHEDULER.schedule(canceller, DISCOVERY_TIMEOUT_MINS, MINUTES);
+    }
+
+    /**
+     * Update discovery status in DB to finished, send report on sockets,
+     * send cancel discovery call to actually stop it.
+     *
+     * Polling thread is still running until the actual Discovery status won't
+     * be finished.
+     */
+    @Override
+    public void cancelDiscovery(final String discoveryId) {
+        Date finished = new Date();
+        DiscoveryDao dao = null;
+        for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
+            d.setExecuting(false);
+            d.setFinished(finished);
+            discoveryRepository.save(d);
+            dao = d;
+        }
+        DiscoveryStatusReport report = DiscoveryStatusReport.createErrorReport(discoveryId, true, dao);
+
+        try {
+            Application.SOCKET_IO_SERVER.getRoomOperations(discoveryId).sendEvent("discoveryStatus", OBJECT_MAPPER.writeValueAsString(report));
+        } catch (LpAppsException ex) {
+            logger.error("Failed to report discovery status: " + discoveryId, ex);
+        }
+
+        try {
+            discoveryService.cancelDiscovery(discoveryId);
+        } catch (LpAppsException ex) {
+            logger.warn("Failed to cancel discovery " + discoveryId, ex);
+        }
     }
 }

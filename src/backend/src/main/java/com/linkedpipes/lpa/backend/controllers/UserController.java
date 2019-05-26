@@ -9,6 +9,7 @@ import com.linkedpipes.lpa.backend.entities.ExecutionDeleted;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.UserService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +35,11 @@ public class UserController {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
     private final UserService userService;
+    private final ExecutorService executorService;
 
     public UserController(ApplicationContext context) {
         this.userService = context.getBean(UserService.class);
+        this.executorService = context.getBean(ExecutorService.class);
     }
 
 
@@ -59,7 +62,8 @@ public class UserController {
 
     /**
      * Delete execution from user profile in DB. If user is not found, 404 is
-     * returned.
+     * returned. Execution is cancelled first what might trigger several status
+     * messages on sockets.
      *
      * Sockets:: room: [webId], event: executionDeleted, message: ExecutionDeleted.
      *
@@ -76,6 +80,7 @@ public class UserController {
         @NotNull @RequestParam(value = "socketId", required = true) String socketId)
         throws LpAppsException {
         try {
+            executorService.cancelExecution(executionIri);
             UserProfile profile = userService.deleteExecution(user, executionIri);
 
             ExecutionDeleted msg = new ExecutionDeleted();
@@ -95,6 +100,8 @@ public class UserController {
     /**
      * Delete discovery from user profile in DB. If user is not found, 404 is
      * returned. On successful change, deletion is annnounced via sockets.
+     * Discovery is cancelled first what might trigger several status messages
+     * on sockets.
      *
      * Sockets:: room: [webId], event: discoveryDeleted, message: DiscoveryDeleted.
      *
@@ -111,6 +118,7 @@ public class UserController {
         @NotNull @RequestParam(value = "socketId", required = true) String socketId)
         throws LpAppsException {
         try {
+            executorService.cancelDiscovery(discoveryId);
             UserProfile profile = userService.deleteDiscovery(user, discoveryId);
 
             DiscoveryDeleted msg = new DiscoveryDeleted();
