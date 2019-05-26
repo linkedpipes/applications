@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * User profile management endpoints.
+ */
 @RestController
 @Profile("!disableDB")
 public class UserController {
