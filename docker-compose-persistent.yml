@@ -47,6 +47,8 @@ services:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://www.example.com/my-graph"
       VIRT_SPARQL_ResultSetMaxRows: 1000000
+      VIRT_SPARQL_MaxQueryCostEstimationTime: 10000
+      VIRT_SPARQL_MaxQueryExecutionTime: 30
       VIRT_Parameters_NumberOfBuffers: 170000
       VIRT_Parameters_MaxDirtyBuffers: 130000
       VIRT_Parameters_ThreadCleanupInterval: 1
