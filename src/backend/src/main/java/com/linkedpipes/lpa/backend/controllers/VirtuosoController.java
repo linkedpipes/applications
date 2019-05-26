@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,5 +42,17 @@ public class VirtuosoController {
             return ResponseEntity.ok("");
 
         throw new LpAppsException(HttpStatus.NOT_FOUND, "Named graph does not exist.");
+    }
+
+    /**
+     * Drop a named graph from our Virtuoso db
+     * @param graphName - full URI identifying the named graph
+     * @return
+     */
+    @DeleteMapping("api/virtuoso/dropGraph")
+    public ResponseEntity dropNamedGraph(@RequestParam(value = "graphName") String graphName) {
+        VirtuosoService.deleteNamedGraph(graphName);
+
+        return ResponseEntity.ok("");
     }
 }
