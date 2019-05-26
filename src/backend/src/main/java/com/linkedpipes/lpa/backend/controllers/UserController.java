@@ -9,6 +9,7 @@ import com.linkedpipes.lpa.backend.entities.ExecutionDeleted;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.UserService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +35,11 @@ public class UserController {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
     private final UserService userService;
+    private final ExecutorService executorService;
 
     public UserController(ApplicationContext context) {
         this.userService = context.getBean(UserService.class);
+        this.executorService = context.getBean(ExecutorService.class);
     }
 
 
@@ -61,7 +64,13 @@ public class UserController {
      * Delete execution from user profile in DB. If user is not found, 404 is
      * returned.
      *
-     * Sockets:: room: [webId], event: executionDeleted, message: ExecutionDeleted.
+     * Successful deletion is annnounced via sockets:
+     * - room: webId
+     * - event name: executionDeleted
+     * - message type: ExecutionDeleted.
+     *
+     * Execution is cancelled first what might trigger several additional status
+     * messages on sockets.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param executionIri IRI of execution to be deleted
@@ -76,6 +85,7 @@ public class UserController {
         @NotNull @RequestParam(value = "socketId", required = true) String socketId)
         throws LpAppsException {
         try {
+            executorService.cancelExecution(executionIri);
             UserProfile profile = userService.deleteExecution(user, executionIri);
 
             ExecutionDeleted msg = new ExecutionDeleted();
@@ -94,9 +104,15 @@ public class UserController {
 
     /**
      * Delete discovery from user profile in DB. If user is not found, 404 is
-     * returned. On successful change, deletion is annnounced via sockets.
+     * returned.
      *
-     * Sockets:: room: [webId], event: discoveryDeleted, message: DiscoveryDeleted.
+     * On successful change, deletion is annnounced via sockets:
+     * - room: webId,
+     * - event name: discoveryDeleted
+     * - message type: DiscoveryDeleted
+     *
+     * Discovery is cancelled first what might trigger several additioinal
+     * status messages on sockets.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param discoveryId ID of discovery to be deleted
@@ -111,6 +127,7 @@ public class UserController {
         @NotNull @RequestParam(value = "socketId", required = true) String socketId)
         throws LpAppsException {
         try {
+            executorService.cancelDiscovery(discoveryId);
             UserProfile profile = userService.deleteDiscovery(user, discoveryId);
 
             DiscoveryDeleted msg = new DiscoveryDeleted();
@@ -128,9 +145,12 @@ public class UserController {
 
     /**
      * Set color scheme on user profile. If user doesn't exist, it will be added
-     * automatically. On successful change, new color is annnounced via sockets.
+     * automatically.
      *
-     * Sockets:: room: [webId], event: colorChanged, message: color as string.
+     * On successful change, new color is annnounced via sockets:
+     * - room: webId
+     * - event name: colorChanged
+     * - message: color as string.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param color new color (arbitrary string up to 255 characters)
