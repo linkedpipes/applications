@@ -62,10 +62,15 @@ public class UserController {
 
     /**
      * Delete execution from user profile in DB. If user is not found, 404 is
-     * returned. Execution is cancelled first what might trigger several status
-     * messages on sockets.
+     * returned.
      *
-     * Sockets:: room: [webId], event: executionDeleted, message: ExecutionDeleted.
+     * Successful deletion is annnounced via sockets:
+     * - room: webId
+     * - event name: executionDeleted
+     * - message type: ExecutionDeleted.
+     *
+     * Execution is cancelled first what might trigger several additional status
+     * messages on sockets.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param executionIri IRI of execution to be deleted
@@ -99,11 +104,15 @@ public class UserController {
 
     /**
      * Delete discovery from user profile in DB. If user is not found, 404 is
-     * returned. On successful change, deletion is annnounced via sockets.
-     * Discovery is cancelled first what might trigger several status messages
-     * on sockets.
+     * returned.
      *
-     * Sockets:: room: [webId], event: discoveryDeleted, message: DiscoveryDeleted.
+     * On successful change, deletion is annnounced via sockets:
+     * - room: webId,
+     * - event name: discoveryDeleted
+     * - message type: DiscoveryDeleted
+     *
+     * Discovery is cancelled first what might trigger several additioinal
+     * status messages on sockets.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param discoveryId ID of discovery to be deleted
@@ -136,9 +145,12 @@ public class UserController {
 
     /**
      * Set color scheme on user profile. If user doesn't exist, it will be added
-     * automatically. On successful change, new color is annnounced via sockets.
+     * automatically.
      *
-     * Sockets:: room: [webId], event: colorChanged, message: color as string.
+     * On successful change, new color is annnounced via sockets:
+     * - room: webId
+     * - event name: colorChanged
+     * - message: color as string.
      *
      * @param user user identifier - currently webId is sent from frontend
      * @param color new color (arbitrary string up to 255 characters)
