@@ -11,7 +11,7 @@ import UnkownIcon from '@material-ui/icons/WallpaperTwoTone';
 const VisualizerIconComponent = ({ visualizerType, style }) => {
   switch (visualizerType.toUpperCase()) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.LABELED_POINTS_MAP:
+    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
       return <MapIcon style={style} />;
 
     case VISUALIZER_TYPE.LABELED_TIMELINE:

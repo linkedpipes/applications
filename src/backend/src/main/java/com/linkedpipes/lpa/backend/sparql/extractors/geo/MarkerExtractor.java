@@ -32,7 +32,10 @@ public class MarkerExtractor {
 
                     Resource geo = geoSubject.getPropertyResourceValue(Schema.geo);
 
-                    //TODO check what happens in case getDouble fails because lat/long aren't valid double values... fix the filter condition below if necessary
+                    /*
+                      We want getDouble to fail on NumberFormatException if lat/long aren't valid double values, because
+                      that means there is an error in Discovery configuration or in the transformers
+                     */
                     Coordinates coords = new Coordinates(
                             geo.getProperty(Schema.latitude).getDouble(),
                             geo.getProperty(Schema.longitude).getDouble());
@@ -44,8 +47,6 @@ public class MarkerExtractor {
                     LocalizedValue localizedLabel = SparqlUtils.getCombinedLabel(geoSubject, possibleLabels);
                     return new Marker(geoSubject.getURI(), coords, localizedLabel, description);
                 })
-                // Skip markers with invalid coordinates
-                .filter(m -> m.coordinates.lat != null && m.coordinates.lng != null)
                 .collect(toList());
     }
 }

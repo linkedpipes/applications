@@ -48,6 +48,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
         id: uuid.v4(),
         applicationEndpoint: 'map',
         propMarkers,
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
         visualizerCode: 'MAP'
       });
     }
@@ -106,6 +107,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
         id: uuid.v4(),
         applicationEndpoint: 'map',
         markers,
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
         visualizerCode: 'MAP'
       });
     }

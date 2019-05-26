@@ -35,22 +35,20 @@ public class DiscoveryServiceComponent implements DiscoveryService {
     @NotNull private final ApplicationContext context;
     @NotNull private final HttpActions httpActions = new HttpActions();
 
-    public DiscoveryServiceComponent(ApplicationContext context) {
+    public DiscoveryServiceComponent(@NotNull ApplicationContext context) {
         this.context = context;
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        return result;
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        return result;
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @NotNull @Override
