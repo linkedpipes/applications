@@ -11,12 +11,19 @@ import { Log, VisualizersService } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import axios from 'axios';
-// eslint-disable-next-line import/order
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import FiltersComponent from '../CreateVisualizerPage/children/Filters/FiltersComponent';
+import { withStyles } from '@material-ui/core/styles';
 
 type Props = {
   location: Object,
-  setColorTheme: Function
+  setColorTheme: Function,
+  classes: {
+    root: {},
+    vizdiv: {},
+    filterSideBar: {}
+  }
 };
 
 type State = {
@@ -25,6 +32,23 @@ type State = {
   width: number,
   height: number
 };
+
+const styles = theme => ({
+  root: {
+    flex: 1
+  },
+  vizdiv: {
+    overflow: 'hidden'
+  },
+  containerView: {
+    textAlign: 'center',
+    paddingTop: theme.spacing.unit * 20
+  },
+  filterSideBar: {
+    paddingTop: '2rem',
+    paddingLeft: '2rem'
+  }
+});
 
 class ApplicationContainer extends PureComponent<Props, State> {
   state = {
@@ -139,20 +163,50 @@ class ApplicationContainer extends PureComponent<Props, State> {
   render() {
     const { getApplication } = this;
     const { applicationType, applicationData, width, height } = this.state;
+    const visible = (applicationData.filters || {}).visible;
 
     return (
-      <div
-        id="viz-div"
-        style={{
-          flex: 1,
-          width: `${width}px`,
-          height: `${height}px`,
-          textAlign: 'center',
-          overflow: 'hidden'
-        }}
+      <Grid
+        container
+        className={this.props.classes.root}
+        direction="row"
+        spacing={20}
       >
-        {getApplication(applicationType, applicationData)}
-      </div>
+        {visible && (
+          <Grid
+            item
+            lg={4}
+            md={5}
+            xs={12}
+            className={this.props.classes.filterSideBar}
+          >
+            <FiltersComponent editingMode={false} />
+          </Grid>
+        )}
+        <Grid
+          id="viz-div"
+          className={this.props.classes.vizdiv}
+          item
+          lg={visible ? 8 : 12}
+          md={visible ? 7 : 12}
+          xs={12}
+          style={
+            visible && {
+              paddingLeft: '2rem'
+            }
+          }
+        >
+          <div
+            style={{
+              width: `${width}px`,
+              height: `${height}px`,
+              textAlign: visible ? 'left' : 'center'
+            }}
+          >
+            {getApplication(applicationType, applicationData)}
+          </div>
+        </Grid>
+      </Grid>
     );
   }
 }
@@ -170,5 +224,5 @@ export default withRouter(
   connect(
     null,
     mapDispatchToProps
-  )(ApplicationContainer)
+  )(withStyles(styles)(ApplicationContainer))
 );

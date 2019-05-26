@@ -18,7 +18,10 @@ import FormGroup from '@material-ui/core/FormGroup';
 
 type Props = {
   classes: {
-    root: {}
+    root: {},
+    filterTitle: {
+      paddingBottom: string
+    }
   },
   filtersEnabled: boolean,
   filtersVisible: boolean,
@@ -40,6 +43,9 @@ const styles = theme => ({
   },
   filterSpan: {
     paddingLeft: '1rem'
+  },
+  filterTitle: {
+    paddingBottom: '1rem'
   }
 });
 
@@ -47,7 +53,11 @@ class FiltersComponent extends React.PureComponent<Props> {
   state = {
     expanded: null,
     filtersEnabled: true,
-    filtersVisible: true
+    filtersVisible: true,
+    filters: [
+      { label: 'Nodes', visible: true, enabled: true },
+      { label: 'Nodes Copy', visible: false, enabled: true }
+    ]
   };
 
   handleChange = panel => (event, expanded) => {
@@ -61,131 +71,120 @@ class FiltersComponent extends React.PureComponent<Props> {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, editingMode } = this.props;
     const { expanded, filtersEnabled, filtersVisible } = this.state;
 
     return (
       <div className={classes.root}>
-        <Typography variant="h4">
+        <Typography variant="h4" className={classes.filterTitle}>
           Filters
           <span className={classes.filterSpan}>
-            <FormControlLabel
-              control={
-                <Switch
-                  onChange={this.handleSwitchChange('filtersEnabled')}
-                  checked={filtersEnabled}
-                  value={filtersEnabled}
-                  color="primary"
+            {editingMode && (
+              <div>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={this.handleSwitchChange('filtersEnabled')}
+                      checked={filtersEnabled}
+                      value={filtersEnabled}
+                      color="primary"
+                    />
+                  }
+                  label={filtersEnabled ? 'Enabled' : 'Disabled'}
                 />
-              }
-              label={filtersEnabled ? 'Enabled' : 'Disabled'}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  onChange={this.handleSwitchChange('filtersVisible')}
-                  checked={filtersVisible}
-                  value={filtersVisible}
-                  color="primary"
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={this.handleSwitchChange('filtersVisible')}
+                      checked={filtersVisible}
+                      value={filtersVisible}
+                      color="primary"
+                    />
+                  }
+                  label={filtersVisible ? 'Visible' : 'Hidden'}
                 />
-              }
-              label={filtersVisible ? 'Visible' : 'Hidden'}
-            />
+              </div>
+            )}
             <Button variant="contained" size="small" color="primary">
               Apply filters
             </Button>
           </span>
         </Typography>
 
-        <ExpansionPanel
-          expanded={expanded === 'panel1'}
-          onChange={this.handleChange('panel1')}
-        >
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography className={classes.heading}>Nodes</Typography>
-            <FormControlLabel
-              control={<Switch checked value="checkedA" color="primary" />}
-              label="Enabled"
-            />
-            <FormControlLabel
-              control={<Switch checked value="checkedA" color="primary" />}
-              label="Visible"
-            />
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <FormGroup>
-              <span>
-                <FormControlLabel
-                  control={<Checkbox checked />}
-                  label={'Node 1'}
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Enabled"
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Visible"
-                />
-              </span>
+        {(this.state.filters || []).map(filter => (
+          <ExpansionPanel
+            expanded={expanded === filter.label}
+            onChange={this.handleChange(filter.label)}
+            key={filter.label}
+          >
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography className={classes.heading}>
+                {filter.label}
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={filter.enabled}
+                    value={filter.enabled}
+                    color="primary"
+                  />
+                }
+                label={filter.enabled ? 'Enabled' : 'Disabled'}
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={filter.visible}
+                    value={filter.visible}
+                    color="primary"
+                  />
+                }
+                label={filter.visible ? 'Visible' : 'Hidden'}
+              />
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <FormGroup>
+                <span>
+                  <FormControlLabel
+                    control={<Checkbox checked />}
+                    label={'Node 1'}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Enabled"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Visible"
+                  />
+                </span>
 
-              <span>
-                <FormControlLabel
-                  control={<Checkbox checked />}
-                  label={'Node 1'}
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Enabled"
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Visible"
-                />
-              </span>
-
-              <span>
-                <FormControlLabel
-                  control={<Checkbox checked />}
-                  label={'Node 1'}
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Enabled"
-                />
-                <FormControlLabel
-                  control={<Switch checked value="checkedA" color="primary" />}
-                  label="Visible"
-                />
-              </span>
-            </FormGroup>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-        <ExpansionPanel
-          expanded={expanded === 'panel2'}
-          onChange={this.handleChange('panel2')}
-        >
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography className={classes.heading}>Scheme</Typography>
-            <FormControlLabel
-              control={<Switch checked value="checkedA" color="primary" />}
-              label="Enabled"
-            />
-            <FormControlLabel
-              control={<Switch checked value="checkedA" color="primary" />}
-              label="Visible"
-            />
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <FormControl className={classes.formControl}>
-              <Select name="scheme">
-                <MenuItem value={1}>Scheme 1</MenuItem>
-                <MenuItem value={2}>Scheme 2</MenuItem>
-              </Select>
-              <FormHelperText>Selected scheme</FormHelperText>
-            </FormControl>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+                <span>
+                  <FormControlLabel
+                    control={<Checkbox checked />}
+                    label={'Node 1'}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Enabled"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Visible"
+                  />
+                </span>
+              </FormGroup>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+        ))}
       </div>
     );
   }
