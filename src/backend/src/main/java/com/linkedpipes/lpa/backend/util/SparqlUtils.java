@@ -1,6 +1,8 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -34,6 +36,17 @@ public class SparqlUtils {
                 .flatMap(Streams::sequentialFromIterator)
                 .map(Statement::getLiteral)
                 .collect(collectingAndThen(toList(), LocalizedValue::new));
+    }
+
+    public static LocalizedValue getLabel(QuerySolution solution, String[] labelVariables){
+        return Arrays.stream(labelVariables)
+                .filter(solution::contains)
+                .map(l -> localizedLabel(solution.get(l).asLiteral()))
+                .findAny().orElse(null);
+    }
+
+    public static LocalizedValue localizedLabel(Literal literal){
+        return new LocalizedValue(literal.getLanguage(), literal.getString());
     }
 
 }

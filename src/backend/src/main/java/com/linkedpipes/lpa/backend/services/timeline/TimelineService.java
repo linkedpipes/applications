@@ -20,11 +20,11 @@ public class TimelineService {
 
     public List<Interval> getIntervals(@Nullable String graphIri, @Nullable Date start, @Nullable Date end) throws LpAppsException {
         SelectSparqlQueryProvider provider = new IntervalQueryProvider(start, end);
-        return JenaUtils.withQueryExecution(provider.get(graphIri), IntervalExtractor::extract);
+        return JenaUtils.withQueryExecution(provider.get(graphIri), new IntervalExtractor()::extract);
     }
 
     public List<Instant> getInstants(@Nullable String graphIri, @Nullable Date start, @Nullable Date end) throws LpAppsException {
         SelectSparqlQueryProvider provider = new InstantQueryProvider(start, end);
-        return JenaUtils.withQueryExecution(provider.get(graphIri), InstantExtractor::extract);
+        return JenaUtils.withQueryExecution(provider.get(graphIri), new InstantExtractor()::extract);
     }
 }

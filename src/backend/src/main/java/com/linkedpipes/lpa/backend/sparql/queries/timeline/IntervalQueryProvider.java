@@ -7,6 +7,7 @@ import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.XSD;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,7 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
     public static final String VAR_INTERVAL = var("interval");
     public static final String VAR_START = var("start");
     public static final String VAR_END = var("end");
-
+    public static final String VAR_TITLE = var("title");
 
     public IntervalQueryProvider(){
         this.start = null;
@@ -65,6 +66,13 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
+    public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+        return builder
+                .addOptional(VAR_INTERVAL, DCTerms.title, VAR_TITLE);
+    }
+
+    @NotNull
+    @Override
     public SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
         if(start != null) {
             builder.addFilter(VAR_START + " > " + SparqlUtils.formatXSDDate(start));
@@ -79,7 +87,7 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+    public SelectBuilder addGroupBy(@NotNull SelectBuilder builder) {
         return builder
                 .addGroupBy(VAR_INTERVAL)
                 .addGroupBy(VAR_START)

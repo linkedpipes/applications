@@ -21,6 +21,7 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
     // VARIABLES
     public static final String VAR_INSTANT = var("instant");
     public static final String VAR_DATE = var("date");
+    public static final String VAR_TITLE = var("title");
 
     public InstantQueryProvider(){
         this.start = null;
@@ -60,6 +61,13 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
+    public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+        return builder
+                .addOptional(VAR_INSTANT, DCTerms.title, VAR_TITLE);
+    }
+
+    @NotNull
+    @Override
     public SelectBuilder addFilters(@NotNull SelectBuilder builder) throws ParseException {
         if(start != null) {
             builder.addFilter(VAR_DATE + " > " + SparqlUtils.formatXSDDate(start));
@@ -74,7 +82,7 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
 
     @NotNull
     @Override
-    public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
+    public SelectBuilder addGroupBy(@NotNull SelectBuilder builder) {
         return builder
                 .addGroupBy(VAR_INSTANT)
                 .addGroupBy(VAR_DATE);
