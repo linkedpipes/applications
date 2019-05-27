@@ -10,11 +10,8 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import FormGroup from '@material-ui/core/FormGroup';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -23,8 +20,6 @@ type Props = {
       paddingBottom: string
     }
   },
-  filtersEnabled: boolean,
-  filtersVisible: boolean,
   editingMode: boolean
 };
 
@@ -49,143 +44,196 @@ const styles = theme => ({
   }
 });
 
-class FiltersComponent extends React.PureComponent<Props> {
+class FiltersComponent extends React.Component<Props> {
   state = {
-    expanded: null,
-    filtersEnabled: true,
-    filtersVisible: true,
-    filters: [
-      { label: 'Nodes', visible: true, enabled: true },
-      { label: 'Nodes Copy', visible: false, enabled: true }
-    ]
+    filtersState: {
+      enabled: true,
+      visible: true,
+      filterGroups: [
+        {
+          label: 'Nodes',
+          enabled: true,
+          visible: true,
+          type: 'NODES_FILTER',
+          filters: [
+            { label: 'Nodes', visible: true, enabled: true },
+            { label: 'Nodes Copy', visible: false, enabled: true }
+          ]
+        }
+      ]
+    }
   };
 
-  handleChange = panel => (event, expanded) => {
-    this.setState({
-      expanded: expanded ? panel : false
-    });
+  getFilter = filterGroup => {
+    switch (filterGroup) {
+      case 'nodesFilter':
+        return <div />;
+      default:
+        return <div> Unknown filter type </div>;
+    }
   };
 
   handleSwitchChange = name => event => {
-    this.setState({ [name]: event.target.checked });
+    const newValue = event.target.checked;
+    this.setState(prevState => {
+      return {
+        filtersState: {
+          ...prevState.filtersState,
+          [name]: newValue
+        }
+      };
+    });
   };
 
   render() {
     const { classes, editingMode } = this.props;
-    const { expanded, filtersEnabled, filtersVisible } = this.state;
+    const { filtersState } = this.state;
 
     return (
-      <div className={classes.root}>
-        <Typography variant="h4" className={classes.filterTitle}>
-          Filters
-          <span className={classes.filterSpan}>
-            {editingMode && (
-              <div>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      onChange={this.handleSwitchChange('filtersEnabled')}
-                      checked={filtersEnabled}
-                      value={filtersEnabled}
-                      color="primary"
-                    />
-                  }
-                  label={filtersEnabled ? 'Enabled' : 'Disabled'}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      onChange={this.handleSwitchChange('filtersVisible')}
-                      checked={filtersVisible}
-                      value={filtersVisible}
-                      color="primary"
-                    />
-                  }
-                  label={filtersVisible ? 'Visible' : 'Hidden'}
-                />
-              </div>
+      filtersState && (
+        <div className={classes.root}>
+          <Typography variant="h4" className={classes.filterTitle}>
+            Filters
+            <span className={classes.filterSpan}>
+              {editingMode && (
+                <span>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={this.handleSwitchChange('enabled')}
+                        checked={filtersState.enabled}
+                        value={filtersState.enabled}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={this.handleSwitchChange('visible')}
+                        checked={filtersState.visible}
+                        value={filtersState.visible}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.visible ? 'Visible' : 'Hidden'}
+                  />
+                </span>
+              )}
+              <Button variant="contained" size="small" color="primary">
+                Apply filters
+              </Button>
+            </span>
+          </Typography>
+
+          {(this.state.filtersState.filterGroups || [])
+            .map(filterGroup => ({ ...filterGroup, uuid: uuid() }))
+            .map(
+              filterGroup =>
+                (editingMode || filterGroup.visible) && (
+                  <div>
+                    <ExpansionPanel
+                      key={filterGroup.uuid}
+                      disabled={!filterGroup.enabled && !editingMode}
+                    >
+                      <ExpansionPanelSummary
+                        id={filterGroup.uuid}
+                        expandIcon={<ExpandMoreIcon />}
+                      >
+                        <Typography className={classes.heading}>
+                          {filterGroup.label}
+                        </Typography>
+                        {editingMode && (
+                          <div>
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={filterGroup.enabled}
+                                  value={filterGroup.enabled}
+                                  color="primary"
+                                />
+                              }
+                              label={
+                                filterGroup.enabled ? 'Enabled' : 'Disabled'
+                              }
+                            />
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={filterGroup.visible}
+                                  value={filterGroup.visible}
+                                  color="primary"
+                                />
+                              }
+                              label={filterGroup.visible ? 'Visible' : 'Hidden'}
+                            />
+                          </div>
+                        )}
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormGroup>
+                          <span>
+                            <FormControlLabel
+                              control={<Checkbox checked />}
+                              label={'Node 1'}
+                            />
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked
+                                  value="checkedA"
+                                  color="primary"
+                                />
+                              }
+                              label="Enabled"
+                            />
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked
+                                  value="checkedA"
+                                  color="primary"
+                                />
+                              }
+                              label="Visible"
+                            />
+                          </span>
+
+                          <span>
+                            <FormControlLabel
+                              control={<Checkbox checked />}
+                              label={'Node 1'}
+                            />
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked
+                                  value="checkedA"
+                                  color="primary"
+                                />
+                              }
+                              label="Enabled"
+                            />
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked
+                                  value="checkedA"
+                                  color="primary"
+                                />
+                              }
+                              label="Visible"
+                            />
+                          </span>
+                        </FormGroup>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  </div>
+                )
             )}
-            <Button variant="contained" size="small" color="primary">
-              Apply filters
-            </Button>
-          </span>
-        </Typography>
-
-        {(this.state.filters || []).map(filter => (
-          <ExpansionPanel
-            expanded={expanded === filter.label}
-            onChange={this.handleChange(filter.label)}
-            key={filter.label}
-          >
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography className={classes.heading}>
-                {filter.label}
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={filter.enabled}
-                    value={filter.enabled}
-                    color="primary"
-                  />
-                }
-                label={filter.enabled ? 'Enabled' : 'Disabled'}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={filter.visible}
-                    value={filter.visible}
-                    color="primary"
-                  />
-                }
-                label={filter.visible ? 'Visible' : 'Hidden'}
-              />
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <FormGroup>
-                <span>
-                  <FormControlLabel
-                    control={<Checkbox checked />}
-                    label={'Node 1'}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Enabled"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Visible"
-                  />
-                </span>
-
-                <span>
-                  <FormControlLabel
-                    control={<Checkbox checked />}
-                    label={'Node 1'}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Enabled"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Visible"
-                  />
-                </span>
-              </FormGroup>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
-        ))}
-      </div>
+        </div>
+      )
     );
   }
 }
