@@ -23,7 +23,6 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import GoogleAnalytics from 'react-ga';
 import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
@@ -66,7 +65,13 @@ type Props = {
   handleUpdateApplicationsFolder: Function,
   handleSetUserWebId: Function,
   handleDeleteDiscoverySession: Function,
-  handleDeleteExecutionSession: Function
+  handleDeleteExecutionSession: Function,
+  handleSetUserInboxInvitations: Function,
+  currentInboxInvitations: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoverySessions: Array<Object>,
+  // eslint-disable-next-line react/no-unused-prop-types
+  pipelineExecutions: Array<Object>
 };
 
 type State = {
@@ -102,7 +107,6 @@ class AppRouter extends React.PureComponent<Props, State> {
     } else {
       await this.setupSessionTracker();
     }
-  }
 
     window.onbeforeunload = () => {
       if (
@@ -118,12 +122,65 @@ class AppRouter extends React.PureComponent<Props, State> {
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
-    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    const me = await StorageToolbox.getPerson(updatedProfileData.webId);
     await this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
       me.image
     );
+  };
+
+  checkInbox = async () => {
+    const {
+      webId,
+      handleSetUserInboxInvitations,
+      currentInboxInvitations
+    } = this.props;
+    const inboxInvitations = await StorageToolbox.getInboxMessages(webId);
+    const invitations = [];
+
+    await Promise.all(
+      inboxInvitations.map(async fileUrl => {
+        const invitation = await StorageToolbox.readInboxInvite(fileUrl, webId);
+
+        if (invitation instanceof Invitation) {
+          Log.info(invitation);
+          invitations.push(invitation);
+        } else {
+          await StorageToolbox.processAcceptShareInvite(invitation);
+
+          toast.info(
+            `${
+              invitation.sender.name
+            } - accepted your invitation to collaborate!`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
+        }
+      })
+    );
+
+    if (
+      !(
+        currentInboxInvitations.length === invitations.length &&
+        currentInboxInvitations.sort().every((value, index) => {
+          return (
+            value.invitationUrl === invitations.sort()[index].invitationUrl
+          );
+        })
+      )
+    ) {
+      handleSetUserInboxInvitations(invitations);
+
+      if (invitations.length > 0) {
+        toast.info(`New notifications received! Check your inbox.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
+    }
   };
 
   setupSessionTracker = async () => {
@@ -417,10 +474,10 @@ const mapStateToProps = state => {
     webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight,
-    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
     discoverySessions: state.user.discoverySessions,
     pipelineExecutions: state.user.pipelineExecutions,
-    currentInboxInvitations: state.user.inboxInvitations,
+    currentInboxInvitations: state.user.inboxInvitations
   };
 };
 

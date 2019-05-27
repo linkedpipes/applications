@@ -8,6 +8,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import StorageSharedPage from './StorageSharedAppsBrowserContainer';
 import StoragePage from './StorageAppsBrowserContainer';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 type TabContainerProps = {
   children: Object,
@@ -30,7 +31,8 @@ const styles = () => ({
 
 type Props = {
   classes: Object,
-  theme: Object
+  theme: Object,
+  location: Object
 };
 
 type State = {
@@ -41,6 +43,11 @@ class StoragePageController extends React.Component<Props, State> {
   state = {
     value: 0
   };
+
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+  }
 
   handleChange = (event, value) => {
     this.setState({ value });

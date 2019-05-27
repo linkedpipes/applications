@@ -3,10 +3,7 @@ import React, { PureComponent, Fragment } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import {
-  StorageToolbox,
-  StorageAccessControlDialog
-} from '@storage';
+import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';

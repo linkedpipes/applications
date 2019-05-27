@@ -6,10 +6,10 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
-  homepageTabIndex: 0
-  colorThemeIsLight: false
+  homepageTabIndex: 0,
+  colorThemeIsLight: false,
   inboxDialogIsOpen: false,
-  shareApplicationDialogIsOpen: false,
+  shareApplicationDialogIsOpen: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {

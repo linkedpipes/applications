@@ -47,6 +47,6 @@ export default {
   setAccessControlDialogState,
   setLightColorTheme,
   setChooseFolderDialogState,
-  setSelectedHomepageTabIndex
+  setSelectedHomepageTabIndex,
   setInboxDialogState
 };

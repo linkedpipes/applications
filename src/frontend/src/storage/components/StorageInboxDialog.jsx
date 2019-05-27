@@ -13,7 +13,7 @@ import { userActions } from '@ducks/userDuck';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import LoadingOverlay from 'react-loading-overlay';
-import StorageToolbox from '@storage/StorageToolbox';
+import StorageToolbox from '../StorageToolbox';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
@@ -47,9 +47,7 @@ const styles = theme => ({
 type Props = {
   handleSetInboxDialogState: Function,
   inboxDialogIsOpen: boolean,
-  inboxInvitations: [Object],
-  webId: String,
-  classes: Object
+  inboxInvitations: [Object]
 };
 
 type State = {
@@ -87,7 +85,7 @@ class StorageInboxDialog extends PureComponent<Props, State> {
 
   render() {
     const { loadingIsActive } = this.state;
-    const { classes, inboxInvitations } = this.props;
+    const { inboxInvitations } = this.props;
     const { handleSendAcceptInvitation, handleSendRejectInvitation } = this;
     return (
       <div>
@@ -106,18 +104,15 @@ class StorageInboxDialog extends PureComponent<Props, State> {
               <List dense>
                 {inboxInvitations.map(inboxInvitation => (
                   <ListItem dense key={`${uuid.v4()}`}>
-                    <div
+                    <IconButton
                       onClick={() => {
                         handleSendAcceptInvitation(inboxInvitation);
                       }}
+                      key={`accept-invite-${uuid.v4()}`}
+                      aria-label="Accept"
                     >
-                      <IconButton
-                        key={`accept-invite-${uuid.v4()}`}
-                        aria-label="Accept"
-                      >
-                        <AcceptIcon />
-                      </IconButton>
-                    </div>
+                      <AcceptIcon />
+                    </IconButton>
                     <ListItemText
                       key={`${uuid.v4()}`}
                       primary="Collaboration invite"
@@ -160,7 +155,6 @@ class StorageInboxDialog extends PureComponent<Props, State> {
 const mapStateToProps = state => {
   return {
     currentApplicationsFolder: state.user.applicationsFolder,
-    webId: state.user.webId,
     inboxDialogIsOpen: state.globals.inboxDialogIsOpen,
     inboxInvitations: state.user.inboxInvitations,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata

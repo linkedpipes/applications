@@ -20,7 +20,7 @@ import Switch from '@material-ui/core/Switch';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
-import StorageToolbox from '@storage/StorageToolbox';
+import StorageToolbox from '../StorageToolbox';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import uuid from 'uuid';
@@ -77,7 +77,6 @@ type State = {
   metadataIsPublic: boolean,
   selectedContacts: [],
   availableContacts: [],
-  accessControl: AccessControl,
   collaborators: []
 };
 
@@ -87,7 +86,6 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
     metadataIsPublic: true,
     selectedContacts: [],
     collaborators: [],
-    accessControl: undefined,
     availableContacts: []
   };
 
@@ -108,7 +106,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
     const collaboratorWebIds = accessControl.getCollaborators();
     const collaborators = await StorageToolbox.getPersons(collaboratorWebIds);
     const metadataIsPublic = accessControl.isPublic();
-    this.setState({ collaborators, accessControl, metadataIsPublic });
+    this.setState({ collaborators, metadataIsPublic });
   };
 
   fetchAvailableContacts = async () => {

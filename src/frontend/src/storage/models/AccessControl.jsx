@@ -2,9 +2,6 @@
  * Model class for storing person's invitations.
  */
 
-import StorageBackend from '../StorageBackend';
-import Person from './Person';
-
 const ACL = term => {
   return `http://www.w3.org/ns/auth/acl#${term}`;
 };
@@ -39,7 +36,7 @@ export default class AccessControl {
   }
 
   isPublic = (): boolean => {
-    return this.public !== undefined
+    return this.public !== undefined;
   };
 
   getCollaborators = (): Array<string> => {

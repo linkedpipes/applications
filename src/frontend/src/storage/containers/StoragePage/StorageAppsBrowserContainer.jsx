@@ -2,18 +2,16 @@
 import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
-import { Log, GoogleAnalyticsWrapper } from '@utils';
-import StorageBackend from '../../StorageBackend';
+import { Log } from '@utils';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
-import StorageToolbox from '@storage/StorageToolbox';
+import StorageToolbox from '../../StorageToolbox';
 
 type Props = {
   webId: string,
-  applicationsFolder: string,
-  location: Object
+  applicationsFolder: string
 };
 
 type State = {
@@ -41,9 +39,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    const page = this.props.location.pathname;
-    GoogleAnalyticsWrapper.trackPage(page);
-
     this.loadStoredApplications();
     this.isMounted = true;
   }

@@ -11,7 +11,6 @@ import {
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
-import { StorageBackend } from '.';
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');

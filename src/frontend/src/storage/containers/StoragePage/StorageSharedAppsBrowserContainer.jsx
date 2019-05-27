@@ -7,6 +7,7 @@ import StorageToolbox from '../../StorageToolbox';
 import { connect } from 'react-redux';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
+import { withRouter } from 'react-router-dom';
 import LoadingOverlay from 'react-loading-overlay';
 
 type Props = {
@@ -112,4 +113,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(StorageSharedAppsBrowserContainer);
+export default withRouter(
+  connect(mapStateToProps)(StorageSharedAppsBrowserContainer)
+);
