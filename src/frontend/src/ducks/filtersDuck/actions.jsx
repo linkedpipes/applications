@@ -14,7 +14,31 @@ const setSelectedNodes = nodes => {
   };
 };
 
+const toggleEnabled = value => {
+  return {
+    type: types.TOGGLE_ENABLED,
+    value
+  };
+};
+
+const toggleVisible = value => {
+  return {
+    type: types.TOGGLE_VISIBLE,
+    value
+  };
+};
+
+const setDefaultFiltersState = visualizerCode => {
+  return {
+    type: types.SET_DEFAULT_FILTERS_STATE,
+    visualizerCode
+  };
+};
+
 export default {
   setSelectedScheme,
-  setSelectedNodes
+  setSelectedNodes,
+  setDefaultFiltersState,
+  toggleVisible,
+  toggleEnabled
 };

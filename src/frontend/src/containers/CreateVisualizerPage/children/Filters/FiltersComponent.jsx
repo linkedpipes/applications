@@ -2,16 +2,16 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormGroup from '@material-ui/core/FormGroup';
 import uuid from 'uuid';
+import ChordFiltersComponent from './children/ChordFilter';
+import { connect } from 'react-redux';
+import { filtersActions } from '@ducks/filtersDuck';
 
 type Props = {
   classes: {
@@ -20,7 +20,11 @@ type Props = {
       paddingBottom: string
     }
   },
-  editingMode: boolean
+  editingMode: boolean,
+  selectedResultGraphIri: string,
+  filtersState: {},
+  handleToggleEnabled: Function,
+  handleToggleVisible: Function
 };
 
 const styles = theme => ({
@@ -45,15 +49,17 @@ const styles = theme => ({
 });
 
 class FiltersComponent extends React.Component<Props> {
+  applyCallbacks: Array<Function> = [];
+
   state = {
     filtersState: {
-      enabled: true,
-      visible: true,
+      enabled: false,
+      visible: false,
       filterGroups: [
         {
           label: 'Nodes',
-          enabled: true,
-          visible: true,
+          enabled: false,
+          visible: false,
           type: 'NODES_FILTER',
           filters: [
             { label: 'Nodes', visible: true, enabled: true },
@@ -64,10 +70,22 @@ class FiltersComponent extends React.Component<Props> {
     }
   };
 
+  registerCallback = callback => {
+    this.applyCallbacks.push(callback);
+  };
+
   getFilter = filterGroup => {
     switch (filterGroup) {
-      case 'nodesFilter':
-        return <div />;
+      case 'NODES_FILTER':
+        // editingMode
+        return (
+          <ChordFiltersComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            selectedNodes={this.state.filters}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+          />
+        );
       default:
         return <div> Unknown filter type </div>;
     }
@@ -86,8 +104,13 @@ class FiltersComponent extends React.Component<Props> {
   };
 
   render() {
-    const { classes, editingMode } = this.props;
-    const { filtersState } = this.state;
+    const {
+      classes,
+      editingMode,
+      filtersState,
+      handleToggleEnabled,
+      handleToggleVisible
+    } = this.props;
 
     return (
       filtersState && (
@@ -100,7 +123,7 @@ class FiltersComponent extends React.Component<Props> {
                   <FormControlLabel
                     control={
                       <Switch
-                        onChange={this.handleSwitchChange('enabled')}
+                        onChange={handleToggleEnabled}
                         checked={filtersState.enabled}
                         value={filtersState.enabled}
                         color="primary"
@@ -111,7 +134,7 @@ class FiltersComponent extends React.Component<Props> {
                   <FormControlLabel
                     control={
                       <Switch
-                        onChange={this.handleSwitchChange('visible')}
+                        onChange={handleToggleVisible}
                         checked={filtersState.visible}
                         value={filtersState.visible}
                         color="primary"
@@ -121,7 +144,16 @@ class FiltersComponent extends React.Component<Props> {
                   />
                 </span>
               )}
-              <Button variant="contained" size="small" color="primary">
+              <Button
+                onClick={() => {
+                  this.applyCallbacks.forEach(cb => {
+                    cb();
+                  });
+                }}
+                variant="contained"
+                size="small"
+                color="primary"
+              >
                 Apply filters
               </Button>
             </span>
@@ -171,63 +203,7 @@ class FiltersComponent extends React.Component<Props> {
                           </div>
                         )}
                       </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
-                        <FormGroup>
-                          <span>
-                            <FormControlLabel
-                              control={<Checkbox checked />}
-                              label={'Node 1'}
-                            />
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked
-                                  value="checkedA"
-                                  color="primary"
-                                />
-                              }
-                              label="Enabled"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked
-                                  value="checkedA"
-                                  color="primary"
-                                />
-                              }
-                              label="Visible"
-                            />
-                          </span>
-
-                          <span>
-                            <FormControlLabel
-                              control={<Checkbox checked />}
-                              label={'Node 1'}
-                            />
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked
-                                  value="checkedA"
-                                  color="primary"
-                                />
-                              }
-                              label="Enabled"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked
-                                  value="checkedA"
-                                  color="primary"
-                                />
-                              }
-                              label="Visible"
-                            />
-                          </span>
-                        </FormGroup>
-                      </ExpansionPanelDetails>
+                      {this.getFilter(filterGroup.type)}
                     </ExpansionPanel>
                   </div>
                 )
@@ -238,4 +214,26 @@ class FiltersComponent extends React.Component<Props> {
   }
 }
 
-export default withStyles(styles)(FiltersComponent);
+const mapStateToProps = state => {
+  return {
+    filtersState: state.filters.filtersState
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const handleToggleEnabled = event =>
+    dispatch(filtersActions.toggleEnabled(event.target.checked));
+
+  const handleToggleVisible = event =>
+    dispatch(filtersActions.toggleVisible(event.target.checked));
+
+  return {
+    handleToggleEnabled,
+    handleToggleVisible
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(FiltersComponent));
