@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { Route } from 'react-router-dom';
 import { NavigationBar } from '@components';
 import { withStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import { withAuthorization } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
@@ -16,8 +15,10 @@ const styles = theme => ({
   content: {
     flexFlow: 'column',
     flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto'
+    overflow: 'auto',
+    paddingRight: '2rem',
+    paddingLeft: '2rem',
+    paddingTop: '4rem'
   },
   devBar: {
     fontSize: '1rem',
@@ -51,8 +52,6 @@ const PrivateLayout = ({
         <Fragment>
           <NavigationBar />
           <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <CssBaseline />
             {process.env.NODE_ENV !== 'production' && (
               <div className={classes.devBar}>
                 <Typography variant="subtitle1" noWrap>

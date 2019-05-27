@@ -17,8 +17,8 @@ public class VirtuosoController {
 
     /**
      * Get service description of our virtuoso SPARQL endpoint
-     * @param graphId
-     * @return
+     * @param graphId application specific graph identifier (full graph name IRI will be generated out of it)
+     * @return Service description (Turtle)
      */
     @GetMapping(SERVICE_DESCRIPTION_PATH)
     public ResponseEntity<String> serviceDescription(@RequestParam(value = "graphId") String graphId) {
@@ -28,7 +28,7 @@ public class VirtuosoController {
     /**
      * Check if a named graph exists in our Virtuoso db
      * @param graphName - full URI identifying the named graph
-     * @return
+     * @return 200 OK if graph exists or 404 otherwise
      * @throws LpAppsException
      */
     @GetMapping("api/virtuoso/graphExists")

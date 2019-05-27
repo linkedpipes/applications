@@ -3,10 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, GlobalUtils, SocketContext, Log } from '@utils';
+import { DiscoveryService, GlobalUtils, SocketContext, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import GoogleAnalytics from 'react-ga'
 import { discoverActions } from '../duck';
 
 type Props = {
@@ -27,7 +26,6 @@ type Props = {
 };
 
 type State = {
-  ttlFile: any,
   discoveryIsLoading: boolean,
   discoveryLoadingLabel: string
 };
@@ -36,7 +34,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   isMounted = false;
 
   state = {
-    ttlFile: undefined,
     discoveryIsLoading: false,
     discoveryLoadingLabel: ''
   };
@@ -51,7 +48,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   postStartFromFile = async instance => {
     return DiscoveryService.postDiscoverFromTtl({
-      ttlFile: instance.state.ttlFile,
       webId: instance.props.webId
     }).then(response => {
       return response;
@@ -70,18 +66,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   handleDiscoveryInputCase = () => {
-    // eslint-disable-next-line consistent-this
-    const instance = this;
-
-    if (this.props.dataSourcesUris) {
-      return DiscoveryService.postDiscoverFromTtl({
-        ttlFile: this.props.dataSourcesUris,
-        webId: instance.props.webId
-      }).then(response => {
-        return response;
-      });
-    }
-
     return this.postStartFromSparqlEndpoint();
   };
 
@@ -147,8 +131,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           return;
         }
         if (parsedData.status.isFinished) {
-
-          GoogleAnalytics.event({
+          GoogleAnalyticsWrapper.trackEvent({
             category: 'Discovery',
             action: 'Processed discovery : step 1'
           });
@@ -188,12 +171,6 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     }
   };
 
-  handleSelectedFile = fileItems => {
-    this.setState({
-      ttlFile: fileItems.length === 1 ? fileItems[0].file : undefined
-    });
-  };
-
   // Handle when the text in the SPARQL
   // endpoint textfields changes
   handleSetSparqlIri = e => {
@@ -225,23 +202,24 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph
     } = this.props;
 
-    const { discoveryIsLoading, ttlFile, discoveryLoadingLabel } = this.state;
+    const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
+    const inputFieldsAreNotFilled =
+      sparqlEndpointIri === '' || namedGraph === '' || dataSampleIri === '';
 
     return (
       <DiscoverSelectorComponent
         discoveryIsLoading={discoveryIsLoading}
+        inputFieldsAreNotFilled={inputFieldsAreNotFilled}
         discoveryLoadingLabel={discoveryLoadingLabel}
         dataSourcesUris={dataSourcesUris}
-        onHandleSelectedFile={this.handleSelectedFile}
-        ttlFile={ttlFile}
         sparqlEndpointIri={sparqlEndpointIri}
-        onHandleClearInputsClicked={this.handleClearInputsClicked}
+        namedGraph={namedGraph}
         dataSampleIri={dataSampleIri}
+        onHandleClearInputsClicked={this.handleClearInputsClicked}
         onHandleProcessStartDiscovery={this.handleProcessStartDiscovery}
         onHandleSetNamedGraph={this.handleSetNamedGraph}
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
-        namedGraph={namedGraph}
       />
     );
   }

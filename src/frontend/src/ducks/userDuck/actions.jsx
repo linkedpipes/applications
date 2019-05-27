@@ -32,6 +32,11 @@ const addDiscoverySession = ({ session }) => ({
   session
 });
 
+const deleteDiscoverySession = ({ discoveryId }) => ({
+  type: types.DELETE_DISCOVERY_SESSION,
+  discoveryId
+});
+
 const updateDiscoverySession = ({ session }) => ({
   type: types.UPDATE_DISCOVERY_SESSION,
   session
@@ -40,6 +45,11 @@ const updateDiscoverySession = ({ session }) => ({
 const addExecutionSession = ({ session }) => ({
   type: types.ADD_EXECUTION_SESSION,
   session
+});
+
+const deleteExecutionSession = ({ executionIri }) => ({
+  type: types.DELETE_EXECUTION_SESSION,
+  executionIri
 });
 
 const updateExecutionSession = ({ session }) => ({
@@ -79,8 +89,10 @@ export default {
   setSolidName,
   setSolidImage,
   addDiscoverySession,
+  deleteDiscoverySession,
   updateDiscoverySession,
   addExecutionSession,
+  deleteExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
   updateApplicationsFolder,

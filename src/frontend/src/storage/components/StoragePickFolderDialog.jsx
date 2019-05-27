@@ -12,6 +12,8 @@ import { userActions } from '@ducks/userDuck';
 import { Utils } from '../utils';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import StorageBackend from '../StorageBackend';
+import { Log } from '@utils';
 import LoadingOverlay from 'react-loading-overlay';
 import StorageToolbox from '@storage/StorageToolbox';
 
@@ -138,8 +140,14 @@ class StoragePickFolderDialog extends PureComponent<Props, State> {
       destinationFolderUrl
     ).then(created => {
       if (created) {
-        this.props.handleUpdateApplicationsFolder(destinationFolderUrl);
-        this.props.handleUpdateChooseFolderDialogState(false);
+        StorageBackend.deepCopy(currentApplicationsFolder, folderUrl).then(
+          () => {
+            Log.info(`Copied ${currentApplicationsFolder} to ${folderUrl}.`);
+            this.props.handleUpdateApplicationsFolder(folderUrl);
+            this.props.handleUpdateChooseFolderDialogState(false);
+          },
+          err => Log.err(err)
+        );
       } else {
         toast.error('Error creating app folders, try again.', {
           position: toast.POSITION.TOP_RIGHT,

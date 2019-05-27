@@ -25,7 +25,7 @@ type Props = {
   onHandleClearInputsClicked(): Function,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
-  ttlFile: any
+  inputFieldsAreNotFilled: boolean
 };
 
 const styles = theme => ({
@@ -56,7 +56,6 @@ const DiscoverSelectorComponent = ({
   discoveryIsLoading,
   discoveryLoadingLabel,
   dataSourcesUris,
-  ttlFile,
   sparqlEndpointIri,
   dataSampleIri,
   onHandleProcessStartDiscovery,
@@ -67,7 +66,8 @@ const DiscoverSelectorComponent = ({
   namedGraph,
   sparqlTextFieldValue,
   namedTextFieldValue,
-  dataSampleTextFieldValue
+  dataSampleTextFieldValue,
+  inputFieldsAreNotFilled
 }: Props) => (
   <Card className={classes.card}>
     <CardContent>
@@ -100,7 +100,7 @@ const DiscoverSelectorComponent = ({
                     component="span"
                     color="primary"
                     disabled={
-                      !ttlFile &&
+                      dataSourcesUris &&
                       sparqlEndpointIri === '' &&
                       dataSampleIri === '' &&
                       namedGraph === ''
@@ -119,13 +119,7 @@ const DiscoverSelectorComponent = ({
                     component="span"
                     color="secondary"
                     id="start-discovery-button"
-                    disabled={
-                      !ttlFile &&
-                      !dataSourcesUris &&
-                      sparqlEndpointIri === '' &&
-                      dataSampleIri === '' &&
-                      namedGraph === ''
-                    }
+                    disabled={inputFieldsAreNotFilled}
                     onClick={onHandleProcessStartDiscovery}
                     size="small"
                   >

@@ -198,7 +198,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         )}
         height={size}
         width={size}
-        style={{ font: '10px sans-serif' }}
+        style={{ font: '10px sans-serif', paddingBottom: '0' }}
       />
     );
   }

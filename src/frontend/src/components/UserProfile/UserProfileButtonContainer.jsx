@@ -4,8 +4,6 @@ import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { SocketContext, GlobalUtils } from '@utils';
-import { globalActions } from '@ducks/globalDuck';
-import GoogleAnalytics from 'react-ga';
 
 type Props = {
   history: Object,
@@ -36,8 +34,6 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       localStorage.removeItem('solid-auth-client');
       // Clear cookies
       GlobalUtils.clearCookies();
-      // Clear google analyics
-      GoogleAnalytics.set({ userId: undefined });
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {

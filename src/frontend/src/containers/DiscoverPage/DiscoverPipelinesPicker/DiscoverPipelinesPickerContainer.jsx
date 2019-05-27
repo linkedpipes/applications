@@ -5,7 +5,7 @@ import { discoverActions } from '../duck';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent';
 import ErrorBoundary from 'react-error-boundary';
-import GoogleAnalytics from 'react-ga'
+import { GoogleAnalyticsWrapper } from '@utils';
 
 class DiscoverPipelinesPickerContainer extends PureComponent {
   state = {
@@ -29,8 +29,7 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   };
 
   handleSelectPipeline = datasourceAndPipelines => {
-
-    GoogleAnalytics.event({
+    GoogleAnalyticsWrapper.trackEvent({
       category: 'Discovery',
       action: 'Selected pipeline : step 3'
     });
