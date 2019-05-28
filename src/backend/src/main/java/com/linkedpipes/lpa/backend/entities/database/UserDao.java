@@ -32,9 +32,7 @@ public class UserDao implements Serializable {
 
     public void addApplication(final ApplicationDao app) {
         this.applications.add(app);
-        if (app.getUser() != this) {
-            app.setUser(this);
-        }
+        app.setUser(this);
     }
 
     public List<ApplicationDao> getApplications() {
@@ -43,9 +41,7 @@ public class UserDao implements Serializable {
 
     public void removeApplication(final ApplicationDao app) {
         this.applications.remove(app);
-        if (app.getUser() == this) {
-            app.setUser(null);
-        }
+        app.setUser(null);
     }
 
     public void addDiscovery(final DiscoveryDao discovery) {

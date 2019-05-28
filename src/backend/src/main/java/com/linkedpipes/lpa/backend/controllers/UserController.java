@@ -184,11 +184,10 @@ public class UserController {
         @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
         throws LpAppsException {
         try {
-            userService.addUserIfNotPresent(user);
             return ResponseEntity.ok(userService.addApplication(user, executionIri, solidIri));
         } catch (UserNotFoundException e) {
             logger.error("User not found: " + user);
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
         }
     }
 
@@ -198,11 +197,10 @@ public class UserController {
         @NotNull @RequestParam(value = "solidIri", required = true) String solidIri)
         throws LpAppsException {
         try {
-            userService.addUserIfNotPresent(user);
             return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
         } catch (UserNotFoundException e) {
             logger.error("User not found: " + user);
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
         }
     }
 }
