@@ -48,7 +48,8 @@ public class InstantQueryProvider extends SelectSparqlQueryProvider {
         return builder
                 .setDistinct(true)
                 .addVar(VAR_INSTANT)
-                .addVar(VAR_DATE);
+                .addVar(VAR_DATE)
+                .addVar(VAR_TITLE);
     }
 
     @NotNull

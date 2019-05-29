@@ -51,7 +51,8 @@ public class IntervalQueryProvider extends SelectSparqlQueryProvider {
                 .setDistinct(true)
                 .addVar(VAR_INTERVAL)
                 .addVar(VAR_START)
-                .addVar(VAR_END);
+                .addVar(VAR_END)
+                .addVar(VAR_TITLE);
     }
 
     @NotNull

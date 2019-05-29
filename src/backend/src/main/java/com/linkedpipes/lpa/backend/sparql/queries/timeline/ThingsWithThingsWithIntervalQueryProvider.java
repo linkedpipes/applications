@@ -51,9 +51,12 @@ public class ThingsWithThingsWithIntervalQueryProvider extends SelectSparqlQuery
     public SelectBuilder addVars(@NotNull SelectBuilder builder) {
         return builder
                 .setDistinct(true)
+                .addVar(VAR_DISTANT_OBJECT)
+                .addVar(VAR_OBJECT)
                 .addVar(VAR_INTERVAL)
                 .addVar(VAR_START)
-                .addVar(VAR_END);
+                .addVar(VAR_END)
+                .addVar(VAR_TITLE);
     }
 
     @NotNull

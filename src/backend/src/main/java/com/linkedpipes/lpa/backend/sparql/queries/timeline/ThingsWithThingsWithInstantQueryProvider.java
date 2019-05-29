@@ -50,8 +50,11 @@ public class ThingsWithThingsWithInstantQueryProvider extends SelectSparqlQueryP
     public SelectBuilder addVars(@NotNull SelectBuilder builder) {
         return builder
                 .setDistinct(true)
+                .addVar(VAR_DISTANT_OBJECT)
+                .addVar(VAR_OBJECT)
                 .addVar(VAR_INSTANT)
-                .addVar(VAR_DATE);
+                .addVar(VAR_DATE)
+                .addVar(VAR_TITLE);
     }
 
     @NotNull
