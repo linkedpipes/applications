@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Date;
 
 @RestController
 @Profile("!disableDB")
@@ -86,6 +87,20 @@ public class PipelineController {
             logger.error("User not found: " + webId);
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
+    }
+
+    @NotNull
+    @PostMapping("/api/pipeline/repeat")
+    public void executePipeline(@NotNull @RequestParam(value="frequencyHours") long frequencyHours,
+                                @NotNull @RequestParam(value="finishAt") Long finishAtTimestamp,
+                                @NotNull @RequestParam(value="webId") String webId,
+                                @NotNull @RequestParam(value = "executionIri") String executionIri,
+                                @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) {
+        Date finish = null;
+        if (finishAtTimestamp != null) {
+            finish = new Date(finishAtTimestamp);
+        }
+        executorService.repeatExecution(frequencyHours, finish, executionIri, webId, selectedVisualiser);
     }
 
 }

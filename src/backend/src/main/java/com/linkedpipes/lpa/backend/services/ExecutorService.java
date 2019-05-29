@@ -5,6 +5,7 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ExecutorService {
@@ -15,4 +16,5 @@ public interface ExecutorService {
     Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException;
     void cancelExecution(String executionIri);
     void cancelDiscovery(String discoveryId);
+    void repeatExecution(long frequencyHours, Date finishAt, String executionIri, String userId, String selectedVisualiser);
 }

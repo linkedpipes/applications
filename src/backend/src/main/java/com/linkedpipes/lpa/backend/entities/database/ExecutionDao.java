@@ -34,6 +34,9 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private boolean removed = false;
 
+    @Column(nullable = true)
+    private Date finishRepeatingExeutionsAt = null;
+
     @ManyToOne
     @JoinColumn(name="user_web_id")
     private UserDao user;
@@ -144,5 +147,13 @@ public class ExecutionDao implements Serializable {
 
     public void setRemoved(boolean removed) {
         this.removed = removed;
+    }
+
+    public Date getFinishRepeatingExecutionsAt() {
+        return this.finishRepeatingExeutionsAt;
+    }
+
+    public void setFinishRepeatingExecutionsAt(final Date finishAt) {
+        this.finishRepeatingExeutionsAt = finishAt;
     }
 }

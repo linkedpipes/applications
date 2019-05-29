@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
+import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
@@ -50,6 +51,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;
+    @NotNull private final VirtuosoService virtuosoService;
 
     @Autowired
     private DiscoveryRepository discoveryRepository;
@@ -61,6 +63,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.discoveryService = context.getBean(DiscoveryService.class);
         this.etlService = context.getBean(EtlService.class);
         this.userService = context.getBean(UserService.class);
+        this.virtuosoService = context.getBean(VirtuosoService.class);
     }
 
     /**
@@ -418,5 +421,35 @@ public class ExecutorServiceComponent implements ExecutorService {
         } catch (LpAppsException ex) {
             logger.warn("Failed to cancel discovery " + discoveryId, ex);
         }
+    }
+
+
+    @Override
+    public void repeatExecution(@NotNull long frequencyHours, @Nullable Date finishAt, @NotNull String executionIri, @NotNull String userId, @NotNull String selectedVisualiser) {
+        if (finishAt != null) {
+            for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+                e.setFinishRepeatingExecutionsAt(finishAt);
+                executionRepository.save(e);
+            }
+        }
+
+        Runnable executor = () -> {
+            try {
+                Date now = new Date();
+                for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+                    Date finish = e.getFinishRepeatingExecutionsAt();
+                    if ((finish == null) || (finish.after(now))) {
+                        virtuosoService.deleteNamedGraph(e.getPipeline().getResultGraphIri());
+                        executePipeline(e.getPipeline().getEtlPipelineIri(), userId, selectedVisualiser);
+                    }
+                }
+            } catch (LpAppsException e) {
+
+            } catch (UserNotFoundException f) {
+                throw new PollingCompletedException(f);
+            }
+        };
+
+        ScheduledFuture<?> executorHandle = Application.SCHEDULER.scheduleAtFixedRate(executor, frequencyHours, frequencyHours, HOURS);
     }
 }
