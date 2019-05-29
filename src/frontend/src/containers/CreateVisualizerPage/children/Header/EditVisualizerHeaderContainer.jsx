@@ -7,7 +7,7 @@ import { StorageToolbox, StorageBackend } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AppConfiguration from '@storage/models/AppConfiguration';
-import { GoogleAnalyticsWrapper } from '@utils';
+import { GoogleAnalyticsWrapper, UserService } from '@utils';
 
 type Props = {
   selectedApplication: any,
@@ -22,7 +22,8 @@ type Props = {
   setApplicationLoaderStatus: Function,
   selectedApplicationMetadata: AppConfiguration,
   handleSetSelectedApplicationTitle: Function,
-  handleSetSelectedApplicationMetadata: Function
+  handleSetSelectedApplicationMetadata: Function,
+  webId: string
 };
 
 type State = {
@@ -147,6 +148,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus,
       selectedApplicationMetadata,
       applicationsFolder,
+      webId,
       history
     } = this.props;
 
@@ -163,6 +165,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
         pathname: '/dashboard'
       });
     }
+
+    await UserService.deleteApplication(webId, selectedApplicationMetadata.url);
 
     GoogleAnalyticsWrapper.trackEvent({
       category: 'CreateApp',

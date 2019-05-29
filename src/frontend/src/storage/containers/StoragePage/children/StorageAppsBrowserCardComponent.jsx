@@ -15,7 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService } from '@utils';
+import { GlobalUtils, VisualizersService, UserService } from '@utils';
 import { AppConfiguration } from '../../../models';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
@@ -72,7 +72,8 @@ type Props = {
   setApplicationLoaderStatus: Function,
   history: Object,
   applicationsFolder: string,
-  indexNumber: Number
+  indexNumber: Number,
+  webId: string
 };
 
 type State = {
@@ -104,6 +105,11 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        this.props.webId,
+        this.props.applicationMetadata.url
+      );
+
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
 
@@ -307,7 +313,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    applicationsFolder: state.user.applicationsFolder
+    applicationsFolder: state.user.applicationsFolder,
+    webId: state.user.webId
   };
 };
 

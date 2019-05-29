@@ -8,6 +8,7 @@ import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { GoogleAnalyticsWrapper } from '@utils';
 import AppConfiguration from '@storage/models/AppConfiguration';
+import UserService from '@utils/user.service';
 
 type Props = {
   selectedApplication: any,
@@ -119,6 +120,8 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
     );
 
     this.setState({ currentApplicationMetadata });
+
+    await UserService.postApplication(webId, currentApplicationMetadata.url);
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
       currentApplicationMetadata.object,
