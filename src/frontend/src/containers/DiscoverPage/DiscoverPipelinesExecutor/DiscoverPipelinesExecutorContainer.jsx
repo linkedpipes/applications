@@ -62,7 +62,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
-    const { onAddSelectedResultGraphIriAction, onAddSingleExport } = this.props;
+    const { onAddSelectedResultGraphIriAction } = this.props;
     const self = this;
 
     return ETLService.getExportPipeline({
@@ -75,11 +75,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
       .then(json => {
         const response = json;
 
-        onAddSingleExport(
-          response.pipelineId,
-          response.etlPipelineIri,
-          response.resultGraphIri
-        );
         onAddSelectedResultGraphIriAction(response.resultGraphIri);
 
         self.setState({
@@ -192,7 +187,6 @@ DiscoverPipelinesExecutorContainer.propTypes = {
   etlExecutionStatus: PropTypes.any,
   onAddSelectedResultGraphIriAction: PropTypes.any,
   onAddSingleExecution: PropTypes.any,
-  onAddSingleExport: PropTypes.any,
   onSetEtlExecutionStatus: PropTypes.any,
   pipelineId: PropTypes.any,
   selectedVisualizer: PropTypes.any,
@@ -215,15 +209,6 @@ const mapDispatchToProps = dispatch => {
   const onSetEtlExecutionStatus = status =>
     dispatch(discoverActions.setEtlExecutionStatus(status));
 
-  const onAddSingleExport = (pipelineId, etlPipelineIri, resultGraphIri) =>
-    dispatch(
-      etlActions.addSingleExport({
-        id: pipelineId,
-        etlPipelineIri,
-        resultGraphIri
-      })
-    );
-
   const onAddSelectedResultGraphIriAction = resultGraphIri =>
     dispatch(
       etlActions.addSelectedResultGraphIriAction({
@@ -240,7 +225,6 @@ const mapDispatchToProps = dispatch => {
     );
 
   return {
-    onAddSingleExport,
     onAddSelectedResultGraphIriAction,
     onSetEtlExecutionStatus,
     onAddSingleExecution

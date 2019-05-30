@@ -13,15 +13,6 @@ const removeSingleExecution = ({ id } = {}) => ({
   id
 });
 
-const addSingleExport = ({ id, resultGraphIri, etlPipelineIri } = {}) => ({
-  type: types.ADD_EXPORT,
-  pipelineId: id,
-  exportValues: {
-    resultGraphIri,
-    etlPipelineIri
-  }
-});
-
 const removeSingleExport = ({ id } = {}) => ({
   type: types.REMOVE_EXPORT,
   id
@@ -39,11 +30,16 @@ const setPipelineIdAction = ({ id } = {}) => ({
   }
 });
 
+const setSelectedPipelineExecution = pipelineExecution => ({
+  type: types.SET_PIPELINE_EXECUTION,
+  pipelineExecution
+});
+
 export default {
   addSingleExecution,
   removeSingleExecution,
-  addSingleExport,
   removeSingleExport,
   addSelectedResultGraphIriAction,
-  setPipelineIdAction
+  setPipelineIdAction,
+  setSelectedPipelineExecution
 };

@@ -105,7 +105,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
-      await UserService.deleteApplication(
+      const deleteAppResponse = await UserService.deleteApplication(
         this.props.webId,
         this.props.applicationMetadata.url
       );

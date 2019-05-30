@@ -17,9 +17,9 @@ const UserService = {
     });
   },
 
-  postApplication(webId, solidIri) {
+  postApplication(webId, solidIri, executionIri) {
     return lpaAxios.post('/user/application', null, {
-      params: { webId, solidIri }
+      params: { webId, solidIri, executionIri }
     });
   },
 

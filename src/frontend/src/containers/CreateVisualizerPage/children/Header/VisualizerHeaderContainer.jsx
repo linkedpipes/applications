@@ -80,6 +80,12 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication.applicationEndpoint
     );
 
+    const postAppResponse = await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.url,
+      selectedResultGraphIri
+    );
+
     setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
 
@@ -96,7 +102,8 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationTitle,
       applicationsFolder,
       webId,
-      setApplicationLoaderStatus
+      setApplicationLoaderStatus,
+      selectedResultGraphIri
     } = this.props;
 
     setApplicationLoaderStatus(true);
@@ -121,7 +128,11 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
 
     this.setState({ currentApplicationMetadata });
 
-    await UserService.postApplication(webId, currentApplicationMetadata.url);
+    const postAppResponse = await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.url,
+      selectedResultGraphIri
+    );
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
       currentApplicationMetadata.object,

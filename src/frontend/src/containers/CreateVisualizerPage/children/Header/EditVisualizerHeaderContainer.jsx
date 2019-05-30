@@ -166,7 +166,10 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       });
     }
 
-    await UserService.deleteApplication(webId, selectedApplicationMetadata.url);
+    const deleteAppResponse = await UserService.deleteApplication(
+      webId,
+      selectedApplicationMetadata.url
+    );
 
     GoogleAnalyticsWrapper.trackEvent({
       category: 'CreateApp',

@@ -40,7 +40,8 @@ type Props = {
   applicationsFolder: String,
   location: Object,
   tabIndex: number,
-  handleSetHomepageTabIndex: Function
+  handleSetHomepageTabIndex: Function,
+  handleSetSelectedPipelineExecution: Function
 };
 type State = {
   applicationsMetadata: Array<AppConfiguration>,
@@ -197,7 +198,8 @@ class HomeContainer extends PureComponent<Props, State> {
     const {
       history,
       handleSetResultPipelineIri,
-      handleSetSelectedVisualizer
+      handleSetSelectedVisualizer,
+      handleSetSelectedPipelineExecution
     } = this.props;
     Log.info(`About to push with id ${pipelineExecution}`);
     const pipelineIri = pipelineExecution.etlPipelineIri;
@@ -215,6 +217,7 @@ class HomeContainer extends PureComponent<Props, State> {
           visualizer: { visualizerCode: visualizerType }
         };
 
+        handleSetSelectedPipelineExecution(pipelineExecution);
         handleSetResultPipelineIri(resultGraphIri);
         handleSetSelectedVisualizer(selectedVisualiser);
 
@@ -299,7 +302,7 @@ class HomeContainer extends PureComponent<Props, State> {
       applicationMetadata
     );
     if (result) {
-      await UserService.deleteApplication(
+      const deleteAppResponse = await UserService.deleteApplication(
         this.props.webId,
         applicationMetadata.url
       );
@@ -446,6 +449,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetHomepageTabIndex = index =>
     dispatch(globalActions.setSelectedHomepageTabIndex(index));
 
+  const handleSetSelectedPipelineExecution = pipelineExecution =>
+    dispatch(etlActions.setSelectedPipelineExecution(pipelineExecution));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -454,7 +460,8 @@ const mapDispatchToProps = dispatch => {
     handleSetSelectedApplicationData,
     handleSetSelectedApplicationMetadata,
     handleSetUserProfileAsync,
-    handleSetHomepageTabIndex
+    handleSetHomepageTabIndex,
+    handleSetSelectedPipelineExecution
   };
 };
 

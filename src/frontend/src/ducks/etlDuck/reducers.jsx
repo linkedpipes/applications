@@ -1,6 +1,10 @@
 import types from './types';
 
-const INITIAL_STATE = { executions: {}, exportRecords: {} };
+const INITIAL_STATE = {
+  executions: {},
+  exportRecords: {},
+  pipelineExecution: undefined
+};
 
 const etlReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -36,6 +40,9 @@ const etlReducer = (state = INITIAL_STATE, action) => {
 
     case types.SET_PIPELINE_ID:
       return { ...state, pipelineId: action.pipeline.id };
+
+    case types.SET_PIPELINE_EXECUTION:
+      return { ...state, selectedPipelineExecution: action.pipelineExecution };
 
     default:
       return state;
