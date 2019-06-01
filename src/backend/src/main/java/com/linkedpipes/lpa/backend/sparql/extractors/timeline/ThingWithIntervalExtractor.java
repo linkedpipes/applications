@@ -33,8 +33,8 @@ public class ThingWithIntervalExtractor {
                                 solution.getResource(ThingsWithIntervalQueryProvider.VAR_OBJECT).getURI(),
                                 new Interval(solution.getResource(ThingsWithIntervalQueryProvider.VAR_INTERVAL).getURI(),
                                     dateFormat.parse(solution.getLiteral(ThingsWithIntervalQueryProvider.VAR_START).getString()),
-                                    dateFormat.parse(solution.getLiteral(ThingsWithIntervalQueryProvider.VAR_END).getString()),
-                                    SparqlUtils.getLabel(solution, possibleLabelVariables))));
+                                    dateFormat.parse(solution.getLiteral(ThingsWithIntervalQueryProvider.VAR_END).getString())),
+                                SparqlUtils.getLabel(solution, possibleLabelVariables)));
             } catch (ParseException e) {
                 log.warn("Interval discarded due to date parsing error: {\n" +
                         "  startDate: " + solution.getLiteral(ThingsWithIntervalQueryProvider.VAR_START).getString() + "\n" +

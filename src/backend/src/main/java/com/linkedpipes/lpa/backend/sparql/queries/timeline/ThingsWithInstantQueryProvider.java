@@ -65,7 +65,7 @@ public class ThingsWithInstantQueryProvider extends SelectSparqlQueryProvider {
     @Override
     public SelectBuilder addOptionals(@NotNull SelectBuilder builder) {
         return builder
-                .addOptional(VAR_INSTANT, DCTerms.title, VAR_TITLE);
+                .addOptional(VAR_OBJECT, DCTerms.title, VAR_TITLE);
     }
 
     @NotNull

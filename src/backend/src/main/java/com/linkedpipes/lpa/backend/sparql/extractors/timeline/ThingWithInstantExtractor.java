@@ -32,8 +32,9 @@ public class ThingWithInstantExtractor {
                 instants.add(new ThingWithInstant(
                         solution.getResource(ThingsWithInstantQueryProvider.VAR_OBJECT).getURI(),
                         new Instant(solution.getResource(ThingsWithInstantQueryProvider.VAR_INSTANT).getURI(),
-                            dateFormat.parse(solution.getLiteral(ThingsWithInstantQueryProvider.VAR_DATE).getString()),
-                            SparqlUtils.getLabel(solution, possibleLabelVariables))));
+                            dateFormat.parse(solution.getLiteral(ThingsWithInstantQueryProvider.VAR_DATE).getString())
+                            ),
+                        SparqlUtils.getLabel(solution, possibleLabelVariables)));
             } catch (ParseException e) {
                 log.warn("Instant discarded due to date parsing error: " + solution.getLiteral(ThingsWithInstantQueryProvider.VAR_DATE).getString());
             }
