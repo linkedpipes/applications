@@ -93,7 +93,7 @@
     "eslint-plugin-material-ui": "1.0.1",
     "eslint-plugin-prettier": "3.1.0",
     "eslint-plugin-react": "7.13.0",
-    "flow-bin": "0.98.1",
+    "flow-bin": "0.100.0",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
     "lint-staged": "8.1.7",
