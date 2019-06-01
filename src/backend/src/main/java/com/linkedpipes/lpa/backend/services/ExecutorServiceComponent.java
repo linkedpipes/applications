@@ -3,6 +3,7 @@ package com.linkedpipes.lpa.backend.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
@@ -42,10 +43,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.discoveryPollingTimeoutMins");
-    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.etlPollingTimeoutMins");
-    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.discoveryPollingFrequencySecs");
-    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.etlPollingFrequencySecs");
+    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingTimeout);
+    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingTimeout);
+    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingFrequency);
+    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingFrequency);
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;

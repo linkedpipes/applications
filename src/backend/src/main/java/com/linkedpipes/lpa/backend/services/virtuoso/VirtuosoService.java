@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services.virtuoso;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
 import com.linkedpipes.lpa.backend.util.JenaUtils;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +60,7 @@ public class VirtuosoService {
                     }
 
                     String ttlData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
-                    putTtlToVirtuoso(matcher.group(GRAPH_NAME_SUFFIX), ttlData);
+                    putTtlToVirtuoso(LPA.Generated.uri + matcher.group(GRAPH_NAME_SUFFIX), ttlData);
                 }
             }
 
@@ -69,16 +70,17 @@ public class VirtuosoService {
         }
     }
 
-    private static void putTtlToVirtuoso(@NotNull String graphNameSuffix, @NotNull String ttlData) {
-        log.info(">>> graph {}", LPA.Generated.uri + graphNameSuffix);
+    public static void putTtlToVirtuoso(@NotNull String graphName, @NotNull String ttlData) {
+        log.info(">>> graph {}", graphName);
 
         LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HttpHeaders.CONTENT_TYPE, "text/turtle");
         HttpEntity<String> entity = new HttpEntity<>(ttlData, headers);
         URI uri = new DefaultUriBuilderFactory()
-                .uriString(Application.getConfig().getString("lpa.virtuoso.crudEndpoint"))
-                .queryParam("graph", LPA.Generated.uri + graphNameSuffix)
+                .uriString(Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint))
+                .queryParam("graph", graphName)
                 .build();
+        //TODO stop catching error here!!!
         try {
             new RestTemplate().put(uri, entity);
         } catch (RestClientException e) {
