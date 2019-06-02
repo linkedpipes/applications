@@ -67,7 +67,7 @@ public class VirtuosoService {
             }
 
             log.info("Done!");
-        } catch (IOException e) {
+        } catch (IOException | RestClientException e) {
             log.error("Failed to fill Virtuoso with test data!", e);
         }
     }
@@ -88,12 +88,8 @@ public class VirtuosoService {
                 .uriString(Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint))
                 .queryParam("graph", graphName)
                 .build();
-        //TODO stop catching error here!!!
-        try {
-            new RestTemplate().put(uri, entity);
-        } catch (RestClientException e) {
-            log.error("PUT to virtuoso failed", e);
-        }
+
+        new RestTemplate().put(uri, entity);
     }
 
 }
