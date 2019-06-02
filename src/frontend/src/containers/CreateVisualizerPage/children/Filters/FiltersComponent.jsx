@@ -1,63 +1,220 @@
+// flow
 import React from 'react';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import OptionsComponent from './Options';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Button from '@material-ui/core/Button';
+import ChordFiltersComponent from './children/ChordFilter';
+import { connect } from 'react-redux';
+import { filtersActions } from '@ducks/filtersDuck';
 
-const FiltersComponent = ({ filters }) => (
-  <div>
-    <List
-      component="nav"
-      subheader={
-        <ListSubheader disableSticky>
-          {!filters || filters.length === 0
-            ? 'No filters available'
-            : 'Available filters'}
-        </ListSubheader>
-      }
-    >
-      {filters &&
-        filters.length > 0 &&
-        filters.map(filter => {
-          return (
-            <div key={filter.property.uri}>
-              <ListItem button onClick={this.handleClick(filter)}>
-                <ListItemText inset primary={filter.property.label} />
-                {filter.expanded ? <ExpandMore /> : <ExpandLess />}
-              </ListItem>
-              <Collapse in={filter.expanded} timeout="auto" unmountOnExit>
-                {filter.options.length > 0 && (
-                  <List component="div" disablePadding>
-                    {filter.options.map(option => {
-                      return (
-                        <OptionsComponent
-                          type={filter.type}
-                          key={option.skosConcept.uri}
-                          option={option}
-                          onChange={this.handleOptionChange(
-                            filter.property.uri,
-                            option.skosConcept.uri
-                          )}
-                        />
-                      );
-                    })}
-                  </List>
-                )}
-              </Collapse>
-            </div>
-          );
-        })}
-    </List>
-  </div>
-);
-
-FiltersComponent.propTypes = {
-  filters: PropTypes.array
+type Props = {
+  classes: {
+    root: {},
+    filterTitle: {
+      paddingBottom: string
+    }
+  },
+  editingMode: boolean,
+  selectedResultGraphIri: string,
+  filtersState: {},
+  handleToggleEnabled: Function,
+  handleToggleVisible: Function
 };
 
-export default FiltersComponent;
+const styles = theme => ({
+  root: {
+    width: '100%'
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    flexBasis: '33.33%',
+    flexShrink: 0
+  },
+  secondaryHeading: {
+    fontSize: theme.typography.pxToRem(15),
+    color: theme.palette.text.secondary
+  },
+  filterSpan: {
+    paddingLeft: '1rem'
+  },
+  filterTitle: {
+    paddingBottom: '1rem'
+  }
+});
+
+class FiltersComponent extends React.Component<Props> {
+  applyCallbacks: Array<Function> = [];
+
+  registerCallback = callback => {
+    this.applyCallbacks.push(callback);
+  };
+
+  getFilter = (filterType, filterLabel, selectedOptions) => {
+    switch (filterType) {
+      case 'NODES_FILTER':
+        // editingMode
+        return (
+          <ChordFiltersComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            selectedNodes={selectedOptions}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+          />
+        );
+      default:
+        return <div> Unknown filter type </div>;
+    }
+  };
+
+  handleSwitchChange = name => event => {
+    const newValue = event.target.checked;
+    this.setState(prevState => {
+      return {
+        filtersState: {
+          ...prevState.filtersState,
+          [name]: newValue
+        }
+      };
+    });
+  };
+
+  render() {
+    const {
+      classes,
+      editingMode,
+      filtersState,
+      handleToggleEnabled,
+      handleToggleVisible
+    } = this.props;
+
+    return (
+      filtersState && (
+        <div className={classes.root}>
+          <Typography variant="h4" className={classes.filterTitle}>
+            Filters
+            <span className={classes.filterSpan}>
+              {editingMode && (
+                <span>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={handleToggleEnabled}
+                        checked={filtersState.enabled}
+                        value={filtersState.enabled}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={handleToggleVisible}
+                        checked={filtersState.visible}
+                        value={filtersState.visible}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.visible ? 'Visible' : 'Hidden'}
+                  />
+                </span>
+              )}
+              <Button
+                onClick={() => {
+                  this.applyCallbacks.forEach(cb => {
+                    cb();
+                  });
+                }}
+                variant="contained"
+                size="small"
+                color="primary"
+              >
+                Apply filters
+              </Button>
+            </span>
+          </Typography>
+
+          {(Object.values(filtersState.filterGroups) || []).map(
+            filterGroup =>
+              (editingMode || filterGroup.visible) && (
+                <div>
+                  <ExpansionPanel
+                    key={filterGroup.label}
+                    disabled={!filterGroup.enabled && !editingMode}
+                  >
+                    <ExpansionPanelSummary
+                      id={filterGroup.label}
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography className={classes.heading}>
+                        {filterGroup.label}
+                      </Typography>
+                      {editingMode && (
+                        <div>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={filterGroup.enabled}
+                                value={filterGroup.enabled}
+                                color="primary"
+                              />
+                            }
+                            label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
+                          />
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={filterGroup.visible}
+                                value={filterGroup.visible}
+                                color="primary"
+                              />
+                            }
+                            label={filterGroup.visible ? 'Visible' : 'Hidden'}
+                          />
+                        </div>
+                      )}
+                    </ExpansionPanelSummary>
+                    {this.getFilter(
+                      filterGroup.type,
+                      filterGroup.label,
+                      filterGroup.selectedOptions
+                    )}
+                  </ExpansionPanel>
+                </div>
+              )
+          )}
+        </div>
+      )
+    );
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+    filtersState: state.filters.filtersState
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const handleToggleEnabled = event =>
+    dispatch(filtersActions.toggleEnabled(event.target.checked));
+
+  const handleToggleVisible = event =>
+    dispatch(filtersActions.toggleVisible(event.target.checked));
+
+  return {
+    handleToggleEnabled,
+    handleToggleVisible
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(FiltersComponent));

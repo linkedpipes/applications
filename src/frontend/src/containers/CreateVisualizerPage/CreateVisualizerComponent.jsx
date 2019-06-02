@@ -25,7 +25,8 @@ type Props = {
   loadingIsActive: boolean,
   width: number,
   height: number,
-  selectedNodes?: Set<string>
+  selectedNodes?: Set<string>,
+  filtersState: {}
 };
 
 const styles = {
@@ -53,7 +54,8 @@ const CreateVisualizerComponent = ({
   loadingIsActive,
   selectedNodes,
   width,
-  height
+  height,
+  filtersState
 }: Props) => (
   <LoadingOverlay className={classes.root} active={loadingIsActive} spinner>
     {selectedApplicationMetadata ? (
@@ -81,6 +83,7 @@ const CreateVisualizerComponent = ({
       width={width}
       height={height}
       selectedNodes={selectedNodes}
+      filtersState={filtersState}
     />
   </LoadingOverlay>
 );

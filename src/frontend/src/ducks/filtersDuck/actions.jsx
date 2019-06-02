@@ -7,14 +7,39 @@ const setSelectedScheme = scheme => {
   };
 };
 
-const setSelectedNodes = nodes => {
+const setSelectedNodes = (filterName, nodes) => {
   return {
     type: types.SET_SELECTED_NODES,
-    nodes
+    nodes,
+    filterName
+  };
+};
+
+const toggleEnabled = value => {
+  return {
+    type: types.TOGGLE_ENABLED,
+    value
+  };
+};
+
+const toggleVisible = value => {
+  return {
+    type: types.TOGGLE_VISIBLE,
+    value
+  };
+};
+
+const setDefaultFiltersState = visualizerCode => {
+  return {
+    type: types.SET_DEFAULT_FILTERS_STATE,
+    visualizerCode
   };
 };
 
 export default {
   setSelectedScheme,
-  setSelectedNodes
+  setSelectedNodes,
+  setDefaultFiltersState,
+  toggleVisible,
+  toggleEnabled
 };
