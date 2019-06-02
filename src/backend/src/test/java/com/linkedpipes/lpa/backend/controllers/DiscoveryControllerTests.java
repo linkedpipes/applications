@@ -55,16 +55,6 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(USER_ID, null));
-    }
-
-    @Test
-    void testStartDiscoveryEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscovery(USER_ID, List.of()));
-    }
-
-    @Test
     void testStartDiscoveryFromEndpoint() throws LpAppsException{
         ResponseEntity<?> response = discoveryController.startDiscoveryFromEndpoint(TEST_TREEMAP_SPARQL_IRI,
                 TEST_TREEMAP_DATA_SAMPLE_URI, USER_ID, List.of(TEST_TREEMAP_NAMED_GRAPH_URI));
@@ -76,35 +66,19 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFakeUri() throws LpAppsException {
-        ResponseEntity<?> response = discoveryController.startDiscovery(USER_ID, FAKE_DISCOVERY_DATA_SOURCES);
-        assertFalse(response.getStatusCode().isError());
-
-        Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
-    }
-
-    @Test
     void testStartDiscoveryFromInputNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null, null));
     }
 
     @Test
     void testStartDiscoveryFromInputEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, ""));
-    }
-
-    @Test
-    void testStartDiscoveryFromInputFakeConfig() {
-        assertThrows(LpAppsException.class, () ->
-                discoveryController.startDiscoveryFromInput(USER_ID, "This is a fake Discovery configuration."));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, "", ""));
     }
 
     @Test
     void testStartDiscoveryFromInputIriFake() {
         assertThrows(LpAppsException.class, () ->
-                discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI."));
+                discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI.", TEST_TREEMAP_DATA_SAMPLE_URI));
     }
 
 }
