@@ -2,6 +2,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
+import { filtersActions } from '@ducks/filtersDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
@@ -17,9 +18,11 @@ type Props = {
   handleResetCurrentApplicationData: Function,
   handleResetCurrentApplicationTitle: Function,
   handleResetCurrentApplicationMetadata: Function,
+  handleSetDefaultFiltersState: Function,
   history: Object,
   selectedNodes?: Set<string>,
-  location: Object
+  location: Object,
+  filtersState: {}
 };
 
 type State = {
@@ -43,7 +46,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
 
@@ -58,6 +61,10 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         pathname: '/dashboard'
       });
     }
+    // Set default filters state for given visualizer
+    await this.props.handleSetDefaultFiltersState(
+      selectedVisualizer.visualizer.visualizerCode
+    );
   }
 
   componentWillUnmount() {
@@ -87,7 +94,8 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       selectedApplication,
       selectedApplicationMetadata,
       handleSetCurrentApplicationData,
-      selectedNodes
+      selectedNodes,
+      filtersState
     } = this.props;
 
     return (
@@ -104,6 +112,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         width={this.state.width}
         height={this.state.height}
         selectedNodes={selectedNodes}
+        filtersState={filtersState}
       />
     );
   }
@@ -113,15 +122,18 @@ const mapStateToProps = state => {
   return {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
-    filters: state.visualizers.filters,
     selectedResultGraphIri: state.etl.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
-    selectedNodes: state.filters.nodes
+    selectedNodes: state.filters.nodes,
+    filtersState: state.filters.filtersState
   };
 };
 
 const mapDispatchToProps = dispatch => {
+  const handleSetDefaultFiltersState = visualizerCode =>
+    dispatch(filtersActions.setDefaultFiltersState(visualizerCode));
+
   const handleSetCurrentApplicationData = applicationData =>
     dispatch(applicationActions.setApplication(applicationData));
 
@@ -138,7 +150,8 @@ const mapDispatchToProps = dispatch => {
     handleSetCurrentApplicationData,
     handleResetCurrentApplicationData,
     handleResetCurrentApplicationMetadata,
-    handleResetCurrentApplicationTitle
+    handleResetCurrentApplicationTitle,
+    handleSetDefaultFiltersState
   };
 };
 

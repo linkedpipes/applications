@@ -15,6 +15,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FiltersComponent from '../CreateVisualizerPage/children/Filters/FiltersComponent';
 import { withStyles } from '@material-ui/core/styles';
+import { pathOr } from 'rambda';
 
 type Props = {
   location: Object,
@@ -135,7 +136,11 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
             size={this.state.height + this.state.width}
-            selectedNodes={new Set(applicationData.selectedNodes)}
+            selectedNodes={pathOr(
+              [],
+              'filterGroups.nodesFilter.selectedOptions',
+              applicationData.filtersState
+            )}
             isPublished
           />
         );

@@ -7,10 +7,11 @@ const setSelectedScheme = scheme => {
   };
 };
 
-const setSelectedNodes = nodes => {
+const setSelectedNodes = (filterName, nodes) => {
   return {
     type: types.SET_SELECTED_NODES,
-    nodes
+    nodes,
+    filterName
   };
 };
 
