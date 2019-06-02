@@ -69,6 +69,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           id: uuid.v4(),
           applicationEndpoint: 'chord',
           selectedResultGraphIri: this.props.selectedResultGraphIri,
+          selectedPipelineExecution: this.props.selectedPipelineExecution,
           visualizerCode: 'CHORD',
           selectedNodes: this.props.selectedNodes && [
             ...this.props.selectedNodes

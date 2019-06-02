@@ -49,6 +49,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
         applicationEndpoint: 'map',
         propMarkers,
         selectedResultGraphIri: this.props.selectedResultGraphIri,
+        selectedPipelineExecution: this.props.selectedPipelineExecution,
         visualizerCode: 'MAP'
       });
     }
@@ -108,6 +109,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
         applicationEndpoint: 'map',
         markers,
         selectedResultGraphIri: this.props.selectedResultGraphIri,
+        selectedPipelineExecution: this.props.selectedPipelineExecution,
         visualizerCode: 'MAP'
       });
     }

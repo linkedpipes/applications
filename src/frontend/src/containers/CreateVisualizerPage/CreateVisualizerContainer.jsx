@@ -12,6 +12,7 @@ type Props = {
   filters: Object,
   selectedResultGraphIri: string,
   selectedApplication: Object,
+  selectedPipelineExecution: string,
   selectedApplicationMetadata: AppConfiguration,
   handleSetCurrentApplicationData: Function,
   handleResetCurrentApplicationData: Function,
@@ -84,6 +85,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       headerParams,
       filters,
       selectedResultGraphIri,
+      selectedPipelineExecution,
       selectedApplication,
       selectedApplicationMetadata,
       handleSetCurrentApplicationData,
@@ -96,6 +98,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         headerParams={headerParams}
         filters={filters}
         selectedResultGraphIri={selectedResultGraphIri}
+        selectedPipelineExecution={selectedPipelineExecution}
         selectedApplication={selectedApplication}
         selectedApplicationMetadata={selectedApplicationMetadata}
         handleSetCurrentApplicationData={handleSetCurrentApplicationData}
@@ -115,6 +118,7 @@ const mapStateToProps = state => {
     headerParams: state.globals.headerParams,
     filters: state.visualizers.filters,
     selectedResultGraphIri: state.etl.selectedResultGraphIri,
+    selectedPipelineExecution: state.etl.selectedPipelineExecution,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
     selectedNodes: state.filters.nodes

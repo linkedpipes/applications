@@ -16,6 +16,7 @@ type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
   visualizer: { visualizerCode: string },
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
   selectedApplication: Object,
   selectedApplicationMetadata: Object,
@@ -68,6 +69,7 @@ const getFilters = (visualizerCode, selectedResultGraphIri) => {
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
+  selectedPipelineExecution,
   selectedApplication,
   handleSetCurrentApplicationData,
   selectedApplicationMetadata,
@@ -88,6 +90,7 @@ const getVisualizer = (
           propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
       );
@@ -96,6 +99,7 @@ const getVisualizer = (
       return (
         <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
         />
@@ -104,6 +108,7 @@ const getVisualizer = (
       return (
         <ChordVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           size={height + width}
@@ -143,6 +148,7 @@ const VisualizerControllerContainer = (props: Props) => {
         {getVisualizer(
           props.visualizer.visualizerCode,
           props.selectedResultGraphIri,
+          props.selectedPipelineExecution,
           props.selectedApplication,
           props.handleSetCurrentApplicationData,
           props.selectedApplicationMetadata,

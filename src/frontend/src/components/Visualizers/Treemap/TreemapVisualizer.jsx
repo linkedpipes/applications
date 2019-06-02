@@ -86,6 +86,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         applicationEndpoint: 'treemap',
         conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
         selectedResultGraphIri: this.props.selectedResultGraphIri,
+        selectedPipelineExecution: this.props.selectedPipelineExecution,
         visualizerCode: 'TREEMAP'
       });
     }

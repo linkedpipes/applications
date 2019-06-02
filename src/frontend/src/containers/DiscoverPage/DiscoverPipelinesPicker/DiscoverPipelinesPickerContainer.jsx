@@ -94,8 +94,6 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
   return {
-    exportsDict: state.etl.exports,
-    executions: state.etl.executions,
     discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     dataSourceGroups:

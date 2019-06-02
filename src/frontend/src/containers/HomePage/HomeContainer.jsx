@@ -32,6 +32,7 @@ type Props = {
   socket: Object,
   webId: Object,
   handleSetResultPipelineIri: Function,
+  handleSetPipelineExecutionIri: Function,
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
@@ -198,11 +199,13 @@ class HomeContainer extends PureComponent<Props, State> {
     const {
       history,
       handleSetResultPipelineIri,
+      handleSetPipelineExecutionIri,
       handleSetSelectedVisualizer
     } = this.props;
     Log.info(`About to push with id ${pipelineExecution}`);
     const pipelineIri = pipelineExecution.etlPipelineIri;
     const visualizerType = pipelineExecution.selectedVisualiser;
+    const executionIri = pipelineExecution.executionIri;
 
     ETLService.getPipeline({
       pipelineIri
@@ -211,12 +214,14 @@ class HomeContainer extends PureComponent<Props, State> {
         return response.data;
       })
       .then(json => {
+
         const resultGraphIri = json.resultGraphIri;
         const selectedVisualiser = {
           visualizer: { visualizerCode: visualizerType }
         };
 
         handleSetResultPipelineIri(resultGraphIri);
+        handleSetPipelineExecutionIri(executionIri);
         handleSetSelectedVisualizer(selectedVisualiser);
 
         history.push({
@@ -421,6 +426,14 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleSetPipelineExecutionIri = executionIri => {
+    dispatch(
+      etlActions.addSelectedPipelineExecution({
+        data: executionIri
+      })
+    );
+  };
+
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(
       globalActions.addSelectedVisualizerAction({
@@ -446,6 +459,7 @@ const mapDispatchToProps = dispatch => {
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
+    handleSetPipelineExecutionIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,

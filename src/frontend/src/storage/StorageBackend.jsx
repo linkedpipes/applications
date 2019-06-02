@@ -587,6 +587,65 @@ class SolidBackend {
     );
   }
 
+  async uploadApplicationConfiguration(
+    appConfigurationFile: File,
+    appTitle: string,
+    appEndpoint: string,
+    webId: string,
+    appFolder: string,
+    isPublic: boolean,
+    color: string,
+    allowedUsers: string[]
+  ): Promise<AppConfiguration> {
+    const appConfigurationFilePath = `${appFolder}/configurations`;
+    const appConfigurationFileTitle = `${Utils.getName()}`;
+    let appConfigurationUrl;
+    const created = new Date(Date.now());
+    try {
+      const appConfigFileJsonLD = await this.createUploadApplicationConfigurationStatement(
+        `${appConfigurationFilePath}/${appConfigurationFileTitle}.jsonld`,
+        appTitle,
+        user,
+        color,
+        createdAt,
+        graphIri,
+        conceptIri,
+        etlExecutionIri,
+        endpoint,
+        visualizerType
+      );
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.jsonld`,
+        appConfigFileJsonLD
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
+      await StorageFileClient.createFile(
+        appConfigurationFilePath,
+        `${appConfigurationFileTitle}.jsonld.acl`,
+        await this.createFileAccessList(
+          webId,
+          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
+          [READ],
+          isPublic,
+          allowedUsers
+        )
+      ).then(response => {
+        if (response.status === 201) {
+          const filePath = response.url;
+          Log.info(`Created file at ${filePath}.`);
+        }
+      });
+    } catch (err) {
+      Log.info(err);
+      return Promise.reject(err);
+    }
+  }
+
   async removeAppConfiguration(
     appFolder: string,
     appConfiguration: AppConfiguration
@@ -701,6 +760,91 @@ class SolidBackend {
     );
 
     return response;
+  }
+
+  async createUploadFilterConfigurationStatemet(
+    nodesFilter: Object,
+    schemeFilter: Object
+  ) {
+    return {
+      '@type': 'FilterGroup',
+      nodesFilter: {
+        '@type': 'NodesFilter',
+        label: nodesFilter.label,
+        enabled: nodesFilter.enabled,
+        visible: nodesFilter.visible,
+        type: nodesFilter.type,
+        selectedOptions: {
+          '@type': 'FilterOptionGroup',
+          items: [
+            {
+              '@type': 'FilterOption',
+              uri: 'goes here',
+              label: 'goes here',
+              visible: true,
+              enabled: true
+            },
+            {
+              '@type': 'FilterOption',
+              uri: 'goes here1',
+              label: 'goes here1',
+              visible: true,
+              enabled: false
+            },
+            {
+              '@type': 'FilterOption',
+              uri: 'goes here2',
+              label: 'goes here2',
+              visible: true,
+              enabled: true
+            }
+          ]
+        }
+      },
+      schemeFilter: {
+        '@type': 'SchemeFilter'
+      }
+    };
+  }
+
+  /**
+   * Creates appropriate RDF statements for the new application configuration to upload.
+   * @param {string} appConfigurationMetadataPath An URL of the new RDF Turtle image file.
+   * @param {string} appConfigurationUrl An URL of the new image file.
+   * @param {string} appTitle A title of an application configuration.
+   * @param {string} appEndpoint An endpoint of application configuration
+   * @param {string} user A WebID of the image's creator.
+   * @param {string} cardColor Color to be used for card visualizing the app
+   * @param {Date} createdAt A creation date of the image.
+   * @return {$rdf.Statement[]} An array of the image RDF statements.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  async createUploadApplicationConfigurationStatement(
+    appConfigurationMetadataPath: string,
+    title: string,
+    user: string,
+    backgroundColor: string,
+    createdAt: Date,
+    graphIri: string,
+    conceptIri: string,
+    etlExecutionIri: string,
+    endpoint: string,
+    visualizerType: string
+  ): $rdf.Statement[] {
+    return {
+      '@context':
+        'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/d5de385001a5b6b27ff893009f3abfab6ec81a8b/lapps-ontology.jsonld',
+      '@type': 'VisualizerConfiguration',
+      id: '0fe46b0d-cee5-4055-a45a-bdc4c7c9d4f5',
+      author: user,
+      title: title,
+      backgroundColor: backgroundColor,
+      graphIri: graphIri,
+      conceptIri: conceptIri,
+      etlExecutionIri: etlExecutionIri,
+      endpoint: endpoint,
+      visualizerType: visualizerType
+    };
   }
 
   /**

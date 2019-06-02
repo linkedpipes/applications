@@ -16,6 +16,7 @@ type Props = {
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   classes: {
     root: {}
   },
@@ -44,6 +45,7 @@ const CreateVisualizerComponent = ({
   headerParams,
   filters,
   selectedResultGraphIri,
+  selectedPipelineExecution,
   selectedApplication,
   selectedApplicationMetadata,
   handleSetCurrentApplicationData,
@@ -72,6 +74,7 @@ const CreateVisualizerComponent = ({
       filters={filters}
       visualizer={selectedVisualizer.visualizer}
       selectedResultGraphIri={selectedResultGraphIri}
+      selectedPipelineExecution={selectedPipelineExecution}
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
       selectedApplication={selectedApplication}
       selectedApplicationMetadata={selectedApplicationMetadata}
