@@ -214,7 +214,6 @@ class HomeContainer extends PureComponent<Props, State> {
         return response.data;
       })
       .then(json => {
-
         const resultGraphIri = json.resultGraphIri;
         const selectedVisualiser = {
           visualizer: { visualizerCode: visualizerType }
@@ -246,20 +245,9 @@ class HomeContainer extends PureComponent<Props, State> {
 
     await this.setApplicationLoaderStatus(true);
 
-    const appConfigurationResponse = await axios.get(
-      applicationMetadata.object
-    );
+    const applicationConfiguration = applicationMetadata.configuration;
 
-    if (appConfigurationResponse.status !== 200) {
-      toast.error('Error, unable to load!', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
-      });
-      await this.setApplicationLoaderStatus(false);
-    }
-    const applicationData = appConfigurationResponse.data.applicationData;
-
-    const resultGraphIri = applicationData.selectedResultGraphIri;
+    const resultGraphIri = applicationConfiguration.graphIri;
 
     let graphExists = true;
 
@@ -269,14 +257,14 @@ class HomeContainer extends PureComponent<Props, State> {
 
     if (graphExists) {
       const selectedVisualiser = {
-        visualizer: { visualizerCode: applicationData.visualizerCode }
+        visualizer: { visualizerCode: applicationConfiguration.visualizerType }
       };
 
-      handleSetResultPipelineIri(resultGraphIri);
-      handleSetSelectedApplicationTitle(applicationMetadata.title);
-      handleSetSelectedApplicationData(applicationData);
-      handleSetSelectedApplicationMetadata(applicationMetadata);
-      handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetResultPipelineIri(resultGraphIri);
+      await handleSetSelectedApplicationTitle(applicationConfiguration.title);
+      await handleSetSelectedApplicationData(applicationConfiguration);
+      await handleSetSelectedApplicationMetadata(applicationMetadata);
+      await handleSetSelectedVisualizer(selectedVisualiser);
 
       await this.setApplicationLoaderStatus(false);
 
@@ -291,7 +279,7 @@ class HomeContainer extends PureComponent<Props, State> {
           position: toast.POSITION.TOP_RIGHT
         }
       );
-      this.handleDeleteApp(applicationMetadata);
+      this.handleDeleteApp();
     }
   };
 

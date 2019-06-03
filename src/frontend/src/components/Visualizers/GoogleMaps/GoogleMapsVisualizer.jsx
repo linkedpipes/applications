@@ -18,6 +18,7 @@ type Props = {
   selectedResultGraphIri: string,
   propMarkers: Array<{ coordinates: { lat: number, lon: number } }>,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: string,
   isPublished: boolean
 };
 
@@ -46,11 +47,10 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     if (!isPublished) {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
-        applicationEndpoint: 'map',
-        propMarkers,
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        selectedPipelineExecution: this.props.selectedPipelineExecution,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        graphIri: this.props.selectedResultGraphIri,
+        etlExecutionIri: this.props.selectedPipelineExecution,
+        visualizerType: 'MAP'
       });
     }
 
@@ -106,11 +106,10 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     if (!isPublished) {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
-        applicationEndpoint: 'map',
-        markers,
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        selectedPipelineExecution: this.props.selectedPipelineExecution,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        graphIri: this.props.selectedResultGraphIri,
+        etlExecutionIri: this.props.selectedPipelineExecution,
+        visualizerType: 'MAP'
       });
     }
   };

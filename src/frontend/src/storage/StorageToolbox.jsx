@@ -21,34 +21,32 @@ class StorageToolbox {
     return publishedUrl;
   };
 
-  saveAppToSolid = async (appData, appTitle, webId, appFolder, isPublic) => {
+  saveAppToSolid = async (
+    applicationConfiguration,
+    filtersConfiguration,
+    webId,
+    appFolder
+  ) => {
     if (!webId) {
       Log.error('No webID available', 'StorageToolbox');
       return;
     }
 
-    const file = JSON.stringify({
-      applicationData: appData
-    });
+    const configurationJsonld = StorageBackend.createUploadApplicationConfigurationStatement(
+      applicationConfiguration,
+      filtersConfiguration,
+      webId
+    );
 
-    const appEndpoint = appData.applicationEndpoint;
-
-    const randomColor = GlobalUtils.randDarkColor();
-
-    return await StorageBackend.uploadAppConfiguration(
-      file,
-      appTitle,
-      appEndpoint,
-      webId,
+    return await StorageBackend.uploadApplicationConfiguration(
+      configurationJsonld,
       appFolder,
-      isPublic,
-      randomColor,
-      []
+      webId
     );
   };
 
   removeAppFromStorage = async (appFolder, appConfiguration) => {
-    return await StorageBackend.removeAppConfiguration(
+    return await StorageBackend.removeApplicationConfiguration(
       appFolder,
       appConfiguration
     );
@@ -195,7 +193,7 @@ class StorageToolbox {
   };
 
   fetchAclFromMetadata = async (metadata: AppConfiguration) => {
-    const metadataAcl = `${metadata.url}.acl`;
+    const metadataAcl = `${metadata.solidFileUrl}.acl`;
     const accessControlObject = await StorageBackend.fetchAccessControlFile(
       metadataAcl
     );

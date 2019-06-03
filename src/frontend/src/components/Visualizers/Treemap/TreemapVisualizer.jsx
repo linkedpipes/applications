@@ -17,6 +17,7 @@ type Props = {
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: Function,
   isPublished: boolean,
   selectedScheme: string
 };
@@ -83,11 +84,11 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     if (!isPublished) {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
-        applicationEndpoint: 'treemap',
-        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        selectedPipelineExecution: this.props.selectedPipelineExecution,
-        visualizerCode: 'TREEMAP'
+        endpoint: 'treemap',
+        applicationData: { conceptIri: this.props.selectedScheme }, // TODO: change Confusing Naming
+        graphIri: this.props.selectedResultGraphIri,
+        etlExecutionIri: this.props.selectedPipelineExecution,
+        visualizerType: 'TREEMAP'
       });
     }
 
@@ -175,7 +176,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     );
 
     this.props.handleSetCurrentApplicationData({
-      conceptIri: this.props.selectedScheme
+      applicationData: { conceptIri: this.props.selectedScheme }
     });
   };
 

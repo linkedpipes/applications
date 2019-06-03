@@ -13,6 +13,7 @@ type Props = {
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: string,
   isPublished: boolean,
   theme: Object,
   height: number,
@@ -86,11 +87,11 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       if (!isPublished) {
         handleSetCurrentApplicationData({
           id: uuid.v4(),
-          applicationEndpoint: 'chord',
-          selectedResultGraphIri: this.props.selectedResultGraphIri,
-          selectedPipelineExecution: this.props.selectedPipelineExecution,
-          visualizerCode: 'CHORD',
-          selectedNodes
+          endpoint: 'chord',
+          graphIri: this.props.selectedResultGraphIri,
+          etlExecutionIri: this.props.selectedPipelineExecution,
+          visualizerType: 'CHORD',
+          applicationData: { selectedNodes }
         });
       }
 

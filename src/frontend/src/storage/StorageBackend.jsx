@@ -3,6 +3,7 @@ import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
   AppConfiguration,
+  ApplicationMetadata,
   SharedAppConfiguration,
   Person,
   Invitation,
@@ -11,6 +12,7 @@ import {
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
+import { GlobalUtils } from '@utils/';
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
@@ -432,7 +434,7 @@ class SolidBackend {
       configurationsFolder
     );
     for (const i in files) {
-      if (String(files[i].value).endsWith('.ttl')) {
+      if (String(files[i].value).endsWith('.jsonld')) {
         await this.getAppConfigurationMetadata(files[i].value)
           .then(appConfigMetadata => {
             configurationsMetadata.push(appConfigMetadata);
@@ -440,9 +442,8 @@ class SolidBackend {
           .catch(err => console.log(err));
       }
     }
-    // this.registerChanges(configurationsFolder);
     return configurationsMetadata.sort((a, b) =>
-      Utils.sortByDateAsc(a.createdAt, b.createdAt)
+      Utils.sortByDateAsc(a.configuration.published, b.configuration.published)
     );
   }
 
@@ -452,187 +453,57 @@ class SolidBackend {
    * @return {Promise<AppConfiguration>} Fetched image.
    */
   async getAppConfigurationMetadata(url: string): Promise<AppConfiguration> {
-    const fileUrl = $rdf.sym(url);
-    const file = fileUrl.doc();
-    try {
-      const response = await this.load(file);
-      Log.info(response);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-    const type = this.store.match(fileUrl, RDF('type'), POST, file);
-    if (type) {
-      const configurationUrl = this.store.any(
-        fileUrl,
-        FOAF('depiction'),
-        null,
-        file
-      );
-      const title = this.store.any(fileUrl, DCT('title'), null, file);
-      const endpoint = this.store.any(fileUrl, DCT('identifier'), null, file);
-      const creator = this.store.any(fileUrl, DCT('creator'), null, file);
-      const color = this.store.any(fileUrl, VCARD('label'), null, file);
-      const created = this.store.any(fileUrl, DCT('created'), null, file);
-      return new AppConfiguration(
-        url.toString(),
-        configurationUrl.value,
-        title.value,
-        endpoint.value,
-        creator.value,
-        color.value,
-        new Date(created.value)
-      );
-    }
-    return Promise.reject(new Error('App configuration not found.'));
+    const applicationConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
+      url
+    );
+    const appConfigurationFileTitle = `${Utils.getFilenameFromPathUrl(url)}`;
+    const appConfigurationFullPath = url;
+
+    return ApplicationMetadata.from({
+      solidFileTitle: appConfigurationFileTitle,
+      solidFileUrl: appConfigurationFullPath,
+      configuration: applicationConfiguration
+    });
   }
 
   /**
    * Uploads a new image to the user's POD.
-   * @param {string} appConfigurationFile An app file data.
-   * @param {string} webId A WebID of the image's creator.
+   * @param {Object} applicationConfiguration Partially constructed jsonld configuration.
    * @param {string} appFolder An application folder of the application's creator.
-   * @param {boolean} isPublic Whether the image is public or private.
-   * @param {string} color Color for application card.
-   * @param {string[]} allowedUsers An array of the user's which are allowed to access the application.
+   * @param {string} webId A WebID of the image's creator.
    * @return {Promise<ApplicationConfiguration>} Uploaded image.
    */
-  async uploadAppConfiguration(
-    appConfigurationFile: File,
-    appTitle: string,
-    appEndpoint: string,
-    webId: string,
-    appFolder: string,
-    isPublic: boolean,
-    color: string,
-    allowedUsers: string[]
-  ): Promise<AppConfiguration> {
-    const appConfigurationFilePath = `${appFolder}/configurations`;
-    const appConfigurationFileTitle = `${Utils.getName()}`;
-    let appConfigurationUrl;
-    const created = new Date(Date.now());
-    try {
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json`,
-        appConfigurationFile
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
-      const appConfigFileTtl = await this.createUploadAppConfigurationStatement(
-        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
-        appTitle,
-        appEndpoint,
-        webId,
-        color,
-        created
-      );
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.ttl`,
-        appConfigFileTtl
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.acl`,
-        await this.createFileAccessList(
-          webId,
-          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
-          [READ],
-          isPublic,
-          allowedUsers
-        )
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.ttl.acl`,
-        await this.createFileAccessList(
-          webId,
-          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-          [APPEND, READ],
-          isPublic,
-          allowedUsers
-        )
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
-    } catch (err) {
-      Log.info(err);
-      return Promise.reject(err);
-    }
-    return new AppConfiguration(
-      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
-      appTitle,
-      appEndpoint,
-      webId,
-      color,
-      created
-    );
-  }
-
   async uploadApplicationConfiguration(
-    appConfigurationFile: File,
-    appTitle: string,
-    appEndpoint: string,
-    webId: string,
-    appFolder: string,
-    isPublic: boolean,
-    color: string,
-    allowedUsers: string[]
-  ): Promise<AppConfiguration> {
+    applicationConfiguration,
+    appFolder,
+    webId
+  ): Promise<ApplicationMetadata> {
     const appConfigurationFilePath = `${appFolder}/configurations`;
     const appConfigurationFileTitle = `${Utils.getName()}`;
     let appConfigurationUrl;
     const created = new Date(Date.now());
     try {
-      const appConfigFileJsonLD = await this.createUploadApplicationConfigurationStatement(
-        `${appConfigurationFilePath}/${appConfigurationFileTitle}.jsonld`,
-        appTitle,
-        user,
-        color,
-        createdAt,
-        graphIri,
-        conceptIri,
-        etlExecutionIri,
-        endpoint,
-        visualizerType
-      );
       await StorageFileClient.createFile(
         appConfigurationFilePath,
         `${appConfigurationFileTitle}.jsonld`,
-        appConfigFileJsonLD
+        applicationConfiguration
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
           Log.info(`Created file at ${filePath}.`);
         }
       });
+
+      const appConfigurationFullPath = `${appConfigurationFilePath}/${appConfigurationFileTitle}.jsonld`;
       await StorageFileClient.createFile(
         appConfigurationFilePath,
         `${appConfigurationFileTitle}.jsonld.acl`,
         await this.createFileAccessList(
           webId,
-          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
+          appConfigurationFullPath,
           [READ],
-          isPublic,
-          allowedUsers
+          true,
+          []
         )
       ).then(response => {
         if (response.status === 201) {
@@ -640,40 +511,35 @@ class SolidBackend {
           Log.info(`Created file at ${filePath}.`);
         }
       });
+
+      return Promise.resolve(
+        ApplicationMetadata.from({
+          solidFileTitle: appConfigurationFileTitle,
+          solidFileUrl: appConfigurationFullPath,
+          configuration: applicationConfiguration
+        })
+      );
     } catch (err) {
       Log.info(err);
       return Promise.reject(err);
     }
   }
 
-  async removeAppConfiguration(
+  async removeApplicationConfiguration(
     appFolder: string,
-    appConfiguration: AppConfiguration
+    appMetadata: ApplicationMetadata
   ): Promise<Boolean> {
     try {
       const folderPath = `${Utils.getFolderUrlFromPathUrl(
-        appConfiguration.url
+        appConfiguration.solidFileUrl
       )}`;
-      const metadataFileTitle = `${Utils.getFilenameFromPathUrl(
-        appConfiguration.url
-      )}`;
-      const fileTitle = `${Utils.getFilenameFromPathUrl(
-        appConfiguration.object
-      )}`;
+      const metadataFileTitle = `${appConfiguration.solidFileTitle}.jsonld`;
 
       await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
         response => {
           if (response.status === 200) {
             const filePath = response.url;
             Log.info(`Removed ${metadataFileTitle} at ${filePath}.`);
-          }
-        }
-      );
-      await StorageFileClient.removeItem(folderPath, fileTitle).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${fileTitle} at ${filePath}.`);
           }
         }
       );
@@ -686,14 +552,6 @@ class SolidBackend {
           Log.info(`Removed ${metadataFileTitle}.acl at ${filePath}.`);
         }
       });
-      await StorageFileClient.removeItem(folderPath, `${fileTitle}.acl`).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${fileTitle}.acl ${filePath}.`);
-          }
-        }
-      );
     } catch (err) {
       console.log('Could not delete a profile document.');
       return Promise.reject(err);
@@ -762,49 +620,66 @@ class SolidBackend {
     return response;
   }
 
-  async createUploadFilterConfigurationStatemet(
-    nodesFilter: Object,
-    schemeFilter: Object
-  ) {
-    return {
-      '@type': 'FilterGroup',
-      nodesFilter: {
-        '@type': 'NodesFilter',
-        label: nodesFilter.label,
-        enabled: nodesFilter.enabled,
-        visible: nodesFilter.visible,
-        type: nodesFilter.type,
-        selectedOptions: {
-          '@type': 'FilterOptionGroup',
-          items: [
-            {
-              '@type': 'FilterOption',
-              uri: 'goes here',
-              label: 'goes here',
-              visible: true,
-              enabled: true
-            },
-            {
-              '@type': 'FilterOption',
-              uri: 'goes here1',
-              label: 'goes here1',
-              visible: true,
-              enabled: false
-            },
-            {
-              '@type': 'FilterOption',
-              uri: 'goes here2',
-              label: 'goes here2',
-              visible: true,
-              enabled: true
-            }
-          ]
-        }
-      },
-      schemeFilter: {
-        '@type': 'SchemeFilter'
+  createUploadFilterConfigurationStatement(filtersConfiguration) {
+    if (!filtersConfiguration) {
+      return '';
+    } else {
+      const filtersState = filtersConfiguration.filtersState;
+      const { enabled, visible, filterGroups } = filtersState;
+      const { nodesFilter, schemeFilter } = filterGroups;
+
+      let nodesObject = {};
+      if (nodesFilter != undefined) {
+        let nodesItems = [];
+
+        nodesItems = nodesFilter.selectedOptions.map(item => {
+          (item['@type'] = 'FilterOption'), (item['visible'] = true);
+          item['enabled'] = true;
+          return item;
+        });
+
+        nodesObject = {
+          '@type': 'NodesFilter',
+          label: nodesFilter.label,
+          enabled: nodesFilter.enabled,
+          visible: nodesFilter.visible,
+          type: nodesFilter.type,
+          selectedOptions: {
+            '@type': 'FilterOptionGroup',
+            items: nodesItems
+          }
+        };
       }
-    };
+
+      let schemeObject = {};
+      if (schemeFilter != undefined) {
+        let schemeItems = [];
+
+        schemeItems = schemeFilter.selectedOptions.map(item => {
+          (item['@type'] = 'FilterOption'), (item['visible'] = true);
+          item['enabled'] = true;
+          return item;
+        });
+
+        schemeObject = {
+          '@type': 'SchemeFilter',
+          label: schemeFilter.label,
+          enabled: schemeFilter.enabled,
+          visible: schemeFilter.visible,
+          type: schemeFilter.type,
+          selectedOptions: {
+            '@type': 'FilterOptionGroup',
+            items: schemeItems
+          }
+        };
+      }
+
+      return {
+        '@type': 'FilterGroup',
+        nodesFilter: nodesObject,
+        schemeFilter: schemeObject
+      };
+    }
   }
 
   /**
@@ -819,32 +694,40 @@ class SolidBackend {
    * @return {$rdf.Statement[]} An array of the image RDF statements.
    */
   // eslint-disable-next-line class-methods-use-this
-  async createUploadApplicationConfigurationStatement(
-    appConfigurationMetadataPath: string,
-    title: string,
-    user: string,
-    backgroundColor: string,
-    createdAt: Date,
-    graphIri: string,
-    conceptIri: string,
-    etlExecutionIri: string,
-    endpoint: string,
-    visualizerType: string
-  ): $rdf.Statement[] {
-    return {
+  createUploadApplicationConfigurationStatement(
+    {
+      id,
+      applicationData,
+      title,
+      createdAt,
+      graphIri,
+      conceptIri,
+      etlExecutionIri,
+      endpoint,
+      visualizerType
+    },
+    filtersConfiguration,
+    webId
+  ): string {
+    return JSON.stringify({
       '@context':
-        'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/d5de385001a5b6b27ff893009f3abfab6ec81a8b/lapps-ontology.jsonld',
+        'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/ae03d1c163bb015f79a3ea65f9ab009a6ab22c52/lapps-ontology.jsonld',
       '@type': 'VisualizerConfiguration',
-      id: '0fe46b0d-cee5-4055-a45a-bdc4c7c9d4f5',
-      author: user,
+      id: id,
+      author: webId,
       title: title,
-      backgroundColor: backgroundColor,
+      backgroundColor: GlobalUtils.randDarkColor(),
       graphIri: graphIri,
       conceptIri: conceptIri,
+      published: new Date(Date.now()).toISOString(),
       etlExecutionIri: etlExecutionIri,
+      applicationData: applicationData,
       endpoint: endpoint,
+      filterGroups: this.createUploadFilterConfigurationStatement(
+        filtersConfiguration
+      ),
       visualizerType: visualizerType
-    };
+    });
   }
 
   /**

@@ -29,6 +29,13 @@ const toggleVisible = value => {
   };
 };
 
+const setFiltersState = value => {
+  return {
+    type: types.SET_FILTERS_STATE,
+    value
+  };
+};
+
 const setDefaultFiltersState = visualizerCode => {
   return {
     type: types.SET_DEFAULT_FILTERS_STATE,
@@ -39,6 +46,7 @@ const setDefaultFiltersState = visualizerCode => {
 export default {
   setSelectedScheme,
   setSelectedNodes,
+  setFiltersState,
   setDefaultFiltersState,
   toggleVisible,
   toggleEnabled

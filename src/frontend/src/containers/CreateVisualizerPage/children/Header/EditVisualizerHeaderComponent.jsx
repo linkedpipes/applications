@@ -126,7 +126,7 @@ const EditVisualizerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
-              value={selectedApplicationMetadata.title}
+              value={selectedApplicationMetadata.configuration.title}
               className={classes.textField}
               readOnly
               variant="outlined"
@@ -140,7 +140,7 @@ const EditVisualizerHeaderComponent = ({
             <Typography align="center" variant="h6">
               {selectedVisualizer
                 ? GlobalUtils.getBeautifiedVisualizerTitle(
-                    selectedApplicationMetadata.endpoint
+                    selectedApplicationMetadata.configuration.endpoint
                   )
                 : 'Unkown visualizer type'}
             </Typography>

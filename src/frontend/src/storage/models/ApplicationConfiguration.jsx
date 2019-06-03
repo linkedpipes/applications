@@ -1,15 +1,7 @@
-import FilterConfiguration from './FilterConfiguration';
-
 /**
  * Model class for storing application configuration.
  */
 export default class ApplicationConfiguration {
-  /** Expresses the url of the context for jsonld configuration. */
-  context: string;
-
-  /** Type of the ontology class. */
-  type: string;
-
   id: string;
 
   author: string;
@@ -20,7 +12,7 @@ export default class ApplicationConfiguration {
 
   graphIri: string;
 
-  conceptIri: string;
+  applicationData: string;
 
   etlExecutionIri: string;
 
@@ -28,33 +20,42 @@ export default class ApplicationConfiguration {
 
   visualizerType: string;
 
-  filterConfiguration: FilterConfiguration;
+  filterGroups: Object;
 
-  constructor(
-    context: string,
-    type: string,
-    id: string,
-    author: string,
-    title: string,
-    backgroundColor: string,
-    graphIri: string,
-    conceptIri: string,
-    etlExecutionIri: string,
-    endpoint: string,
-    visualizerType: string,
-    filterConfiguration: string
-  ) {
-    this.context = context;
-    this.type = type;
+  published: Date;
+
+  constructor({
+    id,
+    author,
+    title,
+    backgroundColor,
+    graphIri,
+    applicationData,
+    etlExecutionIri,
+    endpoint,
+    visualizerType,
+    filterGroups,
+    published
+  }) {
     this.id = id;
     this.author = author;
     this.title = title;
     this.backgroundColor = backgroundColor;
     this.graphIri = graphIri;
-    this.conceptIri = conceptIri;
+    this.applicationData = applicationData;
     this.etlExecutionIri = etlExecutionIri;
     this.endpoint = endpoint;
     this.visualizerType = visualizerType;
-    this.filterConfiguration = filterConfiguration;
+    this.filterGroups = filterGroups;
+    this.published = published;
+  }
+
+  static from(json) {
+    let jsonObject = json;
+
+    if (typeof jsonObject === 'string' || jsonObject instanceof String)
+      jsonObject = JSON.parse(json);
+
+    return new ApplicationConfiguration(jsonObject);
   }
 }

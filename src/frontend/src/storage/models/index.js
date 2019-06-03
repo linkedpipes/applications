@@ -1,5 +1,7 @@
 import AppConfiguration from './AppConfiguration';
 import SharedAppConfiguration from './SharedAppConfiguration';
+import ApplicationConfiguration from './ApplicationConfiguration';
+import ApplicationMetadata from './ApplicationMetadata';
 import Person from './Person';
 import Invitation from './Invitation';
 import AcceptedInvitation from './AcceptedInvitation';
@@ -10,6 +12,8 @@ export {
   AppConfiguration,
   AccessControl,
   SharedAppConfiguration,
+  ApplicationConfiguration,
+  ApplicationMetadata,
   AcceptedInvitation,
   Invitation,
   Person,

@@ -65,8 +65,8 @@ const ApplicationsTableComponent = ({
                 >
                   <CopyToClipboard
                     text={StorageToolbox.appIriToPublishUrl(
-                      metadata.object,
-                      metadata.endpoint
+                      metadata.solidFileUrl,
+                      metadata.configuration.endpoint
                     )}
                     onCopy={onHandleShareAppClicked}
                   >
@@ -76,12 +76,14 @@ const ApplicationsTableComponent = ({
                   </CopyToClipboard>
                 </TableCell>
                 <TableCell align="center" component="th" scope="row">
-                  {metadata.title}
+                  {metadata.configuration.title}
                 </TableCell>
-                <TableCell align="center">{metadata.endpoint}</TableCell>
-                <TableCell align="center">{`${moment(metadata.createdAt).format(
-                  'lll'
-                )}`}</TableCell>
+                <TableCell align="center">
+                  {metadata.configuration.endpoint}
+                </TableCell>
+                <TableCell align="center">{`${moment(
+                  metadata.configuration.published
+                ).format('lll')}`}</TableCell>
               </TableRow>
             ))}
           </TableBody>

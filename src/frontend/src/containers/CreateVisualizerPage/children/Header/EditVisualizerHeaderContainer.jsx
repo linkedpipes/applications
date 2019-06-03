@@ -194,6 +194,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus
     } = this.props;
 
+    const applicationMetadata = selectedApplicationMetadata;
+
     if (modifiedSelectedApplicationTitle === '') {
       toast.error('Error, provide a valid name for an application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -206,7 +208,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     this.handleCloseRenameDialog();
 
     const isRenamed = await StorageToolbox.renameAppConfiguration(
-      selectedApplicationMetadata.url,
+      applicationMetadata.solidFileUrl,
       modifiedSelectedApplicationTitle
     );
 
@@ -216,9 +218,9 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
         autoClose: 2000
       });
 
-      selectedApplicationMetadata.title = modifiedSelectedApplicationTitle;
+      applicationMetadata.configuration.title = modifiedSelectedApplicationTitle;
       handleSetSelectedApplicationTitle(modifiedSelectedApplicationTitle);
-      handleSetSelectedApplicationMetadata(selectedApplicationMetadata);
+      handleSetSelectedApplicationMetadata(applicationMetadata);
     } else {
       toast.success('Error, unable to rename application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -333,7 +335,7 @@ const mapStateToProps = state => {
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
-    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    selectedApplicationTitle: state.application.selectedApplication.title,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };

@@ -41,6 +41,12 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
         }
       };
 
+    case types.SET_FILTERS_STATE:
+      return {
+        ...state,
+        filtersState: action.value
+      };
+
     case types.SET_DEFAULT_FILTERS_STATE:
       switch (action.visualizerCode) {
         case VISUALIZER_TYPE.CHORD:
