@@ -3,14 +3,15 @@ import React, { PureComponent, Fragment } from 'react';
 import SettingsPageComponent from './SettingsPageComponent';
 import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
-import { withAuthorization } from '@utils';
+import { withAuthorization, GoogleAnalyticsWrapper } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
   userProfile: Object,
   handleUpdateChooseFolderDialogState: Function,
   setColorTheme: Function,
-  colorThemeIsLight: Boolean
+  colorThemeIsLight: Boolean,
+  location: Object
 };
 
 class SettingsPageContainer extends PureComponent<Props> {
@@ -18,6 +19,11 @@ class SettingsPageContainer extends PureComponent<Props> {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
     (this: any).handleChangeColor = this.handleChangeColor.bind(this);
+  }
+
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   handleChangeFolder() {

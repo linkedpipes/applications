@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
-import axios from 'axios';
-import { Log } from '@utils';
 
 export const samples = [
   {
@@ -17,10 +15,12 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'ttlFile',
+    type: 'sparqlEndpoint',
     label: 'GoogleMaps Sample',
-    fileUrl:
-      'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
+    sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
+    namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
+    dataSampleIri:
+      'https://gist.githubusercontent.com/Ponsietta/1cfcc9cc018c11e39afe1553d0b3f25f/raw/266634bcc2b5bb56b5eed8dbcaf69df9f719cf08/ruian-test-buildings_map_sample.ttl'
   },
   {
     id: uuid.v4(),
@@ -37,20 +37,7 @@ class DiscoverExamplesContainer extends PureComponent {
   handleListItemClicked = item => {
     const { onInputExampleClicked } = this.props;
     const inputExample = item;
-    if (item.type === 'ttlFile') {
-      axios
-        .get(item.fileUrl)
-        .then(response => {
-          inputExample.dataSourcesUris = response.data;
-          onInputExampleClicked(inputExample);
-        })
-        .catch(error => {
-          // handle error
-          Log.error(error, 'DiscoverExamplesContainer');
-        });
-    } else {
-      onInputExampleClicked(inputExample);
-    }
+    onInputExampleClicked(inputExample);
   };
 
   render() {

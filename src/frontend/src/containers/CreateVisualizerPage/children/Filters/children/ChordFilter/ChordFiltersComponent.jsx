@@ -18,7 +18,6 @@ type Props = {
     formControl: string,
     selectEmpty: string
   },
-  nodes: Array<{ label: { languageMap: { nolang: string } }, uri: string }>,
   onApplyFilter: Function
 };
 type State = {
@@ -40,6 +39,8 @@ const styles = theme => ({
 });
 
 class ChordFiltersComponent extends React.Component<Props, State> {
+  conceptsFetched: Set<string>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -78,8 +79,6 @@ class ChordFiltersComponent extends React.Component<Props, State> {
       })
     }));
   };
-
-  conceptsFetched: Set<string>;
 
   // todo: add switch to define whether it is editable by users
   render() {

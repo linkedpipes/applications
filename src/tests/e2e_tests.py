@@ -4,6 +4,7 @@ import os
 import sys
 import requests
 import browserstack_plugins.fast_selenium
+from concurrent.futures import ThreadPoolExecutor
 
 
 from selenium import webdriver
@@ -27,6 +28,47 @@ slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 
 
+class Runner():
+
+    @staticmethod
+    def parallel_execution(*name, options='by_module'):
+        """
+        name - name of the class with tests or module with classes that contain tests
+        modules - name of the module with tests or with class that contains tests
+        options:
+            by_method - gather all tests methods in the class/classes and execute in parallel
+            by_module - gather all tests from modules in parallel
+            by_class - will execute all classes (with tests) in parallel
+        """
+
+        suite = unittest.TestSuite()
+
+        if (options == 'by_method'):
+            for object in name:
+                for method in dir(object):
+                    if (method.startswith('test')):
+                        suite.addTest(object(method))
+        elif (options == 'by_class'):
+            for object in name:
+                suite.addTest(
+                    unittest.TestLoader().loadTestsFromTestCase(object))
+
+        elif (options == 'by_module'):
+            for module in name:
+                suite.addTest(
+                    unittest.TestLoader().loadTestsFromModule(module))
+        else:
+            raise ValueError("Parameter 'options' is incorrect."
+                             "Available options: 'by_method', 'by_class', 'by_module'")
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            list_of_suites = list(suite)
+            for test in range(len(list_of_suites)):
+                test_name = str(list_of_suites[test])
+                executor.submit(unittest.TextTestRunner().run,
+                                list_of_suites[test])
+
+
 class UntitledTestCase(unittest.TestCase):
 
     browserstack_username = 'no_username'
@@ -35,9 +77,12 @@ class UntitledTestCase(unittest.TestCase):
     build_travis_number = -1
 
     def setUp(self):
+        super(UntitledTestCase, self).setUp()
+
         desired_cap['build'] = self.build_travis_number
         desired_cap['project'] = self.pr_repo_title
 
+        # self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         self.driver = webdriver.Remote(
             command_executor='http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(self.browserstack_username,
                                                                                     self.browserstack_access_key),
@@ -60,11 +105,11 @@ class UntitledTestCase(unittest.TestCase):
         print('WAITING for {0}'.format(element_id))
         return element
 
-    def custom_wait_clickable_and_click(self, element_id, attempts=5):
+    def custom_wait_clickable_and_click(self, element_id, attempts=2000):
         count = 0
         while count < attempts:
             try:
-                time.sleep(5)
+                time.sleep(4)
                 # This will throw an exception if it times out, which is what we want.
                 # We only want to start trying to click it once we've confirmed that
                 # selenium thinks it's visible and clickable.
@@ -77,7 +122,67 @@ class UntitledTestCase(unittest.TestCase):
             except WebDriverException as e:
                 count = count + 1
 
-    def test_google_maps_flow(self):
+    # def test_google_maps_flow(self):
+    #     driver = self.driver
+    #
+    #     driver.get("https://applications.linkedpipes.com/login")
+    #     driver.find_element_by_id("with-web-id-checkbox").click()
+    #     driver.find_element_by_id("webId").click()
+    #     driver.find_element_by_id("webId").clear()
+    #     driver.find_element_by_id("webId").send_keys(
+    #         "https://seleniumlpa.inrupt.net/profile/card#me")
+    #     driver.find_element_by_id(
+    #         "sign-in-button").click()
+    #     driver.find_element_by_id("username").click()
+    #     driver.find_element_by_id("username").clear()
+    #     driver.find_element_by_id("username").send_keys("seleniumlpa1")
+    #     driver.find_element_by_id("password").click()
+    #     driver.find_element_by_id("password").clear()
+    #     driver.find_element_by_id("password").send_keys("Selenium123!")
+    #     driver.find_element_by_id("login").click()
+    #
+    #     self.custom_wait_clickable_and_click(
+    #         element_id="googlemaps-sample-home-button")
+    #
+    #     self.custom_wait_clickable_and_click(
+    #         element_id="start-discovery-button")
+    #
+    #     self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
+    #
+    #     self.custom_wait_clickable_and_click(element_id="create-app-button")
+    #
+    #     self.custom_wait_clickable_and_click("application-title-field")
+    #     driver.find_element_by_id("application-title-field").clear()
+    #     driver.find_element_by_id(
+    #         "application-title-field").send_keys("test_selenium_gmaps_app")
+    #     driver.find_element_by_id("create-app-publish-button").click()
+    #
+    #     self.custom_wait_clickable_and_click("browse-published-button")
+    #
+    #     self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
+    #
+    #     self.custom_wait_clickable_and_click("storage_navbar_button")
+    #
+    #     self.custom_wait_clickable_and_click("more_icon_0_test_selenium_gmaps_app")
+    #
+    #     self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
+    #
+    #     self.custom_wait_clickable_and_click("dashboard_navbar_button")
+    #
+    #     self.custom_wait_clickable_and_click("discoveries_tab")
+    #
+    #     self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
+    #
+    #     self.custom_wait_clickable_and_click("dashboard_navbar_button")
+    #
+    #     self.custom_wait_clickable_and_click("pipeline_executions_tab")
+    #
+    #     self.custom_wait_clickable_and_click("delete_execution_session_button_0")
+    #
+    #
+    #     time.sleep(5)
+
+    def test_treemap_flow(self):
         driver = self.driver
 
         driver.get("https://applications.linkedpipes.com/login")
@@ -85,44 +190,58 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa.inrupt.net/profile/card#me")
+            "https://seleniumlpa1.inrupt.net/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlpa")
+        driver.find_element_by_id("username").send_keys("seleniumlpa1")
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
         driver.find_element_by_id("password").send_keys("Selenium123!")
         driver.find_element_by_id("login").click()
 
         self.custom_wait_clickable_and_click(
-            element_id="googlemaps-sample-home-button")
+            element_id="treemap-sample-home-button")
 
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
         self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
-        self.custom_wait_clickable_and_click(element_id="button-2-pipeline")
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
         driver.find_element_by_id(
-            "application-title-field").send_keys("test_selenium_gmaps_app")
+            "application-title-field").send_keys("test_selenium_treemap_app")
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
 
-        self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
+        self.custom_wait_clickable_and_click("0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
 
-        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_gmaps_app")
+        self.custom_wait_clickable_and_click(
+            "more_icon_0_test_selenium_treemap_app")
 
-        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
+        self.custom_wait_clickable_and_click(
+            "delete_button_0_test_selenium_treemap_app")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        self.custom_wait_clickable_and_click("discoveries_tab")
+
+        self.custom_wait_clickable_and_click(
+            "delete_discovery_session_button_0")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        self.custom_wait_clickable_and_click("pipeline_executions_tab")
+
+        self.custom_wait_clickable_and_click(
+            "delete_execution_session_button_0")
 
         time.sleep(5)
 
@@ -134,7 +253,7 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa.inrupt.net/profile/card#me")
+            "https://seleniumlpa2.inrupt.net/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
@@ -167,9 +286,25 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
 
-        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_chord_app")
+        self.custom_wait_clickable_and_click(
+            "more_icon_0_test_selenium_chord_app")
 
-        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_chord_app")
+        self.custom_wait_clickable_and_click(
+            "delete_button_0_test_selenium_chord_app")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        self.custom_wait_clickable_and_click("discoveries_tab")
+
+        self.custom_wait_clickable_and_click(
+            "delete_discovery_session_button_0")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        self.custom_wait_clickable_and_click("pipeline_executions_tab")
+
+        self.custom_wait_clickable_and_click(
+            "delete_execution_session_button_0")
 
         time.sleep(5)
 
@@ -238,4 +373,6 @@ if __name__ == "__main__":
         UntitledTestCase.browserstack_access_key = sys.argv.pop()
         UntitledTestCase.browserstack_username = sys.argv.pop()
 
-    unittest.main()
+    runner = Runner()
+
+    runner.parallel_execution(UntitledTestCase, options='by_method')

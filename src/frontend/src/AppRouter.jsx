@@ -16,27 +16,34 @@ import {
   SettingsPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log, AuthenticationService } from '@utils';
+import { SocketContext, Log, UserService } from '@utils';
 import { StoragePage, StorageBackend } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import withTracker from './withTracker';
-import GoogleAnalytics from 'react-ga';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
 // BASE_SOCKET_URL is not set
-const socket = io.connect(
-  process.env.BASE_SOCKET_URL ? process.env.BASE_SOCKET_URL : undefined,
-  {
-    reconnection: process.env.SOCKET_RECONNECT
-      ? process.env.SOCKET_RECONNECT
-      : false
-  }
-);
+
+let socket;
+
+const startSocketClient = () => {
+  socket = io.connect(
+    process.env.BASE_SOCKET_URL ? process.env.BASE_SOCKET_URL : undefined,
+    {
+      reconnection: process.env.SOCKET_RECONNECT
+        ? process.env.SOCKET_RECONNECT
+        : false
+    }
+  );
+};
+
+const stopSocketClient = () => {
+  socket.disconnect();
+};
 
 const styles = () => ({
   root: {
@@ -47,7 +54,7 @@ const styles = () => ({
 
 type Props = {
   classes: any,
-  userId: ?string,
+  webId: ?string,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   handleSetSolidUserProfileAsync: Function,
@@ -56,22 +63,23 @@ type Props = {
   handleUpdateDiscoverySession: Function,
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
-  handleSetUserWebId: Function
+  handleSetUserWebId: Function,
+  handleDeleteDiscoverySession: Function,
+  handleDeleteExecutionSession: Function
 };
 
 type State = {
   isExternalPath: boolean
 };
 
-const errorHandler = userId => {
+const errorHandler = webId => {
   return (error: Error, componentStack: string) => {
     Log.error(componentStack, 'AppRouter');
     Sentry.withScope(scope => {
-      scope.setUser({ id: userId || 'unidentified user' }); // How can we capture WEBID from here
+      scope.setUser({ id: webId || 'unidentified user' }); // How can we capture WEBID from here
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
       Sentry.captureException(error);
-      Sentry.showReportDialog(); // Only if not production
     });
   };
 };
@@ -81,7 +89,7 @@ class AppRouter extends React.PureComponent<Props, State> {
     isExternalPath: false
   };
 
-  componentDidMount() {
+  componentDidMount = async () => {
     const pathname = window.location.href;
 
     if (
@@ -91,20 +99,25 @@ class AppRouter extends React.PureComponent<Props, State> {
     ) {
       this.setState({ isExternalPath: true });
     } else {
-      this.setupSessionTracker();
+      await this.setupSessionTracker();
     }
-  }
 
-  componentWillUnmount() {
-    if (!this.state.isExternalPath) {
-      socket.removeAllListeners();
-    }
-  }
+    window.onbeforeunload = () => {
+      if (
+        !this.state.isExternalPath &&
+        this.props.webId &&
+        socket !== undefined
+      ) {
+        socket.emit('leave', this.props.webId);
+        socket.removeAllListeners();
+      }
+    };
+  };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
     const me = await StorageBackend.getPerson(updatedProfileData.webId);
-    this.props.handleSetSolidUserProfileAsync(
+    await this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
       me.image
@@ -120,26 +133,21 @@ class AppRouter extends React.PureComponent<Props, State> {
 
     authClient.trackSession(session => {
       if (session) {
-        GoogleAnalytics.set({ userId: session.webId });
-
         handleSetUserWebId(session.webId);
 
         Log.info(session);
         self.startSocketListeners();
 
-        AuthenticationService.getUserProfile(session.webId)
+        UserService.getUserProfile(session.webId)
           .then(res => {
-            Log.info(
-              'Response from get user profile call:',
-              'AuthenticationService'
-            );
-            Log.info(res, 'AuthenticationService');
-            Log.info(res.data, 'AuthenticationService');
+            Log.info('Response from get user profile call:', 'UserService');
+            Log.info(res, 'UserService');
+            Log.info(res.data, 'UserService');
 
             return res.data;
           })
           .then(async jsonResponse => {
-            self.setupProfileData(jsonResponse);
+            await self.setupProfileData(jsonResponse);
 
             socket.emit('join', session.webId);
 
@@ -171,7 +179,10 @@ class AppRouter extends React.PureComponent<Props, State> {
 
         Log.warn('Called global');
       } else {
-        socket.removeAllListeners();
+        // eslint-disable-next-line no-lonely-if
+        if (socket !== undefined) {
+          socket.removeAllListeners();
+        }
       }
     });
   };
@@ -181,25 +192,34 @@ class AppRouter extends React.PureComponent<Props, State> {
       handleAddDiscoverySession,
       handleAddExecutionSession,
       handleUpdateDiscoverySession,
-      handleUpdateExecutionSession
+      handleUpdateExecutionSession,
+      handleDeleteDiscoverySession,
+      handleDeleteExecutionSession
     } = this.props;
 
-    socket.removeAllListeners();
+    if (socket) {
+      // restart if there is an instance already
+      stopSocketClient();
+    }
+    startSocketClient();
 
-    socket.on('connect', data => {
-      Log.warn('Client connected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+    socket.on('connect', () => {
+      if (socket.connected) {
+        Log.info('Client connected', 'AppRouter');
+        Log.info(socket.id, 'AppRouter');
+      }
     });
-    socket.on('disconnect', data => {
-      Log.warn('Client disconnected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+
+    socket.on('disconnect', () => {
+      Log.info('Client disconnected', 'AppRouter');
+      Log.info(socket.id, 'AppRouter');
     });
-    socket.on('reconnect', data => {
-      Log.warn('Client reconnected', 'AppRouter');
-      Log.warn(data, 'AppRouter');
-      Log.warn(socket.id, 'AppRouter');
+
+    socket.on('reconnect', () => {
+      if (socket.connected) {
+        Log.info('Client reconnected', 'AppRouter');
+        Log.info(socket.id, 'AppRouter');
+      }
     });
 
     socket.on('discoveryAdded', data => {
@@ -209,6 +229,21 @@ class AppRouter extends React.PureComponent<Props, State> {
       const parsedData = JSON.parse(data);
       socket.emit('join', parsedData.discoveryId);
       handleAddDiscoverySession(parsedData);
+    });
+
+    socket.on('discoveryDeleted', data => {
+      Log.info(socket.id);
+      const senderSocketId = data.socketId;
+      const currentSocketId = socket.id;
+
+      if (
+        senderSocketId &&
+        currentSocketId &&
+        senderSocketId !== currentSocketId
+      ) {
+        const discoveryId = data.discoveryId;
+        handleDeleteDiscoverySession(discoveryId);
+      }
     });
 
     const self = this;
@@ -232,6 +267,21 @@ class AppRouter extends React.PureComponent<Props, State> {
 
       socket.emit('join', pipelineRecord.executionIri);
       handleAddExecutionSession(pipelineRecord);
+    });
+
+    socket.on('executionDeleted', data => {
+      Log.info(socket.id);
+      const senderSocketId = data.socketId;
+      const currentSocketId = socket.id;
+
+      if (
+        senderSocketId &&
+        currentSocketId &&
+        senderSocketId !== currentSocketId
+      ) {
+        const executionIri = data.executionIri;
+        handleDeleteExecutionSession(executionIri);
+      }
     });
 
     socket.on('discoveryStatus', data => {
@@ -291,29 +341,25 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, userId } = this.props;
+    const { classes, webId } = this.props;
     return (
       <div>
-        <ErrorBoundary onError={errorHandler(userId)}>
+        <ErrorBoundary onError={errorHandler(webId)}>
           <BrowserRouter>
             <div className={classes.root}>
               <SocketContext.Provider value={socket}>
                 <Switch>
                   <PublicLayout
-                    component={withTracker(AuthorizationPage)}
+                    component={AuthorizationPage}
                     path="/login"
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/dashboard"
-                    component={withTracker(HomePage)}
-                    exact
-                  />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact />
 
                   <PrivateLayout
                     path="/create-app"
-                    component={withTracker(CreateVisualizerPage)}
+                    component={CreateVisualizerPage}
                     exact
                   />
 
@@ -325,7 +371,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
                   <PrivateLayout
                     path="/profile"
-                    component={withTracker(UserProfilePage)}
+                    component={UserProfilePage}
                     exact
                   />
 
@@ -335,23 +381,15 @@ class AppRouter extends React.PureComponent<Props, State> {
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/about"
-                    component={withTracker(AboutPage)}
-                    exact
-                  />
+                  <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout
                     path="/storage"
-                    component={withTracker(StoragePage)}
+                    component={StoragePage}
                     exact
                   />
 
-                  <PublicLayout
-                    path="/404"
-                    component={withTracker(NotFoundPage)}
-                    exact
-                  />
+                  <Route path="/404" component={NotFoundPage} exact />
 
                   <Route path="/map" component={ApplicationPage} />
 
@@ -373,7 +411,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.webId,
+    webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
@@ -399,8 +437,14 @@ const mapDispatchToProps = dispatch => {
   const handleAddDiscoverySession = discoverySession =>
     dispatch(userActions.addDiscoverySession({ session: discoverySession }));
 
+  const handleDeleteDiscoverySession = discoveryId =>
+    dispatch(userActions.deleteDiscoverySession({ discoveryId }));
+
   const handleAddExecutionSession = executionSession =>
     dispatch(userActions.addExecutionSession({ session: executionSession }));
+
+  const handleDeleteExecutionSession = executionIri =>
+    dispatch(userActions.deleteExecutionSession({ executionIri }));
 
   const handleUpdateDiscoverySession = discoverySession =>
     dispatch(userActions.updateDiscoverySession({ session: discoverySession }));
@@ -422,6 +466,8 @@ const mapDispatchToProps = dispatch => {
     handleSetUserWebId,
     handleAddDiscoverySession,
     handleAddExecutionSession,
+    handleDeleteDiscoverySession,
+    handleDeleteExecutionSession,
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,

@@ -15,7 +15,8 @@ type Props = {
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
   size: number,
-  selectedNodes: Set<string>
+  selectedNodes: Set<string>,
+  theme: Object
 };
 
 type State = {
@@ -197,7 +198,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         )}
         height={size}
         width={size}
-        style={{ font: '10px sans-serif' }}
+        style={{ font: '10px sans-serif', paddingBottom: '0' }}
       />
     );
   }

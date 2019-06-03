@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { GoogleAnalyticsWrapper } from '@utils';
 import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
@@ -80,6 +81,12 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
 
     setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
+
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'CreateApp',
+      action: 'Pressed create app',
+      label: `type : '${selectedApplication.applicationEndpoint}'`
+    });
   };
 
   handleEmbedClicked = async () => {

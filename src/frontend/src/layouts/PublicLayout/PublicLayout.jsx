@@ -1,8 +1,8 @@
+// @flow
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 const styles = () => ({
   root: {
@@ -15,7 +15,20 @@ const styles = () => ({
   }
 });
 
-const PublicLayout = ({ classes, component: Component, webId, ...rest }) => {
+type Props = {
+  classes: Object,
+  component: Object,
+  webId: string,
+  location: Object
+};
+
+const PublicLayout = ({
+  classes,
+  component: Component,
+  webId,
+  location,
+  ...rest
+}: Props) => {
   return !webId ? (
     <Route
       {...rest}
@@ -26,14 +39,10 @@ const PublicLayout = ({ classes, component: Component, webId, ...rest }) => {
       )}
     />
   ) : (
-    <Redirect to="/dashboard" />
+    <Redirect
+      to={`${!location.state ? '/dashboard' : location.state.prevPath}`}
+    />
   );
-};
-
-PublicLayout.propTypes = {
-  classes: PropTypes.any,
-  component: PropTypes.any,
-  webId: PropTypes.any
 };
 
 const mapStateToProps = state => {

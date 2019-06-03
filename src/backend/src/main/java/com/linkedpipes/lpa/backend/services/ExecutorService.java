@@ -13,5 +13,6 @@ public interface ExecutorService {
     Discovery startDiscoveryFromInput(String discoveryConfig, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException;
     Discovery startDiscoveryFromInputIri(String discoveryConfigIri, String userId) throws LpAppsException, UserNotFoundException;
     Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException;
-
+    void cancelExecution(String executionIri);
+    void cancelDiscovery(String discoveryId);
 }
