@@ -119,7 +119,7 @@ const getVisualizer = (
           width={width}
           selectedNodes={pathOr(
             [],
-            'filterGroups.nodesFilter.selectedOptions',
+            'filterGroups.nodesFilter.selectedOptions.items',
             filtersState
           )}
         />

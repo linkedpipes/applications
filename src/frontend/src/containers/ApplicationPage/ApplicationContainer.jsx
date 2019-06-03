@@ -136,7 +136,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
             size={this.state.height + this.state.width}
             selectedNodes={pathOr(
               [],
-              'filterGroups.nodesFilter.selectedOptions',
+              'filterGroups.nodesFilter.selectedOptions.items',
               applicationData.filtersState
             )}
             isPublished

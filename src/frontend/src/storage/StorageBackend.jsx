@@ -624,7 +624,8 @@ class SolidBackend {
     if (!filtersConfiguration) {
       return '';
     } else {
-      const filtersState = filtersConfiguration.filtersState;
+      let filtersState = filtersConfiguration.filtersState;
+
       const { enabled, visible, filterGroups } = filtersState;
       const { nodesFilter, schemeFilter } = filterGroups;
 
@@ -632,7 +633,7 @@ class SolidBackend {
       if (nodesFilter != undefined) {
         let nodesItems = [];
 
-        nodesItems = nodesFilter.selectedOptions.map(item => {
+        nodesItems = nodesFilter.selectedOptions.items.map(item => {
           (item['@type'] = 'FilterOption'), (item['visible'] = true);
           item['enabled'] = true;
           return item;
@@ -675,9 +676,13 @@ class SolidBackend {
       }
 
       return {
-        '@type': 'FilterGroup',
-        nodesFilter: nodesObject,
-        schemeFilter: schemeObject
+        '@type': 'FilterConfiguration',
+        enabled: filtersState.enabled,
+        visible: filtersState.visible,
+        filterGroups: {
+          '@type': 'FilterGroup',
+          nodesFilter: nodesObject
+        }
       };
     }
   }
@@ -723,7 +728,7 @@ class SolidBackend {
       etlExecutionIri: etlExecutionIri,
       applicationData: applicationData,
       endpoint: endpoint,
-      filterGroups: this.createUploadFilterConfigurationStatement(
+      filteredBy: this.createUploadFilterConfigurationStatement(
         filtersConfiguration
       ),
       visualizerType: visualizerType

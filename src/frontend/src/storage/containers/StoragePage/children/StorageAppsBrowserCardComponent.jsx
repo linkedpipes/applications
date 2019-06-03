@@ -70,6 +70,7 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   setApplicationLoaderStatus: Function,
+  handleSetFiltersState: Function,
   history: Object,
   applicationsFolder: string,
   indexNumber: Number
@@ -138,6 +139,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
+      handleSetFiltersState,
       history
     } = this.props;
 
@@ -163,7 +165,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await handleSetSelectedApplicationData(applicationConfiguration);
       await handleSetSelectedApplicationMetadata(applicationMetadata);
       await handleSetSelectedVisualizer(selectedVisualiser);
-      await handleSetFiltersState(applicationConfiguration.filterGroups);
+      await handleSetFiltersState(applicationConfiguration.filterConfiguration);
 
       await setApplicationLoaderStatus(false);
 

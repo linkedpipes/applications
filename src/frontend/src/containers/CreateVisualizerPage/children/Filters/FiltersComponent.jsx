@@ -62,7 +62,7 @@ class FiltersComponent extends React.Component<Props> {
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            selectedNodes={selectedOptions}
+            selectedNodes={selectedOptions.items}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -142,6 +142,8 @@ class FiltersComponent extends React.Component<Props> {
 
           {(Object.values(filtersState.filterGroups) || []).map(
             filterGroup =>
+              typeof filterGroup !== 'string' &&
+              !(filterGroup instanceof String) &&
               (editingMode || filterGroup.visible) && (
                 <div>
                   <ExpansionPanel

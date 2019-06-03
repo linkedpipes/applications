@@ -20,7 +20,7 @@ export default class ApplicationConfiguration {
 
   visualizerType: string;
 
-  filterGroups: Object;
+  filterConfiguration: Object;
 
   published: Date;
 
@@ -34,7 +34,7 @@ export default class ApplicationConfiguration {
     etlExecutionIri,
     endpoint,
     visualizerType,
-    filterGroups,
+    filteredBy,
     published
   }) {
     this.id = id;
@@ -46,7 +46,7 @@ export default class ApplicationConfiguration {
     this.etlExecutionIri = etlExecutionIri;
     this.endpoint = endpoint;
     this.visualizerType = visualizerType;
-    this.filterGroups = filterGroups;
+    this.filterConfiguration = filteredBy;
     this.published = published;
   }
 
