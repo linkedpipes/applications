@@ -38,7 +38,7 @@
     "moment": "^2.24.0",
     "normalize.css": "8.0.1",
     "prop-types": "15.7.2",
-    "query-string": "6.5.0",
+    "query-string": "6.6.0",
     "rdflib": "0.20.1",
     "react": "16.8.6",
     "react-chord-diagram": "1.2.0",
