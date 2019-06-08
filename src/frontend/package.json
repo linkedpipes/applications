@@ -77,7 +77,7 @@
     "babel-eslint": "10.0.1",
     "babel-loader": "8.0.6",
     "babel-plugin-module-resolver": "3.2.0",
-    "babel-plugin-smart-webpack-import": "1.4.3",
+    "babel-plugin-smart-webpack-import": "1.4.5",
     "babel-preset-flow": "6.23.0",
     "cross-env": "5.2.0",
     "css-loader": "2.1.1",
