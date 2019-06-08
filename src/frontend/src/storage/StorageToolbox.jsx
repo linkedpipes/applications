@@ -48,10 +48,10 @@ class StorageToolbox {
     );
   };
 
-  removeAppFromStorage = async (appFolder, appConfiguration) => {
+  removeAppFromStorage = async (appFolder, appMetadata) => {
     return StorageBackend.removeApplicationConfiguration(
       appFolder,
-      appConfiguration
+      appMetadata
     );
   };
 

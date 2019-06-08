@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
+import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -147,7 +148,7 @@ class FiltersComponent extends React.Component<Props> {
               (editingMode || filterGroup.visible) && (
                 <div>
                   <ExpansionPanel
-                    key={filterGroup.label}
+                    key={uuid.v4()}
                     disabled={!filterGroup.enabled && !editingMode}
                   >
                     <ExpansionPanelSummary
@@ -183,7 +184,7 @@ class FiltersComponent extends React.Component<Props> {
                       )}
                     </ExpansionPanelSummary>
                     {this.getFilter(
-                      filterGroup.type,
+                      filterGroup.filterType,
                       filterGroup.label,
                       filterGroup.selectedOptions
                     )}

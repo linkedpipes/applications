@@ -59,7 +59,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Nodes',
                   enabled: true,
                   visible: true,
-                  type: 'NODES_FILTER',
+                  filterType: 'NODES_FILTER',
                   selectedOptions: { items: [] }
                 }
               }
@@ -75,14 +75,14 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Scheme',
                   enabled: true,
                   visible: true,
-                  type: 'SCHEME_FILTER',
+                  filterType: 'SCHEME_FILTER',
                   selectedOptions: { items: [] }
                 },
                 nodesFilter: {
                   label: 'Nodes',
                   enabled: true,
                   visible: true,
-                  type: 'NODES_FILTER',
+                  filterType: 'NODES_FILTER',
                   selectedOptions: { items: [] }
                 }
               }

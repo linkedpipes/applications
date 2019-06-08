@@ -8,6 +8,10 @@ import uuid from 'uuid';
 
 const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+
+const LPA_CONTEXT =
+  'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/4b5c66c10782b6e34bf0e895b2a0a6331af63676/lapps-ontology.jsonld';
+
 export default class ApplicationConfiguration {
   configurationId: string;
 
@@ -91,7 +95,7 @@ export default class ApplicationConfiguration {
         label: nodesFilter.label,
         enabled: nodesFilter.enabled,
         visible: nodesFilter.visible,
-        type: nodesFilter.type,
+        filterType: nodesFilter.filterType,
         selectedOptions: {
           '@type': 'FilterOptionGroup',
           items: nodesItems
@@ -114,7 +118,7 @@ export default class ApplicationConfiguration {
         label: schemeFilter.label,
         enabled: schemeFilter.enabled,
         visible: schemeFilter.visible,
-        type: schemeFilter.type,
+        filterType: schemeFilter.filterType,
         selectedOptions: {
           '@type': 'FilterOptionGroup',
           items: schemeItems
@@ -146,8 +150,7 @@ export default class ApplicationConfiguration {
     webId
   ): string {
     return new ApplicationConfiguration({
-      '@context':
-        'https://raw.githubusercontent.com/aorumbayev/linkedpipes_applications_ontology/master/OnToology/lpapps.owl/context/context.jsonld',
+      '@context': LPA_CONTEXT,
       '@type': 'VisualizerConfiguration',
       configurationId: uuid.v4(),
       author: webId,
@@ -255,6 +258,14 @@ export default class ApplicationConfiguration {
             $rdf.lit(this.filterConfiguration.filterGroups.nodesFilter.label),
             doc
           );
+          store.add(
+            nodesFilter,
+            LPA('filterType'),
+            $rdf.lit(
+              this.filterConfiguration.filterGroups.nodesFilter.filterType
+            ),
+            doc
+          );
 
           if (
             this.filterConfiguration.filterGroups.nodesFilter.selectedOptions
@@ -342,26 +353,125 @@ export default class ApplicationConfiguration {
   };
 
   static nodeToValue(statement, { store, fileUrl, file }) {
-    return store.any(fileUrl, LPA(statement), undefined, file).value;
+    const result = store.any(fileUrl, LPA(statement), undefined, file).value;
+    return result === 'true' || result === 'false'
+      ? JSON.parse(result)
+      : result;
   }
 
   static fromTurtle(store, fileUrl, file) {
     const params = { store, fileUrl, file };
 
+    const filteredBy = store.any(fileUrl, LPA('filteredBy'), undefined, file);
+    const filteredByParams = { store, fileUrl: filteredBy, file };
+
+    const filterGroups = store.any(
+      filteredBy,
+      LPA('filterGroups'),
+      undefined,
+      file
+    );
+
+    const nodesFilter = store.any(
+      filterGroups,
+      LPA('nodesFilter'),
+      undefined,
+      file
+    );
+
+    const nodesFilterParams = { store, fileUrl: nodesFilter, file };
+
+    const selectedOptions = store.any(
+      nodesFilter,
+      LPA('selectedOptions'),
+      undefined,
+      file
+    );
+
+    const items = store.any(selectedOptions, LPA('items'), undefined, file)
+      .elements;
+
+    const selectedOptionsParsed = {
+      '@type': 'FilterOptionGroup',
+      items: items.map(element => {
+        const itemParams = { store, fileUrl: element, file };
+        return {
+          '@type': 'FilterOption',
+          uri: ApplicationConfiguration.nodeToValue('uri', itemParams),
+          label: ApplicationConfiguration.nodeToValue('label', itemParams),
+          visible: ApplicationConfiguration.nodeToValue('visible', itemParams),
+          enabled: ApplicationConfiguration.nodeToValue('enabled', itemParams)
+        };
+      })
+    };
+
+    const nodesFilterParsed = {
+      '@type': 'NodesFilter',
+      label: ApplicationConfiguration.nodeToValue('label', nodesFilterParams),
+      enabled: ApplicationConfiguration.nodeToValue(
+        'enabled',
+        nodesFilterParams
+      ),
+      visible: ApplicationConfiguration.nodeToValue(
+        'visible',
+        nodesFilterParams
+      ),
+      filterType: ApplicationConfiguration.nodeToValue(
+        'filterType',
+        nodesFilterParams
+      ),
+      selectedOptions: selectedOptionsParsed
+    };
+
+    const filterGroupsParsed = {
+      '@type': 'FilterGroup',
+      nodesFilter: nodesFilterParsed
+    };
+
+    const filterConfigurationParsed = {
+      '@type': 'FilterConfiguration',
+      enabled: ApplicationConfiguration.nodeToValue(
+        'enabled',
+        filteredByParams
+      ),
+      visible: ApplicationConfiguration.nodeToValue(
+        'visible',
+        filteredByParams
+      ),
+      filterGroups: filterGroupsParsed
+    };
+
     return new ApplicationConfiguration({
-      '@context':
-        'https://raw.githubusercontent.com/aorumbayev/linkedpipes_applications_ontology/master/OnToology/lpapps.owl/context/context.jsonld',
+      '@context': LPA_CONTEXT,
       '@type': 'VisualizerConfiguration',
-      configurationId: ApplicationConfiguration('configurationId', params),
-      author: ApplicationConfiguration('author', params),
-      title: ApplicationConfiguration('title', params),
-      backgroundColor: ApplicationConfiguration('backgroundColor', params),
-      graphIri: ApplicationConfiguration('graphIri', params),
-      published: new Date(ApplicationConfiguration('published', params)),
-      etlExecutionIri: ApplicationConfiguration('etlExecutionIri', params),
-      applicationData: ApplicationConfiguration('applicationData', params),
-      endpoint: ApplicationConfiguration('endpoint', params),
-      visualizerType: ApplicationConfiguration('visualizerType', params)
+      configurationId: ApplicationConfiguration.nodeToValue(
+        'configurationId',
+        params
+      ),
+      author: ApplicationConfiguration.nodeToValue('author', params),
+      title: ApplicationConfiguration.nodeToValue('title', params),
+      backgroundColor: ApplicationConfiguration.nodeToValue(
+        'backgroundColor',
+        params
+      ),
+      graphIri: ApplicationConfiguration.nodeToValue('graphIri', params),
+      published: new Date(
+        ApplicationConfiguration.nodeToValue('published', params)
+      ),
+      etlExecutionIri: ApplicationConfiguration.nodeToValue(
+        'etlExecutionIri',
+        params
+      ),
+      applicationData: ApplicationConfiguration.nodeToValue(
+        'applicationData',
+        params
+      ),
+      endpoint: ApplicationConfiguration.nodeToValue('endpoint', params),
+      visualizerType: ApplicationConfiguration.nodeToValue(
+        'visualizerType',
+        params
+      ),
+      filteredBy: filterConfigurationParsed
     });
   }
 }

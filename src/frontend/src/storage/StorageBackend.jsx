@@ -28,6 +28,7 @@ const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
 const SCHEMA = $rdf.Namespace('http://schema.org/');
 const ACTIVITY_STREAM = $rdf.Namespace('https://www.w3.org/ns/activitystreams');
+const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
@@ -435,7 +436,7 @@ class SolidBackend {
       configurationsFolder
     );
     for (const i in files) {
-      if (String(files[i].value).endsWith('.jsonld')) {
+      if (String(files[i].value).endsWith('.ttl')) {
         await this.getAppConfigurationMetadata(files[i].value)
           .then(appConfigMetadata => {
             configurationsMetadata.push(appConfigMetadata);
@@ -454,17 +455,38 @@ class SolidBackend {
    * @return {Promise<AppConfiguration>} Fetched image.
    */
   async getAppConfigurationMetadata(url: string): Promise<ApplicationMetadata> {
-    const applicationConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
-      url
-    );
-    const appConfigurationFileTitle = `${Utils.getFilenameFromPathUrl(url)}`;
-    const appConfigurationFullPath = url;
+    const fileUrl = $rdf.sym(url);
+    const file = fileUrl.doc();
 
-    return ApplicationMetadata.from({
-      solidFileTitle: appConfigurationFileTitle,
-      solidFileUrl: appConfigurationFullPath,
-      configuration: applicationConfiguration
-    });
+    try {
+      await this.load(file);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    const type = this.store.match(
+      fileUrl,
+      RDF('type'),
+      LPA('VisualizerConfiguration'),
+      file
+    );
+
+    if (type) {
+      const applicationConfiguration = ApplicationConfiguration.fromTurtle(
+        this.store,
+        fileUrl,
+        file
+      );
+
+      const appConfigurationFileTitle = `${Utils.getFilenameFromPathUrl(url)}`;
+      const appConfigurationFullPath = url;
+
+      return ApplicationMetadata.from({
+        solidFileTitle: appConfigurationFileTitle,
+        solidFileUrl: appConfigurationFullPath,
+        configuration: applicationConfiguration
+      });
+    }
   }
 
   async getApplicationConfigurationMetadata(
@@ -578,9 +600,9 @@ class SolidBackend {
   ): Promise<Boolean> {
     try {
       const folderPath = `${Utils.getFolderUrlFromPathUrl(
-        appConfiguration.solidFileUrl
+        appMetadata.solidFileUrl
       )}`;
-      const metadataFileTitle = `${appConfiguration.solidFileTitle}.jsonld`;
+      const metadataFileTitle = appMetadata.solidFileTitle;
 
       await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
         response => {
