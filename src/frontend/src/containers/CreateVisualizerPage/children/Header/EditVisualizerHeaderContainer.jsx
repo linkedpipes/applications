@@ -7,8 +7,8 @@ import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { GoogleAnalyticsWrapper } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedApplication: any,
@@ -21,7 +21,7 @@ type Props = {
   selectedApplicationTitle: string,
   applicationsFolder: string,
   setApplicationLoaderStatus: Function,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleUpdateAccessControlDialogState: Function

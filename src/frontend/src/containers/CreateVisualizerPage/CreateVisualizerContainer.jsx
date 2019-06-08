@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import { filtersActions } from '@ducks/filtersDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedVisualizer: Object,
@@ -14,7 +14,7 @@ type Props = {
   selectedResultGraphIri: string,
   selectedApplication: Object,
   selectedPipelineExecution: string,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   handleSetCurrentApplicationData: Function,
   handleResetCurrentApplicationData: Function,
   handleResetCurrentApplicationMetadata: Function,

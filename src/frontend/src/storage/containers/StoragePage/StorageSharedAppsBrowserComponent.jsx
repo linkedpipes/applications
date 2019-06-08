@@ -5,8 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import StorageAppsBrowserCardComponent from './children/StorageAppsBrowserCardComponent';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import Emoji from 'react-emoji-render';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = () => ({
   root: {
@@ -30,7 +30,7 @@ type Props = {
     root: {},
     gridArea: {}
   },
-  sharedApplicationsMetadata: Array<AppConfiguration>,
+  sharedApplicationsMetadata: Array<ApplicationMetadata>,
   onHandleApplicationDeleted: Function,
   setApplicationLoaderStatus: Function
 };

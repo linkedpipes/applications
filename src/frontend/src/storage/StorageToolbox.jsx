@@ -1,9 +1,9 @@
 import { Log } from '@utils';
 import StorageBackend from './StorageBackend';
 import { Utils } from './utils';
-import AppConfiguration from './models/AppConfiguration';
 import ApplicationConfiguration from './models/ApplicationConfiguration';
 import { Person } from './models';
+import ApplicationMetadata from './models/ApplicationMetadata';
 import ApplicationMetadata from './models/ApplicationMetadata';
 // eslint-disable-next-line import/order
 const os = require('os');
@@ -192,7 +192,7 @@ class StorageToolbox {
     return StorageBackend.getFriends(webId);
   };
 
-  fetchAclFromMetadata = async (metadata: AppConfiguration) => {
+  fetchAclFromMetadata = async (metadata: ApplicationMetadata) => {
     const metadataAcl = `${metadata.solidFileUrl}.acl`;
     const accessControlObject = await StorageBackend.fetchAccessControlFile(
       metadataAcl

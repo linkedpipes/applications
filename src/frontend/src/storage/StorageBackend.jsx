@@ -2,7 +2,6 @@
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
-  AppConfiguration,
   ApplicationMetadata,
   ApplicationConfiguration,
   SharedAppConfiguration,
@@ -426,7 +425,7 @@ class SolidBackend {
   /**
    * Fetches a single image.
    * @param {string} url An URL of the given image.
-   * @return {Promise<AppConfiguration>} Fetched image.
+   * @return {Promise<ApplicationMetadata>} Fetched image.
    */
   async getAppConfigurationMetadata(url: string): Promise<ApplicationMetadata> {
     const fileUrl = $rdf.sym(url);
@@ -463,43 +462,6 @@ class SolidBackend {
     }
 
     return Promise.reject(new Error('Configuration not found!'));
-  }
-
-  async getApplicationConfigurationMetadata(
-    url: string
-  ): Promise<ApplicationMetadata> {
-    const fileUrl = $rdf.sym(url);
-    const file = fileUrl.doc();
-    try {
-      await this.load(file);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-    const type = this.store.match(fileUrl, RDF('type'), POST, file);
-    if (type) {
-      const configurationUrl = this.store.any(
-        fileUrl,
-        FOAF('depiction'),
-        null,
-        file
-      );
-      const title = this.store.any(fileUrl, DCT('title'), null, file);
-      const endpoint = this.store.any(fileUrl, DCT('identifier'), null, file);
-      const creator = this.store.any(fileUrl, DCT('creator'), null, file);
-      const color = this.store.any(fileUrl, VCARD('label'), null, file);
-      const created = this.store.any(fileUrl, DCT('created'), null, file);
-      return new AppConfiguration(
-        url.toString(),
-        configurationUrl.value,
-        title.value,
-        endpoint.value,
-        creator.value,
-        color.value,
-        new Date(created.value)
-      );
-    }
-
-    return Promise.reject(new Error('App configuration not found.'));
   }
 
   /**

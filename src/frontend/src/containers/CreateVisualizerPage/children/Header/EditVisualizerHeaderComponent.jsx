@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GlobalUtils } from '@utils';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
@@ -35,7 +35,7 @@ type Props = {
   handleChangeWidth: Function,
   height: number,
   width: number,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   deleteAppDialogOpen: boolean,
   handleDeleteAppDismissed: Function,
   handleDeleteAppConfirmed: Function,

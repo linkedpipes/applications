@@ -7,7 +7,7 @@ import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { GoogleAnalyticsWrapper } from '@utils';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedApplication: any,
@@ -31,7 +31,7 @@ type State = {
   appIri: string,
   height: number,
   width: number,
-  currentApplicationMetadata: AppConfiguration
+  currentApplicationMetadata: ApplicationMetadata
 };
 
 class VisualizerHeaderContainer extends PureComponent<Props, State> {

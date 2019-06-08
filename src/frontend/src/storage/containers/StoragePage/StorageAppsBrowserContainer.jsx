@@ -4,10 +4,10 @@ import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
 import { Log } from '@utils';
 import { connect } from 'react-redux';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
 import StorageToolbox from '../../StorageToolbox';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   webId: string,
@@ -15,7 +15,7 @@ type Props = {
 };
 
 type State = {
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   loadingAppIsActive: boolean
 };
 

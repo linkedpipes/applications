@@ -16,7 +16,6 @@ import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { GlobalUtils, VisualizersService } from '@utils';
-import { AppConfiguration } from '../../../models';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -29,6 +28,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
 import ShareIcon from '@material-ui/icons/Share';
 import { filtersActions } from '@ducks/filtersDuck';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = {
   card: {
@@ -62,7 +62,7 @@ type Props = {
     actions: {},
     textField: {}
   },
-  applicationMetadata: AppConfiguration,
+  applicationMetadata: ApplicationMetadata,
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   onHandleApplicationDeleted: Function,

@@ -21,9 +21,9 @@ import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import StorageToolbox from '../StorageToolbox';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import uuid from 'uuid';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = theme => ({
   root: {
@@ -67,7 +67,7 @@ const MenuProps = {
 type Props = {
   handleUpdateAccessControlDialogState: Function,
   shareApplicationDialogIsOpen: boolean,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   webId: String,
   classes: Object
 };

@@ -9,12 +9,13 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import uuid from 'uuid';
-import { AppConfiguration, StorageToolbox } from '@storage';
+import { StorageToolbox } from '@storage';
 import moment from 'moment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import { withStyles } from '@material-ui/core/styles';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = () => ({
   root: {
@@ -23,7 +24,7 @@ const styles = () => ({
 });
 
 type Props = {
-  applicationsList: Array<AppConfiguration>,
+  applicationsList: Array<ApplicationMetadata>,
   onHandleAppClicked: Function,
   onHandleShareAppClicked: Function,
   onHandleDeleteAppClicked: Function,

@@ -10,7 +10,7 @@ import {
 import StorageToolbox from './StorageToolbox';
 import StorageBackend from './StorageBackend';
 // Models
-import { AppConfiguration } from './models';
+import { ApplicationMetadata } from './models';
 
 export {
   StoragePage,
@@ -18,6 +18,6 @@ export {
   StorageAccessControlDialog,
   StorageToolbox,
   StorageBackend,
-  AppConfiguration,
+  ApplicationMetadata,
   StorageInboxDialog
 };

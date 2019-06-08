@@ -21,7 +21,6 @@ import {
   GoogleAnalyticsWrapper
 } from '@utils';
 import LoadingOverlay from 'react-loading-overlay';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { userActions } from '@ducks/userDuck';
 import { ApplicationMetadata } from '@storage/models';
 
@@ -47,7 +46,7 @@ type Props = {
   handleSetHomepageTabIndex: Function
 };
 type State = {
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   loadingAppIsActive: boolean
 };
 

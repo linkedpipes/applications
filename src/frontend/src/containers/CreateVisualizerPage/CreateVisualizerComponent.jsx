@@ -7,7 +7,6 @@ import {
   VisualizerContainer
 } from './children';
 import LoadingOverlay from 'react-loading-overlay';
-import AppConfiguration from '@storage/models/AppConfiguration';
 
 type Props = {
   selectedVisualizer: any,

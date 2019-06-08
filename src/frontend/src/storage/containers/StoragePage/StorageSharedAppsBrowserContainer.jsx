@@ -5,10 +5,10 @@ import StorageSharedAppsBrowserComponent from './StorageSharedAppsBrowserCompone
 import { Log } from '@utils';
 import StorageToolbox from '../../StorageToolbox';
 import { connect } from 'react-redux';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import LoadingOverlay from 'react-loading-overlay';
+import ApplicationConfiguration from '@storage/models/ApplicationConfiguration';
 
 type Props = {
   webId: string,
@@ -16,7 +16,7 @@ type Props = {
 };
 
 type State = {
-  sharedApplicationsMetadata: Array<AppConfiguration>,
+  sharedApplicationsMetadata: Array<ApplicationConfiguration>,
   loadingAppIsActive: boolean
 };
 
