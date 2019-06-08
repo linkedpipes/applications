@@ -85,13 +85,8 @@ const getVisualizer = (
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
-      const markers =
-        selectedApplication && selectedApplication.markers
-          ? selectedApplication.markers
-          : [];
       return (
         <GoogleMapsVisualizer
-          propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}

@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-unused-vars */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
@@ -13,7 +13,12 @@ import {
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
-import { GlobalUtils } from '@utils/';
+// eslint-disable-next-line import/newline-after-import
+const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+// const N3 = require('n3');
+const Q = require('q');
+const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+const as = require('activitystrea.ms');
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
@@ -25,16 +30,11 @@ const SIOC = $rdf.Namespace('http://rdfs.org/sioc/ns#');
 const XSD = $rdf.Namespace('http://www.w3.org/2001/XMLSchema#');
 const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
 const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
-const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
-const SCHEMA = $rdf.Namespace('http://schema.org/');
-const ACTIVITY_STREAM = $rdf.Namespace('https://www.w3.org/ns/activitystreams');
 const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
 const TIME = XSD('dateTime');
-const LIKE = AS('Like');
-const COMMENT = AS('Note');
 const CONTROL = ACL('Control');
 const READ = ACL('Read');
 const WRITE = ACL('Write');
@@ -46,43 +46,19 @@ const APPEND = ACL('Append');
  */
 class SolidBackend {
   /** A store graph used to store the fetched/created/updated documents. */
-  _store: $rdf.IndexedFormula;
+  store: $rdf.IndexedFormula;
 
   /** A fetcher responsible for fetching documents. */
-  _fetcher: $rdf.Fetcher;
+  fetcher: $rdf.Fetcher;
 
   /** An updater responsible for updating documents. */
-  _updater: $rdf.UpdateManager;
+  updater: $rdf.UpdateManager;
 
   constructor() {
-    this._store = $rdf.graph();
-    this._fetcher = new $rdf.Fetcher(this.store);
-    this._updater = new $rdf.UpdateManager(this.store);
+    this.store = $rdf.graph();
+    this.fetcher = new $rdf.Fetcher(this.store);
+    this.updater = new $rdf.UpdateManager(this.store);
     this.alreadyCheckedResources = [];
-  }
-
-  set store(store) {
-    this._store = store;
-  }
-
-  set fetcher(fetcher) {
-    this._fetcher = fetcher;
-  }
-
-  set updater(updater) {
-    this._updater = updater;
-  }
-
-  get store() {
-    return this._store;
-  }
-
-  get fetcher() {
-    return this._fetcher;
-  }
-
-  get updater() {
-    return this._updater;
   }
 
   /**
@@ -107,14 +83,11 @@ class SolidBackend {
    */
   async update(deletions: $rdf.Statement[], insertions: $rdf.Statement[]) {
     try {
-      await this.updater.update(
-        deletions,
-        insertions,
-        (uri, ok, message, response) => {
-          if (ok) console.log('Resource updated.');
-          else console.log(message);
-        }
-      );
+      return this.updater.update(deletions, insertions, (uri, ok, message) => {
+        if (ok) Log.info('Resource updated.', 'StorageBackend');
+        else Log.warn(message);
+        return Promise.resolve(message);
+      });
     } catch (err) {
       return Promise.reject(new Error('Could not update the document.'));
     }
@@ -206,7 +179,7 @@ class SolidBackend {
     const configurationsUrl = `${url}/${folderTitle}`;
 
     try {
-      await StorageFileClient.createFolder(url, folderTitle).then(success => {
+      await StorageFileClient.createFolder(url, folderTitle).then(() => {
         Log.info(`Created folder ${folderUrl}.`);
       });
 
@@ -221,14 +194,14 @@ class SolidBackend {
           null
         ),
         '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(fileCreated => {
+      ).then(() => {
         Log.info(`Created access list ${folderUrl}/.acl`);
       });
 
       await StorageFileClient.createFolder(
         configurationsUrl,
         'configurations'
-      ).then(success => {
+      ).then(() => {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
 
@@ -243,11 +216,11 @@ class SolidBackend {
           null
         ),
         '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(fileCreated => {
+      ).then(() => {
         Log.info(`Created access list ${folderUrl}/configurations/.acl`);
       });
 
-      await this.updateAppFolder(webId, folderUrl).then(success => {
+      await this.updateAppFolder(webId, folderUrl).then(() => {
         Log.info(`Updated app folder in profile.`);
       });
     } catch (err) {
@@ -276,7 +249,7 @@ class SolidBackend {
           return true;
         },
         e => {
-          Log.err('Error copying : ' + e);
+          Log.err(`Error copying : ${e}`);
           return false;
         }
       );
@@ -284,7 +257,7 @@ class SolidBackend {
     const updateProfileLinkResult = await this.updateAppFolder(
       webId,
       destinationFolder
-    ).then(success => {
+    ).then(() => {
       return true;
     });
 
@@ -306,11 +279,11 @@ class SolidBackend {
         fetch: authClient.fetch
       })
       .then(
-        res => {
+        () => {
           return true;
         },
         e => {
-          Log.err('Error copying : ' + e);
+          Log.err(`Error copying : ${e}`);
           return false;
         }
       );
@@ -323,7 +296,7 @@ class SolidBackend {
         return true;
       },
       e => {
-        Log.err('Error copying : ' + e);
+        Log.err(`Error copying : ${e}`);
         return false;
       }
     );
@@ -331,7 +304,7 @@ class SolidBackend {
     const updateProfileLinkResult = await this.updateAppFolder(
       webId,
       destinationFolder
-    ).then(success => {
+    ).then(() => {
       return true;
     });
 
@@ -349,13 +322,13 @@ class SolidBackend {
     newTitle: string
   ): Promise<boolean> {
     const metadataFile = $rdf.sym(metadataUrl);
-    const predicate = $rdf.sym(DCT('title'));
+    const predicate = $rdf.sym(LPA('title'));
     const title = $rdf.lit(newTitle);
     const metadata = metadataFile.doc();
     try {
       await this.load(metadata);
     } catch (err) {
-      console.log('Could not load a metadata document.');
+      Log.error('Could not load a metadata document.', 'StorageBackend');
       return false;
     }
     const ins = [$rdf.st(metadataFile, predicate, title, metadata)];
@@ -389,7 +362,7 @@ class SolidBackend {
     try {
       await this.load(profile);
     } catch (err) {
-      console.log('Could not load a profile document.');
+      Log.error('Could not load a profile document.', 'StorageBackend');
       return false;
     }
     const ins = [$rdf.st(user, predicate, folder, profile)];
@@ -417,7 +390,7 @@ class SolidBackend {
     try {
       folder = appFolder || (await this.getValidAppFolder(webId));
     } catch (err) {
-      console.log(err);
+      Log.error(err, 'StorageBackend');
       return [];
     }
     if (!folder) return [];
@@ -426,7 +399,7 @@ class SolidBackend {
     try {
       await this.load(configurationsFolder);
     } catch (err) {
-      console.log(err);
+      Log.error(err, 'StorageBackend');
       return [];
     }
     const files = this.store.each(
@@ -435,15 +408,16 @@ class SolidBackend {
       null,
       configurationsFolder
     );
-    for (const i in files) {
-      if (String(files[i].value).endsWith('.ttl')) {
-        await this.getAppConfigurationMetadata(files[i].value)
+    files.forEach(async file => {
+      if (String(file.value).endsWith('.ttl')) {
+        await this.getAppConfigurationMetadata(file.value)
           .then(appConfigMetadata => {
             configurationsMetadata.push(appConfigMetadata);
           })
-          .catch(err => console.log(err));
+          .catch(err => Log.error(err, 'StorageBackend'));
       }
-    }
+    });
+
     return configurationsMetadata.sort((a, b) =>
       Utils.sortByDateAsc(a.configuration.published, b.configuration.published)
     );
@@ -487,6 +461,8 @@ class SolidBackend {
         configuration: applicationConfiguration
       });
     }
+
+    return Promise.reject(new Error('Configuration not found!'));
   }
 
   async getApplicationConfigurationMetadata(
@@ -541,11 +517,6 @@ class SolidBackend {
     const appConfigurationFilePath = `${appFolder}/configurations`;
     const appConfigurationFileTitle = `${Utils.getName()}`;
     const appConfigurationFullPath = `${appConfigurationFilePath}/${appConfigurationFileTitle}.ttl`;
-    let appConfigurationUrl;
-    const created = new Date(Date.now());
-
-    const newStore = $rdf.graph();
-
     const applicationConfigurationTurtle = await applicationConfiguration.toTurtle(
       appConfigurationFullPath
     );
@@ -594,6 +565,7 @@ class SolidBackend {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async removeApplicationConfiguration(
     appFolder: string,
     appMetadata: ApplicationMetadata
@@ -622,7 +594,7 @@ class SolidBackend {
         }
       });
     } catch (err) {
-      console.log('Could not delete a profile document.');
+      Log.error('Could not delete a profile document.', 'StorageBackend');
       return Promise.reject(err);
     }
 
@@ -700,7 +672,7 @@ class SolidBackend {
     try {
       await this.load(doc);
     } catch (err) {
-      console.log('Could not load a profile document.');
+      Log.error('Could not load a profile document.', 'StorageBackend');
       return Promise.reject(err);
     }
     return this.store
@@ -723,8 +695,8 @@ class SolidBackend {
     }
     const nameLd = this.store.any(user, FOAF('name'), null, profile);
     const name = nameLd ? nameLd.value : '';
-    const emailLd = this.store.any(user, FOAF('mbox'), null, profile);
-    const email = emailLd ? emailLd.value : '';
+    // const emailLd = this.store.any(user, FOAF('mbox'), null, profile);
+    // const email = emailLd ? emailLd.value : '';
     let imageLd = this.store.any(user, FOAF('img'), null, profile);
     imageLd = imageLd || this.store.any(user, VCARD('hasPhoto'), null, profile);
     const image = imageLd ? imageLd.value : '/img/icon/empty-profile.svg';
@@ -738,13 +710,13 @@ class SolidBackend {
    */
   async getPersons(userIds: string[]): Promise<Person[]> {
     const users = [];
-    for (const i in userIds) {
-      await this.getPerson(userIds[i])
+    userIds.forEach(async value => {
+      await this.getPerson(value)
         .then(person => {
           users.push(person);
         })
-        .catch(err => console.log(err));
-    }
+        .catch(err => Log.error(err, 'StorageBackend'));
+    });
     return users.flat();
   }
 
@@ -896,12 +868,12 @@ class SolidBackend {
     } else if (allowedUsers) {
       allowedUsers.forEach(userId => {
         const userGroup = $rdf.sym(accessListUrl);
-        const user = $rdf.sym(userId);
+        const friendWebId = $rdf.sym(userId);
         acl = acl.concat(
           this.createAccessStatement(
             userGroup,
             resource,
-            user,
+            friendWebId,
             isFolder,
             doc,
             modes
@@ -965,6 +937,7 @@ class SolidBackend {
     try {
       await this.load(resource);
       await this.update(deletions, insertions);
+      return Promise.resolve('Resource updated!');
     } catch (err) {
       return Promise.reject(err);
     }
@@ -987,8 +960,6 @@ class SolidBackend {
   }
 
   async generateInvitationFile(baseUrl, metadataUrl, userWebId, opponentWebId) {
-    const as = require('activitystrea.ms');
-
     return new Promise(resolve => {
       as.invite()
         .name('lpapps_invite')
@@ -1004,7 +975,6 @@ class SolidBackend {
   }
 
   generateResponseToInvitation(invitation, response) {
-    const as = require('activitystrea.ms');
     return new Promise(resolve => {
       as.import(invitation.object, (err, invitationObject) => {
         if (err) throw err;
@@ -1015,8 +985,8 @@ class SolidBackend {
             .target(`${invitation.senderWebId}`)
             .object(invitationObject)
             .publishedNow()
-            .prettyWrite((err, doc) => {
-              if (err) throw err;
+            .prettyWrite((writeError, doc) => {
+              if (writeError) throw writeError;
               resolve(doc);
             });
         }
@@ -1025,10 +995,6 @@ class SolidBackend {
   }
 
   async checkSharedConfigurationsFolder(folderUrl) {
-    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
-    const N3 = require('n3');
-    const Q = require('q');
-    const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
     const authClient = await import(
       /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
     );
@@ -1036,7 +1002,6 @@ class SolidBackend {
     const deferred = Q.defer();
     const newResources = [];
     const rdfjsSource = await rdfjsSourceFromUrl(folderUrl, authClient.fetch);
-    const self = this;
     const engine = newEngine();
 
     engine
@@ -1046,7 +1011,7 @@ class SolidBackend {
     }`,
         { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
       )
-      .then(function(result) {
+      .then(result => {
         result.bindingsStream.on('data', data => {
           data = data.toObject();
 
@@ -1055,7 +1020,7 @@ class SolidBackend {
           newResources.push(resource);
         });
 
-        result.bindingsStream.on('end', function() {
+        result.bindingsStream.on('end', () => {
           deferred.resolve(newResources);
         });
       });
@@ -1064,10 +1029,6 @@ class SolidBackend {
   }
 
   async checkInboxFolder(inboxUrl) {
-    const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
-    const N3 = require('n3');
-    const Q = require('q');
-    const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
     const authClient = await import(
       /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
     );
@@ -1083,7 +1044,7 @@ class SolidBackend {
         `SELECT ?resource { ?resource a <http://www.w3.org/ns/ldp#Resource>. }`,
         { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
       )
-      .then(function(result) {
+      .then(result => {
         result.bindingsStream.on('data', data => {
           data = data.toObject();
 
@@ -1095,7 +1056,7 @@ class SolidBackend {
           // }
         });
 
-        result.bindingsStream.on('end', function() {
+        result.bindingsStream.on('end', () => {
           deferred.resolve(newResources);
         });
       });
@@ -1118,9 +1079,8 @@ class SolidBackend {
         invitation,
         invitationUrl
       );
-    } else {
-      return new Invitation(sender, recipient, invitation, invitationUrl);
     }
+    return new Invitation(sender, recipient, invitation, invitationUrl);
   }
 
   async parseSharedConfiguration(configurationUrl) {
@@ -1164,7 +1124,7 @@ class SolidBackend {
       `${fileMetadataTitle}.acl`,
       accessListConfiguration,
       '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(fileCreated => {
+    ).then(() => {
       Log.info(`Created access list ${fileMetadataTitle}.acl`);
     });
 
@@ -1204,13 +1164,11 @@ class SolidBackend {
         null
       ),
       '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(fileCreated => {
+    ).then(() => {
       Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
     });
 
     const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
-
-    const as = require('activitystrea.ms');
 
     const self = this;
 
@@ -1246,7 +1204,6 @@ class SolidBackend {
   }
 
   async removeInvitation(invitationUrl) {
-    const self = this;
     return StorageFileClient.removeItem(
       Utils.getFolderUrlFromPathUrl(invitationUrl),
       Utils.getFilenameFromPathUrl(invitationUrl)
@@ -1255,7 +1212,6 @@ class SolidBackend {
 
   async fetchAccessControlFile(aclUrl) {
     const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl);
-    Log.info(response);
 
     const newStore = $rdf.graph();
 
@@ -1304,7 +1260,7 @@ class SolidBackend {
       `${fileMetadataTitle}.acl`,
       accessListConfiguration,
       '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(fileCreated => {
+    ).then(() => {
       Log.info(`Updated access list ${fileMetadataTitle}.acl`);
     });
   }

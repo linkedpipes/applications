@@ -12,33 +12,47 @@ import uuid from 'uuid';
 import { AppConfiguration, StorageToolbox } from '@storage';
 import moment from 'moment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import IconButton from '@material-ui/core/IconButton';
+import RemoveIcon from '@material-ui/icons/RemoveCircle';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = () => ({
+  root: {
+    overflowX: 'auto'
+  }
+});
 
 type Props = {
   applicationsList: Array<AppConfiguration>,
   onHandleAppClicked: Function,
-  onHandleShareAppClicked: Function
+  onHandleShareAppClicked: Function,
+  onHandleDeleteAppClicked: Function,
+  classes: Object
 };
 
 const ApplicationsTableComponent = ({
   applicationsList,
   onHandleShareAppClicked,
-  onHandleAppClicked
+  onHandleAppClicked,
+  onHandleDeleteAppClicked,
+  classes
 }: Props) => (
   <div>
     {(applicationsList && applicationsList.length) > 0 ? (
-      <Paper>
+      <Paper classes={classes}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
               <TableCell align="center">Action</TableCell>
               <TableCell align="center">Share</TableCell>
+              <TableCell align="center">Remove</TableCell>
               <TableCell align="center">Title</TableCell>
               <TableCell align="center">Type</TableCell>
               <TableCell align="center">Created At</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {applicationsList.map(metadata => (
+            {applicationsList.map((metadata, index) => (
               <TableRow key={uuid()}>
                 <TableCell
                   align="center"
@@ -75,6 +89,21 @@ const ApplicationsTableComponent = ({
                     </Button>
                   </CopyToClipboard>
                 </TableCell>
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_application_session_button_${index}`}
+                    key={`button_application_${metadata.solidFileTitle}`}
+                    aria-label="Decline"
+                    onClick={() => onHandleDeleteAppClicked(metadata)}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                </TableCell>
                 <TableCell align="center" component="th" scope="row">
                   {metadata.configuration.title}
                 </TableCell>
@@ -99,4 +128,4 @@ const ApplicationsTableComponent = ({
   </div>
 );
 
-export default ApplicationsTableComponent;
+export default withStyles(styles)(ApplicationsTableComponent);

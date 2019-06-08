@@ -16,7 +16,6 @@ type Props = {
     progress: number
   },
   selectedResultGraphIri: string,
-  propMarkers: Array<{ coordinates: { lat: number, lon: number } }>,
   handleSetCurrentApplicationData: Function,
   selectedPipelineExecution: string,
   isPublished: boolean
@@ -38,7 +37,6 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
 
   async componentDidMount() {
     const {
-      propMarkers,
       selectedResultGraphIri,
       handleSetCurrentApplicationData,
       isPublished
@@ -55,18 +53,11 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
 
     const self = this;
 
-    if (propMarkers.length === 0) {
-      const markers = await this.fetchMarkers(selectedResultGraphIri);
-      await this.setState({
-        markers
-      });
-      self.updateMarkersState(markers);
-    } else {
-      await this.setState({
-        markers: propMarkers
-      });
-      await self.updateMarkersState(propMarkers);
-    }
+    const markers = await this.fetchMarkers(selectedResultGraphIri);
+    await this.setState({
+      markers
+    });
+    self.updateMarkersState();
   }
 
   fetchMarkers = async selectedResultGraphIri => {
@@ -78,7 +69,7 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
     return responseMarkers;
   };
 
-  updateMarkersState = async markers => {
+  updateMarkersState = async () => {
     const { handleSetCurrentApplicationData, isPublished } = this.props;
     await this.setState({
       zoomToMarkers: async map => {
@@ -101,15 +92,6 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
         }
       }
     });
-
-    if (!isPublished) {
-      handleSetCurrentApplicationData({
-        endpoint: 'map',
-        graphIri: this.props.selectedResultGraphIri,
-        etlExecutionIri: this.props.selectedPipelineExecution,
-        visualizerType: 'MAP'
-      });
-    }
   };
 
   render() {

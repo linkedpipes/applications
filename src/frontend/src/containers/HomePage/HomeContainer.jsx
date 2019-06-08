@@ -6,6 +6,7 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
+import { filtersActions } from '@ducks/filtersDuck';
 import { StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
@@ -19,10 +20,10 @@ import {
   UserService,
   GoogleAnalyticsWrapper
 } from '@utils';
-import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
 import AppConfiguration from '@storage/models/AppConfiguration';
 import { userActions } from '@ducks/userDuck';
+import { ApplicationMetadata } from '@storage/models';
 
 type Props = {
   history: { push: any },
@@ -38,6 +39,7 @@ type Props = {
   handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function,
   handleSetUserProfileAsync: Function,
+  handleSetFiltersState: Function,
   webId: string,
   applicationsFolder: String,
   location: Object,
@@ -240,6 +242,7 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
+      handleSetFiltersState,
       history
     } = this.props;
 
@@ -265,6 +268,7 @@ class HomeContainer extends PureComponent<Props, State> {
       await handleSetSelectedApplicationData(applicationConfiguration);
       await handleSetSelectedApplicationMetadata(applicationMetadata);
       await handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetFiltersState(applicationConfiguration.filterConfiguration);
 
       await this.setApplicationLoaderStatus(false);
 
@@ -299,15 +303,21 @@ class HomeContainer extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(false);
   };
 
-  handleApplicationDeleted = applicationConfigurationMetadata => {
+  handleApplicationDeleted = (
+    applicationConfigurationMetadata: ApplicationMetadata
+  ) => {
     const newApplicationsMetadata = this.state.applicationsMetadata;
 
     const filteredMetadata = newApplicationsMetadata.filter(value => {
-      return value.url !== applicationConfigurationMetadata.url;
+      return (
+        value.solidFileUrl !== applicationConfigurationMetadata.solidFileUrl
+      );
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      `Removed application:\n${
+        applicationConfigurationMetadata.solidFileTitle
+      }`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000
@@ -356,6 +366,7 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick,
       handleAppClicked,
+      handleDeleteApp,
       handleShareAppClicked,
       setApplicationLoaderStatus,
       handlePipelineExecutionRowDeleteClicked
@@ -377,6 +388,7 @@ class HomeContainer extends PureComponent<Props, State> {
           discoveriesList={userProfile.discoverySessions}
           tabIndex={tabIndex}
           onHandleAppClicked={handleAppClicked}
+          onHandleDeleteAppClicked={handleDeleteApp}
           onHandleShareAppClicked={handleShareAppClicked}
           onSetApplicationLoaderStatus={setApplicationLoaderStatus}
           onHandlePipelineExecutionRowDeleteClicked={
@@ -444,6 +456,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetHomepageTabIndex = index =>
     dispatch(globalActions.setSelectedHomepageTabIndex(index));
 
+  const handleSetFiltersState = filters =>
+    dispatch(filtersActions.setFiltersState(filters));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -453,7 +468,8 @@ const mapDispatchToProps = dispatch => {
     handleSetSelectedApplicationData,
     handleSetSelectedApplicationMetadata,
     handleSetUserProfileAsync,
-    handleSetHomepageTabIndex
+    handleSetHomepageTabIndex,
+    handleSetFiltersState
   };
 };
 

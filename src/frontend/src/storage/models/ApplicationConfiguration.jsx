@@ -80,7 +80,7 @@ export default class ApplicationConfiguration {
     const { nodesFilter, schemeFilter } = filterGroups;
 
     let nodesObject = {};
-    if (nodesFilter != undefined) {
+    if (nodesFilter !== undefined) {
       let nodesItems = [];
 
       nodesItems = nodesFilter.selectedOptions.items.map(item => {
@@ -104,11 +104,12 @@ export default class ApplicationConfiguration {
     }
 
     let schemeObject = {};
-    if (schemeFilter != undefined) {
+    if (schemeFilter !== undefined) {
       let schemeItems = [];
 
       schemeItems = schemeFilter.selectedOptions.map(item => {
-        (item['@type'] = 'FilterOption'), (item.visible = true);
+        item['@type'] = 'FilterOption';
+        item.visible = true;
         item.enabled = true;
         return item;
       });

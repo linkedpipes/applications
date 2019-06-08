@@ -22,7 +22,7 @@ type Props = {
   applicationsFolder: string,
   setApplicationLoaderStatus: Function,
   handleSetSelectedApplicationMetadata: Function,
-  filters: Objects
+  filters: Object
 };
 
 type State = {

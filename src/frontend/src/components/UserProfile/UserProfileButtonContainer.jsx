@@ -4,7 +4,7 @@ import UserProfileButtonComponent from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
-import { SocketContext, GlobalUtils } from '@utils';
+import { SocketContext, GlobalUtils, Log } from '@utils';
 
 type Props = {
   history: Object,
@@ -38,7 +38,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
-      // console.log(`Error: ${error}`);
+      Log.error(error);
     }
   };
 

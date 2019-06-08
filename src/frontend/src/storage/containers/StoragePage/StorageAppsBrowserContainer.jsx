@@ -87,11 +87,15 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     const newApplicationsMetadata = this.state.applicationsMetadata;
 
     const filteredMetadata = newApplicationsMetadata.filter(value => {
-      return value.url !== applicationConfigurationMetadata.url;
+      return (
+        value.solidFileUrl !== applicationConfigurationMetadata.solidFileUrl
+      );
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      `Removed application:\n${
+        applicationConfigurationMetadata.solidFileTitle
+      }`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000

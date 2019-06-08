@@ -1,12 +1,11 @@
-/* eslint-disable */
-import stringHash from 'string-hash';
-import { Log, GlobalUtils } from '@utils';
+import { Log } from '@utils';
 import StorageBackend from './StorageBackend';
 import { Utils } from './utils';
 import AppConfiguration from './models/AppConfiguration';
 import ApplicationConfiguration from './models/ApplicationConfiguration';
-import { AccessControl, Person } from './models';
-
+import { Person } from './models';
+import ApplicationMetadata from './models/ApplicationMetadata';
+// eslint-disable-next-line import/order
 const os = require('os');
 
 class StorageToolbox {
@@ -22,12 +21,12 @@ class StorageToolbox {
     return publishedUrl;
   };
 
-  saveAppToSolid = async (
+  async saveAppToSolid(
     applicationConfiguration,
     filtersConfiguration,
     webId,
     appFolder
-  ) => {
+  ): Promise<ApplicationMetadata> {
     if (!webId) {
       Log.error('No webID available', 'StorageToolbox');
       return;
@@ -39,14 +38,12 @@ class StorageToolbox {
       webId
     );
 
-    console.log(applicationConfigurationObject);
-
-    return StorageBackend.uploadApplicationConfiguration(
+    return await StorageBackend.uploadApplicationConfiguration(
       applicationConfigurationObject,
       appFolder,
       webId
     );
-  };
+  }
 
   removeAppFromStorage = async (appFolder, appMetadata) => {
     return StorageBackend.removeApplicationConfiguration(
@@ -77,7 +74,7 @@ class StorageToolbox {
     webId,
     recipientWebId
   ) => {
-    let invitation = await StorageBackend.generateInvitationFile(
+    const invitation = await StorageBackend.generateInvitationFile(
       applicationConfiguration.url,
       applicationConfiguration.url,
       webId,

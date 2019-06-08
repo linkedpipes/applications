@@ -110,11 +110,10 @@ class ApplicationContainer extends PureComponent<Props, State> {
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
       case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
-        const markers = applicationData.markers;
+        const selectedResultGraphIri = applicationData.selectedResultGraphIri;
         return (
           <GoogleMapsVisualizer
-            propMarkers={markers}
-            selectedResultGraphIri={''}
+            selectedResultGraphIri={selectedResultGraphIri}
             isPublished
           />
         );
