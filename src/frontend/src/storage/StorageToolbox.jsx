@@ -4,6 +4,7 @@ import { Log, GlobalUtils } from '@utils';
 import StorageBackend from './StorageBackend';
 import { Utils } from './utils';
 import AppConfiguration from './models/AppConfiguration';
+import ApplicationConfiguration from './models/ApplicationConfiguration';
 import { AccessControl, Person } from './models';
 
 const os = require('os');
@@ -32,21 +33,23 @@ class StorageToolbox {
       return;
     }
 
-    const configurationJsonld = StorageBackend.createUploadApplicationConfigurationStatement(
+    const applicationConfigurationObject = ApplicationConfiguration.fromRawParameters(
       applicationConfiguration,
       filtersConfiguration,
       webId
     );
 
-    return await StorageBackend.uploadApplicationConfiguration(
-      configurationJsonld,
+    console.log(applicationConfigurationObject);
+
+    return StorageBackend.uploadApplicationConfiguration(
+      applicationConfigurationObject,
       appFolder,
       webId
     );
   };
 
   removeAppFromStorage = async (appFolder, appConfiguration) => {
-    return await StorageBackend.removeApplicationConfiguration(
+    return StorageBackend.removeApplicationConfiguration(
       appFolder,
       appConfiguration
     );
@@ -144,7 +147,7 @@ class StorageToolbox {
   };
 
   copyFolderRecursively = async (webId, originalFolder, destinationFolder) => {
-    return await StorageBackend.copyFoldersRecursively(
+    return StorageBackend.copyFoldersRecursively(
       webId,
       originalFolder,
       destinationFolder
@@ -152,7 +155,7 @@ class StorageToolbox {
   };
 
   moveFolderRecursively = async (webId, originalFolder, destinationFolder) => {
-    return await StorageBackend.moveFolderRecursively(
+    return StorageBackend.moveFolderRecursively(
       webId,
       originalFolder,
       destinationFolder
@@ -163,7 +166,7 @@ class StorageToolbox {
     webId: string,
     appFolder: string
   ): Promise<ApplicationConfiguration[]> => {
-    return await StorageBackend.getAppConfigurationsMetadata(webId, appFolder);
+    return StorageBackend.getAppConfigurationsMetadata(webId, appFolder);
   };
 
   getPerson = async (webId: string): Promise<Person> => {

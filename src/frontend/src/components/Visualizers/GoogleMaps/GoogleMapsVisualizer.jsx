@@ -46,7 +46,6 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
         endpoint: 'map',
         graphIri: this.props.selectedResultGraphIri,
         etlExecutionIri: this.props.selectedPipelineExecution,
@@ -105,7 +104,6 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
         endpoint: 'map',
         graphIri: this.props.selectedResultGraphIri,
         etlExecutionIri: this.props.selectedPipelineExecution,

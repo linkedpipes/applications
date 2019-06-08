@@ -13,7 +13,10 @@ export default class ApplicationMetadata {
   constructor({ solidFileTitle, solidFileUrl, configuration }) {
     this.solidFileTitle = solidFileTitle;
     this.solidFileUrl = solidFileUrl;
-    this.configuration = ApplicationConfiguration.from(configuration);
+    this.configuration =
+      configuration instanceof ApplicationConfiguration
+        ? configuration
+        : ApplicationConfiguration.from(configuration);
   }
 
   static from(json) {

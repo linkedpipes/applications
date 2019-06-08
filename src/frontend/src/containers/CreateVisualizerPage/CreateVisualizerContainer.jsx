@@ -62,7 +62,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       });
     }
     // Set default filters state for given visualizer
-    if (!this.props.filtersState) {
+    if (!this.props.selectedApplicationMetadata) {
       await this.props.handleSetDefaultFiltersState(
         selectedVisualizer.visualizer.visualizerCode
       );

@@ -86,7 +86,6 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     if (this.elementVizDiv) {
       if (!isPublished) {
         handleSetCurrentApplicationData({
-          id: uuid.v4(),
           endpoint: 'chord',
           graphIri: this.props.selectedResultGraphIri,
           etlExecutionIri: this.props.selectedPipelineExecution,

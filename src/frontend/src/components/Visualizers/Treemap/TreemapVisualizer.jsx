@@ -83,7 +83,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
         endpoint: 'treemap',
         applicationData: { conceptIri: this.props.selectedScheme }, // TODO: change Confusing Naming
         graphIri: this.props.selectedResultGraphIri,

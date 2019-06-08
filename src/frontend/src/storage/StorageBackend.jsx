@@ -4,6 +4,7 @@ import { Utils } from './utils';
 import {
   AppConfiguration,
   ApplicationMetadata,
+  ApplicationConfiguration,
   SharedAppConfiguration,
   Person,
   Invitation,
@@ -89,7 +90,7 @@ class SolidBackend {
    */
   async load(document: $rdf.NamedNode, forceReload = true) {
     try {
-      return await this.fetcher.load(document, {
+      return this.fetcher.load(document, {
         force: forceReload,
         clearPreviousData: true
       });
@@ -452,7 +453,7 @@ class SolidBackend {
    * @param {string} url An URL of the given image.
    * @return {Promise<AppConfiguration>} Fetched image.
    */
-  async getAppConfigurationMetadata(url: string): Promise<AppConfiguration> {
+  async getAppConfigurationMetadata(url: string): Promise<ApplicationMetadata> {
     const applicationConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
       url
     );
@@ -466,6 +467,43 @@ class SolidBackend {
     });
   }
 
+  async getApplicationConfigurationMetadata(
+    url: string
+  ): Promise<ApplicationMetadata> {
+    const fileUrl = $rdf.sym(url);
+    const file = fileUrl.doc();
+    try {
+      await this.load(file);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+    const type = this.store.match(fileUrl, RDF('type'), POST, file);
+    if (type) {
+      const configurationUrl = this.store.any(
+        fileUrl,
+        FOAF('depiction'),
+        null,
+        file
+      );
+      const title = this.store.any(fileUrl, DCT('title'), null, file);
+      const endpoint = this.store.any(fileUrl, DCT('identifier'), null, file);
+      const creator = this.store.any(fileUrl, DCT('creator'), null, file);
+      const color = this.store.any(fileUrl, VCARD('label'), null, file);
+      const created = this.store.any(fileUrl, DCT('created'), null, file);
+      return new AppConfiguration(
+        url.toString(),
+        configurationUrl.value,
+        title.value,
+        endpoint.value,
+        creator.value,
+        color.value,
+        new Date(created.value)
+      );
+    }
+
+    return Promise.reject(new Error('App configuration not found.'));
+  }
+
   /**
    * Uploads a new image to the user's POD.
    * @param {Object} applicationConfiguration Partially constructed jsonld configuration.
@@ -474,19 +512,29 @@ class SolidBackend {
    * @return {Promise<ApplicationConfiguration>} Uploaded image.
    */
   async uploadApplicationConfiguration(
-    applicationConfiguration,
+    applicationConfiguration: ApplicationConfiguration,
     appFolder,
     webId
   ): Promise<ApplicationMetadata> {
     const appConfigurationFilePath = `${appFolder}/configurations`;
     const appConfigurationFileTitle = `${Utils.getName()}`;
+    const appConfigurationFullPath = `${appConfigurationFilePath}/${appConfigurationFileTitle}.ttl`;
     let appConfigurationUrl;
     const created = new Date(Date.now());
+
+    const newStore = $rdf.graph();
+
+    const applicationConfigurationTurtle = await applicationConfiguration.toTurtle(
+      appConfigurationFullPath
+    );
+
+    Log.info(applicationConfigurationTurtle, 'StorageBackend');
+
     try {
       await StorageFileClient.createFile(
         appConfigurationFilePath,
-        `${appConfigurationFileTitle}.jsonld`,
-        applicationConfiguration
+        `${appConfigurationFileTitle}.ttl`,
+        applicationConfigurationTurtle
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
@@ -494,10 +542,9 @@ class SolidBackend {
         }
       });
 
-      const appConfigurationFullPath = `${appConfigurationFilePath}/${appConfigurationFileTitle}.jsonld`;
       await StorageFileClient.createFile(
         appConfigurationFilePath,
-        `${appConfigurationFileTitle}.jsonld.acl`,
+        `${appConfigurationFileTitle}.ttl.acl`,
         await this.createFileAccessList(
           webId,
           appConfigurationFullPath,
@@ -620,121 +667,6 @@ class SolidBackend {
     return response;
   }
 
-  createUploadFilterConfigurationStatement(filtersConfiguration) {
-    if (!filtersConfiguration) {
-      return '';
-    } else {
-      let filtersState = filtersConfiguration.filtersState;
-
-      const { enabled, visible, filterGroups } = filtersState;
-      const { nodesFilter, schemeFilter } = filterGroups;
-
-      let nodesObject = {};
-      if (nodesFilter != undefined) {
-        let nodesItems = [];
-
-        nodesItems = nodesFilter.selectedOptions.items.map(item => {
-          (item['@type'] = 'FilterOption'), (item['visible'] = true);
-          item['enabled'] = true;
-          return item;
-        });
-
-        nodesObject = {
-          '@type': 'NodesFilter',
-          label: nodesFilter.label,
-          enabled: nodesFilter.enabled,
-          visible: nodesFilter.visible,
-          type: nodesFilter.type,
-          selectedOptions: {
-            '@type': 'FilterOptionGroup',
-            items: nodesItems
-          }
-        };
-      }
-
-      let schemeObject = {};
-      if (schemeFilter != undefined) {
-        let schemeItems = [];
-
-        schemeItems = schemeFilter.selectedOptions.map(item => {
-          (item['@type'] = 'FilterOption'), (item['visible'] = true);
-          item['enabled'] = true;
-          return item;
-        });
-
-        schemeObject = {
-          '@type': 'SchemeFilter',
-          label: schemeFilter.label,
-          enabled: schemeFilter.enabled,
-          visible: schemeFilter.visible,
-          type: schemeFilter.type,
-          selectedOptions: {
-            '@type': 'FilterOptionGroup',
-            items: schemeItems
-          }
-        };
-      }
-
-      return {
-        '@type': 'FilterConfiguration',
-        enabled: filtersState.enabled,
-        visible: filtersState.visible,
-        filterGroups: {
-          '@type': 'FilterGroup',
-          nodesFilter: nodesObject
-        }
-      };
-    }
-  }
-
-  /**
-   * Creates appropriate RDF statements for the new application configuration to upload.
-   * @param {string} appConfigurationMetadataPath An URL of the new RDF Turtle image file.
-   * @param {string} appConfigurationUrl An URL of the new image file.
-   * @param {string} appTitle A title of an application configuration.
-   * @param {string} appEndpoint An endpoint of application configuration
-   * @param {string} user A WebID of the image's creator.
-   * @param {string} cardColor Color to be used for card visualizing the app
-   * @param {Date} createdAt A creation date of the image.
-   * @return {$rdf.Statement[]} An array of the image RDF statements.
-   */
-  // eslint-disable-next-line class-methods-use-this
-  createUploadApplicationConfigurationStatement(
-    {
-      id,
-      applicationData,
-      title,
-      createdAt,
-      graphIri,
-      conceptIri,
-      etlExecutionIri,
-      endpoint,
-      visualizerType
-    },
-    filtersConfiguration,
-    webId
-  ): string {
-    return JSON.stringify({
-      '@context':
-        'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/ae03d1c163bb015f79a3ea65f9ab009a6ab22c52/lapps-ontology.jsonld',
-      '@type': 'VisualizerConfiguration',
-      id: id,
-      author: webId,
-      title: title,
-      backgroundColor: GlobalUtils.randDarkColor(),
-      graphIri: graphIri,
-      conceptIri: conceptIri,
-      published: new Date(Date.now()).toISOString(),
-      etlExecutionIri: etlExecutionIri,
-      applicationData: applicationData,
-      endpoint: endpoint,
-      filteredBy: this.createUploadFilterConfigurationStatement(
-        filtersConfiguration
-      ),
-      visualizerType: visualizerType
-    });
-  }
-
   /**
    * Fetches WebIDs of the user's friends from his POD.
    * @param {string} webId A WebID of the user.
@@ -801,7 +733,7 @@ class SolidBackend {
    */
   async getFriends(webId: string): Promise<Person[]> {
     const friendsIds = await this.getFriendsWebId(webId);
-    return await this.getPersons(friendsIds);
+    return this.getPersons(friendsIds);
   }
 
   /**
@@ -1345,7 +1277,7 @@ class SolidBackend {
       })
     );
 
-    return await StorageFileClient.updateFile(
+    return StorageFileClient.updateFile(
       `${fileMetadataFolder}/`,
       `${fileMetadataTitle}.acl`,
       accessListConfiguration,
