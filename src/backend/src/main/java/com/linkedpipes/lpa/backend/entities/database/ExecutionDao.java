@@ -34,8 +34,11 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private boolean removed = false;
 
-    @Column(nullable = true)
-    private Date finishRepeatingExeutionsAt = null;
+    @Column(nullable = false, name="repeat")
+    private boolean scheduled = false;
+
+    @Column(nullable = false)
+    private long frequencyHours = -1;
 
     @ManyToOne
     @JoinColumn(name="user_web_id")
@@ -149,11 +152,19 @@ public class ExecutionDao implements Serializable {
         this.removed = removed;
     }
 
-    public Date getFinishRepeatingExecutionsAt() {
-        return this.finishRepeatingExeutionsAt;
+    public boolean isScheduled() {
+        return this.scheduled;
     }
 
-    public void setFinishRepeatingExecutionsAt(final Date finishAt) {
-        this.finishRepeatingExeutionsAt = finishAt;
+    public void setScheduled(boolean scheduled) {
+        this.scheduled = scheduled;
+    }
+
+    public long getFrequencyHours() {
+        return this.frequencyHours;
+    }
+
+    public void setFrequencyHours(long freq) {
+        this.frequencyHours = freq;
     }
 }

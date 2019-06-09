@@ -16,5 +16,7 @@ public interface ExecutorService {
     Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException;
     void cancelExecution(String executionIri);
     void cancelDiscovery(String discoveryId);
-    void repeatExecution(long frequencyHours, Date finishAt, String executionIri, String userId, String selectedVisualiser);
+    void repeatExecution(long frequencyHours, boolean repeat, String executionIri, String userId, String selectedVisualiser);
+    void stopScheduledExecution(boolean repeat, String executionIri);
+
 }

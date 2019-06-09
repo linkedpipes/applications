@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
+import javax.annotation.PostConstruct;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -425,31 +426,57 @@ public class ExecutorServiceComponent implements ExecutorService {
 
 
     @Override
-    public void repeatExecution(@NotNull long frequencyHours, @Nullable Date finishAt, @NotNull String executionIri, @NotNull String userId, @NotNull String selectedVisualiser) {
-        if (finishAt != null) {
-            for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                e.setFinishRepeatingExecutionsAt(finishAt);
-                executionRepository.save(e);
-            }
+    public void repeatExecution(@NotNull long frequencyHours, @NotNull boolean repeat, @NotNull String executionIri, @NotNull String userId, @NotNull String selectedVisualiser) {
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            e.setScheduled(repeat);
+            e.setFrequencyHours(frequencyHours);
+            executionRepository.save(e);
         }
 
+        scheduleRepeatedExecution(frequencyHours, executionIri, userId, selectedVisualiser);
+    }
+
+    @Override
+    public void stopScheduledExecution(@NotNull boolean repeat, @NotNull String executionIri) {
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            e.setScheduled(repeat);
+            executionRepository.save(e);
+        }
+    }
+
+    private void scheduleRepeatedExecution(@NotNull long frequencyHours, @NotNull String executionIri, @NotNull String userId, @NotNull String selectedVisualiser) {
         Runnable executor = () -> {
             try {
-                Date now = new Date();
                 for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-                    Date finish = e.getFinishRepeatingExecutionsAt();
-                    if ((finish == null) || (finish.after(now))) {
+                    if (!e.isScheduled()){
+                        throw new PollingCompletedException();
+                    } else {
                         virtuosoService.deleteNamedGraph(e.getPipeline().getResultGraphIri());
                         executePipeline(e.getPipeline().getEtlPipelineIri(), userId, selectedVisualiser);
                     }
                 }
             } catch (LpAppsException e) {
-
+                //something went wrong this time, will retry next iteration
             } catch (UserNotFoundException f) {
                 throw new PollingCompletedException(f);
             }
         };
 
         ScheduledFuture<?> executorHandle = Application.SCHEDULER.scheduleAtFixedRate(executor, frequencyHours, frequencyHours, HOURS);
+    }
+
+    @PostConstruct
+    public void startRepeatedExecutionsOnBoot() {
+        logger.info("Scheduling repeated executions");
+        for (ExecutionDao e : executionRepository.findByScheduled(true)) {
+            logger.debug(e.getExecutionIri());
+            scheduleRepeatedExecution(
+                e.getFrequencyHours(),
+                e.getExecutionIri(),
+                e.getUser().getWebId(),
+                e.getSelectedVisualiser()
+            );
+        }
+        logger.info("Done");
     }
 }
