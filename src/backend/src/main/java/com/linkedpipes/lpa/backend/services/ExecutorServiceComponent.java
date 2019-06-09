@@ -6,7 +6,6 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
-import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
@@ -23,8 +22,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
@@ -51,7 +50,6 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;
-    @NotNull private final VirtuosoService virtuosoService;
 
     @Autowired
     private DiscoveryRepository discoveryRepository;
@@ -63,7 +61,6 @@ public class ExecutorServiceComponent implements ExecutorService {
         this.discoveryService = context.getBean(DiscoveryService.class);
         this.etlService = context.getBean(EtlService.class);
         this.userService = context.getBean(UserService.class);
-        this.virtuosoService = context.getBean(VirtuosoService.class);
     }
 
     /**

@@ -21,7 +21,6 @@ import java.time.temporal.Temporal;
 import java.time.ZoneId;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +100,7 @@ public class ScheduledExecutionServiceComponent implements ScheduledExecutionSer
             }
         };
 
-        ScheduledFuture<?> executorHandle = Application.SCHEDULER.scheduleAtFixedRate(executor, initialDelay, frequencyHours, HOURS);
+        Application.SCHEDULER.scheduleAtFixedRate(executor, initialDelay, frequencyHours, HOURS);
     }
 
     @PostConstruct

@@ -5,7 +5,6 @@ import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 
-import java.util.Date;
 import java.util.List;
 
 public interface ExecutorService {
