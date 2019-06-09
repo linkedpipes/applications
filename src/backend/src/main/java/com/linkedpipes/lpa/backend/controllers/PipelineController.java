@@ -9,6 +9,7 @@ import com.linkedpipes.lpa.backend.services.DiscoveryService;
 import com.linkedpipes.lpa.backend.services.ExecutorService;
 import com.linkedpipes.lpa.backend.services.PipelineExportService;
 import com.linkedpipes.lpa.backend.services.UserService;
+import com.linkedpipes.lpa.backend.services.ScheduledExecutionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,12 +31,14 @@ public class PipelineController {
     @NotNull private final ExecutorService executorService;
     @NotNull private final UserService userService;
     @NotNull private final PipelineExportService pipelineExportService;
+    @NotNull private final ScheduledExecutionService scheduledExecutionService;
 
     public PipelineController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         executorService = context.getBean(ExecutorService.class);
         userService = context.getBean(UserService.class);
         pipelineExportService = context.getBean(PipelineExportService.class);
+        scheduledExecutionService = context.getBean(ScheduledExecutionService.class);
     }
 
     @GetMapping("/api/pipeline")
@@ -79,7 +82,7 @@ public class PipelineController {
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
         try {
             userService.addUserIfNotPresent(webId);
-            Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser);
+            Execution response = executorService.executePipeline(etlPipelineIri, webId, selectedVisualiser, true);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             logger.error("User not found: " + webId);
@@ -98,7 +101,7 @@ public class PipelineController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "Frequency must be positive");
         }
 
-        executorService.repeatExecution(frequencyHours, true, executionIri, webId, selectedVisualiser);
+        scheduledExecutionService.repeatExecution(frequencyHours, true, executionIri, webId, selectedVisualiser);
     }
 
     @NotNull
@@ -106,7 +109,7 @@ public class PipelineController {
     public void executePipeline(@NotNull @RequestParam(value="repeat") boolean repeat,
                                 @NotNull @RequestParam(value="executionIri") String executionIri)
                                 throws LpAppsException {
-        executorService.stopScheduledExecution(repeat, executionIri);
+        scheduledExecutionService.stopScheduledExecution(repeat, executionIri);
     }
 
 }

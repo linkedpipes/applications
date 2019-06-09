@@ -6,4 +6,5 @@ public class PipelineExecution {
     public String etlPipelineIri;
     public String selectedVisualiser;
     public long started, finished;
+    public boolean scheduleOn, startedByUser;
 }

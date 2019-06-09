@@ -37,6 +37,9 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false, name="repeat")
     private boolean scheduled = false;
 
+    @Column(nullable = false, name="native")
+    private boolean startedByUser = true;
+
     @Column(nullable = false)
     private long frequencyHours = -1;
 
@@ -166,5 +169,13 @@ public class ExecutionDao implements Serializable {
 
     public void setFrequencyHours(long freq) {
         this.frequencyHours = freq;
+    }
+
+    public boolean isStartedByUser() {
+        return this.startedByUser;
+    }
+
+    public void setStartedByUser(boolean user) {
+        this.startedByUser = user;
     }
 }

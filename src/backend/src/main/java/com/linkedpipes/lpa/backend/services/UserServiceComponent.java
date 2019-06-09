@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public class UserServiceComponent implements UserService {
 
     @Autowired
     private ApplicationRepository appRepository;
+
 
     /**
     * Returns the user's profile. If user doesn't exist yet we add them.
@@ -207,6 +209,8 @@ public class UserServiceComponent implements UserService {
                 exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
                 exec.selectedVisualiser = e.getSelectedVisualiser();
                 exec.started = e.getStarted().getTime() / 1000L;
+                exec.scheduleOn = e.isScheduled();
+                exec.startedByUser = e.isStartedByUser();
                 if (e.getFinished() != null) {
                     exec.finished = e.getFinished().getTime() / 1000L;
                 } else {
@@ -246,7 +250,6 @@ public class UserServiceComponent implements UserService {
                                        throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
-        PipelineInformationDao pipelineInformationToDelete = null;
 
         for (ExecutionDao execution : user.getExecutions()) {
             if (execution.getExecutionIri().equals(executionIri)) {
@@ -255,6 +258,14 @@ public class UserServiceComponent implements UserService {
             }
         }
 
+        removeExecutionFromUser(user, toDelete);
+
+        return transformUserProfile(user);
+    }
+
+    private void removeExecutionFromUser(UserDao user, ExecutionDao toDelete) {
+        PipelineInformationDao pipelineInformationToDelete = null;
+
         if (toDelete != null) {
             user.removeExecution(toDelete);
 
@@ -262,12 +273,19 @@ public class UserServiceComponent implements UserService {
                 pipelineInformationToDelete = toDelete.getPipeline();
             }
 
-            if (toDelete.getApplications().isEmpty()) {
+            List<ExecutionDao> executions = new ArrayList<>();
+            for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(toDelete.getPipeline().getResultGraphIri())) {
+                executions.addAll(x.getExecutions());
+            }
+
+            if (toDelete.getApplications().isEmpty()) { //this is for repeated executions using the same NG
                 //no applications - delete from virtuoso
                 String graphName = toDelete.getPipeline().getResultGraphIri();
                 VirtuosoService.deleteNamedGraph(graphName);
 
-                executionRepository.delete(toDelete);
+                for (ExecutionDao e : executions) {
+                    executionRepository.delete(e);
+                }
             } else {
                 toDelete.setRemoved(true);
                 executionRepository.save(toDelete);
@@ -279,8 +297,6 @@ public class UserServiceComponent implements UserService {
 
             repository.save(user);
         }
-
-        return transformUserProfile(user);
     }
 
     /**
@@ -362,8 +378,30 @@ public class UserServiceComponent implements UserService {
             if (app.getSolidIri().equals(solidIri)) {
                 ExecutionDao execution = app.getExecution();
                 if (null != execution) {
-                    if (execution.isRemoved()) {
-                        //execution was already removed
+                    if (execution.isScheduled()) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.getExecutionIri().equals(execution.getExecutionIri())) {
+                                    executionRepository.delete(y);
+                                }
+                            }
+                        }
+                    }
+
+                    boolean allRemoved = execution.isRemoved();
+                    if (allRemoved) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.isRemoved()) {
+                                    allRemoved = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (allRemoved) {
+                        //all executions were already removed
                         String graphName = app.getExecution().getPipeline().getResultGraphIri();
                         VirtuosoService.deleteNamedGraph(graphName);
 

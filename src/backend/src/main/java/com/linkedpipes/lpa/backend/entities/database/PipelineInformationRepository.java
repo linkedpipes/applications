@@ -7,4 +7,5 @@ import java.util.List;
 @Repository
 public interface PipelineInformationRepository extends CrudRepository<PipelineInformationDao, Long> {
     List<PipelineInformationDao> findByEtlPipelineIri(String pipelineIri);
+    List<PipelineInformationDao> findByResultGraphIri(String resultGraphIri);
 }
