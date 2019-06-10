@@ -389,8 +389,8 @@ export default class ApplicationConfiguration {
       file
     );
 
-    const items = store.any(selectedOptions, LPA('items'), undefined, file)
-      .elements;
+    let items = store.any(selectedOptions, LPA('items'), undefined, file);
+    items = items !== undefined ? items.elements : [];
 
     const selectedOptionsParsed = {
       '@type': 'FilterOptionGroup',

@@ -8,8 +8,8 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Switch from '@material-ui/core/Switch';
-import _ from 'lodash';
+import uuid from 'uuid';
+import lodash from 'lodash';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -51,8 +51,8 @@ const styles = theme => ({
 });
 
 const isArrayEqual = (x, y) => {
-  return _(x)
-    .differenceWith(y, _.isEqual)
+  return lodash(x)
+    .differenceWith(y, lodash.isEqual)
     .isEmpty();
 };
 
@@ -134,6 +134,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
           {(this.state.nodes || []).map(node => (
             <span key={node.uri}>
               <FormControlLabel
+                key={uuid.v4()}
                 control={
                   <Checkbox
                     value={node.uri}

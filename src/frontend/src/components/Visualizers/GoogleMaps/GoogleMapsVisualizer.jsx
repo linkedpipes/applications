@@ -70,7 +70,6 @@ class GoogleMapsVisualizer extends PureComponent<Props, State> {
   };
 
   updateMarkersState = async () => {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
     await this.setState({
       zoomToMarkers: async map => {
         const bounds = new window.google.maps.LatLngBounds();

@@ -4,7 +4,6 @@ import { Utils } from './utils';
 import ApplicationConfiguration from './models/ApplicationConfiguration';
 import { Person } from './models';
 import ApplicationMetadata from './models/ApplicationMetadata';
-import ApplicationMetadata from './models/ApplicationMetadata';
 // eslint-disable-next-line import/order
 const os = require('os');
 
@@ -70,13 +69,12 @@ class StorageToolbox {
   };
 
   sendCollaborationInvitation = async (
-    applicationConfiguration,
+    applicationMetadata,
     webId,
     recipientWebId
   ) => {
     const invitation = await StorageBackend.generateInvitationFile(
-      applicationConfiguration.url,
-      applicationConfiguration.url,
+      applicationMetadata.solidFileUrl,
       webId,
       recipientWebId
     );
@@ -123,24 +121,21 @@ class StorageToolbox {
     const updates = await StorageBackend.checkSharedConfigurationsFolder(
       sharedConfigurationsUrl
     );
-    const sharedApplicationsConfigurations = [];
+    const sharedApplicationsMetadata = [];
     const self = this;
 
     await Promise.all(
       updates.map(async fileUrl => {
         const sharedConfiguration = await self.readSharedConfiguration(fileUrl);
         Log.info(sharedConfiguration);
-        const appMetadataUrl = sharedConfiguration.url;
-        const appConfiguration = await StorageBackend.getAppConfigurationMetadata(
-          appMetadataUrl
-        );
-        sharedApplicationsConfigurations.push(appConfiguration);
+
+        sharedApplicationsMetadata.push(sharedConfiguration.appMetadata);
       })
     );
 
-    Log.info(sharedApplicationsConfigurations);
+    Log.info(sharedApplicationsMetadata);
 
-    return sharedApplicationsConfigurations;
+    return sharedApplicationsMetadata;
   };
 
   copyFolderRecursively = async (webId, originalFolder, destinationFolder) => {

@@ -61,6 +61,7 @@ class FiltersComponent extends React.Component<Props> {
         // editingMode
         return (
           <ChordFiltersComponent
+            key={uuid.v4()}
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
             selectedNodes={selectedOptions.items}
@@ -69,7 +70,7 @@ class FiltersComponent extends React.Component<Props> {
           />
         );
       default:
-        return <div> Unknown filter type </div>;
+        return <div key={uuid.v4()}> Unknown filter type </div>;
     }
   };
 
@@ -153,16 +154,19 @@ class FiltersComponent extends React.Component<Props> {
                   >
                     <ExpansionPanelSummary
                       id={filterGroup.label}
+                      key={uuid.v4()}
                       expandIcon={<ExpandMoreIcon />}
                     >
-                      <Typography className={classes.heading}>
+                      <Typography key={uuid.v4()} className={classes.heading}>
                         {filterGroup.label}
                       </Typography>
                       {editingMode && (
                         <div>
                           <FormControlLabel
+                            key={uuid.v4()}
                             control={
                               <Switch
+                                key={uuid.v4()}
                                 checked={filterGroup.enabled}
                                 value={filterGroup.enabled}
                                 color="primary"
@@ -171,8 +175,10 @@ class FiltersComponent extends React.Component<Props> {
                             label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
                           />
                           <FormControlLabel
+                            key={uuid.v4()}
                             control={
                               <Switch
+                                key={uuid.v4()}
                                 checked={filterGroup.visible}
                                 value={filterGroup.visible}
                                 color="primary"

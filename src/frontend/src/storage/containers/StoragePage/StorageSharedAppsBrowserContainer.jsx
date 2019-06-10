@@ -44,7 +44,7 @@ class StorageSharedAppsBrowserContainer extends PureComponent<Props, State> {
 
   async componentWillUpdate() {
     if (this.isMounted && this.props.webId && !this.didUpdateMetadata) {
-      this.loadStoredApplications();
+      // this.loadStoredApplications();
       this.didUpdateMetadata = true;
     }
   }

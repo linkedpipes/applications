@@ -1,4 +1,4 @@
-import SharedAppConfiguration from './SharedAppConfiguration';
+import SharedApplicationConfiguration from './SharedApplicationConfiguration';
 import ApplicationConfiguration from './ApplicationConfiguration';
 import ApplicationMetadata from './ApplicationMetadata';
 import Person from './Person';
@@ -9,7 +9,7 @@ import { FileItem, FolderItem } from './Item';
 
 export {
   AccessControl,
-  SharedAppConfiguration,
+  SharedApplicationConfiguration,
   ApplicationConfiguration,
   ApplicationMetadata,
   AcceptedInvitation,

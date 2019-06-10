@@ -1,10 +1,12 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unused-vars */
+/* eslint-disable-next-line no-await-in-loop */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
   ApplicationMetadata,
   ApplicationConfiguration,
-  SharedAppConfiguration,
+  SharedApplicationConfiguration,
   Person,
   Invitation,
   AcceptedInvitation,
@@ -66,10 +68,7 @@ class SolidBackend {
    */
   async load(document: $rdf.NamedNode, forceReload = true) {
     try {
-      return this.fetcher.load(document, {
-        force: forceReload,
-        clearPreviousData: true
-      });
+      return this.fetcher.load(document);
     } catch (err) {
       return Promise.reject(new Error('Could not fetch the document.'));
     }
@@ -217,6 +216,28 @@ class SolidBackend {
         '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
       ).then(() => {
         Log.info(`Created access list ${folderUrl}/configurations/.acl`);
+      });
+
+      await StorageFileClient.createFolder(
+        configurationsUrl,
+        'sharedConfigurations'
+      ).then(() => {
+        Log.info(`Created folder ${configurationsUrl}.`);
+      });
+
+      await StorageFileClient.updateItem(
+        `${folderUrl}/sharedConfigurations`,
+        '.acl',
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/sharedConfigurations/`,
+          [READ],
+          true,
+          null
+        ),
+        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      ).then(() => {
+        Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
       });
 
       await this.updateAppFolder(webId, folderUrl).then(() => {
@@ -407,15 +428,22 @@ class SolidBackend {
       null,
       configurationsFolder
     );
-    files.forEach(async file => {
+
+    const promises = [];
+
+    for (const file of files) {
       if (String(file.value).endsWith('.ttl')) {
-        await this.getAppConfigurationMetadata(file.value)
-          .then(appConfigMetadata => {
-            configurationsMetadata.push(appConfigMetadata);
-          })
-          .catch(err => Log.error(err, 'StorageBackend'));
+        promises.push(
+          this.getAppConfigurationMetadata(file.value)
+            .then(appConfigMetadata => {
+              configurationsMetadata.push(appConfigMetadata);
+            })
+            .catch(err => Log.error(err, 'StorageBackend'))
+        );
       }
-    });
+    }
+
+    await Promise.all(promises);
 
     return configurationsMetadata.sort((a, b) =>
       Utils.sortByDateAsc(a.configuration.published, b.configuration.published)
@@ -672,13 +700,21 @@ class SolidBackend {
    */
   async getPersons(userIds: string[]): Promise<Person[]> {
     const users = [];
-    userIds.forEach(async value => {
-      await this.getPerson(value)
-        .then(person => {
-          users.push(person);
-        })
-        .catch(err => Log.error(err, 'StorageBackend'));
-    });
+
+    const promises = [];
+
+    for (const value of userIds) {
+      promises.push(
+        this.getPerson(value)
+          .then(person => {
+            users.push(person);
+          })
+          .catch(err => Log.error(err, 'StorageBackend'))
+      );
+    }
+
+    await Promise.all(promises);
+
     return users.flat();
   }
 
@@ -921,7 +957,7 @@ class SolidBackend {
     });
   }
 
-  async generateInvitationFile(baseUrl, metadataUrl, userWebId, opponentWebId) {
+  async generateInvitationFile(metadataUrl, userWebId, opponentWebId) {
     return new Promise(resolve => {
       as.invite()
         .name('lpapps_invite')
@@ -1051,11 +1087,12 @@ class SolidBackend {
     );
 
     const appMetadataUrl = sharedAppConfiguration.url;
-    const appConfiguration = await this.getAppConfigurationMetadata(
-      appMetadataUrl
-    );
+    const appMetadata = await this.getAppConfigurationMetadata(appMetadataUrl);
 
-    return new SharedAppConfiguration(sharedAppConfiguration, appConfiguration);
+    return new SharedApplicationConfiguration(
+      sharedAppConfiguration,
+      appMetadata
+    );
   }
 
   async processAcceptSharedInvite(sharedInvitation) {
