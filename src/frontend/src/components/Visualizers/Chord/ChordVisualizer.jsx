@@ -15,8 +15,6 @@ type Props = {
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
   theme: Object,
-  height: number,
-  width: number,
   selectedNodes: Array<{ label: string, uri: string }>
 };
 
@@ -152,11 +150,11 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidUpdate(prevProps) {
-    this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
-    const size = Math.min(
-      this.elementVizDiv.clientHeight,
-      this.elementVizDiv.clientWidth
-    );
+    // this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
+    // const size = Math.min(
+    //   this.elementVizDiv.clientHeight,
+    //   this.elementVizDiv.clientWidth
+    // );
     // Typical usage (don't forget to compare props):
     if (!areEqual(prevProps.selectedNodes, this.props.selectedNodes)) {
       const selectedNodes = this.props.selectedNodes;
@@ -179,6 +177,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           color => `#${color}`
         );
 
+        // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           dataLoadingStatus: 'ready',
           matrix: matrixData,
@@ -199,6 +198,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           color => `#${color}`
         );
 
+        // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           dataLoadingStatus: 'ready',
           matrix: matrixData,

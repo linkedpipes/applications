@@ -10,7 +10,18 @@ const INITIAL_STATE = {
 const filtersReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case types.SET_SELECTED_SCHEME:
-      return { nodes: null, selectedScheme: [action.selectedScheme] };
+      return {
+        filtersState: {
+          ...state.filtersState,
+          filterGroups: {
+            ...state.filtersState.filterGroups,
+            schemeFilter: {
+              ...state.filtersState.filterGroups.schemeFilter,
+              selectedOptions: [action.selectedScheme]
+            }
+          }
+        }
+      };
     case types.SET_SELECTED_NODES:
       return {
         filtersState: {
@@ -40,7 +51,11 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
           visible: action.value
         }
       };
-
+    case types.RESET_FILTERS:
+      return {
+        ...state,
+        filtersState: null
+      };
     case types.SET_DEFAULT_FILTERS_STATE:
       switch (action.visualizerCode) {
         case VISUALIZER_TYPE.CHORD:

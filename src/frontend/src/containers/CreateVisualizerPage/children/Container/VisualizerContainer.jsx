@@ -9,8 +9,6 @@ import {
 } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
-import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
-import ChordFiltersComponent from '../Filters/children/ChordFilter';
 import FiltersComponent from '../Filters/FiltersComponent';
 import { pathOr } from 'rambda';
 
@@ -102,6 +100,13 @@ const getVisualizer = (
           selectedResultGraphIri={selectedResultGraphIri}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          selectedScheme={
+            pathOr(
+              [{ label: '', uri: '' }],
+              'filterGroups.schemeFilter.selectedOptions',
+              filtersState
+            )[0]
+          }
         />
       );
     case VISUALIZER_TYPE.CHORD:

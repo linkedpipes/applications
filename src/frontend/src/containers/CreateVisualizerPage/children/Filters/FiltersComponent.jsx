@@ -9,6 +9,7 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
+import TreemapFiltersComponent from './children/TreemapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 
@@ -17,7 +18,8 @@ type Props = {
     root: {},
     filterTitle: {
       paddingBottom: string
-    }
+    },
+    filterWrapper: { paddingBottom: string }
   },
   editingMode: boolean,
   selectedResultGraphIri: string,
@@ -44,6 +46,9 @@ const styles = theme => ({
   },
   filterTitle: {
     paddingBottom: '1rem'
+  },
+  filterWrapper: {
+    paddingBottom: '1rem'
   }
 });
 
@@ -57,12 +62,21 @@ class FiltersComponent extends React.Component<Props> {
   getFilter = (filterType, filterLabel, selectedOptions) => {
     switch (filterType) {
       case 'NODES_FILTER':
-        // editingMode
         return (
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
             selectedNodes={selectedOptions}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+          />
+        );
+      case 'SCHEME_FILTER':
+        return (
+          <TreemapFiltersComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            selectedScheme={selectedOptions[0]}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -143,7 +157,7 @@ class FiltersComponent extends React.Component<Props> {
           {(Object.values(filtersState.filterGroups) || []).map(
             filterGroup =>
               (editingMode || filterGroup.visible) && (
-                <div>
+                <div className={classes.filterWrapper} key={filterGroup.label}>
                   <ExpansionPanel
                     key={filterGroup.label}
                     disabled={!filterGroup.enabled && !editingMode}

@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
-import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 
 type Props = {
@@ -18,7 +17,7 @@ type Props = {
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
-  selectedScheme: string
+  selectedScheme: { label: string, uri: string }
 };
 
 type State = {
@@ -115,7 +114,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            this.props.selectedScheme,
+            this.props.selectedScheme.uri,
             this.props.selectedResultGraphIri,
             iri
           );
@@ -139,14 +138,16 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
-    if (selectedResultGraphIri && selectedScheme) {
-      this.handleSchemeChange(selectedScheme);
+    if (selectedResultGraphIri && selectedScheme.uri) {
+      this.handleSchemeChange(selectedScheme.uri);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedScheme !== this.props.selectedScheme) {
-      this.handleSchemeChange(nextProps.selectedScheme);
+    if (nextProps.selectedScheme && this.props.selectedScheme) {
+      if (nextProps.selectedScheme.uri !== this.props.selectedScheme.uri) {
+        this.handleSchemeChange(nextProps.selectedScheme.uri);
+      }
     }
     return null;
   }
@@ -174,7 +175,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     );
 
     this.props.handleSetCurrentApplicationData({
-      conceptIri: this.props.selectedScheme
+      conceptIri: this.props.selectedScheme.uri
     });
   };
 
@@ -185,6 +186,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     return (
       <div className={classes.wrapper}>
         {this.props.selectedScheme &&
+          this.props.selectedScheme.uri &&
           (this.state.dataLoadingStatus === 'ready' ? (
             <div className={classes.wrapper}>
               <Button
@@ -224,10 +226,4 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    selectedScheme: state.filters.selectedScheme || ownProps.selectedScheme
-  };
-};
-
-export default connect(mapStateToProps)(withStyles(styles)(TreemapVisualizer));
+export default withStyles(styles)(TreemapVisualizer);
