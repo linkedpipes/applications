@@ -37,7 +37,8 @@ type Props = {
 
 type State = {
   discoveryIsLoading: boolean,
-  discoveryLoadingLabel: string
+  discoveryLoadingLabel: string,
+  tabIndex: Object
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
@@ -45,7 +46,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   state = {
     discoveryIsLoading: false,
-    discoveryLoadingLabel: ''
+    discoveryLoadingLabel: '',
+    tabIndex: 0
   };
 
   componentDidMount() {
@@ -234,6 +236,10 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.handleSetRdfFile(rdfFile);
   };
 
+  handleTabIndexChange = (event, newValue) => {
+    this.setState({ tabIndex: newValue });
+  };
+
   render() {
     const {
       dataSourcesUris,
@@ -244,7 +250,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       inputType
     } = this.props;
 
-    const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
+    const { discoveryIsLoading, discoveryLoadingLabel, tabIndex } = this.state;
     const inputFieldsAreNotFilled =
       (inputType === 'SPARQL_ENDPOINT' &&
         (sparqlEndpointIri === '' ||
@@ -271,6 +277,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         }
         onHandleSetRdfFile={this.handleSetRdfFile}
         rdfInputIri={rdfInputIri}
+        tabIndex={tabIndex}
+        onHandleTabIndexChange={this.handleTabIndexChange}
       />
     );
   }

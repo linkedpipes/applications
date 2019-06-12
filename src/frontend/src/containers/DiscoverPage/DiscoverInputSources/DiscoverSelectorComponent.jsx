@@ -12,6 +12,10 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { FilePond, registerPlugin } from 'react-filepond';
+import SwipeableViews from 'react-swipeable-views';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import './css/FilePondDarkStyle.css';
 
 // Register the filepond plugins
@@ -36,7 +40,9 @@ type Props = {
   inputFieldsAreNotFilled: boolean,
   onHandleRdfInputIriTextFieldChange: Function,
   rdfInputIri: string,
-  onHandleSetRdfFile: Function
+  onHandleSetRdfFile: Function,
+  onHandleTabIndexChange: Function,
+  tabIndex: Number
 };
 
 const styles = theme => ({
@@ -81,7 +87,9 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       inputFieldsAreNotFilled,
       onHandleRdfInputIriTextFieldChange,
       rdfInputIri,
-      onHandleSetRdfFile
+      onHandleSetRdfFile,
+      tabIndex,
+      onHandleTabIndexChange
     } = this.props;
 
     return (
@@ -90,68 +98,67 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
           <div className={classes.gridRoot}>
             <Grid container spacing={24}>
               <Grid item xs={12} sm={12}>
-                <DiscoverSparqlSelectorFields
-                  discoveryIsLoading={discoveryIsLoading}
-                  handleSparqlTextFieldChange={onHandleSetSparqlIri}
-                  handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                  handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
-                  sparqlEndpointIri={sparqlEndpointIri}
-                  dataSampleIri={dataSampleIri}
-                  namedGraph={namedGraph}
-                  sparqlTextFieldValue={sparqlTextFieldValue}
-                  namedTextFieldValue={namedTextFieldValue}
-                  dataSampleTextFieldValue={dataSampleTextFieldValue}
-                />
+                <AppBar position="static" color="default">
+                  <Tabs
+                    value={tabIndex}
+                    onChange={onHandleTabIndexChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="fullWidth"
+                  >
+                    <Tab label="From SPARQL endpoint" />
+                    <Tab label="From URL with RDF" />
+                    <Tab label="From File with RDF" />
+                  </Tabs>
+                </AppBar>
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                <Typography align="center" gutterBottom>
-                  or
-                </Typography>
-                <Divider />
-              </Grid>
+                <SwipeableViews axis={'x'} index={tabIndex}>
+                  <DiscoverSparqlSelectorFields
+                    discoveryIsLoading={discoveryIsLoading}
+                    handleSparqlTextFieldChange={onHandleSetSparqlIri}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+                    sparqlEndpointIri={sparqlEndpointIri}
+                    dataSampleIri={dataSampleIri}
+                    namedGraph={namedGraph}
+                    sparqlTextFieldValue={sparqlTextFieldValue}
+                    namedTextFieldValue={namedTextFieldValue}
+                    dataSampleTextFieldValue={dataSampleTextFieldValue}
+                  />
 
-              <Grid item xs={12} sm={12}>
-                <DiscoverRdfUrlField
-                  discoveryIsLoading={discoveryIsLoading}
-                  handleRdfInputIriTextFieldChange={
-                    onHandleRdfInputIriTextFieldChange
-                  }
-                  rdfInputIri={rdfInputIri}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <Typography align="center" gutterBottom>
-                  or
-                </Typography>
-                <Divider />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <FilePond
-                  // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
-                  ref={ref => (this.pond = ref)}
-                  allowMultiple={false}
-                  allowFileTypeValidation
-                  acceptedFileTypes={['text/turtle', '.ttl']}
-                  fileValidateTypeLabelExpectedTypesMap={{
-                    'text/turtle': '.ttl'
-                  }}
-                  fileValidateTypeDetectType={() =>
-                    new Promise(resolve => {
-                      resolve('.ttl');
-                    })
-                  }
-                  className={classes.itemGrid}
-                  maxFiles={3}
-                  onupdatefiles={fileItems => {
-                    // Set current file objects to this.state
-                    onHandleSetRdfFile(
-                      fileItems.length === 1 ? fileItems[0].file : undefined
-                    );
-                  }}
-                />
+                  <DiscoverRdfUrlField
+                    discoveryIsLoading={discoveryIsLoading}
+                    handleRdfInputIriTextFieldChange={
+                      onHandleRdfInputIriTextFieldChange
+                    }
+                    rdfInputIri={rdfInputIri}
+                  />
+                  <FilePond
+                    // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
+                    ref={ref => (this.pond = ref)}
+                    allowMultiple={false}
+                    allowFileTypeValidation
+                    acceptedFileTypes={['text/turtle', '.ttl']}
+                    fileValidateTypeLabelExpectedTypesMap={{
+                      'text/turtle': '.ttl'
+                    }}
+                    fileValidateTypeDetectType={() =>
+                      new Promise(resolve => {
+                        resolve('.ttl');
+                      })
+                    }
+                    className={classes.itemGrid}
+                    maxFiles={3}
+                    onupdatefiles={fileItems => {
+                      // Set current file objects to this.state
+                      onHandleSetRdfFile(
+                        fileItems.length === 1 ? fileItems[0].file : undefined
+                      );
+                    }}
+                  />
+                </SwipeableViews>
               </Grid>
 
               <Grid item xs={12} sm={12}>
