@@ -8,8 +8,6 @@ import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { DiscoverSparqlSelectorFields, DiscoverRdfUrlField } from './children';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { FilePond, registerPlugin } from 'react-filepond';
 import SwipeableViews from 'react-swipeable-views';
