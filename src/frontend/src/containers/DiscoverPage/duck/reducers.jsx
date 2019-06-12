@@ -8,6 +8,7 @@ const INITIAL_STATE = {
   dataSampleIri: '',
   namedGraph: '',
   rdfInputIri: '',
+  rdfFile: undefined,
   inputType: 'SPARQL_ENDPOINT'
 };
 
@@ -114,6 +115,15 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
         ...state,
         rdfInputIri: value,
         inputType: 'RDF_INPUT_IRI'
+      });
+    }
+
+    case types.SET_RDF_FILE: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        rdfFile: value,
+        inputType: 'RDF_INPUT_FILE'
       });
     }
 

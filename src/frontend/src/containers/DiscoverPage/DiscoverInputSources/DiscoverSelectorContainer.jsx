@@ -31,7 +31,8 @@ type Props = {
   webId: string,
   rdfInputIri: string,
   handleSetRdfInputIriUrlFieldValue: Function,
-  inputType: string
+  inputType: string,
+  handleSetRdfFile: Function
 };
 
 type State = {
@@ -227,6 +228,12 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.handleSetRdfInputIriUrlFieldValue(rawText);
   };
 
+  handleSetRdfFile = e => {
+    const rdfFile = e.target.value;
+    Log.info('Rdf file selected', 'DiscoverSelectorContainer');
+    this.props.handleSetRdfFile(rdfFile);
+  };
+
   render() {
     const {
       dataSourcesUris,
@@ -262,6 +269,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         onHandleRdfInputIriTextFieldChange={
           this.handleRdfInputIriTextFieldChange
         }
+        onHandleSetRdfFile={this.handleSetRdfFile}
         rdfInputIri={rdfInputIri}
       />
     );
@@ -317,6 +325,10 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.resetSelectedInputExample());
   };
 
+  const handleSetRdfFile = file => {
+    dispatch(discoverActions.handleSetRdfFile(file));
+  };
+
   return {
     handleSetDiscoveryId,
     handleSetPipelineGroups,
@@ -324,7 +336,8 @@ const mapDispatchToProps = dispatch => {
     handleSetNamedGraphFieldValue,
     handleSetSparqlIriFieldValue,
     handleSetRdfInputIriUrlFieldValue,
-    resetFieldsAndExamples
+    resetFieldsAndExamples,
+    handleSetRdfFile
   };
 };
 

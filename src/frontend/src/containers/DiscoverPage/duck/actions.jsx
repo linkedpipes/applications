@@ -76,6 +76,13 @@ const setRdfInputIri = rdfInputIri => {
   };
 };
 
+const setRdfFile = rdfFile => {
+  return {
+    type: types.SET_RDF_FILE,
+    value: rdfFile
+  };
+};
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
@@ -87,5 +94,6 @@ export default {
   setNamedGraph,
   setSparqlEndpointIri,
   setDataSampleIri,
-  setRdfInputIri
+  setRdfInputIri,
+  setRdfFile
 };
