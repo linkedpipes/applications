@@ -6,7 +6,9 @@ const INITIAL_STATE = {
   dataSourcesUris: undefined,
   sparqlEndpointIri: '',
   dataSampleIri: '',
-  namedGraph: ''
+  namedGraph: '',
+  rdfInputIri: '',
+  inputType: 'SPARQL_ENDPOINT'
 };
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
@@ -47,7 +49,9 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
         dataSourcesUris: undefined,
         sparqlEndpointIri: '',
         dataSampleIri: '',
-        namedGraph: ''
+        namedGraph: '',
+        rdfInputIri: '',
+        inputType: 'SPARQL_ENDPOINT'
       };
     }
 
@@ -81,7 +85,8 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        dataSampleIri: value
+        dataSampleIri: value,
+        inputType: 'SPARQL_ENDPOINT'
       });
     }
 
@@ -89,7 +94,8 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        sparqlEndpointIri: value
+        sparqlEndpointIri: value,
+        inputType: 'SPARQL_ENDPOINT'
       });
     }
 
@@ -97,7 +103,17 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        namedGraph: value
+        namedGraph: value,
+        inputType: 'SPARQL_ENDPOINT'
+      });
+    }
+
+    case types.SET_RDF_RESOURCE_URL: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        rdfInputIri: value,
+        inputType: 'RDF_INPUT_IRI'
       });
     }
 

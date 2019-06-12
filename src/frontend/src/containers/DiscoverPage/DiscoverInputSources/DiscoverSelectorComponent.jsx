@@ -7,7 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-import DiscoverSelectorFields from './children';
+import { DiscoverSparqlSelectorFields, DiscoverRdfUrlField } from './children';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
 
 type Props = {
   classes: any,
@@ -25,7 +27,9 @@ type Props = {
   onHandleClearInputsClicked(): Function,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
-  inputFieldsAreNotFilled: boolean
+  inputFieldsAreNotFilled: boolean,
+  onHandleRdfInputIriTextFieldChange: Function,
+  rdfInputIri: string
 };
 
 const styles = theme => ({
@@ -41,10 +45,6 @@ const styles = theme => ({
     height: '100%',
     width: '100%',
     margin: 'auto'
-  },
-  textField: {
-    margin: 'auto',
-    width: '100%'
   },
   card: {
     flexGrow: 1
@@ -67,14 +67,16 @@ const DiscoverSelectorComponent = ({
   sparqlTextFieldValue,
   namedTextFieldValue,
   dataSampleTextFieldValue,
-  inputFieldsAreNotFilled
+  inputFieldsAreNotFilled,
+  onHandleRdfInputIriTextFieldChange,
+  rdfInputIri
 }: Props) => (
   <Card className={classes.card}>
     <CardContent>
       <div className={classes.gridRoot}>
         <Grid container spacing={24}>
           <Grid item xs={12} sm={12}>
-            <DiscoverSelectorFields
+            <DiscoverSparqlSelectorFields
               discoveryIsLoading={discoveryIsLoading}
               handleSparqlTextFieldChange={onHandleSetSparqlIri}
               handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
@@ -85,6 +87,23 @@ const DiscoverSelectorComponent = ({
               sparqlTextFieldValue={sparqlTextFieldValue}
               namedTextFieldValue={namedTextFieldValue}
               dataSampleTextFieldValue={dataSampleTextFieldValue}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={12}>
+            <Typography align="center" gutterBottom>
+              or
+            </Typography>
+            <Divider />
+          </Grid>
+
+          <Grid item xs={12} sm={12}>
+            <DiscoverRdfUrlField
+              discoveryIsLoading={discoveryIsLoading}
+              handleRdfInputIriTextFieldChange={
+                onHandleRdfInputIriTextFieldChange
+              }
+              rdfInputIri={rdfInputIri}
             />
           </Grid>
 

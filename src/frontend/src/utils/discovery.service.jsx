@@ -19,6 +19,12 @@ const DiscoveryService = {
     });
   },
 
+  async postDiscoverFromInputIri({ rdfInputIri, webId }) {
+    return lpaAxios.post('/pipelines/discoverFromInputIri', null, {
+      params: { rdfInputIri, webId }
+    });
+  },
+
   // WebId should be sent in body itself
   async postDiscoverFromUriList({ datasourceUris, webId }) {
     return lpaAxios.post('/pipelines/discover/', datasourceUris, {

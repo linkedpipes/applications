@@ -1,3 +1,4 @@
-import DiscoverSelectorFields from './DiscoverSelectorFieldsComponent';
+import DiscoverSparqlSelectorFields from './DiscoverSparqlSelectorFieldsComponent';
+import DiscoverRdfUrlField from './DiscoverRdfUrlFieldComponent';
 
-export default DiscoverSelectorFields;
+export { DiscoverSparqlSelectorFields, DiscoverRdfUrlField };

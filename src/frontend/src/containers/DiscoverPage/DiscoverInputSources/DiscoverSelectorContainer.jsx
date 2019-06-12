@@ -3,7 +3,13 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, GlobalUtils, SocketContext, Log, GoogleAnalyticsWrapper } from '@utils';
+import {
+  DiscoveryService,
+  GlobalUtils,
+  SocketContext,
+  Log,
+  GoogleAnalyticsWrapper
+} from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
@@ -22,7 +28,10 @@ type Props = {
   handleSetDataSampleIriFieldValue: Function,
   resetFieldsAndExamples: Function,
   // eslint-disable-next-line react/no-unused-prop-types
-  webId: string
+  webId: string,
+  rdfInputIri: string,
+  handleSetRdfInputIriUrlFieldValue: Function,
+  inputType: string
 };
 
 type State = {
@@ -65,8 +74,25 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     });
   };
 
+  postStartFromRdfInputIri = async () => {
+    const { rdfInputIri, webId } = this.props;
+    return DiscoveryService.postDiscoverFromInputIri({
+      rdfInputIri,
+      webId
+    }).then(response => {
+      return response;
+    });
+  };
+
   handleDiscoveryInputCase = () => {
-    return this.postStartFromSparqlEndpoint();
+    const { inputType } = this.props;
+    switch (inputType) {
+      case 'RDF_INPUT_IRI':
+        return this.postStartFromRdfInputIri();
+
+      default:
+        return this.postStartFromSparqlEndpoint();
+    }
   };
 
   handleProcessStartDiscovery = () => {
@@ -194,17 +220,30 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.resetFieldsAndExamples();
   };
 
+  handleRdfInputIriTextFieldChange = e => {
+    const rawText = e.target.value;
+    Log.info('Rdf field changed', 'DiscoverSelectorContainer');
+    Log.info(rawText, 'DiscoverSelectorContainer');
+    this.props.handleSetRdfInputIriUrlFieldValue(rawText);
+  };
+
   render() {
     const {
       dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
-      namedGraph
+      namedGraph,
+      rdfInputIri,
+      inputType
     } = this.props;
 
     const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
     const inputFieldsAreNotFilled =
-      sparqlEndpointIri === '' || namedGraph === '' || dataSampleIri === '';
+      (inputType === 'SPARQL_ENDPOINT' &&
+        (sparqlEndpointIri === '' ||
+          namedGraph === '' ||
+          dataSampleIri === '')) ||
+      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '');
 
     return (
       <DiscoverSelectorComponent
@@ -220,6 +259,10 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         onHandleSetNamedGraph={this.handleSetNamedGraph}
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
+        onHandleRdfInputIriTextFieldChange={
+          this.handleRdfInputIriTextFieldChange
+        }
+        rdfInputIri={rdfInputIri}
       />
     );
   }
@@ -241,7 +284,9 @@ const mapStateToProps = state => {
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
     namedGraph: state.discover.namedGraph,
-    webId: state.user.webId
+    webId: state.user.webId,
+    rdfInputIri: state.discover.rdfInputIri,
+    inputType: state.discover.inputType
   };
 };
 
@@ -265,6 +310,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetDataSampleIriFieldValue = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
 
+  const handleSetRdfInputIriUrlFieldValue = rdfInputIri =>
+    dispatch(discoverActions.setRdfInputIri(rdfInputIri));
+
   const resetFieldsAndExamples = () => {
     dispatch(discoverActions.resetSelectedInputExample());
   };
@@ -275,6 +323,7 @@ const mapDispatchToProps = dispatch => {
     handleSetDataSampleIriFieldValue,
     handleSetNamedGraphFieldValue,
     handleSetSparqlIriFieldValue,
+    handleSetRdfInputIriUrlFieldValue,
     resetFieldsAndExamples
   };
 };
