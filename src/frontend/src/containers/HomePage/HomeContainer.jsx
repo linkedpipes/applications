@@ -302,10 +302,10 @@ class HomeContainer extends PureComponent<Props, State> {
       applicationMetadata
     );
     if (result) {
-      const deleteAppResponse = await UserService.deleteApplication(
-        this.props.webId,
-        applicationMetadata.url
-      );
+      // const deleteAppResponse = await UserService.deleteApplication(
+      //   this.props.webId,
+      //   applicationMetadata.url
+      // );
       this.handleApplicationDeleted(applicationMetadata);
     }
 

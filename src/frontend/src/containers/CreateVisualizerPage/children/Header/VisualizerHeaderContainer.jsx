@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { GoogleAnalyticsWrapper } from '@utils';
 import AppConfiguration from '@storage/models/AppConfiguration';
-import UserService from '@utils/user.service';
+// import UserService from '@utils/user.service';
 
 type Props = {
   selectedApplication: any,
@@ -80,11 +80,11 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplication.applicationEndpoint
     );
 
-    const postAppResponse = await UserService.postApplication(
-      webId,
-      currentApplicationMetadata.url,
-      selectedResultGraphIri
-    );
+    // const postAppResponse = await UserService.postApplication(
+    //   webId,
+    //   currentApplicationMetadata.url,
+    //   selectedResultGraphIri
+    // );
 
     setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
@@ -102,8 +102,8 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationTitle,
       applicationsFolder,
       webId,
-      setApplicationLoaderStatus,
-      selectedResultGraphIri
+      setApplicationLoaderStatus
+      // selectedResultGraphIri
     } = this.props;
 
     setApplicationLoaderStatus(true);
@@ -128,11 +128,11 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
 
     this.setState({ currentApplicationMetadata });
 
-    const postAppResponse = await UserService.postApplication(
-      webId,
-      currentApplicationMetadata.url,
-      selectedResultGraphIri
-    );
+    // const postAppResponse = await UserService.postApplication(
+    //   webId,
+    //   currentApplicationMetadata.url,
+    //   selectedResultGraphIri
+    // );
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
       currentApplicationMetadata.object,
