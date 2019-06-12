@@ -174,7 +174,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 const mapDispatchToProps = dispatch => {
   const onApplyFilter = (filterName, nodes) =>
     dispatch(
-      filtersActions.setSelectedNodesWithSolid(
+      filtersActions.setSelectedNodes(
         filterName,
         nodes
           .filter(node => node.checked)
