@@ -9,6 +9,7 @@ import {
 // Utils
 import StorageToolbox from './StorageToolbox';
 import StorageBackend from './StorageBackend';
+import StorageSparqlClient from './StorageSparqlClient';
 // Models
 import { ApplicationMetadata } from './models';
 
@@ -17,6 +18,7 @@ export {
   StoragePickFolderDialog,
   StorageAccessControlDialog,
   StorageToolbox,
+  StorageSparqlClient,
   StorageBackend,
   ApplicationMetadata,
   StorageInboxDialog

@@ -7,11 +7,12 @@ import {
   VisualizerContainer
 } from './children';
 import LoadingOverlay from 'react-loading-overlay';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedVisualizer: any,
   selectedApplication: any,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,

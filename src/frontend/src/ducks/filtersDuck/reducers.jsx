@@ -2,9 +2,9 @@ import types from './types';
 import { VISUALIZER_TYPE } from '@constants';
 
 const INITIAL_STATE = {
-  selectedScheme: null,
-  nodes: null,
-  filtersState: null
+  selectedScheme: undefined,
+  nodes: undefined,
+  filtersState: undefined
 };
 
 const filtersReducer = (state = INITIAL_STATE, action) => {
@@ -88,6 +88,10 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
               }
             }
           };
+
+        case VISUALIZER_TYPE.RESET_FILTERS:
+          return INITIAL_STATE;
+
         default:
           return state;
       }

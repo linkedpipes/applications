@@ -9,8 +9,6 @@ import {
 } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
-import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
-import ChordFiltersComponent from '../Filters/children/ChordFilter';
 import FiltersComponent from '../Filters/FiltersComponent';
 import { pathOr } from 'rambda';
 
@@ -142,6 +140,7 @@ const VisualizerControllerContainer = (props: Props) => {
           selectedResultGraphIri={props.selectedResultGraphIri}
         />
       </Grid>
+
       <Grid
         id="viz-div"
         className={props.classes.vizdiv}

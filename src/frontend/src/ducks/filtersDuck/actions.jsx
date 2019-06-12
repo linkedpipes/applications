@@ -1,4 +1,5 @@
 import types from './types';
+import StorageToolbox from '@storage/StorageToolbox';
 
 const setSelectedScheme = scheme => {
   return {
@@ -15,6 +16,26 @@ const setSelectedNodes = (filterName, nodes) => {
   };
 };
 
+const setSelectedNodesWithSolid = (filterName, nodes) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    const oldNodes =
+      state.filters.filtersState.filterGroups.nodesFilter.selectedOptions.items;
+    dispatch(setSelectedNodes(filterName, nodes));
+    const difference = oldNodes.filter(x => !nodes.includes(x));
+    let filtersOptionsToUpdate = nodes;
+    if (difference.length === 0 || oldNodes.length === 0) {
+      filtersOptionsToUpdate = difference;
+    }
+
+    const metadata = state.application.selectedApplicationMetadata;
+    StorageToolbox.setNodesSelectedOptions(
+      metadata.solidFileUrl,
+      filtersOptionsToUpdate
+    );
+  };
+};
+
 const toggleEnabled = value => {
   return {
     type: types.TOGGLE_ENABLED,
@@ -22,10 +43,28 @@ const toggleEnabled = value => {
   };
 };
 
+const toggleEnabledWithSolid = value => {
+  return (dispatch, getState) => {
+    dispatch(toggleEnabled(value));
+    const state = getState();
+    const metadata = state.application.selectedApplicationMetadata;
+    StorageToolbox.setFiltersStateEnabled(metadata.solidFileUrl, value);
+  };
+};
+
 const toggleVisible = value => {
   return {
     type: types.TOGGLE_VISIBLE,
     value
+  };
+};
+
+const toggleVisibleWithSolid = value => {
+  return (dispatch, getState) => {
+    dispatch(toggleVisible(value));
+    const state = getState();
+    const metadata = state.application.selectedApplicationMetadata;
+    StorageToolbox.setFiltersStateVisible(metadata.solidFileUrl, value);
   };
 };
 
@@ -43,11 +82,21 @@ const setDefaultFiltersState = visualizerCode => {
   };
 };
 
+const resetFilters = () => {
+  return {
+    type: types.RESET_FILTERS
+  };
+};
+
 export default {
   setSelectedScheme,
   setSelectedNodes,
   setFiltersState,
   setDefaultFiltersState,
   toggleVisible,
-  toggleEnabled
+  toggleEnabled,
+  toggleEnabledWithSolid,
+  resetFilters,
+  toggleVisibleWithSolid,
+  setSelectedNodesWithSolid
 };

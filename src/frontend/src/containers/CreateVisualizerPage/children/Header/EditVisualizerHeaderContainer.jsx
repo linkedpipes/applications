@@ -62,8 +62,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppPublished(publishedUrl);
@@ -73,8 +73,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppEmbedded(publishedUrl);

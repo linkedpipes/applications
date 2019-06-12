@@ -19,6 +19,7 @@ type Props = {
   handleResetCurrentApplicationData: Function,
   handleResetCurrentApplicationMetadata: Function,
   handleSetDefaultFiltersState: Function,
+  handleResetFilters: Function,
   history: Object,
   selectedNodes?: Set<string>,
   location: Object,
@@ -73,6 +74,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     window.removeEventListener('resize', this.updateWindowDimensions);
     this.props.handleResetCurrentApplicationData();
     this.props.handleResetCurrentApplicationMetadata();
+    this.props.handleResetFilters();
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -147,11 +149,14 @@ const mapDispatchToProps = dispatch => {
   const handleResetCurrentApplicationMetadata = () =>
     dispatch(applicationActions.resetApplicationMetadata());
 
+  const handleResetFilters = () => dispatch(filtersActions.resetFilters());
+
   return {
     handleSetCurrentApplicationData,
     handleResetCurrentApplicationData,
     handleResetCurrentApplicationMetadata,
-    handleSetDefaultFiltersState
+    handleSetDefaultFiltersState,
+    handleResetFilters
   };
 };
 

@@ -14,6 +14,7 @@ import {
 } from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
+import StorageSparqlClient from './StorageSparqlClient';
 // eslint-disable-next-line import/newline-after-import
 const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
 // const N3 = require('n3');
@@ -55,20 +56,30 @@ class SolidBackend {
   /** An updater responsible for updating documents. */
   updater: $rdf.UpdateManager;
 
+  /** Flag to indicate whether fetcher requires single force reload */
+  requiresForceReload: Boolean;
+
   constructor() {
     this.store = $rdf.graph();
     this.fetcher = new $rdf.Fetcher(this.store);
     this.updater = new $rdf.UpdateManager(this.store);
     this.alreadyCheckedResources = [];
+    this.alreadyAddedDownstreamListeners = [];
+    this.requiresForceReload = false;
   }
 
   /**
    * Fetches and loads a given document to the store.
    * @param {$rdf.NamedNode} document A given document to fetch and load.
    */
-  async load(document: $rdf.NamedNode, forceReload = true) {
+  async load(document: $rdf.NamedNode) {
+    const reloadRequired = this.requiresForceReload;
+    this.requiresForceReload = false;
     try {
-      return this.fetcher.load(document);
+      return this.fetcher.load(document, {
+        force: reloadRequired,
+        clearPreviousData: reloadRequired
+      });
     } catch (err) {
       return Promise.reject(new Error('Could not fetch the document.'));
     }
@@ -94,10 +105,14 @@ class SolidBackend {
   /**
    * Registers a given document for the updater to listen to the remote
    * changes of the document.
-   * @param {$rdf.NamedNode} document A given document to register.
+   * @param {string} URL to a given resource.
    */
-  registerChanges(document: $rdf.NamedNode) {
-    // this.updater.addDownstreamChangeListener(document, () => {});
+  registerChanges(url: string, callbackOnRefresh: Function = undefined) {
+    if (this.alreadyAddedDownstreamListeners.indexOf(url) === -1) {
+      const doc = $rdf.sym(url).doc();
+      this.updater.addDownstreamChangeListener(doc, callbackOnRefresh);
+      this.alreadyAddedDownstreamListeners.push(url);
+    }
   }
 
   /**
@@ -269,7 +284,7 @@ class SolidBackend {
           return true;
         },
         e => {
-          Log.err(`Error copying : ${e}`);
+          Log.error(`Error copying : ${e}`);
           return false;
         }
       );
@@ -341,30 +356,125 @@ class SolidBackend {
     metadataUrl: string,
     newTitle: string
   ): Promise<boolean> {
-    const metadataFile = $rdf.sym(metadataUrl);
-    const predicate = $rdf.sym(LPA('title'));
-    const title = $rdf.lit(newTitle);
-    const metadata = metadataFile.doc();
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:title ?titleValue . }
+            INSERT
+            { ?configuration lpa:title "${newTitle}" .}
+            WHERE
+            { ?configuration lpa:title ?titleValue . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
     try {
-      await this.load(metadata);
+      await this.load($rdf.sym(metadataUrl).doc());
     } catch (err) {
       Log.error('Could not load a metadata document.', 'StorageBackend');
       return false;
     }
-    const ins = [$rdf.st(metadataFile, predicate, title, metadata)];
-    const del = this.store.statementsMatching(
-      metadataFile,
-      predicate,
-      null,
-      metadata
-    );
+    return true;
+  }
+
+  async setFiltersStateEnabled(
+    metadataUrl: string,
+    isEnabled: Boolean
+  ): Promise<boolean> {
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled ?test . }
+            INSERT
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled "${
+                isEnabled ? 'true' : 'false'
+              }" . }
+            WHERE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled ?test . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
     try {
-      await this.updateResource(metadata.value, ins, del);
+      await this.load($rdf.sym(metadataUrl).doc());
     } catch (err) {
-      Log.error(err);
+      Log.error('Could not load a metadata document.', 'StorageBackend');
       return false;
     }
-    // this.registerChanges(metadataFile);
+    return true;
+  }
+
+  async setFiltersStateVisible(
+    metadataUrl: string,
+    isVisible: Boolean
+  ): Promise<boolean> {
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible ?test . }
+            INSERT
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible "${
+                isVisible ? 'true' : 'false'
+              }" . }
+            WHERE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible ?test . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
+    try {
+      await this.load($rdf.sym(metadataUrl).doc());
+    } catch (err) {
+      Log.error('Could not load a metadata document.', 'StorageBackend');
+      return false;
+    }
+
+    return true;
+  }
+
+  async setNodesSelectedOptions(
+    metadataUrl: string,
+    nodes: Array<Object>
+  ): Promise<boolean> {
+    const promises = [];
+
+    for (const node of nodes) {
+      const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:enabled ?optionEnabled . }
+            INSERT
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:enabled "true" . }
+            WHERE
+            { ?optionToUpdate lpa:uri ?optionUriValue .
+              ?optionToUpdate lpa:enabled ?optionEnabled . }
+    `;
+      promises.push(
+        StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery)
+      );
+    }
+
+    await Promise.all(promises);
+
+    try {
+      await this.load($rdf.sym(metadataUrl).doc());
+    } catch (err) {
+      Log.error('Could not load a metadata document.', 'StorageBackend');
+      return false;
+    }
+
     return true;
   }
 
@@ -455,11 +565,18 @@ class SolidBackend {
    * @param {string} url An URL of the given image.
    * @return {Promise<ApplicationMetadata>} Fetched image.
    */
-  async getAppConfigurationMetadata(url: string): Promise<ApplicationMetadata> {
+  async getAppConfigurationMetadata(
+    url: string,
+    callbackOnRefresh: Function = undefined,
+    forceReload: Boolean = false
+  ): Promise<ApplicationMetadata> {
     const fileUrl = $rdf.sym(url);
     const file = fileUrl.doc();
 
     try {
+      if (forceReload) {
+        this.requiresForceReload = forceReload;
+      }
       await this.load(file);
     } catch (err) {
       return Promise.reject(err);
@@ -481,6 +598,8 @@ class SolidBackend {
 
       const appConfigurationFileTitle = `${Utils.getFilenameFromPathUrl(url)}`;
       const appConfigurationFullPath = url;
+
+      this.registerChanges(url, callbackOnRefresh);
 
       return ApplicationMetadata.from({
         solidFileTitle: appConfigurationFileTitle,
@@ -511,6 +630,12 @@ class SolidBackend {
       appConfigurationFullPath
     );
 
+    $rdf.parse(
+      applicationConfigurationTurtle,
+      this.store,
+      appConfigurationFullPath
+    );
+
     Log.info(applicationConfigurationTurtle, 'StorageBackend');
 
     try {
@@ -522,6 +647,7 @@ class SolidBackend {
         if (response.status === 201) {
           const filePath = response.url;
           Log.info(`Created file at ${filePath}.`);
+          this.load($rdf.sym(appConfigurationFullPath).doc());
         }
       });
 
@@ -541,6 +667,8 @@ class SolidBackend {
           Log.info(`Created file at ${filePath}.`);
         }
       });
+
+      this.requiresForceReload = true;
 
       return Promise.resolve(
         ApplicationMetadata.from({
@@ -589,66 +717,6 @@ class SolidBackend {
     }
 
     return true;
-  }
-
-  /**
-   * Creates appropriate RDF statements for the new application configuration to upload.
-   * @param {string} appConfigurationMetadataPath An URL of the new RDF Turtle image file.
-   * @param {string} appConfigurationUrl An URL of the new image file.
-   * @param {string} appTitle A title of an application configuration.
-   * @param {string} appEndpoint An endpoint of application configuration
-   * @param {string} user A WebID of the image's creator.
-   * @param {string} cardColor Color to be used for card visualizing the app
-   * @param {Date} createdAt A creation date of the image.
-   * @return {$rdf.Statement[]} An array of the image RDF statements.
-   */
-  // eslint-disable-next-line class-methods-use-this
-  async createUploadAppConfigurationStatement(
-    appConfigurationMetadataPath: string,
-    appConfigurationUrl: string,
-    appTitle: string,
-    appEndpoint: string,
-    user: string,
-    cardColor: String,
-    createdAt: Date
-  ): $rdf.Statement[] {
-    const appConfigFile = $rdf.sym(appConfigurationMetadataPath);
-    const appConfig = $rdf.sym(appConfigurationUrl);
-    const title = $rdf.lit(appTitle);
-    const endpoint = $rdf.lit(appEndpoint);
-    const creator = $rdf.sym(user);
-    const color = $rdf.lit(cardColor);
-    const doc = appConfigFile.doc();
-
-    const fileRdf = [
-      $rdf.st(appConfigFile, RDF('type'), SIOC('Post'), doc),
-      $rdf.st(appConfigFile, FOAF('depiction'), appConfig, doc),
-      $rdf.st(appConfigFile, DCT('title'), title, doc),
-      $rdf.st(appConfigFile, DCT('identifier'), endpoint, doc),
-      $rdf.st(appConfigFile, DCT('creator'), creator, doc),
-      $rdf.st(appConfigFile, VCARD('label'), color, doc),
-      $rdf.st(
-        appConfigFile,
-        DCT('created'),
-        $rdf.lit(createdAt.toISOString(), null, TIME),
-        doc
-      )
-    ]
-      .join('\n')
-      .toString();
-
-    const newStore = $rdf.graph();
-
-    $rdf.parse(fileRdf, newStore, appConfigurationMetadataPath);
-
-    const response = await $rdf.serialize(
-      null,
-      newStore,
-      appConfigurationMetadataPath,
-      'text/turtle'
-    );
-
-    return response;
   }
 
   /**

@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
+import Emoji from 'react-emoji-render';
 import uuid from 'uuid';
 
 type Props = {
@@ -74,19 +75,7 @@ class FiltersComponent extends React.Component<Props> {
     }
   };
 
-  handleSwitchChange = name => event => {
-    const newValue = event.target.checked;
-    this.setState(prevState => {
-      return {
-        filtersState: {
-          ...prevState.filtersState,
-          [name]: newValue
-        }
-      };
-    });
-  };
-
-  render() {
+  getComponents = () => {
     const {
       classes,
       editingMode,
@@ -95,112 +84,126 @@ class FiltersComponent extends React.Component<Props> {
       handleToggleVisible
     } = this.props;
 
-    return (
-      filtersState && (
+    const filtersAvailable = filtersState !== undefined;
+
+    if (!filtersAvailable) {
+      return (
         <div className={classes.root}>
           <Typography variant="h4" className={classes.filterTitle}>
-            Filters
-            <span className={classes.filterSpan}>
-              {editingMode && (
-                <span>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleEnabled}
-                        checked={filtersState.enabled}
-                        value={filtersState.enabled}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleVisible}
-                        checked={filtersState.visible}
-                        value={filtersState.visible}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.visible ? 'Visible' : 'Hidden'}
-                  />
-                </span>
-              )}
-              <Button
-                onClick={() => {
-                  this.applyCallbacks.forEach(cb => {
-                    cb();
-                  });
-                }}
-                variant="contained"
-                size="small"
-                color="primary"
-              >
-                Apply filters
-              </Button>
-            </span>
+            <Emoji text="No Filters available 😕" />
           </Typography>
-
-          {(Object.values(filtersState.filterGroups) || []).map(
-            filterGroup =>
-              typeof filterGroup !== 'string' &&
-              !(filterGroup instanceof String) &&
-              (editingMode || filterGroup.visible) && (
-                <div>
-                  <ExpansionPanel
-                    key={uuid.v4()}
-                    disabled={!filterGroup.enabled && !editingMode}
-                  >
-                    <ExpansionPanelSummary
-                      id={filterGroup.label}
-                      key={uuid.v4()}
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography key={uuid.v4()} className={classes.heading}>
-                        {filterGroup.label}
-                      </Typography>
-                      {editingMode && (
-                        <div>
-                          <FormControlLabel
-                            key={uuid.v4()}
-                            control={
-                              <Switch
-                                key={uuid.v4()}
-                                checked={filterGroup.enabled}
-                                value={filterGroup.enabled}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
-                          />
-                          <FormControlLabel
-                            key={uuid.v4()}
-                            control={
-                              <Switch
-                                key={uuid.v4()}
-                                checked={filterGroup.visible}
-                                value={filterGroup.visible}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.visible ? 'Visible' : 'Hidden'}
-                          />
-                        </div>
-                      )}
-                    </ExpansionPanelSummary>
-                    {this.getFilter(
-                      filterGroup.filterType,
-                      filterGroup.label,
-                      filterGroup.selectedOptions
-                    )}
-                  </ExpansionPanel>
-                </div>
-              )
-          )}
         </div>
-      )
+      );
+    }
+
+    return (
+      <div className={classes.root}>
+        <Typography variant="h4" className={classes.filterTitle}>
+          Filters
+          <span className={classes.filterSpan}>
+            {editingMode && (
+              <span>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleEnabled}
+                      checked={filtersState.enabled}
+                      value={filtersState.enabled}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleVisible}
+                      checked={filtersState.visible}
+                      value={filtersState.visible}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.visible ? 'Visible' : 'Hidden'}
+                />
+              </span>
+            )}
+            <Button
+              onClick={() => {
+                this.applyCallbacks.forEach(cb => {
+                  cb();
+                });
+              }}
+              variant="contained"
+              size="small"
+              color="primary"
+            >
+              Apply filters
+            </Button>
+          </span>
+        </Typography>
+
+        {(Object.values(filtersState.filterGroups) || []).map(
+          filterGroup =>
+            typeof filterGroup !== 'string' &&
+            !(filterGroup instanceof String) &&
+            (editingMode || filterGroup.visible) && (
+              <div>
+                <ExpansionPanel
+                  key={uuid.v4()}
+                  disabled={!filterGroup.enabled && !editingMode}
+                >
+                  <ExpansionPanelSummary
+                    id={filterGroup.label}
+                    key={uuid.v4()}
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography key={uuid.v4()} className={classes.heading}>
+                      {filterGroup.label}
+                    </Typography>
+                    {editingMode && (
+                      <div>
+                        <FormControlLabel
+                          key={uuid.v4()}
+                          control={
+                            <Switch
+                              key={uuid.v4()}
+                              checked={filterGroup.enabled}
+                              value={filterGroup.enabled}
+                              color="primary"
+                            />
+                          }
+                          label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
+                        />
+                        <FormControlLabel
+                          key={uuid.v4()}
+                          control={
+                            <Switch
+                              key={uuid.v4()}
+                              checked={filterGroup.visible}
+                              value={filterGroup.visible}
+                              color="primary"
+                            />
+                          }
+                          label={filterGroup.visible ? 'Visible' : 'Hidden'}
+                        />
+                      </div>
+                    )}
+                  </ExpansionPanelSummary>
+                  {this.getFilter(
+                    filterGroup.filterType,
+                    filterGroup.label,
+                    filterGroup.selectedOptions
+                  )}
+                </ExpansionPanel>
+              </div>
+            )
+        )}
+      </div>
     );
+  };
+
+  render() {
+    return this.getComponents();
   }
 }
 
@@ -212,10 +215,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const handleToggleEnabled = event =>
-    dispatch(filtersActions.toggleEnabled(event.target.checked));
+    dispatch(filtersActions.toggleEnabledWithSolid(event.target.checked));
 
   const handleToggleVisible = event =>
-    dispatch(filtersActions.toggleVisible(event.target.checked));
+    dispatch(filtersActions.toggleVisibleWithSolid(event.target.checked));
 
   return {
     handleToggleEnabled,

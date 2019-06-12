@@ -59,6 +59,8 @@ const isArrayEqual = (x, y) => {
 class ChordFiltersComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
 
+  isMounted = false;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -76,6 +78,8 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 
   async componentDidMount() {
     // Get all the nodes
+    this.isMounted = true;
+
     let nodes = [];
     const getNodesResponse = await VisualizersService.getChordNodes(
       this.props.selectedResultGraphIri
@@ -85,7 +89,8 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     //
     if (
       this.props.editingMode &&
-      (this.props.selectedNodes || []).length === 0
+      (this.props.selectedNodes || []).length === 0 &&
+      this.isMounted
     ) {
       this.setState({
         nodes: nodes.map(node => {
@@ -110,20 +115,26 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     this.props.registerCallback(this.handleApplyFilter);
   }
 
+  componentWillUnmount = () => {
+    this.isMounted = false;
+  };
+
   handleApplyFilter = async () => {
     await this.props.onApplyFilter(this.props.name, this.state.nodes);
   };
 
   handleChange = uri => event => {
-    const checked = event.target.checked;
-    this.setState(prevState => ({
-      nodes: prevState.nodes.map(node => {
-        if (node.uri === uri) {
-          return { ...node, checked };
-        }
-        return node;
-      })
-    }));
+    if (this.isMounted) {
+      const checked = event.target.checked;
+      this.setState(prevState => ({
+        nodes: prevState.nodes.map(node => {
+          if (node.uri === uri) {
+            return { ...node, checked };
+          }
+          return node;
+        })
+      }));
+    }
   };
 
   render() {
@@ -163,7 +174,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 const mapDispatchToProps = dispatch => {
   const onApplyFilter = (filterName, nodes) =>
     dispatch(
-      filtersActions.setSelectedNodes(
+      filtersActions.setSelectedNodesWithSolid(
         filterName,
         nodes
           .filter(node => node.checked)

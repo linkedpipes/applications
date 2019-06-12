@@ -37,7 +37,8 @@ class StorageToolbox {
       webId
     );
 
-    return await StorageBackend.uploadApplicationConfiguration(
+    // eslint-disable-next-line consistent-return
+    return StorageBackend.uploadApplicationConfiguration(
       applicationConfigurationObject,
       appFolder,
       webId
@@ -161,6 +162,18 @@ class StorageToolbox {
     return StorageBackend.getAppConfigurationsMetadata(webId, appFolder);
   };
 
+  getAppMetadata = async (
+    appMetadataUrl: string,
+    callbackOnRefresh: Function,
+    forceReload: Boolean = false
+  ): Promise<ApplicationMetadata[]> => {
+    return StorageBackend.getAppConfigurationMetadata(
+      appMetadataUrl,
+      callbackOnRefresh,
+      forceReload
+    );
+  };
+
   getPerson = async (webId: string): Promise<Person> => {
     return StorageBackend.getPerson(webId);
   };
@@ -181,6 +194,27 @@ class StorageToolbox {
     newTitle: string
   ): Promise<boolean> => {
     return StorageBackend.renameAppConfiguration(metadataUrl, newTitle);
+  };
+
+  setFiltersStateEnabled = async (
+    metadataUrl: string,
+    isEnabled: boolean
+  ): Promise<boolean> => {
+    return StorageBackend.setFiltersStateEnabled(metadataUrl, isEnabled);
+  };
+
+  setFiltersStateVisible = async (
+    metadataUrl: string,
+    isVisible: boolean
+  ): Promise<boolean> => {
+    return StorageBackend.setFiltersStateVisible(metadataUrl, isVisible);
+  };
+
+  setNodesSelectedOptions = async (
+    metadataUrl: string,
+    nodes: Array<Object>
+  ): Promise<boolean> => {
+    return StorageBackend.setNodesSelectedOptions(metadataUrl, nodes);
   };
 
   getFriends = async (webId: string): Promise<Person[]> => {

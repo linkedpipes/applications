@@ -103,6 +103,7 @@ export default class ApplicationConfiguration {
       };
     }
 
+    // eslint-disable-next-line no-unused-vars
     let schemeObject = {};
     if (schemeFilter !== undefined) {
       let schemeItems = [];
