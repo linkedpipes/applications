@@ -7,17 +7,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-import { DiscoverSparqlSelectorFields, DiscoverRdfUrlField } from './children';
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-import { FilePond, registerPlugin } from 'react-filepond';
+import {
+  DiscoverSparqlSelectorFields,
+  DiscoverRdfUrlField,
+  DiscoverRdfFileDropIn
+} from './children';
 import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import './css/FilePondDarkStyle.css';
-
-// Register the filepond plugins
-registerPlugin(FilePondPluginFileValidateType);
 
 type Props = {
   classes: any,
@@ -132,29 +130,15 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                       onHandleRdfInputIriTextFieldChange
                     }
                     rdfInputIri={rdfInputIri}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    dataSampleIri={dataSampleIri}
                   />
-                  <FilePond
-                    // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
-                    ref={ref => (this.pond = ref)}
-                    allowMultiple={false}
-                    allowFileTypeValidation
-                    acceptedFileTypes={['text/turtle', '.ttl']}
-                    fileValidateTypeLabelExpectedTypesMap={{
-                      'text/turtle': '.ttl'
-                    }}
-                    fileValidateTypeDetectType={() =>
-                      new Promise(resolve => {
-                        resolve('.ttl');
-                      })
-                    }
-                    className={classes.itemGrid}
-                    maxFiles={3}
-                    onupdatefiles={fileItems => {
-                      // Set current file objects to this.state
-                      onHandleSetRdfFile(
-                        fileItems.length === 1 ? fileItems[0].file : undefined
-                      );
-                    }}
+                  <DiscoverRdfFileDropIn
+                    pond={this.pond}
+                    discoveryIsLoading={discoveryIsLoading}
+                    onHandleSetRdfFile={onHandleSetRdfFile}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    dataSampleIri={dataSampleIri}
                   />
                 </SwipeableViews>
               </Grid>

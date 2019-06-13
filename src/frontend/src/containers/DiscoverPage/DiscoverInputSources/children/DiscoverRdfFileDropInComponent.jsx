@@ -4,14 +4,20 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import { FilePond, registerPlugin } from 'react-filepond';
+import './css/FilePondDarkStyle.css';
+
+// Register the filepond plugins
+registerPlugin(FilePondPluginFileValidateType);
 
 type Props = {
-  classes: { textField: {}, gridRoot: {} },
+  classes: { textField: {}, gridRoot: {}, itemGrid: {} },
   discoveryIsLoading: boolean,
-  handleRdfInputIriTextFieldChange: () => void,
-  rdfInputIri: string,
+  dataSampleIri: string,
   handleDataSampleTextFieldChange: Function,
-  dataSampleIri: string
+  onHandleSetRdfFile: Function,
+  pond: Object
 };
 
 const styles = () => ({
@@ -22,38 +28,24 @@ const styles = () => ({
   textField: {
     margin: 'auto',
     width: '100%'
+  },
+  itemGrid: {
+    height: '100%',
+    width: '100%',
+    margin: 'auto'
   }
 });
 
-const DiscoverSparqlSelectorFields = ({
+const DiscoverRdfFileDropInComponent = ({
   classes,
   discoveryIsLoading,
-  handleRdfInputIriTextFieldChange,
-  rdfInputIri,
+  onHandleSetRdfFile,
   handleDataSampleTextFieldChange,
-  dataSampleIri
+  dataSampleIri,
+  pond
 }: Props) => (
   <div className={classes.gridRoot}>
     <Grid container spacing={16}>
-      <Grid item xs={12} sm={12}>
-        <TextField
-          id="outlined-bare"
-          label="Link to RDF resource"
-          disabled={discoveryIsLoading}
-          className={classes.textField}
-          multiline
-          autoFocus
-          onChange={handleRdfInputIriTextFieldChange}
-          placeholder="Input the link to your RDF resource..."
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true
-          }}
-          value={rdfInputIri}
-        />
-      </Grid>
       <Grid item xs={12} sm={12}>
         <TextField
           id="outlined-bare"
@@ -72,6 +64,30 @@ const DiscoverSparqlSelectorFields = ({
           value={dataSampleIri}
         />
       </Grid>
+      <Grid item xs={12} sm={12}>
+        <FilePond
+          // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
+          allowMultiple={false}
+          allowFileTypeValidation
+          acceptedFileTypes={['text/turtle', '.ttl']}
+          fileValidateTypeLabelExpectedTypesMap={{
+            'text/turtle': '.ttl'
+          }}
+          fileValidateTypeDetectType={() =>
+            new Promise(resolve => {
+              resolve('.ttl');
+            })
+          }
+          className={classes.itemGrid}
+          maxFiles={3}
+          onupdatefiles={fileItems => {
+            // Set current file objects to this.state
+            onHandleSetRdfFile(
+              fileItems.length === 1 ? fileItems[0].file : undefined
+            );
+          }}
+        />
+      </Grid>
     </Grid>
   </div>
 );
@@ -85,5 +101,5 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(DiscoverSparqlSelectorFields)
+  withStyles(styles)(DiscoverRdfFileDropInComponent)
 );
