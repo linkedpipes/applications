@@ -52,7 +52,7 @@ const getStepContent = step => {
 };
 
 const steps = [
-  'Add Data Source IRIs',
+  'Provide your input data sources',
   'Pick a visualizer',
   'Pick a source for execution',
   'Preview & create app'

@@ -6,7 +6,7 @@ import uuid from 'uuid';
 export const samples = [
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Treemap Sample',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008',
@@ -15,7 +15,7 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'GoogleMaps Sample',
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
     namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
@@ -24,7 +24,7 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Chord Sample',
     sparqlEndpointIri: 'http://lpa-virtuoso:8890/sparql',
     namedGraph: 'https://applications.linkedpipes.com/generated-data/chord',

@@ -3,12 +3,14 @@ package com.linkedpipes.lpa.backend.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
+import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -42,10 +50,10 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.discoveryPollingTimeoutMins");
-    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt("lpa.timeout.etlPollingTimeoutMins");
-    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.discoveryPollingFrequencySecs");
-    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt("lpa.timeout.etlPollingFrequencySecs");
+    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingTimeout);
+    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingTimeout);
+    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingFrequency);
+    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingFrequency);
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
@@ -64,9 +72,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     }
 
     /**
-     * Legacy start discovery from input endpoint.
-     * Uses startDiscoveryFromInput but sparqlEndpointIri, dataSampleIri and
-     * namedGraphs are set to null.
+     * Start a discovery using the provided configuration.
      *
      * @param discoveryConfig configuration passed to discovery service
      * @param userId web ID of the user who started the discovery
@@ -75,28 +81,9 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
-        return startDiscoveryFromInput(discoveryConfig, userId, null, null, null);
-    }
-
-    /**
-     * Start a discovery using the provided configuration, log the started
-     * discovery in the DB on the user profile, notify discovery started via
-     * sockets and start status polling.
-     *
-     * @param discoveryConfig configuration passed to discovery service
-     * @param userId web ID of the user who started the discovery
-     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
-     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
-     * @param namedGraphs list of provided named graphs to be recorded in the DB
-     * @return discovery ID wrapped in JSON object
-     * @throws LpAppsException call to discovery failed
-     * @throws UserNotFoundException user was not found
-     */
-    @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig, @NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+    public Discovery startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        processStartedDiscovery(discovery.id, userId, null, null, null);
         return discovery;
     }
 
@@ -112,10 +99,46 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+    public Discovery startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
         processStartedDiscovery(discovery.id, userId, null, null, null);
         return discovery;
+    }
+
+    /**
+     * Start a discovery using a provided SPARQL endpoint, log the started
+     * discovery in the DB on the user profile, notify discovery started via
+     * sockets and start status polling.
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @param namedGraphs list of provided named graphs to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
+    @NotNull @Override
+    public Discovery startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
+        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        return discovery;
+    }
+
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException, IOException {
+        //read rdf data from iri and upload it to our virtuoso, create discovery config
+        //TODO consider using Jena Model instead of stream
+        InputStream inputStream = new URL(rdfFileIri).openStream();
+        String rdfData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
+        return startDiscoveryFromInput(rdfData, userId, dataSampleIri);
+    }
+
+    @NotNull @Override
+    public Discovery startDiscoveryFromInput(@NotNull String rdfData, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
+        //upload rdf to our virtuoso, create discovery config and pass it to discovery
+        String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(rdfData);
+        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint), dataSampleIri, Arrays.asList(namedGraph));
     }
 
     /**

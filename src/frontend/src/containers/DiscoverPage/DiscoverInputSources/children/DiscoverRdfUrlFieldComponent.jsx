@@ -7,58 +7,53 @@ import { connect } from 'react-redux';
 
 type Props = {
   classes: { textField: {}, gridRoot: {} },
-  dataSampleIri: string,
   discoveryIsLoading: boolean,
-  handleDataSampleTextFieldChange: () => void,
-  handleNamedGraphTextFieldChange: () => void,
-  handleSparqlTextFieldChange: () => void,
-  namedGraph: string,
-  sparqlEndpointIri: string
+  handleRdfInputIriTextFieldChange: () => void,
+  rdfInputIri: string,
+  handleDataSampleTextFieldChange: Function,
+  dataSampleIri: string
 };
 
-const styles = theme => ({
+const styles = () => ({
   gridRoot: {
     display: 'flex',
     flexWrap: 'wrap'
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    margin: 'auto',
+    width: '100%'
   }
 });
 
-const DiscoverSelectorComponent = ({
+const DiscoverSparqlSelectorFields = ({
   classes,
   discoveryIsLoading,
-  handleNamedGraphTextFieldChange,
+  handleRdfInputIriTextFieldChange,
+  rdfInputIri,
   handleDataSampleTextFieldChange,
-  handleSparqlTextFieldChange,
-  sparqlEndpointIri,
-  dataSampleIri,
-  namedGraph
+  dataSampleIri
 }: Props) => (
   <div className={classes.gridRoot}>
     <Grid container spacing={16}>
       <Grid item xs={12} sm={12}>
         <TextField
           id="outlined-bare"
-          label="SPARQL IRI"
+          label="Link to RDF resource"
           disabled={discoveryIsLoading}
           className={classes.textField}
           multiline
           autoFocus
-          onChange={handleSparqlTextFieldChange}
-          placeholder="Input your SPARQL IRI..."
+          onChange={handleRdfInputIriTextFieldChange}
+          placeholder="Input the link to your RDF resource..."
           fullWidth
           margin="normal"
           variant="outlined"
           InputLabelProps={{
             shrink: true
           }}
-          value={sparqlEndpointIri}
+          value={rdfInputIri}
         />
       </Grid>
-
       <Grid item xs={12} sm={12}>
         <TextField
           id="outlined-bare"
@@ -77,25 +72,6 @@ const DiscoverSelectorComponent = ({
           value={dataSampleIri}
         />
       </Grid>
-
-      <Grid item xs={12} sm={12}>
-        <TextField
-          id="outlined-bare"
-          label="Named Graph IRI"
-          disabled={discoveryIsLoading}
-          className={classes.textField}
-          multiline
-          onChange={handleNamedGraphTextFieldChange}
-          placeholder="Input your named graph IRI..."
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true
-          }}
-          value={namedGraph}
-        />
-      </Grid>
     </Grid>
   </div>
 );
@@ -109,5 +85,5 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(DiscoverSelectorComponent)
+  withStyles(styles)(DiscoverSparqlSelectorFields)
 );
