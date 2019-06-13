@@ -16,8 +16,7 @@ type Props = {
   discoveryIsLoading: boolean,
   dataSampleIri: string,
   handleDataSampleTextFieldChange: Function,
-  onHandleSetRdfFile: Function,
-  pond: Object
+  onHandleSetRdfFile: Function
 };
 
 const styles = () => ({
@@ -41,8 +40,7 @@ const DiscoverRdfFileDropInComponent = ({
   discoveryIsLoading,
   onHandleSetRdfFile,
   handleDataSampleTextFieldChange,
-  dataSampleIri,
-  pond
+  dataSampleIri
 }: Props) => (
   <div className={classes.gridRoot}>
     <Grid container spacing={16}>

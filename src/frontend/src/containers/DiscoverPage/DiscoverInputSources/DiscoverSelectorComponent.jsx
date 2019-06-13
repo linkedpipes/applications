@@ -61,8 +61,6 @@ const styles = theme => ({
 });
 
 class DiscoverSelectorComponent extends PureComponent<Props> {
-  pond: Object;
-
   render() {
     const {
       classes,
@@ -134,7 +132,6 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     dataSampleIri={dataSampleIri}
                   />
                   <DiscoverRdfFileDropIn
-                    pond={this.pond}
                     discoveryIsLoading={discoveryIsLoading}
                     onHandleSetRdfFile={onHandleSetRdfFile}
                     handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
