@@ -46,7 +46,7 @@ type Props = {
 const styles = theme => ({
   root: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20,
+    paddingTop: theme.spacing(20),
     flex: 1
   },
   gridRoot: {
@@ -94,7 +94,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       <Card className={classes.card}>
         <CardContent>
           <div className={classes.gridRoot}>
-            <Grid container spacing={24}>
+            <Grid container spacing={1}>
               <Grid item xs={12} sm={12}>
                 <AppBar position="static" color="default">
                   <Tabs
@@ -112,7 +112,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                <SwipeableViews axis={'x'} index={tabIndex}>
+                <SwipeableViews animateHeight axis={'x'} index={tabIndex}>
                   <DiscoverSparqlSelectorFields
                     discoveryIsLoading={discoveryIsLoading}
                     handleSparqlTextFieldChange={onHandleSetSparqlIri}

@@ -47,7 +47,7 @@ function StorageAppsBrowserComponent(props: Props) {
     <div className={classes.root}>
       {applicationsMetadata.length !== 0 ? (
         <div className={classes.gridArea}>
-          <Grid container spacing={8}>
+          <Grid container spacing={1}>
             {applicationsMetadata.map((metadata, index) => (
               <Grid
                 key={metadata.createdAt}

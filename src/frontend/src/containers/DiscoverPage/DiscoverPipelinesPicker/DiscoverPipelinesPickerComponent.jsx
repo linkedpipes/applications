@@ -29,7 +29,7 @@ function getSorting(order, orderBy) {
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     flex: 1
   },
   table: {
@@ -63,7 +63,7 @@ const DiscoverPipelinesPickerComponent = ({
   emptyRows,
   onSelectPipeline
 }: Props) => (
-  <Paper className={classes.root}>
+  <Paper elevation={2} className={classes.root}>
     <div className={classes.tableWrapper}>
       <Table className={classes.table} aria-labelledby="tableTitle">
         <DiscoverPipelinesHeader />

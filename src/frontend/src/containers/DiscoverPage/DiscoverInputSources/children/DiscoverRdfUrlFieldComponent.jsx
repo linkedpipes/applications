@@ -19,7 +19,8 @@ const styles = () => ({
   },
   textField: {
     margin: 'auto',
-    width: '100%'
+    width: '100%',
+    marginTop: '0.5rem'
   }
 });
 
@@ -29,29 +30,25 @@ const DiscoverSparqlSelectorFields = ({
   handleRdfInputIriTextFieldChange,
   rdfInputIri
 }: Props) => (
-  <div className={classes.gridRoot}>
-    <Grid container spacing={10}>
-      <Grid item xs={12} sm={12}>
-        <TextField
-          id="outlined-bare"
-          label="Link to RDF resource"
-          disabled={discoveryIsLoading}
-          className={classes.textField}
-          multiline
-          autoFocus
-          onChange={handleRdfInputIriTextFieldChange}
-          placeholder="Input the link to your RDF resource..."
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true
-          }}
-          value={rdfInputIri}
-        />
-      </Grid>
-    </Grid>
-  </div>
+  <Grid item xs={12} sm={12}>
+    <TextField
+      id="outlined-bare"
+      label="Link to RDF resource"
+      disabled={discoveryIsLoading}
+      className={classes.textField}
+      multiline
+      autoFocus
+      onChange={handleRdfInputIriTextFieldChange}
+      placeholder="Input the link to your RDF resource..."
+      fullWidth
+      margin="normal"
+      variant="outlined"
+      InputLabelProps={{
+        shrink: true
+      }}
+      value={rdfInputIri}
+    />
+  </Grid>
 );
 
 const mapStateToProps = state => {

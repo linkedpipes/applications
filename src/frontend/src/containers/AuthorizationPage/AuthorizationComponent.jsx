@@ -6,45 +6,43 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import LockTwoToneIcon from '@material-ui/icons/LockTwoTone';
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import SolidProviderComponent from './children';
 import Switch from '@material-ui/core/Switch';
+import LpaLogo from '@assets/lpa_logo_small.svg';
+import LpaTitle from '@assets/lpa_svg_title.svg';
 
 const styles = theme => ({
   main: {
     width: 'auto',
     display: 'block', // Fix IE 11 issue.
-    marginLeft: theme.spacing.unit * 3,
-    marginRight: theme.spacing.unit * 3,
-    [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
+    marginLeft: theme.spacing(3),
+    marginRight: theme.spacing(3),
+    [theme.breakpoints.up(400 + theme.spacing(6))]: {
       width: 400,
       marginLeft: 'auto',
       marginRight: 'auto'
     }
   },
   paper: {
-    marginTop: theme.spacing.unit * 8,
+    marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
-      .spacing.unit * 3}px`
+    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`
   },
   avatar: {
-    margin: theme.spacing.unit * 3,
-    width: 70,
-    height: 70,
-    backgroundColor: theme.palette.primary.main
+    margin: theme.spacing(3),
+    width: 150,
+    height: 150
   },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing()
   },
   submit: {
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   }
 });
 
@@ -69,13 +67,13 @@ const AuthorizationComponent = ({
 }: Props) => (
   <main className={classes.main}>
     <CssBaseline />
-    <Paper className={classes.paper}>
+    <Paper elevation={2} className={classes.paper}>
       <Avatar className={classes.avatar}>
-        <LockTwoToneIcon style={{ color: 'white', fontSize: '50px' }} />
+        <img src={LpaLogo} alt="" width="150" height="150" />
       </Avatar>
-      <Typography component="h1" variant="h5">
-        Authenticate
-      </Typography>
+
+      <img src={LpaTitle} alt="" width="300" height="50" />
+
       <form className={classes.form}>
         {withWebIdStatus ? (
           <FormControl margin="normal" required fullWidth>
