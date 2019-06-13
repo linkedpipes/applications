@@ -9,7 +9,8 @@ const INITIAL_STATE = {
   namedGraph: '',
   rdfInputIri: '',
   rdfFile: undefined,
-  inputType: 'SPARQL_ENDPOINT'
+  inputType: 'SPARQL_ENDPOINT',
+  activeDiscoverTabIndex: 0
 };
 
 const discoverReducer = (state = INITIAL_STATE, action) => {
@@ -52,21 +53,30 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
         dataSampleIri: '',
         namedGraph: '',
         rdfInputIri: '',
-        inputType: 'SPARQL_ENDPOINT'
+        rdfFile: undefined,
+        inputType: 'SPARQL_ENDPOINT',
+        activeDiscoverTabIndex: 0
       };
     }
 
     case types.SET_SELECTED_INPUT_EXAMPLE: {
       const { sample } = action;
-      switch (sample.type) {
-        case 'sparqlEndpoint': {
-          const { sparqlEndpointIri, dataSampleIri, namedGraph } = sample;
+      const {
+        sparqlEndpointIri,
+        dataSampleIri,
+        namedGraph,
+        inputType
+      } = sample;
+      switch (inputType) {
+        case 'SPARQL_ENDPOINT': {
           return {
             ...state,
             dataSourcesUris: undefined,
             sparqlEndpointIri,
             dataSampleIri,
-            namedGraph
+            namedGraph,
+            inputType,
+            activeDiscoverTabIndex: 0
           };
         }
         default:
@@ -86,8 +96,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        dataSampleIri: value,
-        inputType: 'SPARQL_ENDPOINT'
+        dataSampleIri: value
       });
     }
 
@@ -95,8 +104,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        sparqlEndpointIri: value,
-        inputType: 'SPARQL_ENDPOINT'
+        sparqlEndpointIri: value
       });
     }
 
@@ -104,8 +112,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        namedGraph: value,
-        inputType: 'SPARQL_ENDPOINT'
+        namedGraph: value
       });
     }
 
@@ -113,8 +120,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        rdfInputIri: value,
-        inputType: 'RDF_INPUT_IRI'
+        rdfInputIri: value
       });
     }
 
@@ -122,8 +128,37 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       const { value } = action;
       return Object.assign({}, state, {
         ...state,
-        rdfFile: value,
-        inputType: 'RDF_INPUT_FILE'
+        rdfFile: value
+      });
+    }
+
+    case types.SET_ACTIVE_DISCOVER_INPUT_TAB: {
+      const { value } = action;
+
+      let inputType = '';
+
+      switch (value) {
+        case 0:
+          inputType = 'SPARQL_ENDPOINT';
+          break;
+
+        case 1:
+          inputType = 'RDF_INPUT_IRI';
+          break;
+
+        case 2:
+          inputType = 'RDF_INPUT_FILE';
+          break;
+
+        default:
+          inputType = 'RDF_INPUT_IRI';
+          break;
+      }
+
+      return Object.assign({}, state, {
+        ...state,
+        inputType,
+        activeDiscoverTabIndex: value
       });
     }
 

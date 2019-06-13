@@ -32,13 +32,15 @@ type Props = {
   rdfInputIri: string,
   handleSetRdfInputIriUrlFieldValue: Function,
   inputType: string,
-  handleSetRdfFile: Function
+  handleSetRdfFile: Function,
+  rdfFile: Object,
+  activeDiscoverTabIndex: Number,
+  handleSetActiveDiscoverTabIndex: Function
 };
 
 type State = {
   discoveryIsLoading: boolean,
-  discoveryLoadingLabel: string,
-  tabIndex: Object
+  discoveryLoadingLabel: string
 };
 
 class DiscoverSelectorContainer extends PureComponent<Props, State> {
@@ -46,8 +48,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   state = {
     discoveryIsLoading: false,
-    discoveryLoadingLabel: '',
-    tabIndex: 0
+    discoveryLoadingLabel: ''
   };
 
   componentDidMount() {
@@ -58,9 +59,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.isMounted = false;
   };
 
-  postStartFromFile = async instance => {
-    return DiscoveryService.postDiscoverFromTtl({
-      webId: instance.props.webId
+  postStartFromRdfInputFile = async () => {
+    return DiscoveryService.postDiscoverFromInputFile({
+      webId: this.props.webId,
+      dataSampleIri: this.props.dataSampleIri,
+      rdfFile: this.props.rdfFile
     }).then(response => {
       return response;
     });
@@ -78,10 +81,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   postStartFromRdfInputIri = async () => {
-    const { rdfInputIri, webId } = this.props;
+    const { rdfInputIri, webId, dataSampleIri } = this.props;
     return DiscoveryService.postDiscoverFromInputIri({
       rdfInputIri,
-      webId
+      webId,
+      dataSampleIri
     }).then(response => {
       return response;
     });
@@ -92,6 +96,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     switch (inputType) {
       case 'RDF_INPUT_IRI':
         return this.postStartFromRdfInputIri();
+
+      case 'RDF_INPUT_FILE':
+        return this.postStartFromRdfInputFile();
 
       default:
         return this.postStartFromSparqlEndpoint();
@@ -230,14 +237,17 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.handleSetRdfInputIriUrlFieldValue(rawText);
   };
 
-  handleSetRdfFile = e => {
-    const rdfFile = e.target.value;
-    Log.info('Rdf file selected', 'DiscoverSelectorContainer');
-    this.props.handleSetRdfFile(rdfFile);
+  handleSetRdfFile = file => {
+    if (!file) {
+      Log.info('Rdf file deselected', 'DiscoverSelectorContainer');
+    } else {
+      Log.info('Rdf file selected', 'DiscoverSelectorContainer');
+      this.props.handleSetRdfFile(file);
+    }
   };
 
   handleTabIndexChange = (event, newValue) => {
-    this.setState({ tabIndex: newValue });
+    this.props.handleSetActiveDiscoverTabIndex(newValue);
   };
 
   render() {
@@ -247,10 +257,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       dataSampleIri,
       namedGraph,
       rdfInputIri,
-      inputType
+      inputType,
+      activeDiscoverTabIndex
     } = this.props;
 
-    const { discoveryIsLoading, discoveryLoadingLabel, tabIndex } = this.state;
+    const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
     const inputFieldsAreNotFilled =
       (inputType === 'SPARQL_ENDPOINT' &&
         (sparqlEndpointIri === '' ||
@@ -277,7 +288,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         }
         onHandleSetRdfFile={this.handleSetRdfFile}
         rdfInputIri={rdfInputIri}
-        tabIndex={tabIndex}
+        tabIndex={activeDiscoverTabIndex}
         onHandleTabIndexChange={this.handleTabIndexChange}
       />
     );
@@ -302,7 +313,9 @@ const mapStateToProps = state => {
     namedGraph: state.discover.namedGraph,
     webId: state.user.webId,
     rdfInputIri: state.discover.rdfInputIri,
-    inputType: state.discover.inputType
+    rdfFile: state.discover.rdfFile,
+    inputType: state.discover.inputType,
+    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex
   };
 };
 
@@ -334,7 +347,11 @@ const mapDispatchToProps = dispatch => {
   };
 
   const handleSetRdfFile = file => {
-    dispatch(discoverActions.handleSetRdfFile(file));
+    dispatch(discoverActions.setRdfFile(file));
+  };
+
+  const handleSetActiveDiscoverTabIndex = tabIndex => {
+    dispatch(discoverActions.setActiveDiscoverTabIndexAsync(tabIndex));
   };
 
   return {
@@ -345,7 +362,8 @@ const mapDispatchToProps = dispatch => {
     handleSetSparqlIriFieldValue,
     handleSetRdfInputIriUrlFieldValue,
     resetFieldsAndExamples,
-    handleSetRdfFile
+    handleSetRdfFile,
+    handleSetActiveDiscoverTabIndex
   };
 };
 

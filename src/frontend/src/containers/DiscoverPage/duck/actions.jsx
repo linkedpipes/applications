@@ -83,6 +83,20 @@ const setRdfFile = rdfFile => {
   };
 };
 
+const setActiveDiscoverTabIndex = tabIndex => {
+  return {
+    type: types.SET_ACTIVE_DISCOVER_INPUT_TAB,
+    value: tabIndex
+  };
+};
+
+const setActiveDiscoverTabIndexAsync = tabIndex => {
+  return dispatch => {
+    dispatch(resetSelectedInputExample());
+    dispatch(setActiveDiscoverTabIndex(tabIndex));
+  };
+};
+
 export default {
   incrementActiveStep,
   decrementActiveStep,
@@ -95,5 +109,7 @@ export default {
   setSparqlEndpointIri,
   setDataSampleIri,
   setRdfInputIri,
-  setRdfFile
+  setRdfFile,
+  setActiveDiscoverTabIndex,
+  setActiveDiscoverTabIndexAsync
 };
