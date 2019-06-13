@@ -213,10 +213,10 @@ const NavigationBarComponent = ({
 NavigationBarComponent.propTypes = {
   classes: PropTypes.any,
   drawerState: PropTypes.any,
+  history: PropTypes.any,
   onHandleDrawerClose: PropTypes.any,
   onHandleDrawerOpen: PropTypes.any,
-  theme: PropTypes.any,
-  history: PropTypes.any
+  theme: PropTypes.any
 };
 
 export default withRouter(
