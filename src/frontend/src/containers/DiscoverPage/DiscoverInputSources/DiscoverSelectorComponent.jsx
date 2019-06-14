@@ -100,9 +100,16 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     textColor="primary"
                     variant="fullWidth"
                   >
-                    <Tab label="From SPARQL endpoint" />
-                    <Tab label="From URL with RDF" />
-                    <Tab label="From File with RDF" />
+                    <Tab
+                      label="From SPARQL endpoint"
+                      disabled={discoveryIsLoading}
+                    />
+                    <Tab
+                      label="From URL with RDF"
+                      disabled={discoveryIsLoading}
+                    />
+                    <Tab label="From File with RDF" 
+                    disabled={discoveryIsLoading}/>
                   </Tabs>
                 </AppBar>
               </Grid>
