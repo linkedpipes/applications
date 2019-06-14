@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -43,7 +43,12 @@ const styles = theme => ({
   }
 });
 
-const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
+type Props = {
+  classes: Object,
+  visualizers: []
+};
+
+const DiscoverVisualizerPickerComponent = ({ classes, visualizers }: Props) => (
   <div className={classNames(classes.layout, classes.cardGrid)}>
     <Grid container className={classes.root} spacing={4}>
       <Grid container className={classes.demo} justify="center" spacing={4}>
@@ -74,10 +79,5 @@ const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
     </Grid>
   </div>
 );
-
-DiscoverVisualizerPickerComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  visualizers: PropTypes.any
-};
 
 export default withStyles(styles)(DiscoverVisualizerPickerComponent);

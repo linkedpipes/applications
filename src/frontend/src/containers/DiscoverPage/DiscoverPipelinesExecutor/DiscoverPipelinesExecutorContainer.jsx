@@ -1,5 +1,5 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesExecutorComponent from './DiscoverPipelinesExecutorComponent';
@@ -12,15 +12,28 @@ import {
 } from '@utils';
 import { discoverActions } from '../duck';
 
-class DiscoverPipelinesExecutorContainer extends PureComponent {
+type Props = {
+  discoveryId: string,
+  etlExecutionStatus: string,
+  onAddSelectedResultGraphIriAction: Function,
+  onAddSingleExecution: Function,
+  onAddSingleExport: Function,
+  onSetEtlExecutionStatus: Function,
+  pipelineId: string,
+  selectedVisualizer: Object,
+  socket: Object,
+  webId: string
+};
+
+type State = {
+  loaderLabelText: string
+};
+class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
   isMounted = false;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      loaderLabelText: 'Hold on...'
-    };
-  }
+  state = {
+    loaderLabelText: 'Hold on...'
+  };
 
   componentDidMount = () => {
     this.isMounted = true;
@@ -186,19 +199,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent {
     );
   }
 }
-
-DiscoverPipelinesExecutorContainer.propTypes = {
-  discoveryId: PropTypes.any,
-  etlExecutionStatus: PropTypes.any,
-  onAddSelectedResultGraphIriAction: PropTypes.any,
-  onAddSingleExecution: PropTypes.any,
-  onAddSingleExport: PropTypes.any,
-  onSetEtlExecutionStatus: PropTypes.any,
-  pipelineId: PropTypes.any,
-  selectedVisualizer: PropTypes.any,
-  socket: PropTypes.any,
-  webId: PropTypes.any
-};
 
 const mapStateToProps = state => {
   return {

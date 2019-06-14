@@ -136,7 +136,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     onHandleSetRdfFile={onHandleSetRdfFile}
                     handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
                     dataSampleIri={dataSampleIri}
-                  />
+clea                  />
                 </SwipeableViews>
               </Grid>
 

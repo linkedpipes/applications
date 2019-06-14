@@ -1,8 +1,8 @@
+// @flow
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import PropTypes from 'prop-types';
 import { withTheme, withStyles } from '@material-ui/core/styles';
 import { ToastContainer } from 'react-toastify';
 import UserProfileButton from '../UserProfile';
@@ -93,6 +93,15 @@ const styles = theme => ({
   }
 });
 
+type Props = {
+  classes: Object,
+  drawerState: Boolean,
+  history: Object,
+  onHandleDrawerClose: Function,
+  onHandleDrawerOpen: Function,
+  theme: Object
+};
+
 const NavigationBarComponent = ({
   classes,
   theme,
@@ -100,7 +109,7 @@ const NavigationBarComponent = ({
   onHandleDrawerClose,
   onHandleDrawerOpen,
   history
-}) => (
+}: Props) => (
   <div>
     <AppBar
       position="absolute"
@@ -209,15 +218,6 @@ const NavigationBarComponent = ({
     </Drawer>
   </div>
 );
-
-NavigationBarComponent.propTypes = {
-  classes: PropTypes.any,
-  drawerState: PropTypes.any,
-  history: PropTypes.any,
-  onHandleDrawerClose: PropTypes.any,
-  onHandleDrawerOpen: PropTypes.any,
-  theme: PropTypes.any
-};
 
 export default withRouter(
   withTheme(withStyles(styles, { withTheme: true })(NavigationBarComponent))
