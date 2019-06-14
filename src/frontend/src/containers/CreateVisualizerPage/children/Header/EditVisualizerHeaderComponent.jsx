@@ -150,7 +150,7 @@ const EditVisualizerHeaderComponent = ({
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={16} justify="center">
+        <Grid container spacing={2} justify="center">
           <Grid item>
             <Button
               id="edit-app-publish-button"
