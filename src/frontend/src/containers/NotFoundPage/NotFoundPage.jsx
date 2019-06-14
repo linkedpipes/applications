@@ -7,14 +7,14 @@ import { GoogleAnalyticsWrapper } from '@utils';
 const styles = theme => ({
   root: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20,
+    paddingTop: theme.spacing(20),
     position: 'absolute',
     left: '50%',
     top: '40%',
     transform: 'translate(-50%, -50%)'
   },
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing()
   },
   input: {
     display: 'none'

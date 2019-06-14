@@ -16,7 +16,7 @@ const styles = theme => ({
     color: blue[600]
   },
   paper: {
-    padding: theme.spacing.unit * 4,
+    padding: theme.spacing(4),
     textAlign: 'center',
     color: theme.palette.text.secondary
   }
@@ -51,13 +51,21 @@ class DiscoveryInformationDialog extends PureComponent<Props> {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <Typography component={'span'} align="left">{`SPARQL IRI: ${
-              selectedValue.sparqlEndpointIri
-            }`}</Typography>
-            <Typography component={'span'} align="left">{`Data sample IRI: ${
-              selectedValue.dataSampleIri
-            }`}</Typography>
-            <Typography component={'span'} align="left">{`Named Graph IRIs: ${
+            <Typography
+              variant="body1"
+              component={'span'}
+              align="left"
+            >{`SPARQL IRI: ${selectedValue.sparqlEndpointIri}`}</Typography>
+            <Typography
+              variant="body1"
+              component={'span'}
+              align="left"
+            >{`Data sample IRI: ${selectedValue.dataSampleIri}`}</Typography>
+            <Typography
+              variant="body1"
+              component={'span'}
+              align="left"
+            >{`Named Graph IRIs: ${
               selectedValue.namedGraphs
                 ? selectedValue.namedGraphs.join(',\n')
                 : '–'

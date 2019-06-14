@@ -1,5 +1,5 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
 
@@ -33,8 +33,12 @@ export const samples = [
   }
 ];
 
-class DiscoverExamplesContainer extends PureComponent {
-  handleListItemClicked = item => {
+type Props = {
+  onInputExampleClicked: Function
+};
+
+class DiscoverExamplesContainer extends PureComponent<Props> {
+  handleListItemClicked = (item: Object) => {
     const { onInputExampleClicked } = this.props;
     const inputExample = item;
     onInputExampleClicked(inputExample);
@@ -51,9 +55,5 @@ class DiscoverExamplesContainer extends PureComponent {
     );
   }
 }
-
-DiscoverExamplesContainer.propTypes = {
-  onInputExampleClicked: PropTypes.func.isRequired
-};
 
 export default DiscoverExamplesContainer;
