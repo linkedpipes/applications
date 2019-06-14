@@ -42,7 +42,7 @@ const PipelinesTableComponent = ({
 }: Props) => (
   <div>
     {(pipelinesList && pipelinesList.length) > 0 ? (
-      <Paper classes={classes}>
+      <Paper elevation={2} classes={classes}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
@@ -123,7 +123,7 @@ const PipelinesTableComponent = ({
         </Table>
       </Paper>
     ) : (
-      <Paper>
+      <Paper elevation={2}>
         <Typography variant="body1" gutterBottom>
           No pipelines found
         </Typography>

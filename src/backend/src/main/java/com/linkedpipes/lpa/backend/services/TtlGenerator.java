@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
@@ -112,7 +113,7 @@ public class TtlGenerator {
     @NotNull
     public static String getVirtuosoServiceDescription(@NotNull String graphName) {
         ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"));
-        String virtuosoEndpoint = Application.getConfig().getString("lpa.virtuoso.crudEndpoint");
+        String virtuosoEndpoint = Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint);
 
         builder.resource(virtuosoEndpoint + "/service")
                 .resource(SD.namedGraph)

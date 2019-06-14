@@ -14,5 +14,7 @@ module.name_mapper='@utils' ->'<PROJECT_ROOT>/src/utils'
 module.name_mapper='@storage' ->'<PROJECT_ROOT>/src/storage'
 module.name_mapper='@constants' ->'<PROJECT_ROOT>/src/constants'
 module.name_mapper='@layouts' ->'<PROJECT_ROOT>/src/layouts'
+module.name_mapper='@assets' ->'<PROJECT_ROOT>/assets'
+
 
 [strict]
