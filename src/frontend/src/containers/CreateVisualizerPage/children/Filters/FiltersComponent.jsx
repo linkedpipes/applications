@@ -9,6 +9,10 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import PropTypes from 'prop-types';
 
+// type Props = {
+//   filters: []
+// };
+
 const FiltersComponent = ({ filters }) => (
   <div>
     <List
