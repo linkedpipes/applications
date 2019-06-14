@@ -121,7 +121,7 @@ const VisualizerHeaderComponent = ({
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={16} justify="center">
+        <Grid container spacing={2} justify="center">
           <Grid item>
             <Button
               id="create-app-publish-button"
