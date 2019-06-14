@@ -90,7 +90,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       <Card className={classes.card}>
         <CardContent>
           <div className={classes.gridRoot}>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid item xs={12} sm={12}>
                 <AppBar position="static" color="default">
                   <Tabs
@@ -136,7 +136,8 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     onHandleSetRdfFile={onHandleSetRdfFile}
                     handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
                     dataSampleIri={dataSampleIri}
-clea                  />
+                    clea
+                  />
                 </SwipeableViews>
               </Grid>
 
@@ -144,7 +145,7 @@ clea                  />
                 {discoveryIsLoading ? (
                   <LinearLoader labelText={discoveryLoadingLabel} />
                 ) : (
-                  <Grid container spacing={16}>
+                  <Grid container spacing={2}>
                     <Grid item xs={6} sm={6}>
                       <Button
                         className={classes.itemGrid}

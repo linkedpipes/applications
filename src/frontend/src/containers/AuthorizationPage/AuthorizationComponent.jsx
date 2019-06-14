@@ -1,5 +1,4 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
@@ -68,9 +67,7 @@ const AuthorizationComponent = ({
   <main className={classes.main}>
     <CssBaseline />
     <Paper elevation={2} className={classes.paper}>
-      <Avatar className={classes.avatar}>
-        <img src={LpaLogo} alt="" width="150" height="150" />
-      </Avatar>
+      <img className={classes.avatar} src={LpaLogo} alt="" />
 
       <img src={LpaTitle} alt="" width="300" height="50" />
 

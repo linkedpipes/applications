@@ -26,7 +26,8 @@ const styles = () => ({
   },
   textField: {
     margin: 'auto',
-    width: '100%'
+    width: '100%',
+    marginTop: '0.5rem'
   },
   itemGrid: {
     height: '100%',
@@ -43,7 +44,7 @@ const DiscoverRdfFileDropInComponent = ({
   dataSampleIri
 }: Props) => (
   <div className={classes.gridRoot}>
-    <Grid container spacing={16}>
+    <Grid container spacing={2}>
       <Grid item xs={12} sm={12}>
         <TextField
           id="outlined-bare"
