@@ -15,6 +15,7 @@ import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ResourceBuilder;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class TtlGenerator {
      */
     @NotNull
     public static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
-        ModelBuilder builder = ModelBuilder.from(TtlGenerator.class.getResource("base.ttl"));
+        ModelBuilder builder = ModelBuilder.from(TtlGenerator.class.getResource("base.ttl"), RDFLanguages.TTL.toString());
         ResourceBuilder config = builder.resource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config");
         dataSourceList.forEach(dataSource ->
                 config.property("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(dataSource.uri)));
@@ -112,7 +113,7 @@ public class TtlGenerator {
      */
     @NotNull
     public static String getVirtuosoServiceDescription(@NotNull String graphName) {
-        ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"));
+        ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"), RDFLanguages.TTL.toString());
         String virtuosoEndpoint = Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint);
 
         builder.resource(virtuosoEndpoint + "/service")

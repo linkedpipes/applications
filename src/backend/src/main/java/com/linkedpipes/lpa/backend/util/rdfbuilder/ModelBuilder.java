@@ -21,7 +21,11 @@ public class ModelBuilder {
     }
 
     private ModelBuilder(URL resource) {
-        model.read(resource.toString(), "TTL");
+        RDFDataMgr.read(model, resource.toString()) ;
+    }
+
+    private ModelBuilder(URL resource, String language) {
+        model.read(resource.toString(), language);
     }
 
     public ModelBuilder namespace(String prefix, String uri) {
@@ -52,13 +56,24 @@ public class ModelBuilder {
     }
 
     /**
-     * Initialize from a TTL-formatted resource.
+     * Initialize from a resource.
      *
-     * @param model the resource to initialize the model from
+     * @param model the url of the resource to initialize the model from
      * @return a builder
      */
     public static ModelBuilder from(URL model) {
         return new ModelBuilder(model);
+    }
+
+    /**
+     * Initialize from a resource where the RDF data format is known.
+     *
+     * @param model the url of the resource to initialize the model from
+     * @param language the language of the RDF data in the provided resource
+     * @return a builder
+     */
+    public static ModelBuilder from(URL model, String language) {
+        return new ModelBuilder(model, language);
     }
 
     public static ModelBuilder empty() {

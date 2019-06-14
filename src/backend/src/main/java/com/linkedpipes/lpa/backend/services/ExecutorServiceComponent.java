@@ -13,6 +13,10 @@ import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
+import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +29,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -128,9 +134,9 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException, IOException {
         //read rdf data from iri and upload it to our virtuoso, create discovery config
-        //TODO consider using Jena Model instead of stream
-        InputStream inputStream = new URL(rdfFileIri).openStream();
-        String rdfData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
+        ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
+        //get rdf data in TTL format
+        String rdfData = mb.toString();
         return startDiscoveryFromInput(rdfData, userId, dataSampleIri);
     }
 
