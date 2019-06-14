@@ -44,7 +44,7 @@ const SolidProviderComponent = ({
         <MenuItem value={''}>
           <em>None</em>
         </MenuItem>
-        <MenuItem value={'Inrupt'}>Inrupt</MenuItem>
+        {/* <MenuItem value={'Inrupt'}>Inrupt</MenuItem> */}
         <MenuItem value={'Solid Community'}>Solid Community</MenuItem>
       </Select>
     </FormControl>
