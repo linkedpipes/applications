@@ -40,7 +40,7 @@ const ApplicationsTableComponent = ({
 }: Props) => (
   <div>
     {(applicationsList && applicationsList.length) > 0 ? (
-      <Paper classes={classes}>
+      <Paper classes={classes} elevation={2}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
@@ -120,7 +120,7 @@ const ApplicationsTableComponent = ({
         </Table>
       </Paper>
     ) : (
-      <Paper>
+      <Paper elevation={2}>
         <Typography variant="body1" gutterBottom>
           No applications found
         </Typography>

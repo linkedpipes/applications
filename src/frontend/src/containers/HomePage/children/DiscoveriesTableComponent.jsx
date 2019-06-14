@@ -44,7 +44,7 @@ const DiscoveriesTableComponent = ({
 }: Props) => (
   <div>
     {discoveriesList && discoveriesList.length > 0 ? (
-      <Paper classes={classes}>
+      <Paper elevation={2} classes={classes}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
@@ -137,7 +137,7 @@ const DiscoveriesTableComponent = ({
         </Table>
       </Paper>
     ) : (
-      <Paper>
+      <Paper elevation={2}>
         <Typography component={'span'} variant="body1" gutterBottom>
           No discoveries found
         </Typography>

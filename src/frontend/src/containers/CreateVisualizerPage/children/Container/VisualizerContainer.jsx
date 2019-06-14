@@ -35,7 +35,7 @@ const styles = theme => ({
   },
   containerView: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20
+    paddingTop: theme.spacing(20)
   },
   filterSideBar: {
     overflowY: 'hidden'
@@ -132,7 +132,7 @@ const getVisualizer = (
 
 const VisualizerControllerContainer = (props: Props) => {
   return (
-    <Grid container className={props.classes.root} direction="row" spacing={40}>
+    <Grid container className={props.classes.root} direction="row" spacing={10}>
       <Grid item lg={4} md={5} xs={12} className={props.classes.filterSideBar}>
         <FiltersComponent
           editingMode

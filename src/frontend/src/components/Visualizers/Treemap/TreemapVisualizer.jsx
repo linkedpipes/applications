@@ -34,15 +34,15 @@ const styles = theme => ({
   card: {},
   input: {},
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     alignItems: 'center'
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     minWidth: 120
   },
   selectEmpty: {
-    marginTop: theme.spacing.unit * 2
+    marginTop: theme.spacing(2)
   },
   wrapper: {
     height: '100%'

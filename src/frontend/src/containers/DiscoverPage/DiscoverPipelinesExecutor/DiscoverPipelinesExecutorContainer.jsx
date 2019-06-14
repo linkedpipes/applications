@@ -31,12 +31,9 @@ type State = {
 class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
   isMounted = false;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      loaderLabelText: 'Hold on...'
-    };
-  }
+  state = {
+    loaderLabelText: 'Hold on...'
+  };
 
   componentDidMount = () => {
     this.isMounted = true;

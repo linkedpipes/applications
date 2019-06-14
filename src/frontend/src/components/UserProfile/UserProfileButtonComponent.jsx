@@ -63,19 +63,19 @@ const UserProfileButtonComponent = ({
         <ListItemIcon>
           <PersonIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Profile" />
+        <ListItemText primary="Profile" />
       </MenuItem>
       <MenuItem onClick={onHandleOpenSettings}>
         <ListItemIcon>
           <SettingsIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Settings" />
+        <ListItemText primary="Settings" />
       </MenuItem>
       <MenuItem onClick={onHandleLogoutClicked}>
         <ListItemIcon>
           <RemoveIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Logout" />
+        <ListItemText primary="Logout" />
       </MenuItem>
     </Menu>
   </div>

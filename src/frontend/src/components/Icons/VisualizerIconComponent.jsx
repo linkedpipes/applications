@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { VISUALIZER_TYPE } from '@constants';
 import MapIcon from '@material-ui/icons/MapTwoTone';
 import TimelineIcon from '@material-ui/icons/TimelineTwoTone';
@@ -8,7 +8,12 @@ import ChordIcon from '@material-ui/icons/BlurCircularTwoTone';
 import TreemapIcon from '@material-ui/icons/TableChartTwoTone';
 import UnkownIcon from '@material-ui/icons/WallpaperTwoTone';
 
-const VisualizerIconComponent = ({ visualizerType, style }) => {
+type Props = {
+  style: Object,
+  visualizerType: string
+};
+
+const VisualizerIconComponent = ({ visualizerType, style }: Props) => {
   switch (visualizerType.toUpperCase()) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
@@ -32,11 +37,6 @@ const VisualizerIconComponent = ({ visualizerType, style }) => {
     default:
       return <UnkownIcon style={style} />;
   }
-};
-
-VisualizerIconComponent.propTypes = {
-  style: PropTypes.any,
-  visualizerType: PropTypes.any
 };
 
 export default VisualizerIconComponent;

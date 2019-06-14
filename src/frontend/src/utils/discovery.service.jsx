@@ -1,9 +1,9 @@
 import lpaAxios from './api.service';
 
 const DiscoveryService = {
-  async postDiscoverFromTtl({ ttlFile, webId }) {
-    return lpaAxios.post('/pipelines/discoverFromInput', ttlFile, {
-      params: { webId }
+  async postDiscoverFromInputFile({ rdfFile, webId, dataSampleIri }) {
+    return lpaAxios.post('/pipelines/discoverFromInput', rdfFile, {
+      params: { webId, dataSampleIri }
     });
   },
 
@@ -16,6 +16,12 @@ const DiscoveryService = {
   }) {
     return lpaAxios.post('/pipelines/discoverFromEndpoint', null, {
       params: { sparqlEndpointIri, dataSampleIri, namedGraphs, webId }
+    });
+  },
+
+  async postDiscoverFromInputIri({ rdfInputIri, webId, dataSampleIri }) {
+    return lpaAxios.post('/pipelines/discoverFromInputIri', null, {
+      params: { rdfInputIri, webId, dataSampleIri }
     });
   },
 

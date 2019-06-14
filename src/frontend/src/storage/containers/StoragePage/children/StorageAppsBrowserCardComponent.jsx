@@ -42,7 +42,7 @@ const styles = {
     textAlign: 'center'
   },
 
-  actions: {
+  spacing: {
     display: 'flex'
   },
 
@@ -59,7 +59,7 @@ type Props = {
     card: {},
     cardContent: {},
     media: {},
-    actions: {},
+    spacing: {},
     textField: {}
   },
   applicationMetadata: ApplicationMetadata,
@@ -232,7 +232,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               />
             </div>
           </CardActionArea>
-          <CardActions className={classes.actions} disableActionSpacing>
+          <CardActions className={classes.spacing} disableSpacing>
             <IconButton aria-label="Share" onClick={handleShareApp}>
               <ShareIcon />
             </IconButton>

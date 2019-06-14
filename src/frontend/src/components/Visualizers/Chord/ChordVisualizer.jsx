@@ -35,7 +35,7 @@ const styles = theme => ({
   card: {},
   input: {},
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     alignItems: 'center'
   },
   theme
@@ -236,4 +236,4 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-export default withStyles(styles)(withTheme()(ChordVisualizer));
+export default withStyles(styles)(withTheme(ChordVisualizer));

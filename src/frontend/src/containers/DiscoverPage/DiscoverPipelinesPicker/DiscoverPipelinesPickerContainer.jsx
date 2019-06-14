@@ -1,5 +1,5 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { discoverActions } from '../duck';
 import { etlActions } from '@ducks/etlDuck';
@@ -7,7 +7,22 @@ import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent
 import ErrorBoundary from 'react-error-boundary';
 import { GoogleAnalyticsWrapper } from '@utils';
 
-class DiscoverPipelinesPickerContainer extends PureComponent {
+type Props = {
+  dataSourceGroups: [],
+  discoveryId: string,
+  handleSetSelectedPipelineId: Function,
+  onNextClicked: Function
+};
+
+type State = {
+  order: string,
+  orderBy: string,
+  page: number,
+  rowsPerPage: number,
+  loadingButtons: {}
+};
+
+class DiscoverPipelinesPickerContainer extends PureComponent<Props, State> {
   state = {
     order: 'asc',
     orderBy: 'id',
@@ -69,11 +84,17 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   }
 }
 
-DiscoverPipelinesPickerContainer.propTypes = {
-  dataSourceGroups: PropTypes.any,
-  discoveryId: PropTypes.any,
-  handleSetSelectedPipelineId: PropTypes.any,
-  onNextClicked: PropTypes.any
+const mapStateToProps = state => {
+  return {
+    exportsDict: state.etl.exports,
+    executions: state.etl.executions,
+    discoveryId: state.discovery.discoveryId,
+    selectedVisualizer: state.globals.selectedVisualizer,
+    dataSourceGroups:
+      state.globals.selectedVisualizer !== undefined
+        ? state.globals.selectedVisualizer.dataSourceGroups
+        : []
+  };
 };
 
 const mapDispatchToProps = dispatch => {
@@ -89,17 +110,6 @@ const mapDispatchToProps = dispatch => {
   return {
     handleSetSelectedPipelineId,
     onNextClicked
-  };
-};
-
-const mapStateToProps = state => {
-  return {
-    discoveryId: state.discovery.discoveryId,
-    selectedVisualizer: state.globals.selectedVisualizer,
-    dataSourceGroups:
-      state.globals.selectedVisualizer !== undefined
-        ? state.globals.selectedVisualizer.dataSourceGroups
-        : []
   };
 };
 

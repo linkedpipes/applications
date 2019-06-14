@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
@@ -14,16 +14,16 @@ const styles = theme => ({
     flexGrow: 1
   },
   control: {
-    padding: theme.spacing.unit * 2
+    padding: theme.spacing(2)
   },
   cardGrid: {
-    padding: `${theme.spacing.unit * 8}px 0`
+    padding: `${theme.spacing(8)}px 0`
   },
   layout: {
     width: 'auto',
-    marginLeft: theme.spacing.unit * 3,
-    marginRight: theme.spacing.unit * 3,
-    [theme.breakpoints.up(1100 + theme.spacing.unit * 3 * 2)]: {
+    marginLeft: theme.spacing(3),
+    marginRight: theme.spacing(3),
+    [theme.breakpoints.up(1100 + theme.spacing(6))]: {
       width: 1100,
       marginLeft: 'auto',
       marginRight: 'auto'
@@ -43,10 +43,15 @@ const styles = theme => ({
   }
 });
 
-const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
+type Props = {
+  classes: Object,
+  visualizers: []
+};
+
+const DiscoverVisualizerPickerComponent = ({ classes, visualizers }: Props) => (
   <div className={classNames(classes.layout, classes.cardGrid)}>
-    <Grid container className={classes.root} spacing={40}>
-      <Grid container className={classes.demo} justify="center" spacing={16}>
+    <Grid container className={classes.root} spacing={4}>
+      <Grid container className={classes.demo} justify="center" spacing={4}>
         {visualizers.length === 0 ? (
           <Grid item xs={12}>
             <Card className={classes.card}>
@@ -74,10 +79,5 @@ const DiscoverVisualizerPickerComponent = ({ classes, visualizers }) => (
     </Grid>
   </div>
 );
-
-DiscoverVisualizerPickerComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  visualizers: PropTypes.any
-};
 
 export default withStyles(styles)(DiscoverVisualizerPickerComponent);
