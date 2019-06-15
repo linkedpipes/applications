@@ -33,7 +33,6 @@ public class ModelBuilder {
 
     private ModelBuilder(String rdfData, Lang language) {
         RDFDataMgr.read(model, new ByteArrayInputStream(rdfData.getBytes()), language);
-        //model.read(new ByteArrayInputStream(rdfData.getBytes()), null, language);
     }
 
     public ModelBuilder namespace(String prefix, String uri) {

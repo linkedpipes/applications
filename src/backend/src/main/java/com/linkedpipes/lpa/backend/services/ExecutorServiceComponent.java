@@ -15,6 +15,7 @@ import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
@@ -149,7 +150,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
         //get rdf data in TTL format
         String rdfData = mb.toString();
-        return startDiscoveryFromInput(rdfData, userId, dataSampleIri);
+        return startDiscoveryFromInput(rdfData, RDFLanguages.TTL, userId, dataSampleIri);
     }
 
     /**
@@ -164,12 +165,19 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull String rdfData, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
-        //read rdf data into model
-        //TODO to support RDF data in multiple languages, language will have to be provided by the user or somehow guessed from the data provided
-        //ModelBuilder mb = ModelBuilder.fromString(rdfData, RDFLanguages.TTL);
+    public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
+        String turtleRdfData;
+
+        if (rdfLanguage != RDFLanguages.TTL) {
+            //read rdf data into model to transform it to ttl
+            ModelBuilder mb = ModelBuilder.fromString(rdfData, rdfLanguage);
+            turtleRdfData = mb.toString();
+        }
+        else
+            turtleRdfData = rdfData;
+
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
-        String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(rdfData);
+        String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
         return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint), dataSampleIri, Arrays.asList(namedGraph));
     }
 
