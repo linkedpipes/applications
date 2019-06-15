@@ -21,14 +21,14 @@ const styles = theme => ({
     flexGrow: 1
   },
   button: {
-    marginTop: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    marginTop: theme.spacing(),
+    marginRight: theme.spacing()
   },
   actionsContainer: {
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing(2)
   },
   resetContainer: {
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing(3)
   },
   createAppButtons: {
     justifyContent: 'center'
@@ -52,7 +52,7 @@ const getStepContent = step => {
 };
 
 const steps = [
-  'Add Data Source IRIs',
+  'Provide your input data sources',
   'Pick a visualizer',
   'Pick a source for execution',
   'Preview & create app'

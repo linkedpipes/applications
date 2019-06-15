@@ -8,7 +8,8 @@
       "@utils/*": ["./src/utils/*"],
       "@storage/*": ["./src/storage/*"],
       "@constants/*": ["./src/constants/*"],
-      "@layouts/*": ["./src/layouts/*"]
+      "@layouts/*": ["./src/layouts/*"],
+      "@assets/*": ["./assets/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

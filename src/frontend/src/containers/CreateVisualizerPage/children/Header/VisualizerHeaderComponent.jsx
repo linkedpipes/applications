@@ -41,8 +41,7 @@ const styles = theme => ({
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
-      .spacing.unit * 3}px`
+    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`
   },
   textField: {
     flexGrow: 1,
@@ -51,7 +50,7 @@ const styles = theme => ({
     marginTop: '1rem'
   },
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing()
   }
 });
 
@@ -75,11 +74,16 @@ const VisualizerHeaderComponent = ({
   handleChangeWidth
 }: Props) => (
   <div className={classes.root}>
-    <Paper className={classes.header} position="static" color="default">
+    <Paper
+      elevation={2}
+      className={classes.header}
+      position="static"
+      color="default"
+    >
       <Grid
         container
         direction="column"
-        spacing={16}
+        spacing={2}
         justify="center"
         alignItems="center"
       >
@@ -117,7 +121,7 @@ const VisualizerHeaderComponent = ({
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={16} justify="center">
+        <Grid container spacing={2} justify="center">
           <Grid item>
             <Button
               id="create-app-publish-button"

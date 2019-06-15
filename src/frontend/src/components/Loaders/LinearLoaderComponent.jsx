@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
@@ -16,11 +16,17 @@ const styles = {
   }
 };
 
+type Props = {
+  classes: Object,
+  labelText: string,
+  variant: string
+};
+
 const LinearLoaderComponent = ({
   classes,
   labelText,
   variant = 'indeterminate'
-}) => (
+}: Props) => (
   <div className={classes.root}>
     <Typography align="center" gutterBottom>
       {labelText}
@@ -28,11 +34,5 @@ const LinearLoaderComponent = ({
     <LinearProgress variant={variant} />
   </div>
 );
-
-LinearLoaderComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  labelText: PropTypes.string.isRequired,
-  variant: PropTypes.string
-};
 
 export default withStyles(styles)(LinearLoaderComponent);

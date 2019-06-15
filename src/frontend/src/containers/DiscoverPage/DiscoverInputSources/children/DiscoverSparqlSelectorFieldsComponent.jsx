@@ -16,18 +16,19 @@ type Props = {
   sparqlEndpointIri: string
 };
 
-const styles = theme => ({
+const styles = () => ({
   gridRoot: {
     display: 'flex',
     flexWrap: 'wrap'
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    margin: 'auto',
+    width: '100%',
+    marginTop: '0.5rem'
   }
 });
 
-const DiscoverSelectorComponent = ({
+const DiscoverSparqlSelectorFields = ({
   classes,
   discoveryIsLoading,
   handleNamedGraphTextFieldChange,
@@ -38,7 +39,7 @@ const DiscoverSelectorComponent = ({
   namedGraph
 }: Props) => (
   <div className={classes.gridRoot}>
-    <Grid container spacing={16}>
+    <Grid container spacing={2}>
       <Grid item xs={12} sm={12}>
         <TextField
           id="outlined-bare"
@@ -109,5 +110,5 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(
-  withStyles(styles)(DiscoverSelectorComponent)
+  withStyles(styles)(DiscoverSparqlSelectorFields)
 );

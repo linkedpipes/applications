@@ -14,6 +14,8 @@ stages:
     if: type = push AND branch IN (master, develop) OR commit_message =~ /(\[Travis-E2E\])/
 
 jobs:
+  allow_failures:
+    - script: e2e_tests.py
   include:
     - stage: push-build
       language: node_js
