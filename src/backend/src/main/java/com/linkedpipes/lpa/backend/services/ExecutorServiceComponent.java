@@ -17,6 +17,7 @@ import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -131,8 +132,19 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+     * Start a discovery using a provided IRI referencing an RDF file, by reading the RDF data
+     * from the URI and proceeding to start discovery using that data
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfFileIri IRI to a file containing RDF data
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws IOException reading RDF data from URI failed
+     */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException, IOException {
+    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
         //read rdf data from iri and upload it to our virtuoso, create discovery config
         ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
         //get rdf data in TTL format
@@ -140,9 +152,23 @@ public class ExecutorServiceComponent implements ExecutorService {
         return startDiscoveryFromInput(rdfData, userId, dataSampleIri);
     }
 
+    /**
+     * Start a discovery using provided RDF data, by uploading the RDF data into our Virtuoso
+     * instance, and proceed to start the discovery using our Virtuoso's SPARQL endpoint
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfData RDF data
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String rdfData, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
-        //upload rdf to our virtuoso, create discovery config and pass it to discovery
+        //read rdf data into model
+        //TODO to support RDF data in multiple languages, language will have to be provided by the user or somehow guessed from the data provided
+        //ModelBuilder mb = ModelBuilder.fromString(rdfData, RDFLanguages.TTL);
+        //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(rdfData);
         return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint), dataSampleIri, Arrays.asList(namedGraph));
     }

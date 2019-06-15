@@ -60,6 +60,14 @@ public class DiscoveryController {
         }
     }
 
+    /**
+     * Start discovery of pipelines from received RDF data
+     * @param rdfInput RDF data
+     * @param dataSampleIri
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
@@ -78,6 +86,15 @@ public class DiscoveryController {
         }
     }
 
+    /**
+     * Start discovery of pipelines using data referenced by IRI
+     * @param rdfFileIri IRI referencing a file with RDF data
+     * @param dataSampleIri
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     * @throws IOException reading RDF data from URI failed
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,

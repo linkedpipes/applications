@@ -47,7 +47,7 @@ public class TtlGenerator {
      */
     @NotNull
     public static String getDiscoveryConfig(@NotNull List<DataSource> dataSourceList) {
-        ModelBuilder builder = ModelBuilder.from(TtlGenerator.class.getResource("base.ttl"), RDFLanguages.TTL.toString());
+        ModelBuilder builder = ModelBuilder.from(TtlGenerator.class.getResource("base.ttl"), RDFLanguages.TTL);
         ResourceBuilder config = builder.resource("https://discovery.linkedpipes.com/resource/discovery/all-and-generated/config");
         dataSourceList.forEach(dataSource ->
                 config.property("https://discovery.linkedpipes.com/vocabulary/discovery/hasTemplate", resource(dataSource.uri)));
@@ -113,7 +113,7 @@ public class TtlGenerator {
      */
     @NotNull
     public static String getVirtuosoServiceDescription(@NotNull String graphName) {
-        ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"), RDFLanguages.TTL.toString());
+        ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"), RDFLanguages.TTL);
         String virtuosoEndpoint = Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint);
 
         builder.resource(virtuosoEndpoint + "/service")
