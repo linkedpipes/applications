@@ -34,7 +34,7 @@ const styles = theme => ({
   },
   containerView: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20
+    paddingTop: theme.spacing(20)
   },
   filterSideBar: {
     overflowY: 'hidden'
@@ -80,7 +80,7 @@ const getVisualizer = (
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
       const markers =
         selectedApplication && selectedApplication.markers
           ? selectedApplication.markers
@@ -139,7 +139,7 @@ const getVisualizer = (
 
 const VisualizerControllerContainer = (props: Props) => {
   return (
-    <Grid container className={props.classes.root} direction="row" spacing={40}>
+    <Grid container className={props.classes.root} direction="row" spacing={10}>
       <Grid item lg={4} md={5} xs={12} className={props.classes.filterSideBar}>
         <FiltersComponent
           editingMode

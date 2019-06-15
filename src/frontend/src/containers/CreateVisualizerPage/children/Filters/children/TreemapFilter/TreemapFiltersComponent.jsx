@@ -31,14 +31,11 @@ type State = {
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     minWidth: 100
   },
-  option: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    marginTop: theme.spacing.unit * 2
+  selectEmpty: {
+    marginTop: theme.spacing(2)
   }
 });
 

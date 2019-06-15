@@ -19,7 +19,7 @@ const rows = [
 const DiscoverPipelinesHeaderComponent = () => (
   <TableHead>
     <TableRow>
-      <TableCell component="th" scope="row" padding="dense">
+      <TableCell component="th" scope="row" size="small">
         Action
       </TableCell>
       {rows.map(row => {

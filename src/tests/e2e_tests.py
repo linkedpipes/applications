@@ -190,12 +190,12 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa1.inrupt.net/profile/card#me")
+            "https://seleniumlinked2.solid.community/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlpa1")
+        driver.find_element_by_id("username").send_keys("seleniumlinked2")
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
         driver.find_element_by_id("password").send_keys("Selenium123!")
@@ -253,12 +253,12 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa2.inrupt.net/profile/card#me")
+            "https://seleniumlinked1.solid.community/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlpa")
+        driver.find_element_by_id("username").send_keys("seleniumlinked1")
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
         driver.find_element_by_id("password").send_keys("Selenium123!")

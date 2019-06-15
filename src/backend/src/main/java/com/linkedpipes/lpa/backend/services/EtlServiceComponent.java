@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
@@ -61,7 +62,7 @@ public class EtlServiceComponent implements EtlService {
 
     private class HttpActions {
 
-        private final String URL_BASE = Application.getConfig().getString("lpa.etlServiceUrl");
+        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
 
         private String executePipeline(String pipelineIri) throws LpAppsException {

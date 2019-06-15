@@ -12,11 +12,11 @@ const styles = theme => ({
   },
   button: {
     display: 'block',
-    marginTop: theme.spacing.unit * 2
+    marginTop: theme.spacing(2)
   },
   formControl: {
     width: '100%',
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing()
   }
 });
 
@@ -33,7 +33,7 @@ const SolidProviderComponent = ({
 }: Props) => {
   return (
     <FormControl className={classes.formControl} margin="normal" fullWidth>
-      <InputLabel htmlFor="providerTitle">Provider</InputLabel>
+      <InputLabel htmlFor="providerTitle">SOLID provider</InputLabel>
       <Select
         value={providerTitle}
         onChange={handleChange}
@@ -44,7 +44,7 @@ const SolidProviderComponent = ({
         <MenuItem value={''}>
           <em>None</em>
         </MenuItem>
-        <MenuItem value={'Inrupt'}>Inrupt</MenuItem>
+        {/* <MenuItem value={'Inrupt'}>Inrupt</MenuItem> */}
         <MenuItem value={'Solid Community'}>Solid Community</MenuItem>
       </Select>
     </FormControl>

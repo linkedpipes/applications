@@ -17,7 +17,8 @@
           "@utils": "./src/utils",
           "@constants": "./src/constants",
           "@layouts": "./src/layouts",
-          "@storage": "./src/storage"
+          "@storage": "./src/storage",
+          "@assets": "./assets"
         }
       }
     ]

@@ -89,13 +89,11 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const applicationData = applicationResponse.data.applicationData;
     let applicationType = applicationData.visualizerCode;
 
-    if (applicationType !== VISUALIZER_TYPE.MAP) {
-      await VisualizersService.getGraphExists(
-        applicationData.selectedResultGraphIri
-      ).catch(() => {
-        applicationType = VISUALIZER_TYPE.UNDEFINED;
-      });
-    }
+    await VisualizersService.getGraphExists(
+      applicationData.selectedResultGraphIri
+    ).catch(() => {
+      applicationType = VISUALIZER_TYPE.UNDEFINED;
+    });
 
     self.setState({ applicationType, applicationData });
   };
@@ -111,7 +109,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
   getApplication = (applicationType, applicationData) => {
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
-      case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
+      case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
         const markers = applicationData.markers;
         return (
           <GoogleMapsVisualizer

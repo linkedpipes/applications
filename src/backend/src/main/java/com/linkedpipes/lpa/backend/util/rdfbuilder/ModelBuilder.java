@@ -37,6 +37,10 @@ public class ModelBuilder {
         return ResourceBuilder.of(resource, model);
     }
 
+    public Model build() {
+        return model;
+    }
+
     /**
      * @return TTL-formatted representation of the underlying RDF model
      */
