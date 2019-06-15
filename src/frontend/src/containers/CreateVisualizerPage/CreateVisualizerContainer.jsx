@@ -10,7 +10,6 @@ import { Log, GoogleAnalyticsWrapper } from '@utils';
 type Props = {
   selectedVisualizer: Object,
   headerParams: Object,
-  filters: Object,
   selectedResultGraphIri: string,
   selectedApplication: Object,
   selectedApplicationMetadata: AppConfiguration,
@@ -89,7 +88,6 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     const {
       selectedVisualizer,
       headerParams,
-      filters,
       selectedResultGraphIri,
       selectedApplication,
       selectedApplicationMetadata,
@@ -102,7 +100,6 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       <CreateVisualizerComponent
         selectedVisualizer={selectedVisualizer}
         headerParams={headerParams}
-        filters={filters}
         selectedResultGraphIri={selectedResultGraphIri}
         selectedApplication={selectedApplication}
         selectedApplicationMetadata={selectedApplicationMetadata}

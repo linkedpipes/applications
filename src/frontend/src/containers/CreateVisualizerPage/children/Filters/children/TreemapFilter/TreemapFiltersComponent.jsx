@@ -19,14 +19,24 @@ type Props = {
     formControl: string,
     option: {}
   },
-  selectedScheme: { uri: string, label: string },
+  selectedScheme: {
+    uri: string,
+    label: string,
+    visible: boolean,
+    enabled: boolean
+  },
   registerCallback: Function,
   onApplyFilter: Function,
   name: string
 };
 type State = {
   schemes: Array<{ uri: string, label: string }>,
-  selectedScheme: { uri: string, label: string }
+  selectedScheme: {
+    uri: string,
+    label: string,
+    visible: boolean,
+    enabled: boolean
+  }
 };
 
 const styles = theme => ({
@@ -46,21 +56,8 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
     super(props);
     this.state = {
       schemes: [],
-      selectedScheme: { uri: '', label: '' }
+      selectedScheme: { uri: '', label: '', visible: true, enabled: true }
     };
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    Log.info('derived');
-    Log.info(nextProps, prevState);
-    if (
-      nextProps.selectedScheme &&
-      nextProps.selectedScheme !== prevState.selectedScheme
-    ) {
-      Log.info(nextProps.selectedScheme);
-      return { selectedScheme: nextProps.selectedScheme };
-    }
-    return null;
   }
 
   async componentDidMount() {
@@ -89,7 +86,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
 
   handleSchemeChange = async event => {
     await this.setState({
-      selectedScheme: { uri: event.target.value, label: 'Temp label' }
+      selectedScheme: { ...event.target.value }
     });
   };
 
@@ -112,7 +109,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
               className={classes.option}
             >
               {this.state.schemes.map(scheme => (
-                <MenuItem key={scheme.uri} value={scheme.uri}>
+                <MenuItem key={scheme.uri} value={{ ...scheme }}>
                   {scheme.label}
                 </MenuItem>
               ))}

@@ -59,14 +59,14 @@ class FiltersComponent extends React.Component<Props> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = (filterType, filterLabel, selectedOptions) => {
+  getFilter = (filterType, filterLabel, options) => {
     switch (filterType) {
       case 'NODES_FILTER':
         return (
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            selectedNodes={selectedOptions}
+            nodes={options}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -76,7 +76,7 @@ class FiltersComponent extends React.Component<Props> {
           <TreemapFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            selectedScheme={selectedOptions[0]}
+            selectedScheme={options[0]}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -197,7 +197,7 @@ class FiltersComponent extends React.Component<Props> {
                     {this.getFilter(
                       filterGroup.type,
                       filterGroup.label,
-                      filterGroup.selectedOptions
+                      filterGroup.options
                     )}
                   </ExpansionPanel>
                 </div>

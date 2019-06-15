@@ -134,9 +134,9 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <ChordVisualizer
             selectedResultGraphIri={applicationData.selectedResultGraphIri}
             size={this.state.height + this.state.width}
-            selectedNodes={pathOr(
+            nodes={pathOr(
               [],
-              'filterGroups.nodesFilter.selectedOptions',
+              'filterGroups.nodesFilter.options',
               applicationData.filtersState
             )}
             isPublished

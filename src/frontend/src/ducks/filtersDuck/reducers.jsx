@@ -17,7 +17,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
             ...state.filtersState.filterGroups,
             schemeFilter: {
               ...state.filtersState.filterGroups.schemeFilter,
-              selectedOptions: [action.selectedScheme]
+              options: [action.selectedScheme]
             }
           }
         }
@@ -30,7 +30,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
             ...state.filtersState.filterGroups,
             nodesFilter: {
               ...state.filtersState.filterGroups.nodesFilter,
-              selectedOptions: action.nodes
+              options: action.nodes
             }
           }
         }
@@ -69,7 +69,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   enabled: true,
                   visible: true,
                   type: 'NODES_FILTER',
-                  selectedOptions: []
+                  options: []
                 }
               }
             }
@@ -85,7 +85,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   enabled: true,
                   visible: true,
                   type: 'SCHEME_FILTER',
-                  selectedOptions: []
+                  options: []
                 }
               }
             }

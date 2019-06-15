@@ -2,7 +2,7 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
+import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
 import Button from '@material-ui/core/Button';
@@ -17,7 +17,13 @@ type Props = {
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
-  selectedScheme: { label: string, uri: string }
+  schemes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
 };
 
 type State = {
@@ -71,11 +77,18 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
+  // static getDerivedStateFromProps(props, state) {
+  //   const newSelectedScheme = props.selectedScheme && props.selectedScheme.uri;
+  //   if (newSelectedScheme && newSelectedScheme !== state.selectedScheme.uri) {
+  //     this.handleSchemeChange(props.selectedScheme.uri);
+  //   }
+  // }
+
   async componentDidMount() {
     const {
       handleSetCurrentApplicationData,
       isPublished,
-      selectedScheme,
+      schemes,
       selectedResultGraphIri
     } = this.props;
 
@@ -83,14 +96,14 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       handleSetCurrentApplicationData({
         id: uuid.v4(),
         applicationEndpoint: 'treemap',
-        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        conceptIri: schemes.find(s => s.selected),
+        selectedResultGraphIri,
         visualizerCode: 'TREEMAP'
       });
     }
 
     this.conceptsFetched = new Set();
-
+    const selectedScheme = this.props.schemes.find(s => s.selected);
     this.chartEvents = [
       {
         eventName: 'ready',
@@ -114,7 +127,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            this.props.selectedScheme.uri,
+            selectedScheme.uri,
             this.props.selectedResultGraphIri,
             iri
           );
@@ -139,21 +152,23 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       }
     ];
 
-    if (selectedResultGraphIri && selectedScheme.uri) {
+    if (selectedResultGraphIri && selectedScheme && selectedScheme.uri) {
       this.handleSchemeChange(selectedScheme.uri);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    Log.info(this.props, nextProps);
-    if (nextProps.selectedScheme && this.props.selectedScheme) {
-      if (
-        nextProps.selectedScheme.uri !==
-        (this.props.selectedScheme && this.props.selectedScheme.uri)
-      ) {
-        // this aint been called. ty vole
-        this.handleSchemeChange(nextProps.selectedScheme.uri);
-      }
+    const currentSchemes = this.props.schemes;
+    const currentSelectedScheme = currentSchemes.find(s => s.selected);
+    const newSchemes = nextProps.schemes;
+    const newSelectedScheme = newSchemes.find(s => s.selected);
+    if (
+      newSelectedScheme &&
+      newSelectedScheme.uri !==
+        (currentSelectedScheme && currentSelectedScheme.uri)
+    ) {
+      // this aint been callfinded. ty vole
+      this.handleSchemeChange(newSelectedScheme.uri);
     }
     return null;
   }
@@ -181,18 +196,19 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     );
 
     this.props.handleSetCurrentApplicationData({
-      conceptIri: this.props.selectedScheme.uri
+      conceptIri: scheme
     });
   };
 
   handleGoUpClick = () => {};
 
   render() {
-    const { classes } = this.props;
+    const { classes, schemes } = this.props;
+    const selectedScheme = schemes.find(s => s.selected);
     return (
       <div className={classes.wrapper}>
-        {this.props.selectedScheme &&
-          this.props.selectedScheme.uri &&
+        {selectedScheme &&
+          selectedScheme.uri &&
           (this.state.dataLoadingStatus === 'ready' ? (
             <div className={classes.wrapper}>
               <Button

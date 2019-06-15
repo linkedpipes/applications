@@ -8,6 +8,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Switch from '@material-ui/core/Switch';
 import _ from 'lodash';
 
 type Props = {
@@ -17,9 +18,12 @@ type Props = {
     formControl: string,
     selectEmpty: string
   },
-  selectedNodes: Array<{
+  nodes: Array<{
     label: string,
-    uri: string
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
   }>,
   onApplyFilter: Function,
   editingMode: boolean,
@@ -29,13 +33,11 @@ type Props = {
 
 type State = {
   nodes: Array<{
-    label: { languageMap: { nolang: string } },
-    uri: string,
-    checked: boolean
-  }>,
-  selectedNodes: Array<{
     label: string,
-    uri: string
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
   }>
 };
 
@@ -49,60 +51,83 @@ const styles = theme => ({
   }
 });
 
-const isArrayEqual = (x, y) => {
-  return _(x)
-    .differenceWith(y, _.isEqual)
-    .isEmpty();
-};
+// const areEqual = (
+//   a: Array<{
+//     label: string,
+//     uri: string,
+//     visible: boolean,
+//     enabled: boolean,
+//     selected: boolean
+//   }>,
+//   b: Array<{
+//     label: string,
+//     uri: string,
+//     visible: boolean,
+//     enabled: boolean,
+//     selected: boolean
+//   }>
+// ) => {
+//   if (!a || !b) return false;
+//   if (a.length !== b.length) return false;
+//   for (let i = 0; i < a.length; i += 1) {
+//     let eq = false;
+//     for (let j = 0; j < b.length; j += 1) {
+//       if (_.isEqual(a[i], b[j])) {
+//         eq = true;
+//         break;
+//       }
+//     }
+//     if (!eq) return false;
+//   }
+//   return true;
+// };
 
 class ChordFiltersComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
 
   constructor(props: Props) {
     super(props);
+    // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: [], // Initialize with the props
-      selectedNodes: []
+      nodes: this.props.nodes || []
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (!isArrayEqual(nextProps.selectedNodes, prevState.selectedNodes)) {
-      return { selectedNodes: nextProps.selectedNodes };
-    }
-    return null;
-  }
+  // Currently messing with state
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   if (nextProps.nodes.length && !areEqual(nextProps.nodes, prevState.nodes)) {
+  //     return { nodes: nextProps.nodes };
+  //   }
+  //   return null;
+  // }
 
   async componentDidMount() {
     // Get all the nodes
-    let nodes = [];
-    const getNodesResponse = await VisualizersService.getChordNodes(
-      this.props.selectedResultGraphIri
-    );
-    nodes = getNodesResponse.data || [];
+    if (this.props.editingMode && !this.state.nodes.length) {
+      let nodes = [];
+      const getNodesResponse = await VisualizersService.getChordNodes(
+        this.props.selectedResultGraphIri
+      );
+      nodes = (getNodesResponse.data || []).map(node => ({
+        ...node,
+        label: node.label.languageMap.nolang,
+        visible: true,
+        enabled: true,
+        selected: true
+      }));
 
-    //
-    if (
-      this.props.editingMode &&
-      (this.props.selectedNodes || []).length === 0
-    ) {
-      this.setState({
-        nodes: nodes.map(node => {
-          return { ...node, checked: true };
-        }),
-        selectedNodes: nodes.map(node => ({
-          uri: node.uri,
-          label: node.label.languageMap.nolang
-        }))
-      });
+      // Dispatch setNodes
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(this.props.name, this.state.nodes);
+        }
+      );
     } else {
-      const selectedNodes = this.props.selectedNodes.map(node => node.uri);
-      this.setState({
-        nodes: nodes.map(node => {
-          return { ...node, checked: selectedNodes.includes(node.uri) };
-        }),
-        selectedNodes: this.props.selectedNodes
-      });
+      // Dispatch setNodes
+      this.props.onApplyFilter(this.props.name, this.state.nodes);
     }
 
     // Register callback
@@ -118,7 +143,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     this.setState(prevState => ({
       nodes: prevState.nodes.map(node => {
         if (node.uri === uri) {
-          return { ...node, checked };
+          return { ...node, selected: checked };
         }
         return node;
       })
@@ -126,30 +151,38 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   };
 
   render() {
-    // const { classes } = this.props;
     return (
       <ExpansionPanelDetails>
-        <FormGroup>
-          {(this.state.nodes || []).map(node => (
+        <FormGroup row>
+          {this.state.nodes.map(node => (
             <span key={node.uri}>
               <FormControlLabel
                 control={
                   <Checkbox
                     value={node.uri}
-                    checked={node.checked}
+                    checked={node.selected}
                     onChange={this.handleChange(node.uri)}
                   />
                 }
-                label={node.label.languageMap.nolang}
+                label={node.label}
+                disabled={!node.enabled}
               />
-              {/* <FormControlLabel
-                control={<Switch checked value="checkedA" color="primary" />}
-                label="Enabled"
-              />
-              <FormControlLabel
-                control={<Switch checked value="checkedA" color="primary" />}
-                label="Visible"
-              /> */}
+              {this.props.editingMode && (
+                <span>
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Enabled"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Visible"
+                  />
+                </span>
+              )}
             </span>
           ))}
         </FormGroup>
@@ -160,19 +193,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 
 const mapDispatchToProps = dispatch => {
   const onApplyFilter = (filterName, nodes) =>
-    dispatch(
-      filtersActions.setSelectedNodes(
-        filterName,
-        nodes
-          .filter(node => node.checked)
-          .map(node => ({
-            uri: node.uri,
-            label: node.label.languageMap.nolang,
-            visible: true,
-            enabled: true
-          }))
-      )
-    );
+    dispatch(filtersActions.setSelectedNodes(filterName, nodes));
   return {
     onApplyFilter
   };
