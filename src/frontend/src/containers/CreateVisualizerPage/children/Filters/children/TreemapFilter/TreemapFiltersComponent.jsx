@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
+import { VisualizersService, Log } from '@utils';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -53,15 +53,18 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
     };
   }
 
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   if (
-  //     nextProps.selectedScheme &&
-  //     nextProps.selectedScheme !== prevState.selectedScheme
-  //   ) {
-  //     return { selectedScheme: nextProps.selectedScheme };
-  //   }
-  //   return null;
-  // }
+  static getDerivedStateFromProps(nextProps, prevState) {
+    Log.info('derived');
+    Log.info(nextProps, prevState);
+    if (
+      nextProps.selectedScheme &&
+      nextProps.selectedScheme !== prevState.selectedScheme
+    ) {
+      Log.info(nextProps.selectedScheme);
+      return { selectedScheme: nextProps.selectedScheme };
+    }
+    return null;
+  }
 
   async componentDidMount() {
     // Get the schemes
@@ -73,10 +76,14 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
       label: scheme.label.languageMap.en
     }));
     if (schemes.length) {
-      this.setState({
-        schemes,
-        selectedScheme: this.props.selectedScheme || schemes[0]
-      });
+      this.setState(
+        {
+          schemes,
+          selectedScheme: this.props.selectedScheme || schemes[0]
+        },
+        () =>
+          this.props.onApplyFilter(this.props.name, this.state.selectedScheme)
+      );
     }
 
     // Register callback
@@ -123,7 +130,14 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
 
 const mapDispatchToProps = dispatch => {
   const onApplyFilter = (filterName, scheme) => {
-    dispatch(filtersActions.setSelectedScheme(scheme));
+    Log.info('applyFiltersh', scheme);
+    dispatch(
+      filtersActions.setSelectedScheme({
+        ...scheme,
+        visible: true,
+        enabled: true
+      })
+    );
   };
   return {
     onApplyFilter

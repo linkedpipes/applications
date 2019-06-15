@@ -2,7 +2,7 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
+import { VisualizersService, Log } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
 import Button from '@material-ui/core/Button';
@@ -138,14 +138,20 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
+
     if (selectedResultGraphIri && selectedScheme.uri) {
       this.handleSchemeChange(selectedScheme.uri);
     }
   }
 
   componentWillReceiveProps(nextProps) {
+    Log.info(this.props, nextProps);
     if (nextProps.selectedScheme && this.props.selectedScheme) {
-      if (nextProps.selectedScheme.uri !== this.props.selectedScheme.uri) {
+      if (
+        nextProps.selectedScheme.uri !==
+        (this.props.selectedScheme && this.props.selectedScheme.uri)
+      ) {
+        // this aint been called. ty vole
         this.handleSchemeChange(nextProps.selectedScheme.uri);
       }
     }

@@ -86,13 +86,6 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   visible: true,
                   type: 'SCHEME_FILTER',
                   selectedOptions: []
-                },
-                nodesFilter: {
-                  label: 'Nodes',
-                  enabled: true,
-                  visible: true,
-                  type: 'NODES_FILTER',
-                  selectedOptions: []
                 }
               }
             }

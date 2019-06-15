@@ -167,7 +167,9 @@ const mapDispatchToProps = dispatch => {
           .filter(node => node.checked)
           .map(node => ({
             uri: node.uri,
-            label: node.label.languageMap.nolang
+            label: node.label.languageMap.nolang,
+            visible: true,
+            enabled: true
           }))
       )
     );
