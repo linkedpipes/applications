@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
+import { Log } from '@utils';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { FilePond, registerPlugin } from 'react-filepond';
 import './css/FilePondDarkStyle.css';
@@ -35,6 +36,15 @@ const styles = () => ({
     margin: 'auto'
   }
 });
+
+const extensionMap = {
+  ttl: 'text/turtle',
+  nt: 'application/n-triples',
+  nq: 'application/n-quads',
+  trig: 'application/trig',
+  rdf: 'application/rdf+xml',
+  jsonld: 'application/ld+json'
+};
 
 const DiscoverRdfFileDropInComponent = ({
   classes,
@@ -70,17 +80,11 @@ const DiscoverRdfFileDropInComponent = ({
           allowFileTypeValidation
           acceptedFileTypes={[
             'text/turtle',
-            '.ttl',
             'application/n-triples',
-            '.nt',
             'application/n-quads',
-            '.nq',
             'application/trig',
-            '.trig',
             'application/rdf+xml',
-            '.rdf',
-            'application/ld+json',
-            '.jsonld'
+            'application/ld+json'
           ]}
           fileValidateTypeLabelExpectedTypesMap={{
             'text/turtle': '.ttl',
@@ -90,8 +94,14 @@ const DiscoverRdfFileDropInComponent = ({
             'application/rdf+xml': '.rdf',
             'application/ld+json': '.jsonld'
           }}
-          fileValidateTypeDetectType={(source, type) =>
+          fileValidateTypeDetectType={(file, type) =>
             new Promise(resolve => {
+              Log.info(file, type);
+              if (type === '') {
+                const extension = file.name.split('.').pop();
+                const resolvedType = extensionMap[extension];
+                resolve(resolvedType);
+              }
               resolve(type);
             })
           }
