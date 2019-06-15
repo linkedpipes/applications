@@ -68,17 +68,29 @@ const DiscoverRdfFileDropInComponent = ({
           // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
           allowMultiple={false}
           allowFileTypeValidation
-          acceptedFileTypes={['text/turtle', '.ttl']}
+          acceptedFileTypes={[
+            'text/turtle',
+            'application/n-triples',
+            'application/n-quads',
+            'application/trig',
+            'application/rdf+xml',
+            'application/ld+json'
+          ]}
           fileValidateTypeLabelExpectedTypesMap={{
-            'text/turtle': '.ttl'
+            'text/turtle': '.ttl',
+            'application/n-triples': '.nt',
+            'application/n-quads': '.nq',
+            'application/trig': '.trig',
+            'application/rdf+xml': '.rdf',
+            'application/ld+json': '.jsonld'
           }}
-          fileValidateTypeDetectType={() =>
+          fileValidateTypeDetectType={(source, type) =>
             new Promise(resolve => {
-              resolve('.ttl');
+              resolve(type);
             })
           }
           className={classes.itemGrid}
-          maxFiles={3}
+          maxFiles={1}
           onupdatefiles={fileItems => {
             // Set current file objects to this.state
             onHandleSetRdfFile(

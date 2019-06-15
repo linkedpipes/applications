@@ -3,7 +3,10 @@ import lpaAxios from './api.service';
 const DiscoveryService = {
   async postDiscoverFromInputFile({ rdfFile, webId, dataSampleIri }) {
     return lpaAxios.post('/pipelines/discoverFromInput', rdfFile, {
-      params: { webId, dataSampleIri }
+      params: { webId, dataSampleIri },
+      headers: {
+        'Content-Type': rdfFile.type
+      }
     });
   },
 
