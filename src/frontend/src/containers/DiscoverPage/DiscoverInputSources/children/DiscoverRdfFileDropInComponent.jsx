@@ -70,11 +70,17 @@ const DiscoverRdfFileDropInComponent = ({
           allowFileTypeValidation
           acceptedFileTypes={[
             'text/turtle',
+            '.ttl',
             'application/n-triples',
+            '.nt',
             'application/n-quads',
+            '.nq',
             'application/trig',
+            '.trig',
             'application/rdf+xml',
-            'application/ld+json'
+            '.rdf',
+            'application/ld+json',
+            '.jsonld'
           ]}
           fileValidateTypeLabelExpectedTypesMap={{
             'text/turtle': '.ttl',
