@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
@@ -7,6 +8,7 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
+import org.apache.jena.riot.Lang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -72,14 +74,21 @@ public class DiscoveryController {
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
                                                              @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                             @Nullable @RequestBody String rdfInput) throws LpAppsException {
+                                                             @Nullable @RequestBody String rdfInput,
+                                                             @RequestHeader("Content-Type") String contentType) throws LpAppsException {
         if (rdfInput == null || rdfInput.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
 
+        Lang rdfLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(contentType);
+
+        if (rdfLanguage == null){
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Content type not supported");
+        }
+
         try {
             userService.addUserIfNotPresent(webId);
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(rdfInput, webId, dataSampleIri));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInput(rdfInput, rdfLanguage, webId, dataSampleIri));
 
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
