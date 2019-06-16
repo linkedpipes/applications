@@ -1,8 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
-import Input from '@material-ui/core/Input';
+import { VisualizersService } from '@utils';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
@@ -19,24 +18,26 @@ type Props = {
     formControl: string,
     option: {}
   },
-  selectedScheme: {
+  schemes: Array<{
     uri: string,
     label: string,
     visible: boolean,
-    enabled: boolean
-  },
+    enabled: boolean,
+    selected: boolean
+  }>,
+  editingMode: boolean,
   registerCallback: Function,
   onApplyFilter: Function,
   name: string
 };
 type State = {
-  schemes: Array<{ uri: string, label: string }>,
-  selectedScheme: {
+  schemes: Array<{
     uri: string,
     label: string,
     visible: boolean,
-    enabled: boolean
-  }
+    enabled: boolean,
+    selected: boolean
+  }>
 };
 
 const styles = theme => ({
@@ -55,28 +56,29 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      schemes: [],
-      selectedScheme: { uri: '', label: '', visible: true, enabled: true }
+      schemes: this.props.schemes || []
     };
   }
 
   async componentDidMount() {
     // Get the schemes
-    const schemesResponse = await VisualizersService.getSkosSchemes(
-      this.props.selectedResultGraphIri
-    );
-    const schemes = schemesResponse.data.map(scheme => ({
-      ...scheme,
-      label: scheme.label.languageMap.en
-    }));
-    if (schemes.length) {
+    if (this.props.editingMode && !this.state.schemes.length) {
+      const schemesResponse = await VisualizersService.getSkosSchemes(
+        this.props.selectedResultGraphIri
+      );
+      const schemes = schemesResponse.data.map(scheme => ({
+        ...scheme,
+        label: scheme.label.languageMap.en,
+        visible: true,
+        enabled: true,
+        selected: false
+      }));
+      schemes[0] = { ...schemes[0], selected: true };
       this.setState(
         {
-          schemes,
-          selectedScheme: this.props.selectedScheme || schemes[0]
+          schemes
         },
-        () =>
-          this.props.onApplyFilter(this.props.name, this.state.selectedScheme)
+        () => this.props.onApplyFilter(this.props.name, this.state.schemes)
       );
     }
 
@@ -84,54 +86,58 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
     this.props.registerCallback(this.handleApplyFilter);
   }
 
-  handleSchemeChange = async event => {
-    await this.setState({
-      selectedScheme: { ...event.target.value }
-    });
+  handleSchemeChange = event => {
+    this.setState(prevState => ({
+      schemes: prevState.schemes.map(s => {
+        if (s.uri === event.target.value.uri) {
+          return { ...s, selected: true };
+        }
+        return { ...s, selected: false };
+      })
+    }));
   };
 
   handleApplyFilter = async () => {
-    await this.props.onApplyFilter(this.props.name, this.state.selectedScheme);
+    await this.props.onApplyFilter(this.props.name, this.state.schemes);
   };
 
   render() {
     const { classes } = this.props;
+    const selectedScheme =
+      this.state.schemes && this.state.schemes.find(s => s.selected);
+    if (!selectedScheme) {
+      return <div>loading filters</div>;
+    }
     return (
-      <ExpansionPanelDetails>
-        <FormGroup>
-          <FormControl className={classes.formControl}>
-            <Select
-              value={this.state.selectedScheme && this.state.selectedScheme.uri}
-              onChange={this.handleSchemeChange}
-              input={<Input name="scheme" id="scheme-selector" />}
-              displayEmpty
-              name="scheme"
-              className={classes.option}
-            >
-              {this.state.schemes.map(scheme => (
-                <MenuItem key={scheme.uri} value={{ ...scheme }}>
-                  {scheme.label}
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText>Selected scheme</FormHelperText>
-          </FormControl>
-        </FormGroup>
-      </ExpansionPanelDetails>
+      this.state.schemes &&
+      !!selectedScheme && (
+        <ExpansionPanelDetails>
+          <FormGroup>
+            <FormControl className={classes.formControl}>
+              <Select
+                value={selectedScheme}
+                onChange={this.handleSchemeChange}
+                name="scheme"
+                className={classes.option}
+              >
+                {this.state.schemes.map(scheme => (
+                  <MenuItem key={scheme.uri} value={scheme}>
+                    {scheme.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Selected scheme</FormHelperText>
+            </FormControl>
+          </FormGroup>
+        </ExpansionPanelDetails>
+      )
     );
   }
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = (filterName, scheme) => {
-    Log.info('applyFiltersh', scheme);
-    dispatch(
-      filtersActions.setSelectedScheme({
-        ...scheme,
-        visible: true,
-        enabled: true
-      })
-    );
+  const onApplyFilter = (filterName, schemes) => {
+    dispatch(filtersActions.setSelectedScheme(filterName, schemes));
   };
   return {
     onApplyFilter

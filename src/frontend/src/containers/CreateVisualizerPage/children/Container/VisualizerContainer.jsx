@@ -77,13 +77,11 @@ const getVisualizer = (
           selectedResultGraphIri={selectedResultGraphIri}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
-          schemes={
-            pathOr(
-              [{ label: '', uri: '' }],
-              'filterGroups.schemeFilter.options',
-              filtersState
-            )[0]
-          }
+          schemes={pathOr(
+            [],
+            'filterGroups.schemeFilter.options',
+            filtersState
+          )}
         />
       );
     case VISUALIZER_TYPE.CHORD:

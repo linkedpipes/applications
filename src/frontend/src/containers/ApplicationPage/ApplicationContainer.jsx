@@ -120,12 +120,16 @@ class ApplicationContainer extends PureComponent<Props, State> {
         );
       }
       case VISUALIZER_TYPE.TREEMAP: {
-        const { selectedResultGraphIri, conceptIri } = applicationData;
+        const { selectedResultGraphIri } = applicationData;
         return (
           <TreemapVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
-            selectedScheme={conceptIri}
+            schemes={pathOr(
+              [],
+              'filterGroups.nodesFilter.options',
+              applicationData.filtersState
+            )}
           />
         );
       }

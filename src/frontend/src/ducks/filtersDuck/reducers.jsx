@@ -17,7 +17,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
             ...state.filtersState.filterGroups,
             schemeFilter: {
               ...state.filtersState.filterGroups.schemeFilter,
-              options: [action.selectedScheme]
+              options: action.schemes
             }
           }
         }

@@ -9,7 +9,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Switch from '@material-ui/core/Switch';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 type Props = {
   selectedResultGraphIri: string,

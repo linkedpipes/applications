@@ -1,9 +1,9 @@
 import types from './types';
 
-const setSelectedScheme = scheme => {
+const setSelectedScheme = (filterName, schemes) => {
   return {
     type: types.SET_SELECTED_SCHEME,
-    selectedScheme: scheme
+    schemes
   };
 };
 
