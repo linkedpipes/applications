@@ -247,7 +247,10 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   handleTabIndexChange = (event, newValue) => {
-    this.props.handleSetActiveDiscoverTabIndex(newValue);
+    const { activeDiscoverTabIndex } = this.props;
+    if (activeDiscoverTabIndex !== newValue) {
+      this.props.handleSetActiveDiscoverTabIndex(newValue);
+    }
   };
 
   render() {
