@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react';
 import { VISUALIZER_TYPE } from '@constants';
 import {
-  GoogleMapsVisualizer,
+  MapsVisualizer,
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
@@ -135,7 +135,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
       case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
         const selectedResultGraphIri = applicationConfiguration.graphIri;
         return (
-          <GoogleMapsVisualizer
+          <MapsVisualizer
+            propMarkers={markers}
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
           />

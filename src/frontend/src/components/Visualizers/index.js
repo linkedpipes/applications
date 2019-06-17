@@ -1,5 +1,5 @@
-import { GoogleMapsVisualizer } from './GoogleMaps';
+import { MapsVisualizer } from './Maps';
 import TreemapVisualizer from './Treemap';
 import ChordVisualizer from './Chord';
 
-export { GoogleMapsVisualizer, TreemapVisualizer, ChordVisualizer };
+export { MapsVisualizer, TreemapVisualizer, ChordVisualizer };

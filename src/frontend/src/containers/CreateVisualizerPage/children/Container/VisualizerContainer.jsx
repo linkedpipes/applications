@@ -3,7 +3,7 @@ import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import {
-  GoogleMapsVisualizer,
+  MapsVisualizer,
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
@@ -61,7 +61,8 @@ const getVisualizer = (
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
       return (
-        <GoogleMapsVisualizer
+        <MapsVisualizer
+          propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}
