@@ -1,0 +1,123 @@
+// @flow
+import React, { PureComponent } from 'react';
+import uuid from 'uuid';
+import { VisualizersService } from '@utils';
+import Map from 'pigeon-maps';
+import Marker from 'pigeon-marker';
+import Cluster from 'pigeon-cluster';
+import turfBbox from '@turf/bbox';
+import {
+  featureCollection as turfFeatureCollection,
+  point as turfPoint
+} from '@turf/helpers';
+import geoViewport from '@mapbox/geo-viewport';
+
+const averageGeolocation = (coords, width = 564, height = 300) => {
+  const coord = coords.map(location =>
+    turfPoint([location.coordinates.lng, location.coordinates.lat])
+  );
+  const features = turfFeatureCollection(coord);
+  const bounds = turfBbox(features);
+
+  const { center, zoom } = geoViewport.viewport(bounds, [width, height]);
+
+  return {
+    center: [center[1], center[0]],
+    zoom: Math.min(zoom, 13)
+  };
+};
+
+type Props = {
+  classes: {
+    progress: number
+  },
+  selectedResultGraphIri: string,
+  handleSetCurrentApplicationData: Function,
+  isPublished: boolean
+};
+
+type State = {
+  markers: Array<{ coordinates: { lat: number, lon: number } }>,
+  center: Array<number>,
+  zoom: number
+};
+
+class MapsVisualizer extends PureComponent<Props, State> {
+  constructor() {
+    super();
+    this.state = {
+      markers: [],
+      center: [50.0755, 14.4378],
+      zoom: 4
+    };
+  }
+
+  async componentDidMount() {
+    const {
+      selectedResultGraphIri,
+      handleSetCurrentApplicationData,
+      isPublished
+    } = this.props;
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'map',
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'MAP'
+      });
+    }
+
+    const self = this;
+
+    const markers = await this.fetchMarkers(selectedResultGraphIri);
+    await this.setState({
+      markers
+    });
+    self.updateMarkersState(markers);
+  }
+
+  fetchMarkers = async (selectedResultGraphIri: string) => {
+    const response = await VisualizersService.getMarkers({
+      resultGraphIri: selectedResultGraphIri
+    });
+    const responseMarkers = response.data;
+    // only proceed once second promise is resolved
+    return responseMarkers;
+  };
+
+  updateMarkersState = async (markers: []) => {
+    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const { center, zoom } = averageGeolocation(markers);
+    this.setState({ center, zoom });
+
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'map',
+        markers,
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'MAP'
+      });
+    }
+  };
+
+  render() {
+    const { markers, center, zoom } = this.state;
+    return (
+      <Map center={center} zoom={zoom}>
+        <Cluster>
+          {markers.map(marker => (
+            <Marker
+              key={`${marker.coordinates.lat},${marker.coordinates.lng}`}
+              anchor={[marker.coordinates.lat, marker.coordinates.lng]}
+              payload={1}
+            />
+          ))}
+        </Cluster>
+      </Map>
+    );
+  }
+}
+
+export default MapsVisualizer;

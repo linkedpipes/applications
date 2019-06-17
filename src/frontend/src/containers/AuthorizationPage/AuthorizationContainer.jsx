@@ -5,9 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
+import Particles from 'react-particles-js';
 
 const providers = {
-  Inrupt: 'https://inrupt.net/auth',
+  // Inrupt: 'https://inrupt.net/auth',
   'Solid Community': 'https://solid.community/auth',
   '': ''
 };
@@ -82,7 +83,7 @@ class AuthorizationContainer extends PureComponent<Props, State> {
         (!withWebIdStatus && providerLink === '')
       ) {
         toast.error('Error WebID/Provider is not valid! Try again...', {
-          position: toast.POSITION.BOTTOM_CENTER
+          position: toast.POSITION.TOP_RIGHT
         });
       }
 
@@ -122,7 +123,31 @@ class AuthorizationContainer extends PureComponent<Props, State> {
     } = this;
     const { withWebIdStatus, providerTitle } = this.state;
     return (
-      <div>
+      <div
+        className="container"
+        style={{ width: '100%', height: '100vh', position: 'relative' }}
+      >
+        <Particles
+          style={{ width: '100%', position: 'absolute', zIndex: '-1' }}
+          params={{
+            particles: {
+              number: {
+                value: 50
+              },
+              size: {
+                value: 3
+              }
+            },
+            interactivity: {
+              events: {
+                onhover: {
+                  enable: true,
+                  mode: 'grab'
+                }
+              }
+            }
+          }}
+        />
         <AuthorizationComponent
           onWebIdFieldChange={handleWebIdFieldChange}
           onSignInClick={handleSignIn}

@@ -27,7 +27,6 @@ const styles = theme => ({
     color: 'white',
     textAlign: 'center',
     verticalAlign: 'middle',
-    background: '#525C62',
     width: '100%'
   }
 });

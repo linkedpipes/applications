@@ -1,12 +1,12 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
 
 export const samples = [
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Treemap Sample',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008',
@@ -15,8 +15,8 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
-    label: 'GoogleMaps Sample',
+    inputType: 'SPARQL_ENDPOINT',
+    label: 'Maps Sample',
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
     namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
     dataSampleIri:
@@ -24,7 +24,7 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Chord Sample',
     sparqlEndpointIri: 'http://lpa-virtuoso:8890/sparql',
     namedGraph: 'https://applications.linkedpipes.com/generated-data/chord',
@@ -33,8 +33,12 @@ export const samples = [
   }
 ];
 
-class DiscoverExamplesContainer extends PureComponent {
-  handleListItemClicked = item => {
+type Props = {
+  onInputExampleClicked: Function
+};
+
+class DiscoverExamplesContainer extends PureComponent<Props> {
+  handleListItemClicked = (item: Object) => {
     const { onInputExampleClicked } = this.props;
     const inputExample = item;
     onInputExampleClicked(inputExample);
@@ -51,9 +55,5 @@ class DiscoverExamplesContainer extends PureComponent {
     );
   }
 }
-
-DiscoverExamplesContainer.propTypes = {
-  onInputExampleClicked: PropTypes.func.isRequired
-};
 
 export default DiscoverExamplesContainer;

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import {
-  GoogleMapsVisualizer,
+  MapsVisualizer,
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
@@ -33,7 +33,7 @@ const styles = theme => ({
   },
   containerView: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20
+    paddingTop: theme.spacing(20)
   },
   filterSideBar: {
     overflowY: 'hidden'
@@ -84,7 +84,7 @@ const getVisualizer = (
           ? selectedApplication.markers
           : [];
       return (
-        <GoogleMapsVisualizer
+        <MapsVisualizer
           propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
@@ -125,7 +125,7 @@ const getVisualizer = (
 
 const VisualizerControllerContainer = (props: Props) => {
   return (
-    <Grid container className={props.classes.root} direction="row" spacing={40}>
+    <Grid container className={props.classes.root} direction="row" spacing={10}>
       <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
         {getFilters(
           props.visualizer.visualizerCode,
