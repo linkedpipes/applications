@@ -8,6 +8,42 @@ const VisualizersService = {
     return lpaAxios.get('/map/properties');
   },
 
+  getTimelineInstants: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/instants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsInstants: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/thingswithinstants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithThingsWithInstants: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/thingswiththingswithinstants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineIntervals: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/intervals', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithIntervals: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/thingswithintervals', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithThingsWithIntervals: async resultGraphIri => {
+    return lpaAxios.get('/api/timeline/thingswiththingswithintervals', {
+      params: { resultGraphIri }
+    });
+  },
+
   // why is this a post request?
   getMarkers: async ({ resultGraphIri, filters = {} }) => {
     return lpaAxios.post('/map/markers', filters, {
