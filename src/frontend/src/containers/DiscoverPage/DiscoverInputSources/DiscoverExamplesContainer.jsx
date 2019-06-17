@@ -16,7 +16,7 @@ export const samples = [
   {
     id: uuid.v4(),
     inputType: 'SPARQL_ENDPOINT',
-    label: 'GoogleMaps Sample',
+    label: 'Maps Sample',
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
     namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
     dataSampleIri:
