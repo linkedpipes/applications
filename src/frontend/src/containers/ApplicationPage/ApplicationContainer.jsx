@@ -136,7 +136,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
         const selectedResultGraphIri = applicationConfiguration.graphIri;
         return (
           <MapsVisualizer
-            propMarkers={markers}
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
           />

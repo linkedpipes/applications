@@ -62,7 +62,6 @@ const getVisualizer = (
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
       return (
         <MapsVisualizer
-          propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}
