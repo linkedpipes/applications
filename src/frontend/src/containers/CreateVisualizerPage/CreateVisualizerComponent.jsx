@@ -7,15 +7,16 @@ import {
   VisualizerContainer
 } from './children';
 import LoadingOverlay from 'react-loading-overlay';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedVisualizer: any,
   selectedApplication: any,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   classes: {
     root: {}
   },
@@ -24,7 +25,8 @@ type Props = {
   loadingIsActive: boolean,
   width: number,
   height: number,
-  selectedNodes?: Set<string>
+  selectedNodes?: Set<string>,
+  filtersState: {}
 };
 
 const styles = {
@@ -44,6 +46,7 @@ const CreateVisualizerComponent = ({
   headerParams,
   filters,
   selectedResultGraphIri,
+  selectedPipelineExecution,
   selectedApplication,
   selectedApplicationMetadata,
   handleSetCurrentApplicationData,
@@ -51,7 +54,8 @@ const CreateVisualizerComponent = ({
   loadingIsActive,
   selectedNodes,
   width,
-  height
+  height,
+  filtersState
 }: Props) => (
   <LoadingOverlay className={classes.root} active={loadingIsActive} spinner>
     {selectedApplicationMetadata ? (
@@ -72,12 +76,14 @@ const CreateVisualizerComponent = ({
       filters={filters}
       visualizer={selectedVisualizer.visualizer}
       selectedResultGraphIri={selectedResultGraphIri}
+      selectedPipelineExecution={selectedPipelineExecution}
       handleSetCurrentApplicationData={handleSetCurrentApplicationData}
       selectedApplication={selectedApplication}
       selectedApplicationMetadata={selectedApplicationMetadata}
       width={width}
       height={height}
       selectedNodes={selectedNodes}
+      filtersState={filtersState}
     />
   </LoadingOverlay>
 );

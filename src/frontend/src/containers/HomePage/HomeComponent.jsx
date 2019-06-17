@@ -42,7 +42,8 @@ type Props = {
   onHandleAppClicked: Function,
   onHandleShareAppClicked: Function,
   onSetApplicationLoaderStatus: Function,
-  onHandlePipelineExecutionRowDeleteClicked: Function
+  onHandlePipelineExecutionRowDeleteClicked: Function,
+  onHandleDeleteAppClicked: Function
 };
 
 const styles = theme => ({
@@ -92,7 +93,8 @@ class HomeComponent extends PureComponent<Props> {
       onHandleAppClicked,
       onHandleShareAppClicked,
       onSetApplicationLoaderStatus,
-      onHandlePipelineExecutionRowDeleteClicked
+      onHandlePipelineExecutionRowDeleteClicked,
+      onHandleDeleteAppClicked
     } = this.props;
     return (
       <div className={classes.root}>
@@ -170,6 +172,7 @@ class HomeComponent extends PureComponent<Props> {
                   applicationsList={applicationsList}
                   onHandleShareAppClicked={onHandleShareAppClicked}
                   onHandleAppClicked={onHandleAppClicked}
+                  onHandleDeleteAppClicked={onHandleDeleteAppClicked}
                 />
               )}
             </div>

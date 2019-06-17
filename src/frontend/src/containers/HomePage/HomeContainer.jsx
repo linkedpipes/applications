@@ -6,7 +6,8 @@ import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageBackend, StorageToolbox } from '@storage';
+import { filtersActions } from '@ducks/filtersDuck';
+import { StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
 import {
   Log,
@@ -19,10 +20,9 @@ import {
   UserService,
   GoogleAnalyticsWrapper
 } from '@utils';
-import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { userActions } from '@ducks/userDuck';
+import { ApplicationMetadata } from '@storage/models';
 
 type Props = {
   history: { push: any },
@@ -30,12 +30,15 @@ type Props = {
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
   socket: Object,
+  webId: Object,
   handleSetResultPipelineIri: Function,
+  handleSetPipelineExecutionIri: Function,
   handleSetSelectedVisualizer: Function,
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleSetSelectedApplicationTitle: Function,
   handleSetUserProfileAsync: Function,
+  handleSetFiltersState: Function,
   webId: string,
   applicationsFolder: String,
   location: Object,
@@ -43,7 +46,7 @@ type Props = {
   handleSetHomepageTabIndex: Function
 };
 type State = {
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   loadingAppIsActive: boolean
 };
 
@@ -109,7 +112,7 @@ class HomeContainer extends PureComponent<Props, State> {
     const webId = userProfile.webId;
     const applicationsFolder = userProfile.applicationsFolder;
     if (webId) {
-      const metadata = await StorageBackend.getAppConfigurationsMetadata(
+      const metadata = await StorageToolbox.getAppConfigurationsMetadata(
         webId,
         applicationsFolder
       );
@@ -197,11 +200,13 @@ class HomeContainer extends PureComponent<Props, State> {
     const {
       history,
       handleSetResultPipelineIri,
+      handleSetPipelineExecutionIri,
       handleSetSelectedVisualizer
     } = this.props;
     Log.info(`About to push with id ${pipelineExecution}`);
     const pipelineIri = pipelineExecution.etlPipelineIri;
     const visualizerType = pipelineExecution.selectedVisualiser;
+    const executionIri = pipelineExecution.executionIri;
 
     ETLService.getPipeline({
       pipelineIri
@@ -216,6 +221,7 @@ class HomeContainer extends PureComponent<Props, State> {
         };
 
         handleSetResultPipelineIri(resultGraphIri);
+        handleSetPipelineExecutionIri(executionIri);
         handleSetSelectedVisualizer(selectedVisualiser);
 
         history.push({
@@ -235,25 +241,15 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
+      handleSetFiltersState,
       history
     } = this.props;
 
     await this.setApplicationLoaderStatus(true);
 
-    const appConfigurationResponse = await axios.get(
-      applicationMetadata.object
-    );
+    const applicationConfiguration = applicationMetadata.configuration;
 
-    if (appConfigurationResponse.status !== 200) {
-      toast.error('Error, unable to load!', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
-      });
-      await this.setApplicationLoaderStatus(false);
-    }
-    const applicationData = appConfigurationResponse.data.applicationData;
-
-    const resultGraphIri = applicationData.selectedResultGraphIri;
+    const resultGraphIri = applicationConfiguration.graphIri;
 
     let graphExists = true;
 
@@ -263,14 +259,15 @@ class HomeContainer extends PureComponent<Props, State> {
 
     if (graphExists) {
       const selectedVisualiser = {
-        visualizer: { visualizerCode: applicationData.visualizerCode }
+        visualizer: { visualizerCode: applicationConfiguration.visualizerType }
       };
 
-      handleSetResultPipelineIri(resultGraphIri);
-      handleSetSelectedApplicationTitle(applicationMetadata.title);
-      handleSetSelectedApplicationData(applicationData);
-      handleSetSelectedApplicationMetadata(applicationMetadata);
-      handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetResultPipelineIri(resultGraphIri);
+      await handleSetSelectedApplicationTitle(applicationConfiguration.title);
+      await handleSetSelectedApplicationData(applicationConfiguration);
+      await handleSetSelectedApplicationMetadata(applicationMetadata);
+      await handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetFiltersState(applicationConfiguration.filterConfiguration);
 
       await this.setApplicationLoaderStatus(false);
 
@@ -285,7 +282,7 @@ class HomeContainer extends PureComponent<Props, State> {
           position: toast.POSITION.TOP_RIGHT
         }
       );
-      this.handleDeleteApp(applicationMetadata);
+      this.handleDeleteApp();
     }
   };
 
@@ -305,15 +302,21 @@ class HomeContainer extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(false);
   };
 
-  handleApplicationDeleted = applicationConfigurationMetadata => {
+  handleApplicationDeleted = (
+    applicationConfigurationMetadata: ApplicationMetadata
+  ) => {
     const newApplicationsMetadata = this.state.applicationsMetadata;
 
     const filteredMetadata = newApplicationsMetadata.filter(value => {
-      return value.url !== applicationConfigurationMetadata.url;
+      return (
+        value.solidFileUrl !== applicationConfigurationMetadata.solidFileUrl
+      );
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      `Removed application:\n${
+        applicationConfigurationMetadata.solidFileTitle
+      }`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000
@@ -362,6 +365,7 @@ class HomeContainer extends PureComponent<Props, State> {
       handleSelectDiscoveryClick,
       onHandleSelectPipelineExecutionClick,
       handleAppClicked,
+      handleDeleteApp,
       handleShareAppClicked,
       setApplicationLoaderStatus,
       handlePipelineExecutionRowDeleteClicked
@@ -383,6 +387,7 @@ class HomeContainer extends PureComponent<Props, State> {
           discoveriesList={userProfile.discoverySessions}
           tabIndex={tabIndex}
           onHandleAppClicked={handleAppClicked}
+          onHandleDeleteAppClicked={handleDeleteApp}
           onHandleShareAppClicked={handleShareAppClicked}
           onSetApplicationLoaderStatus={setApplicationLoaderStatus}
           onHandlePipelineExecutionRowDeleteClicked={
@@ -420,6 +425,14 @@ const mapDispatchToProps = dispatch => {
       })
     );
 
+  const handleSetPipelineExecutionIri = executionIri => {
+    dispatch(
+      etlActions.addSelectedPipelineExecution({
+        data: executionIri
+      })
+    );
+  };
+
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(
       globalActions.addSelectedVisualizerAction({
@@ -442,15 +455,20 @@ const mapDispatchToProps = dispatch => {
   const handleSetHomepageTabIndex = index =>
     dispatch(globalActions.setSelectedHomepageTabIndex(index));
 
+  const handleSetFiltersState = filters =>
+    dispatch(filtersActions.setFiltersState(filters));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
+    handleSetPipelineExecutionIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
     handleSetSelectedApplicationMetadata,
     handleSetUserProfileAsync,
-    handleSetHomepageTabIndex
+    handleSetHomepageTabIndex,
+    handleSetFiltersState
   };
 };
 

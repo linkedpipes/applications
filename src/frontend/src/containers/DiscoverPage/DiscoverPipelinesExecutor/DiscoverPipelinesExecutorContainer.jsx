@@ -13,12 +13,11 @@ import {
 import { discoverActions } from '../duck';
 
 type Props = {
+  handleSetPipelineExecutionIri: Function,
   discoveryId: string,
-  etlExecutionStatus: string,
-  onAddSelectedResultGraphIriAction: Function,
-  onAddSingleExecution: Function,
-  onAddSingleExport: Function,
-  onSetEtlExecutionStatus: Function,
+  etlExecutionStatus: Object,
+  handleSetResultPipelineIri: Function,
+  onSetEtlExecutionStatus: Object,
   pipelineId: string,
   selectedVisualizer: Object,
   socket: Object,
@@ -28,6 +27,7 @@ type Props = {
 type State = {
   loaderLabelText: string
 };
+
 class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
   isMounted = false;
 
@@ -75,7 +75,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
   };
 
   exportPipeline = (discoveryId, pipelineId) => {
-    const { onAddSelectedResultGraphIriAction, onAddSingleExport } = this.props;
+    const { handleSetResultPipelineIri } = this.props;
     const self = this;
 
     return ETLService.getExportPipeline({
@@ -88,12 +88,13 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
       .then(json => {
         const response = json;
 
-        onAddSingleExport(
-          response.pipelineId,
-          response.etlPipelineIri,
-          response.resultGraphIri
-        );
-        onAddSelectedResultGraphIriAction(response.resultGraphIri);
+        // TODO: refactor
+        // onAddSingleExport(
+        //   response.pipelineId,
+        //   response.etlPipelineIri,
+        //   response.resultGraphIri
+        // );
+        handleSetResultPipelineIri(response.resultGraphIri);
 
         self.setState({
           loaderLabelText: 'Exported pipeline...'
@@ -104,7 +105,7 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
   };
 
   executePipeline = (pipelineId, etlPipelineIri, visualizerCode) => {
-    const { onAddSingleExecution, webId } = this.props;
+    const { webId, handleSetPipelineExecutionIri } = this.props;
     const self = this;
 
     return ETLService.getExecutePipeline({
@@ -118,7 +119,9 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
       .then(json => {
         const executionIri = json.iri;
 
-        onAddSingleExecution(pipelineId, executionIri);
+        // TODO: refactor
+        // onAddSingleExecution(pipelineId, executionIri);
+        handleSetPipelineExecutionIri(executionIri);
 
         self.setState({
           loaderLabelText: 'Please, hold on processing the pipeline...'
@@ -206,7 +209,6 @@ const mapStateToProps = state => {
     discoveryId: state.discovery.discoveryId,
     selectedVisualizer: state.globals.selectedVisualizer,
     etlExecutionStatus: state.discover.etlExecutionStatus,
-    executions: state.etl.executions,
     webId: state.user.webId
   };
 };
@@ -215,35 +217,25 @@ const mapDispatchToProps = dispatch => {
   const onSetEtlExecutionStatus = status =>
     dispatch(discoverActions.setEtlExecutionStatus(status));
 
-  const onAddSingleExport = (pipelineId, etlPipelineIri, resultGraphIri) =>
-    dispatch(
-      etlActions.addSingleExport({
-        id: pipelineId,
-        etlPipelineIri,
-        resultGraphIri
-      })
-    );
-
-  const onAddSelectedResultGraphIriAction = resultGraphIri =>
+  const handleSetResultPipelineIri = resultGraphIri =>
     dispatch(
       etlActions.addSelectedResultGraphIriAction({
         data: resultGraphIri
       })
     );
 
-  const onAddSingleExecution = (pipelineId, executionIri) =>
+  const handleSetPipelineExecutionIri = executionIri => {
     dispatch(
-      etlActions.addSingleExecution({
-        id: pipelineId,
-        executionIri
+      etlActions.addSelectedPipelineExecution({
+        data: executionIri
       })
     );
+  };
 
   return {
-    onAddSingleExport,
-    onAddSelectedResultGraphIriAction,
-    onSetEtlExecutionStatus,
-    onAddSingleExecution
+    handleSetResultPipelineIri,
+    handleSetPipelineExecutionIri,
+    onSetEtlExecutionStatus
   };
 };
 

@@ -1,13 +1,14 @@
 // @flow
 import React, { PureComponent } from 'react';
-import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
+import StorageSharedAppsBrowserComponent from './StorageSharedAppsBrowserComponent';
 // eslint-disable-next-line import/order
 import { Log } from '@utils';
+import StorageToolbox from '../../StorageToolbox';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import { withRouter } from 'react-router-dom';
 import LoadingOverlay from 'react-loading-overlay';
-import StorageToolbox from '../../StorageToolbox';
-import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import ApplicationConfiguration from '@storage/models/ApplicationConfiguration';
 
 type Props = {
   webId: string,
@@ -15,19 +16,17 @@ type Props = {
 };
 
 type State = {
-  applicationsMetadata: Array<ApplicationMetadata>,
+  sharedApplicationsMetadata: Array<ApplicationConfiguration>,
   loadingAppIsActive: boolean
 };
 
-class StorageAppsBrowserContainer extends PureComponent<Props, State> {
+class StorageSharedAppsBrowserContainer extends PureComponent<Props, State> {
   isMounted = false;
-
-  didLoadInitialMetadata = false;
 
   didUpdateMetadata = false;
 
   state = {
-    applicationsMetadata: [],
+    sharedApplicationsMetadata: [],
     loadingAppIsActive: false
   };
 
@@ -44,13 +43,8 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 
   async componentWillUpdate() {
-    if (
-      this.isMounted &&
-      this.didLoadInitialMetadata &&
-      this.props.webId &&
-      !this.didUpdateMetadata
-    ) {
-      this.loadStoredApplications();
+    if (this.isMounted && this.props.webId && !this.didUpdateMetadata) {
+      // this.loadStoredApplications();
       this.didUpdateMetadata = true;
     }
   }
@@ -58,7 +52,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   componentWillUnmount() {
     this.isMounted = false;
     this.didUpdateMetadata = false;
-    this.didLoadInitialMetadata = false;
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -68,25 +61,22 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   loadStoredApplications = async () => {
     const { webId, applicationsFolder } = this.props;
     if (webId) {
-      const metadata = await StorageToolbox.getAppConfigurationsMetadata(
+      const metadata = await StorageToolbox.getSharedApplicationsMetadata(
         webId,
         applicationsFolder
       );
 
       if (this.isMounted) {
-        this.setState({ applicationsMetadata: metadata });
+        this.setState({ sharedApplicationsMetadata: metadata });
         Log.info(metadata, 'StorageAppsBrowserContainer');
-        if (!this.didLoadInitialMetadata) {
-          this.didLoadInitialMetadata = true;
-        }
       }
     }
   };
 
   handleApplicationDeleted = applicationConfigurationMetadata => {
-    const newApplicationsMetadata = this.state.applicationsMetadata;
+    const newSharedApplicationsMetadata = this.state.sharedApplicationsMetadata;
 
-    const filteredMetadata = newApplicationsMetadata.filter(value => {
+    const filteredMetadata = newSharedApplicationsMetadata.filter(value => {
       return (
         value.solidFileUrl !== applicationConfigurationMetadata.solidFileUrl
       );
@@ -98,11 +88,11 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
       }`,
       {
         position: toast.POSITION.TOP_RIGHT,
-        autoClose: 4000
+        autoClose: 2000
       }
     );
 
-    this.setState({ applicationsMetadata: filteredMetadata });
+    this.setState({ sharedApplicationsMetadata: filteredMetadata });
   };
 
   render() {
@@ -110,8 +100,8 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     const { loadingAppIsActive } = this.state;
     return (
       <LoadingOverlay active={loadingAppIsActive} spinner>
-        <StorageAppsBrowserComponent
-          applicationsMetadata={this.state.applicationsMetadata}
+        <StorageSharedAppsBrowserComponent
+          sharedApplicationsMetadata={this.state.sharedApplicationsMetadata}
           setApplicationLoaderStatus={setApplicationLoaderStatus}
           onHandleApplicationDeleted={handleApplicationDeleted}
         />
@@ -127,4 +117,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(StorageAppsBrowserContainer);
+export default withRouter(
+  connect(mapStateToProps)(StorageSharedAppsBrowserContainer)
+);

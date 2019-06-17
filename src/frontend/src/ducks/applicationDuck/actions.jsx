@@ -23,15 +23,10 @@ const setApplicationTitle = applicationTitle => ({
   value: applicationTitle
 });
 
-const resetApplicationTitle = () => ({
-  type: types.RESET_APPLICATION_TITLE
-});
-
 export default {
   setApplication,
   setApplicationMetadata,
   resetApplicationMetadata,
   resetApplication,
-  setApplicationTitle,
-  resetApplicationTitle
+  setApplicationTitle
 };

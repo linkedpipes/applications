@@ -70,6 +70,11 @@ const setUserProfileAsync = profile => {
     });
 };
 
+const setUserInboxInvitations = inboxInvitations => ({
+  type: types.SET_USER_INBOX_INVITATIONS,
+  value: inboxInvitations
+});
+
 const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
   return dispatch =>
     new Promise(resolve => {
@@ -90,6 +95,7 @@ export default {
   deleteExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
-  setSolidUserProfileAsync,
-  updateApplicationsFolder
+  updateApplicationsFolder,
+  setUserInboxInvitations,
+  setSolidUserProfileAsync
 };

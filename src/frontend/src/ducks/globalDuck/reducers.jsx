@@ -6,8 +6,10 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
+  homepageTabIndex: 0,
   colorThemeIsLight: false,
-  homepageTabIndex: 0
+  inboxDialogIsOpen: false,
+  shareApplicationDialogIsOpen: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -21,6 +23,18 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         chooseFolderDialogIsOpen: action.isOpen
+      };
+
+    case types.SET_ACCESS_CONTROL_DIALOG_STATE:
+      return {
+        ...state,
+        shareApplicationDialogIsOpen: action.isOpen
+      };
+
+    case types.SET_INBOX_DIALOG_STATE:
+      return {
+        ...state,
+        inboxDialogIsOpen: action.isOpen
       };
 
     case types.SET_LIGHT_COLOR_THEME:
