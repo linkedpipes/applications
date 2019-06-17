@@ -15,6 +15,7 @@ type Props = {
   selectedResultGraphIri: string,
   classes: {
     progress: number,
+    formGroup: {},
     formControl: string,
     option: {}
   },
@@ -43,14 +44,17 @@ type State = {
 const styles = theme => ({
   formControl: {
     margin: theme.spacing(),
-    minWidth: 100,
-    overflowX: 'auto'
+    minWidth: '100%',
+    overflow: 'hidden'
+  },
+  formGroup: {
+    minWidth: '100%'
   },
   selectEmpty: {
     marginTop: theme.spacing(2)
   },
   option: {
-    overflowX: 'auto'
+    maxWidth: '90%'
   }
 });
 
@@ -116,7 +120,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
       this.state.schemes &&
       !!selectedScheme && (
         <ExpansionPanelDetails>
-          <FormGroup>
+          <FormGroup className={classes.formGroup}>
             <FormControl className={classes.formControl}>
               <Select
                 value={selectedScheme}

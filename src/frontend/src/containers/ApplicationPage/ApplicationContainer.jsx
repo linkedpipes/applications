@@ -187,17 +187,11 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   render() {
     const { getApplication } = this;
-    const { width, height } = this.state;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
 
     return (
-      <Grid
-        container
-        className={this.props.classes.root}
-        direction="row"
-        spacing={3}
-      >
+      <Grid container className={this.props.classes.root} direction="row">
         {visible && this.state.applicationType !== 'Loading' && (
           <Grid
             item
@@ -226,8 +220,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
         >
           <div
             style={{
-              width: `${width}px`,
-              height: `${height}px`,
+              height: '95%',
               textAlign: visible ? 'left' : 'center'
             }}
           >
