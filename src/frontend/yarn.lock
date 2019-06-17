@@ -1877,7 +1877,7 @@
   dependencies:
     "@sentry/cli" "^1.35.5"
 
-"@solid/cli@^0.1.1":
+"@solid/cli@^0.1.0":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@solid/cli/-/cli-0.1.1.tgz#83b58baffd78e0b02a47b92dceff1dcb9671f48b"
   integrity sha512-NRmSKWGycV2u/YDHTB2DWa7JIH9lK/WqT7HEuaRfWWhxlxSiM52p08aJw90qavEp6pWIz+2Os4kRQpQqJU2oiQ==
@@ -2550,10 +2550,10 @@ async-limiter@~1.0.0:
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
   integrity sha512-jp/uFnooOiO+L211eZOoSyzpOITMXx1rBITauYykG3BRYPu8h0UcxsPNB04RR5vo4Tyz3+ay17tR6JVf9qzYWg==
 
-async@^0.9.x:
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
-  integrity sha1-rqdNXmHB+JlhO/ZL2mbUx48v0X0=
+async@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.0.1.tgz#dfeb34657d1e63c94c0eee424297bf8a2c9a8182"
+  integrity sha512-ZswD8vwPtmBZzbn9xyi8XBQWXH3AvOQ43Za1KWYq7JeycrZuUYzx01KvHcVbXltjqH4y0MWrQ33008uLTqXuDw==
 
 async@^1.5.2:
   version "1.5.2"
@@ -3629,6 +3629,16 @@ concat-stream@^1.5.0:
     buffer-from "^1.0.0"
     inherits "^2.0.3"
     readable-stream "^2.2.2"
+    typedarray "^0.0.6"
+
+concat-stream@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-2.0.0.tgz#414cf5af790a48c60ab9be4527d56d5e41133cb1"
+  integrity sha512-MWufYdFw53ccGjCA+Ol7XJYpAlW6/prSMzuPOTRnJGcGzuhLn4Scrz7qf6o8bROZ514ltazcIFJZevcfbo0x7A==
+  dependencies:
+    buffer-from "^1.0.0"
+    inherits "^2.0.3"
+    readable-stream "^3.0.2"
     typedarray "^0.0.6"
 
 connect-history-api-fallback@^1.6.0:
@@ -6629,17 +6639,7 @@ jsonld@0.4.3:
     request "^2.61.0"
     xmldom "0.1.19"
 
-jsonld@^0.4.11, jsonld@^0.4.5:
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-0.4.12.tgz#a02f205d5341414df1b6d8414f1b967a712073e8"
-  integrity sha1-oC8gXVNBQU3xtthBTxuWenEgc+g=
-  dependencies:
-    es6-promise "^2.0.0"
-    pkginfo "~0.4.0"
-    request "^2.61.0"
-    xmldom "0.1.19"
-
-jsonld@^1.4.0, jsonld@^1.6.2:
+jsonld@1.6.2, jsonld@^1.4.0, jsonld@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.6.2.tgz#d81620dccf75fd7bc7501709eeec5da77ecc45e9"
   integrity sha512-eMzFHqhF2kPMrMUjw8+Lz9IF1QkrxTOIfVndkP/OpuoZs31VdDtfDs8mLa5EOC/ROdemFTQGLdYPZbRtmMe2Yw==
@@ -6647,6 +6647,16 @@ jsonld@^1.4.0, jsonld@^1.6.2:
     rdf-canonize "^1.0.2"
     request "^2.88.0"
     semver "^5.6.0"
+    xmldom "0.1.19"
+
+jsonld@^0.4.11:
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-0.4.12.tgz#a02f205d5341414df1b6d8414f1b967a712073e8"
+  integrity sha1-oC8gXVNBQU3xtthBTxuWenEgc+g=
+  dependencies:
+    es6-promise "^2.0.0"
+    pkginfo "~0.4.0"
+    request "^2.61.0"
     xmldom "0.1.19"
 
 jsonparse@^1.2.0, jsonparse@^1.3.1:
@@ -7276,7 +7286,7 @@ mime-db@1.40.0, "mime-db@>= 1.40.0 < 2":
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.40.0.tgz#a65057e998db090f732a68f6c276d387d4126c32"
   integrity sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==
 
-mime-types@^2.1.12, mime-types@^2.1.24, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
+mime-types@^2.1.12, mime-types@^2.1.22, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
   version "2.1.24"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.24.tgz#b6f8d0b3e951efb77dedeca194cff6d16f676f81"
   integrity sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==
@@ -7449,20 +7459,15 @@ mute-stream@0.0.7:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
-n3@^0.4.1:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-0.4.5.tgz#5b70d3ab6a21c9e8d4c9bda2a3d4d90909beb508"
-  integrity sha1-W3DTq2ohyejUyb2io9TZCQm+tQg=
+n3@1.1.1, n3@^1.0.0, n3@^1.0.3, n3@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-1.1.1.tgz#9201cdec6d73f1089d6ee60386f25095c8a1a4ac"
+  integrity sha512-GEJXn+wc0f4l2noP1N/rMUH9Gei1DQ8IDN03eBsH+uQKkNQUOLgL7ZJVaDjY+pP3LmbLxL1LpUg/AvZ7Kc7KVw==
 
 n3@^0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/n3/-/n3-0.9.1.tgz#430b547d58dc7381408c45784dd8058171903932"
   integrity sha1-QwtUfVjcc4FAjEV4TdgFgXGQOTI=
-
-n3@^1.0.0, n3@^1.0.3, n3@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-1.1.1.tgz#9201cdec6d73f1089d6ee60386f25095c8a1a4ac"
-  integrity sha512-GEJXn+wc0f4l2noP1N/rMUH9Gei1DQ8IDN03eBsH+uQKkNQUOLgL7ZJVaDjY+pP3LmbLxL1LpUg/AvZ7Kc7KVw==
 
 nan@^2.12.1, nan@^2.13.2:
   version "2.14.0"
@@ -7540,7 +7545,7 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-fetch@^2.1.2, node-fetch@^2.6.0:
+node-fetch@^2.1.2, node-fetch@^2.3.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
@@ -8116,7 +8121,7 @@ parse-json@^4.0.0:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
 
-parse-link-header@^1.0.1:
+parse-link-header@1.0.1, parse-link-header@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/parse-link-header/-/parse-link-header-1.0.1.tgz#bedfe0d2118aeb84be75e7b025419ec8a61140a7"
   integrity sha1-vt/g0hGK64S+deewJUGeyKYRQKc=
@@ -8676,17 +8681,17 @@ rdf-terms@^1.2.0, rdf-terms@^1.4.0:
     "@rdfjs/data-model" "^1.1.1"
     lodash.uniqwith "^4.5.0"
 
-rdflib@0.20.1:
+"rdflib@git+https://github.com/aorumbayev/rdflib.js.git":
   version "0.20.1"
-  resolved "https://registry.yarnpkg.com/rdflib/-/rdflib-0.20.1.tgz#e2e8dbff7723f456149881ae5c7e97c3b9757551"
-  integrity sha512-5G1t7rURqPdsYE+mjpDW2e9/H19XFMuChTIjPFPtH2tI0fma+xlJYwrSgmd1aOm45SOYKpqwJfTSIvFpmP2n+g==
+  resolved "git+https://github.com/aorumbayev/rdflib.js.git#dc63b39571fc7371a193c7215fac356db8e6c025"
   dependencies:
-    async "^0.9.x"
-    jsonld "^0.4.5"
-    n3 "^0.4.1"
-    solid-auth-cli "^0.1.12"
-    solid-auth-client "^2.3.0"
-    xmldom "^0.1.22"
+    async "3.0.1"
+    jsonld "1.6.2"
+    n3 "1.1.1"
+    parse-link-header "1.0.1"
+    solid-auth-cli "0.2.6"
+    solid-auth-client "2.3.0"
+    xmldom "0.1.27"
 
 rdfxml-streaming-parser@^1.1.0:
   version "1.2.3"
@@ -8975,7 +8980,7 @@ read-pkg@^2.0.0:
     string_decoder "~1.1.1"
     util-deprecate "~1.0.1"
 
-readable-stream@^3.0.6, readable-stream@^3.1.1:
+readable-stream@^3.0.2, readable-stream@^3.0.6, readable-stream@^3.1.1:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.4.0.tgz#a51c26754658e0a3c21dbf59163bd45ba6f447fc"
   integrity sha512-jItXPLmrSR8jmTRmRWJXCnGJsfy85mB3Wd/uINMXA65yrnFo0cPClFIUWzo2najVNSl+mx7/4W8ttlLWJe99pQ==
@@ -9704,19 +9709,19 @@ sockjs@0.3.19:
     faye-websocket "^0.10.0"
     uuid "^3.0.1"
 
-solid-auth-cli@^0.1.12:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.1.14.tgz#ebba4eea64510eca3935fd0f15c12d6223c238ce"
-  integrity sha512-G1xhi4hASPW5hib1UxN10rm0X2lTYqqNQELJ4neRjcM07qWnkKUG08Q4fMFz5xeKAWjDh8ytqhvq5M349/CZsw==
+solid-auth-cli@0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/solid-auth-cli/-/solid-auth-cli-0.2.6.tgz#69e962421965f4dc76e0ef68ad5454b81eacf5da"
+  integrity sha512-cV+/z8plP4SvSAqBZSEqM76IIacSbGsLGZrioWebkiPIFx8KRBqcCOiJCFqWQbc3DA+OZTi8X+SF8kH7Ygmnew==
   dependencies:
-    "@solid/cli" "^0.1.1"
+    "@solid/cli" "^0.1.0"
     async "^2.6.1"
     isomorphic-fetch "^2.2.1"
     jsonld "^1.4.0"
     n3 "^1.0.3"
-    solid-rest "^1.0.2"
+    solid-rest-file "^0.0.9"
 
-solid-auth-client@2.3.0, solid-auth-client@^2.3.0:
+solid-auth-client@2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.0.tgz#4bac06984b61981ad9d06f285b8ead6200f21aaa"
   integrity sha512-+9RfqC64oWpH4afoWYhCtieuAziFyWiiW/isB9XEV6N+yb2jZ69UCJxpX7iBCpxK0j36bDeisdbp0zHRp/F46A==
@@ -9727,13 +9732,14 @@ solid-auth-client@2.3.0, solid-auth-client@^2.3.0:
     commander "^2.11.0"
     isomorphic-fetch "^2.2.1"
 
-solid-rest@^1.0.2:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/solid-rest/-/solid-rest-1.0.3.tgz#d3d56119f721aa7cb7ae0bf9a31abf575d1c4acb"
-  integrity sha512-PIpKvm4kLx6rRsNPltefxAn0yOL5fbOfrF1J/typlTYlu2uSZvB9Bao5jUD3dO6TvB9CF5Pygc75Cw/4hdiFVg==
+solid-rest-file@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/solid-rest-file/-/solid-rest-file-0.0.9.tgz#eba98703e652b70c1931ea49655f37073713b67b"
+  integrity sha512-Kt977igvsh9WQvmOfPS6kZJNvhp2xK/sZscTqX/dr/IArm3kSjeFIBfrA8BBlP4040M5FdGHdER3pU1Xb+O62A==
   dependencies:
-    mime-types "^2.1.24"
-    node-fetch "^2.6.0"
+    concat-stream "^2.0.0"
+    mime-types "^2.1.22"
+    node-fetch "^2.3.0"
 
 source-list-map@^2.0.0:
   version "2.0.1"
@@ -11044,7 +11050,7 @@ xmldom@0.1.19:
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.19.tgz#631fc07776efd84118bf25171b37ed4d075a0abc"
   integrity sha1-Yx/Ad3bv2EEYvyUXGzftTQdaCrw=
 
-xmldom@^0.1.22:
+xmldom@0.1.27:
   version "0.1.27"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
   integrity sha1-1QH5ezvbQDr4757MIFcxh6rawOk=
