@@ -2,9 +2,9 @@ import types from './types';
 import { VISUALIZER_TYPE } from '@constants';
 
 const INITIAL_STATE = {
-  selectedScheme: undefined,
-  nodes: undefined,
-  filtersState: undefined
+  selectedScheme: null,
+  nodes: null,
+  filtersState: null
 };
 
 const filtersReducer = (state = INITIAL_STATE, action) => {
@@ -70,7 +70,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Nodes',
                   enabled: true,
                   visible: true,
-                  type: 'NODES_FILTER',
+                  filterType: 'NODES_FILTER',
                   options: []
                 }
               }
@@ -86,7 +86,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Scheme',
                   enabled: true,
                   visible: true,
-                  type: 'SCHEME_FILTER',
+                  filterType: 'SCHEME_FILTER',
                   options: []
                 }
               }

@@ -20,7 +20,7 @@ const setSelectedNodesWithSolid = (filterName, nodes) => {
   return (dispatch, getState) => {
     const state = getState();
     const oldNodes =
-      state.filters.filtersState.filterGroups.nodesFilter.selectedOptions.items;
+      state.filters.filtersState.filterGroups.nodesFilter.options;
     dispatch(setSelectedNodes(filterName, nodes));
     const difference = oldNodes.filter(x => !nodes.includes(x));
     let filtersOptionsToUpdate = nodes;
@@ -48,7 +48,9 @@ const toggleEnabledWithSolid = value => {
     dispatch(toggleEnabled(value));
     const state = getState();
     const metadata = state.application.selectedApplicationMetadata;
-    StorageToolbox.setFiltersStateEnabled(metadata.solidFileUrl, value);
+    if (metadata) {
+      StorageToolbox.setFiltersStateEnabled(metadata.solidFileUrl, value);
+    }
   };
 };
 
@@ -64,7 +66,9 @@ const toggleVisibleWithSolid = value => {
     dispatch(toggleVisible(value));
     const state = getState();
     const metadata = state.application.selectedApplicationMetadata;
-    StorageToolbox.setFiltersStateVisible(metadata.solidFileUrl, value);
+    if (metadata) {
+      StorageToolbox.setFiltersStateVisible(metadata.solidFileUrl, value);
+    }
   };
 };
 

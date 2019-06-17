@@ -52,11 +52,11 @@ const styles = theme => ({
   }
 });
 
-const isArrayEqual = (x, y) => {
-  return _(x)
-    .differenceWith(y, _.isEqual)
-    .isEmpty();
-};
+// const isArrayEqual = (x, y) => {
+//   return _(x)
+//     .differenceWith(y, _.isEqual)
+//     .isEmpty();
+// };
 
 class ChordFiltersComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
@@ -93,7 +93,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
         enabled: true,
         selected: true
       }));
-    this.isMounted = true;
+      this.isMounted = true;
 
       // Dispatch setNodes
       this.setState(
@@ -123,15 +123,15 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 
   handleChange = uri => event => {
     if (this.isMounted) {
-    const checked = event.target.checked;
-    this.setState(prevState => ({
-      nodes: prevState.nodes.map(node => {
-        if (node.uri === uri) {
-          return { ...node, selected: checked };
-        }
-        return node;
-      })
-    }));
+      const checked = event.target.checked;
+      this.setState(prevState => ({
+        nodes: prevState.nodes.map(node => {
+          if (node.uri === uri) {
+            return { ...node, selected: checked };
+          }
+          return node;
+        })
+      }));
     }
   };
 

@@ -43,10 +43,14 @@ type State = {
 const styles = theme => ({
   formControl: {
     margin: theme.spacing(),
-    minWidth: 100
+    minWidth: 100,
+    overflowX: 'auto'
   },
   selectEmpty: {
     marginTop: theme.spacing(2)
+  },
+  option: {
+    overflowX: 'auto'
   }
 });
 
@@ -67,7 +71,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
         this.props.selectedResultGraphIri
       );
       const schemes = schemesResponse.data.map(scheme => ({
-        ...scheme,
+        uri: scheme.uri,
         label: scheme.label.languageMap.en,
         visible: true,
         enabled: true,

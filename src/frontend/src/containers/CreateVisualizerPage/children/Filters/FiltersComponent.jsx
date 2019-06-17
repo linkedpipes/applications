@@ -12,8 +12,6 @@ import ChordFiltersComponent from './children/ChordFilter';
 import TreemapFiltersComponent from './children/TreemapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
-import Emoji from 'react-emoji-render';
-import uuid from 'uuid';
 
 type Props = {
   classes: {
@@ -66,7 +64,6 @@ class FiltersComponent extends React.Component<Props> {
       case 'NODES_FILTER':
         return (
           <ChordFiltersComponent
-            key={uuid.v4()}
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
             nodes={options}
@@ -85,11 +82,23 @@ class FiltersComponent extends React.Component<Props> {
           />
         );
       default:
-        return <div key={uuid.v4()}> Unknown filter type </div>;
+        return <div> Unknown filter type </div>;
     }
   };
 
-  getComponents = () => {
+  handleSwitchChange = name => event => {
+    const newValue = event.target.checked;
+    this.setState(prevState => {
+      return {
+        filtersState: {
+          ...prevState.filtersState,
+          [name]: newValue
+        }
+      };
+    });
+  };
+
+  render() {
     const {
       classes,
       editingMode,
@@ -98,20 +107,56 @@ class FiltersComponent extends React.Component<Props> {
       handleToggleVisible
     } = this.props;
 
-    const filtersAvailable = filtersState !== undefined;
-
-    if (!filtersAvailable) {
-      return (
+    return (
+      filtersState && (
         <div className={classes.root}>
           <Typography variant="h4" className={classes.filterTitle}>
-            <Emoji text="No Filters available 😕" />
+            Filters
+            <span className={classes.filterSpan}>
+              {editingMode && (
+                <span>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={handleToggleEnabled}
+                        checked={filtersState.enabled}
+                        value={filtersState.enabled}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        onChange={handleToggleVisible}
+                        checked={filtersState.visible}
+                        value={filtersState.visible}
+                        color="primary"
+                      />
+                    }
+                    label={filtersState.visible ? 'Visible' : 'Hidden'}
+                  />
+                </span>
+              )}
+              <Button
+                onClick={() => {
+                  this.applyCallbacks.forEach(cb => {
+                    cb();
+                  });
+                }}
+                variant="contained"
+                size="small"
+                color="primary"
+              >
+                Apply filters
+              </Button>
+            </span>
           </Typography>
-        </div>
-      );
-    }
 
           {(Object.values(filtersState.filterGroups) || []).map(
             filterGroup =>
+              filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
                 <div className={classes.filterWrapper} key={filterGroup.label}>
                   <ExpansionPanel
@@ -151,26 +196,17 @@ class FiltersComponent extends React.Component<Props> {
                       )}
                     </ExpansionPanelSummary>
                     {this.getFilter(
-                      filterGroup.type,
+                      filterGroup.filterType,
                       filterGroup.label,
                       filterGroup.options
                     )}
-                  </ExpansionPanelSummary>
-                  {this.getFilter(
-                    filterGroup.filterType,
-                    filterGroup.label,
-                    filterGroup.selectedOptions
-                  )}
-                </ExpansionPanel>
-              </div>
-            )
-        )}
-      </div>
+                  </ExpansionPanel>
+                </div>
+              )
+          )}
+        </div>
+      )
     );
-  };
-
-  render() {
-    return this.getComponents();
   }
 }
 

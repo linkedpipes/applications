@@ -5,7 +5,7 @@ import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
-import uuid from 'uuid';
+// import uuid from 'uuid';
 import _ from 'lodash';
 
 type Props = {
@@ -93,17 +93,6 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   const newFiltersState = nextProps.filtersState;
-  //   const selectedNodes = newFiltersState.filterGroups[0].selectedOptions.map(
-  //     node => node.uri
-  //   );
-  //   if (!isArrayEqual(selectedNodes, prevState.selectedNodes)) {
-  //     return { selectedNodes };
-  //   }
-  //   return null;
-  // }
-
   async componentDidMount() {
     const {
       handleSetCurrentApplicationData,
@@ -119,8 +108,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           endpoint: 'chord',
           graphIri: this.props.selectedResultGraphIri,
           etlExecutionIri: this.props.selectedPipelineExecution,
-          visualizerType: 'CHORD',
-          applicationData: { selectedNodes }
+          visualizerType: 'CHORD'
         });
       }
 
@@ -243,11 +231,6 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           groupLabels: labels
         });
       }
-      // if (!this.props.isPublished) {
-      //   this.props.handleSetCurrentApplicationData({
-      //     selectedNodes
-      //   });
-      // }
     }
   }
 

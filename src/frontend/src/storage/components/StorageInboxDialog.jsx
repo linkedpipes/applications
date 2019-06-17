@@ -28,7 +28,7 @@ const styles = theme => ({
     flexWrap: 'wrap'
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     display: 'flex',
     flexWrap: 'wrap'
   },
@@ -37,10 +37,10 @@ const styles = theme => ({
     flexWrap: 'wrap'
   },
   chip: {
-    margin: theme.spacing.unit / 4
+    margin: theme.spacing() / 4
   },
   noLabel: {
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   }
 });
 

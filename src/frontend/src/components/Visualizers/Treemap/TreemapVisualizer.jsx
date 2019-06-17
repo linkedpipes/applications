@@ -96,16 +96,14 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     if (!isPublished) {
       handleSetCurrentApplicationData({
         endpoint: 'treemap',
-        applicationData: { conceptIri: this.props.selectedScheme }, // TODO: change Confusing Naming
         graphIri: this.props.selectedResultGraphIri,
         etlExecutionIri: this.props.selectedPipelineExecution,
         visualizerType: 'TREEMAP'
-        conceptIri: schemes.find(s => s.selected),
       });
     }
 
     this.conceptsFetched = new Set();
-    const selectedScheme = this.props.schemes.find(s => s.selected);
+    const selectedScheme = schemes.find(s => s.selected);
     this.chartEvents = [
       {
         eventName: 'ready',
@@ -202,11 +200,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
-
-    this.props.handleSetCurrentApplicationData({
-      applicationData: { conceptIri: this.props.selectedScheme }
-      conceptIri: scheme
-    });
   };
 
   handleGoUpClick = () => {};

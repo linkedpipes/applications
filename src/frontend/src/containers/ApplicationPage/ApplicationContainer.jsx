@@ -50,7 +50,7 @@ const styles = theme => ({
   },
   containerView: {
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20
+    paddingTop: theme.spacing(20)
   },
   filterSideBar: {
     paddingTop: '2rem',
@@ -142,16 +142,15 @@ class ApplicationContainer extends PureComponent<Props, State> {
         );
       }
       case VISUALIZER_TYPE.TREEMAP: {
-        const { graphIri, applicationData } = applicationConfiguration;
+        const { graphIri } = applicationConfiguration;
         return (
           <TreemapVisualizer
             selectedResultGraphIri={graphIri}
             isPublished
-            selectedScheme={applicationData.conceptIri}
             schemes={pathOr(
               [],
-              'filterGroups.nodesFilter.options',
-              applicationData.filtersState
+              'filterGroups.schemeFilter.options',
+              filtersState
             )}
           />
         );
@@ -161,11 +160,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
             size={this.state.height + this.state.width}
-            nodes={pathOr(
-              [],
-              'filterGroups.nodesFilter.options',
-              filtersState
-            )}
+            nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
             isPublished
           />
         );
@@ -194,14 +189,14 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const { getApplication } = this;
     const { width, height } = this.state;
     const visible =
-      this.props.filtersState !== undefined && this.props.filtersState.visible;
+      this.props.filtersState !== null && this.props.filtersState.visible;
 
     return (
       <Grid
         container
         className={this.props.classes.root}
         direction="row"
-        spacing={24}
+        spacing={3}
       >
         {visible && this.state.applicationType !== 'Loading' && (
           <Grid
