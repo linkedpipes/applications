@@ -3,7 +3,7 @@ import LinearLoader from './Loaders';
 import UserProfileButton from './UserProfile';
 import {
   TreemapVisualizer,
-  GoogleMapsVisualizer,
+  MapsVisualizer,
   ChordVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
@@ -13,7 +13,7 @@ export {
   LinearLoader,
   UserProfileButton,
   TreemapVisualizer,
-  GoogleMapsVisualizer,
+  MapsVisualizer,
   VisualizerIcon,
   ChordVisualizer
 };
