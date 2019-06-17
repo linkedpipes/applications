@@ -4,7 +4,8 @@ import UserProfileButton from './UserProfile';
 import {
   TreemapVisualizer,
   MapsVisualizer,
-  ChordVisualizer
+  ChordVisualizer,
+  TimelineVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
 
@@ -13,6 +14,7 @@ export {
   LinearLoader,
   UserProfileButton,
   TreemapVisualizer,
+  TimelineVisualizer,
   MapsVisualizer,
   VisualizerIcon,
   ChordVisualizer

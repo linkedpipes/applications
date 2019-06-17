@@ -5,7 +5,8 @@ import Grid from '@material-ui/core/Grid';
 import {
   MapsVisualizer,
   TreemapVisualizer,
-  ChordVisualizer
+  ChordVisualizer,
+  TimelineVisualizer
 } from '@components';
 import { VISUALIZER_TYPE } from '@constants';
 import Typography from '@material-ui/core/Typography';
@@ -92,6 +93,12 @@ const getVisualizer = (
         />
       );
     }
+    case VISUALIZER_TYPE.TIMELINE:
+    case VISUALIZER_TYPE.LABELED_TIMELINE:
+    case VISUALIZER_TYPE.TIMELINE_PERIODS:
+    case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
+      return <TimelineVisualizer />;
+
     case VISUALIZER_TYPE.TREEMAP:
       return (
         <TreemapVisualizer
