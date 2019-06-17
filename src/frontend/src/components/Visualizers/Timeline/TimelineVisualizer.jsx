@@ -36,23 +36,23 @@ class TimelineVisualizer extends React.PureComponent<Props, State> {
   //     };
   //   }
 
-  //   async componentDidMount() {
-  //     const {
-  //       handleSetCurrentApplicationData,
-  //       isPublished,
-  //       selectedResultGraphIri
-  //     } = this.props;
+  async componentDidMount() {
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedResultGraphIri
+    } = this.props;
 
-  //     if (!isPublished) {
-  //       handleSetCurrentApplicationData({
-  //         id: uuid.v4(),
-  //         applicationEndpoint: 'treemap',
-  //         conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
-  //         selectedResultGraphIri: this.props.selectedResultGraphIri,
-  //         visualizerCode: 'TIMELINE'
-  //       });
-  //     }
-  //   }
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        id: uuid.v4(),
+        applicationEndpoint: 'treemap',
+        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
+        selectedResultGraphIri: this.props.selectedResultGraphIri,
+        visualizerCode: 'TIMELINE'
+      });
+    }
+  }
 
   //   componentWillReceiveProps(nextProps) {}
 

@@ -97,7 +97,9 @@ const getVisualizer = (
     case VISUALIZER_TYPE.LABELED_TIMELINE:
     case VISUALIZER_TYPE.TIMELINE_PERIODS:
     case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
-      return <TimelineVisualizer />;
+      return (
+        <TimelineVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+      );
 
     case VISUALIZER_TYPE.TREEMAP:
       return (
