@@ -148,7 +148,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
 
         const matrixRequest = await VisualizersService.getChordData(
           selectedResultGraphIri,
-          nodes.map(node => node.uri)
+          selectedNodes.map(node => node.uri)
         );
         const matrixData = await matrixRequest.data;
 

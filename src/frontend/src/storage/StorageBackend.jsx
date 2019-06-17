@@ -146,7 +146,7 @@ class SolidBackend {
     } catch (err) {
       return Promise.reject(err);
     }
-    const wantedFolders = ['configurations'];
+    const wantedFolders = ['configurations', 'sharedConfigurations'];
     const subFolders = this.store
       .match(null, $rdf.sym(RDF('type')), $rdf.sym(LDP('Container')), folder)
       .map(st => st.subject.value)
@@ -166,6 +166,9 @@ class SolidBackend {
    * @return {Promise<string>} The user's valid application folder.
    */
   async getValidAppFolder(webId: string): Promise<string> {
+    if (!webId.includes('#me')) {
+      webId = webId.concat('#me');
+    }
     try {
       const folder = await this.getAppFolder(webId);
       if (folder) {
@@ -1211,28 +1214,6 @@ class SolidBackend {
 
     const folderUrl = await this.getValidAppFolder(webId).catch(async error => {
       Log.error(error, 'StorageBackend');
-    });
-
-    await StorageFileClient.createFolder(
-      folderUrl,
-      'sharedConfigurations'
-    ).then(() => {
-      Log.info(`Created folder ${folderUrl}/${configurationsFolderTitle}.`);
-    });
-
-    await StorageFileClient.updateItem(
-      `${folderUrl}/sharedConfigurations`,
-      '.acl',
-      await this.createFolderAccessList(
-        webId,
-        `${folderUrl}/sharedConfigurations/`,
-        [READ],
-        false,
-        null
-      ),
-      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(() => {
-      Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
     });
 
     const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
