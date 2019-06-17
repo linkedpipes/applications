@@ -5,7 +5,6 @@ import { discoveryReducer } from '@ducks/discoveryDuck';
 import { globalReducer } from '@ducks/globalDuck';
 import { etlReducer } from '@ducks/etlDuck';
 import { userReducer } from '@ducks/userDuck';
-import { visualizersReducer } from '@ducks/visualizersDuck';
 import { applicationReducer } from '@ducks/applicationDuck';
 import { filtersReducer } from '@ducks/filtersDuck';
 import thunk from 'redux-thunk';
@@ -28,7 +27,6 @@ const appReducer = combineReducers({
   globals: globalReducer,
   discover: discoverReducer,
   discovery: discoveryReducer,
-  visualizers: visualizersReducer,
   etl: etlReducer,
   application: applicationReducer,
   filters: filtersReducer
