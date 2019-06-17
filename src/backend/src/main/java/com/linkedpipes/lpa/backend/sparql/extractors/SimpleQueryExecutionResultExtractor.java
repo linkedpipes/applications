@@ -1,14 +1,11 @@
 package com.linkedpipes.lpa.backend.sparql.extractors;
 
-import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
@@ -48,16 +45,5 @@ public abstract class SimpleQueryExecutionResultExtractor<T> {
         }
 
         return null;
-    }
-
-    protected LocalizedValue getLabel(QuerySolution solution, String[] labelVariables){
-        return Arrays.stream(labelVariables)
-                .filter(solution::contains)
-                .map(l -> localizedLabel(solution.get(l).asLiteral()))
-                .findAny().orElse(null);
-    }
-
-    protected LocalizedValue localizedLabel(Literal literal){
-        return new LocalizedValue(literal.getLanguage(), literal.getString());
     }
 }

@@ -8,4 +8,6 @@ public class Prefixes {
     public static final String SCHEMA_PREFIX = "s";
     public static final String RGML_PREFIX = "rgml";
     public static final String SD_PREFIX = "sd";
+    public static final String TIME_PREFIX = "time";
+    public static final String XSD_PREFIX = "xsd";
 }
