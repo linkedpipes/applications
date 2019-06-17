@@ -210,11 +210,11 @@ class StorageToolbox {
     return StorageBackend.setFiltersStateVisible(metadataUrl, isVisible);
   };
 
-  setNodesSelectedOptions = async (
+  setSelectedFilterOptions = async (
     metadataUrl: string,
     nodes: Array<Object>
   ): Promise<boolean> => {
-    return StorageBackend.setNodesSelectedOptions(metadataUrl, nodes);
+    return StorageBackend.setSelectedFilterOptions(metadataUrl, nodes);
   };
 
   getFriends = async (webId: string): Promise<Person[]> => {

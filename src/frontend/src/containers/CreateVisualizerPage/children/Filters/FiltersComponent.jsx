@@ -76,7 +76,7 @@ class FiltersComponent extends React.Component<Props> {
           <TreemapFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            selectedScheme={options[0]}
+            schemes={options}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />

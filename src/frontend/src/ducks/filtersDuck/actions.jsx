@@ -8,6 +8,29 @@ const setSelectedScheme = (filterName, schemes) => {
   };
 };
 
+const setSelectedSchemeWithSolid = (filterName, schemes, isEditing) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    const oldSchemes =
+      state.filters.filtersState.filterGroups.schemeFilter.options;
+    dispatch(setSelectedScheme(filterName, schemes));
+
+    if (isEditing) {
+      const metadata = state.application.selectedApplicationMetadata;
+
+      if (metadata) {
+        const difference = schemes.filter(x => !oldSchemes.includes(x));
+        if (difference.length > 0 && oldSchemes.length > 0) {
+          StorageToolbox.setSelectedFilterOptions(
+            metadata.solidFileUrl,
+            difference
+          );
+        }
+      }
+    }
+  };
+};
+
 const setSelectedNodes = (filterName, nodes) => {
   return {
     type: types.SET_SELECTED_NODES,
@@ -16,23 +39,26 @@ const setSelectedNodes = (filterName, nodes) => {
   };
 };
 
-const setSelectedNodesWithSolid = (filterName, nodes) => {
+const setSelectedNodesWithSolid = (filterName, nodes, isEditing) => {
   return (dispatch, getState) => {
     const state = getState();
     const oldNodes =
       state.filters.filtersState.filterGroups.nodesFilter.options;
     dispatch(setSelectedNodes(filterName, nodes));
-    const difference = oldNodes.filter(x => !nodes.includes(x));
-    let filtersOptionsToUpdate = nodes;
-    if (difference.length === 0 || oldNodes.length === 0) {
-      filtersOptionsToUpdate = difference;
-    }
 
-    const metadata = state.application.selectedApplicationMetadata;
-    StorageToolbox.setNodesSelectedOptions(
-      metadata.solidFileUrl,
-      filtersOptionsToUpdate
-    );
+    if (isEditing) {
+      const metadata = state.application.selectedApplicationMetadata;
+
+      if (metadata) {
+        const difference = nodes.filter(x => !oldNodes.includes(x));
+        if (difference.length > 0 && oldNodes.length > 0) {
+          StorageToolbox.setSelectedFilterOptions(
+            metadata.solidFileUrl,
+            difference
+          );
+        }
+      }
+    }
   };
 };
 
@@ -94,6 +120,7 @@ const resetFilters = () => {
 
 export default {
   setSelectedScheme,
+  setSelectedSchemeWithSolid,
   setSelectedNodes,
   setFiltersState,
   setDefaultFiltersState,

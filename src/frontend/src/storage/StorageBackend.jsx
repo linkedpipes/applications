@@ -441,7 +441,7 @@ class SolidBackend {
     return true;
   }
 
-  async setNodesSelectedOptions(
+  async setSelectedFilterOptions(
     metadataUrl: string,
     nodes: Array<Object>
   ): Promise<boolean> {
@@ -453,13 +453,13 @@ class SolidBackend {
 
             DELETE
             { ?optionToUpdate lpa:uri "${node.uri}" .
-              ?optionToUpdate lpa:enabled ?optionEnabled . }
+              ?optionToUpdate lpa:selected ?optionSelected . }
             INSERT
             { ?optionToUpdate lpa:uri "${node.uri}" .
-              ?optionToUpdate lpa:enabled "true" . }
+              ?optionToUpdate lpa:selected "${node.selected}" . }
             WHERE
-            { ?optionToUpdate lpa:uri ?optionUriValue .
-              ?optionToUpdate lpa:enabled ?optionEnabled . }
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:selected ?optionSelected . }
     `;
       promises.push(
         StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery)

@@ -82,7 +82,12 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
         {
           schemes
         },
-        () => this.props.onApplyFilter(this.props.name, this.state.schemes)
+        () =>
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.schemes,
+            this.props.editingMode
+          )
       );
     }
 
@@ -102,7 +107,11 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   };
 
   handleApplyFilter = async () => {
-    await this.props.onApplyFilter(this.props.name, this.state.schemes);
+    await this.props.onApplyFilter(
+      this.props.name,
+      this.state.schemes,
+      this.props.editingMode
+    );
   };
 
   render() {
@@ -140,8 +149,10 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = (filterName, schemes) => {
-    dispatch(filtersActions.setSelectedScheme(filterName, schemes));
+  const onApplyFilter = (filterName, schemes, isEditing) => {
+    dispatch(
+      filtersActions.setSelectedSchemeWithSolid(filterName, schemes, isEditing)
+    );
   };
   return {
     onApplyFilter

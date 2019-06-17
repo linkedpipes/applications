@@ -65,6 +65,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+    (this: any).handleChange = this.handleChange.bind(this);
     // Initialize nodes with the ones passed from props
     this.state = {
       nodes: this.props.nodes || []
@@ -80,6 +81,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   // }
 
   async componentDidMount() {
+    this.isMounted = true;
     // Get all the nodes
     if (this.props.editingMode && !this.state.nodes.length) {
       let nodes = [];
@@ -93,7 +95,6 @@ class ChordFiltersComponent extends React.Component<Props, State> {
         enabled: true,
         selected: true
       }));
-      this.isMounted = true;
 
       // Dispatch setNodes
       this.setState(
@@ -101,12 +102,20 @@ class ChordFiltersComponent extends React.Component<Props, State> {
           nodes
         },
         () => {
-          this.props.onApplyFilter(this.props.name, this.state.nodes);
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
         }
       );
     } else {
       // Dispatch setNodes
-      this.props.onApplyFilter(this.props.name, this.state.nodes);
+      this.props.onApplyFilter(
+        this.props.name,
+        this.state.nodes,
+        this.props.editingMode
+      );
     }
 
     // Register callback
@@ -118,7 +127,11 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   };
 
   handleApplyFilter = async () => {
-    await this.props.onApplyFilter(this.props.name, this.state.nodes);
+    await this.props.onApplyFilter(
+      this.props.name,
+      this.state.nodes,
+      this.props.editingMode
+    );
   };
 
   handleChange = uri => event => {
@@ -178,8 +191,10 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = (filterName, nodes) =>
-    dispatch(filtersActions.setSelectedNodes(filterName, nodes));
+  const onApplyFilter = (filterName, nodes, isEditing) =>
+    dispatch(
+      filtersActions.setSelectedNodesWithSolid(filterName, nodes, isEditing)
+    );
   return {
     onApplyFilter
   };
