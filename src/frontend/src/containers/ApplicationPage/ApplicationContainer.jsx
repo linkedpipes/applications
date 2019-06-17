@@ -148,6 +148,11 @@ class ApplicationContainer extends PureComponent<Props, State> {
             selectedResultGraphIri={graphIri}
             isPublished
             selectedScheme={applicationData.conceptIri}
+            schemes={pathOr(
+              [],
+              'filterGroups.nodesFilter.options',
+              applicationData.filtersState
+            )}
           />
         );
       }
@@ -156,9 +161,9 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
             size={this.state.height + this.state.width}
-            selectedNodes={pathOr(
+            nodes={pathOr(
               [],
-              'filterGroups.nodesFilter.selectedOptions.items',
+              'filterGroups.nodesFilter.options',
               filtersState
             )}
             isPublished

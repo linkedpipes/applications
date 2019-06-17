@@ -10,7 +10,6 @@ import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 type Props = {
   selectedVisualizer: Object,
   headerParams: Object,
-  filters: Object,
   selectedResultGraphIri: string,
   selectedApplication: Object,
   selectedPipelineExecution: string,
@@ -92,7 +91,6 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     const {
       selectedVisualizer,
       headerParams,
-      filters,
       selectedResultGraphIri,
       selectedPipelineExecution,
       selectedApplication,
@@ -106,7 +104,6 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
       <CreateVisualizerComponent
         selectedVisualizer={selectedVisualizer}
         headerParams={headerParams}
-        filters={filters}
         selectedResultGraphIri={selectedResultGraphIri}
         selectedPipelineExecution={selectedPipelineExecution}
         selectedApplication={selectedApplication}

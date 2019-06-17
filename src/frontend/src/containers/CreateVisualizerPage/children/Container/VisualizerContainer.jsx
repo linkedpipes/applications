@@ -44,29 +44,6 @@ const styles = theme => ({
   input: {}
 });
 
-// const getFilters = (visualizerCode, selectedResultGraphIri) => {
-//   switch (visualizerCode) {
-//     case VISUALIZER_TYPE.MAP:
-//     case VISUALIZER_TYPE.LABELED_POINTS_MAP: {
-//       return <div>Filters for Google Maps not yet implemented.</div>;
-//     }
-//     case VISUALIZER_TYPE.TREEMAP:
-//       return (
-//         <TreemapFiltersComponent
-//           selectedResultGraphIri={selectedResultGraphIri}
-//         />
-//       );
-//     case VISUALIZER_TYPE.CHORD:
-//       return (
-//         <ChordFiltersComponent
-//           selectedResultGraphIri={selectedResultGraphIri}
-//         />
-//       );
-//     default:
-//       return <div>No filters available for selected visualizer.</div>;
-//   }
-// };
-
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
@@ -99,6 +76,11 @@ const getVisualizer = (
           selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          schemes={pathOr(
+            [],
+            'filterGroups.schemeFilter.options',
+            filtersState
+          )}
         />
       );
     case VISUALIZER_TYPE.CHORD:
@@ -110,11 +92,7 @@ const getVisualizer = (
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           height={height}
           width={width}
-          selectedNodes={pathOr(
-            [],
-            'filterGroups.nodesFilter.selectedOptions.items',
-            filtersState
-          )}
+          nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
         />
       );
     case VISUALIZER_TYPE.UNDEFINED:

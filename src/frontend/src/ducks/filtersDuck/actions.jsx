@@ -1,10 +1,10 @@
 import types from './types';
 import StorageToolbox from '@storage/StorageToolbox';
 
-const setSelectedScheme = scheme => {
+const setSelectedScheme = (filterName, schemes) => {
   return {
     type: types.SET_SELECTED_SCHEME,
-    selectedScheme: scheme
+    schemes
   };
 };
 

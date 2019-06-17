@@ -9,6 +9,7 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
+import TreemapFiltersComponent from './children/TreemapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import Emoji from 'react-emoji-render';
@@ -19,7 +20,8 @@ type Props = {
     root: {},
     filterTitle: {
       paddingBottom: string
-    }
+    },
+    filterWrapper: { paddingBottom: string }
   },
   editingMode: boolean,
   selectedResultGraphIri: string,
@@ -46,6 +48,9 @@ const styles = theme => ({
   },
   filterTitle: {
     paddingBottom: '1rem'
+  },
+  filterWrapper: {
+    paddingBottom: '1rem'
   }
 });
 
@@ -56,16 +61,25 @@ class FiltersComponent extends React.Component<Props> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = (filterType, filterLabel, selectedOptions) => {
+  getFilter = (filterType, filterLabel, options) => {
     switch (filterType) {
       case 'NODES_FILTER':
-        // editingMode
         return (
           <ChordFiltersComponent
             key={uuid.v4()}
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            selectedNodes={selectedOptions.items}
+            nodes={options}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+          />
+        );
+      case 'SCHEME_FILTER':
+        return (
+          <TreemapFiltersComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            selectedScheme={options[0]}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -96,97 +110,50 @@ class FiltersComponent extends React.Component<Props> {
       );
     }
 
-    return (
-      <div className={classes.root}>
-        <Typography variant="h4" className={classes.filterTitle}>
-          Filters
-          <span className={classes.filterSpan}>
-            {editingMode && (
-              <span>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      onChange={handleToggleEnabled}
-                      checked={filtersState.enabled}
-                      value={filtersState.enabled}
-                      color="primary"
-                    />
-                  }
-                  label={filtersState.enabled ? 'Enabled' : 'Disabled'}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      onChange={handleToggleVisible}
-                      checked={filtersState.visible}
-                      value={filtersState.visible}
-                      color="primary"
-                    />
-                  }
-                  label={filtersState.visible ? 'Visible' : 'Hidden'}
-                />
-              </span>
-            )}
-            <Button
-              onClick={() => {
-                this.applyCallbacks.forEach(cb => {
-                  cb();
-                });
-              }}
-              variant="contained"
-              size="small"
-              color="primary"
-            >
-              Apply filters
-            </Button>
-          </span>
-        </Typography>
-
-        {(Object.values(filtersState.filterGroups) || []).map(
-          filterGroup =>
-            typeof filterGroup !== 'string' &&
-            !(filterGroup instanceof String) &&
-            (editingMode || filterGroup.visible) && (
-              <div>
-                <ExpansionPanel
-                  key={uuid.v4()}
-                  disabled={!filterGroup.enabled && !editingMode}
-                >
-                  <ExpansionPanelSummary
-                    id={filterGroup.label}
-                    key={uuid.v4()}
-                    expandIcon={<ExpandMoreIcon />}
+          {(Object.values(filtersState.filterGroups) || []).map(
+            filterGroup =>
+              (editingMode || filterGroup.visible) && (
+                <div className={classes.filterWrapper} key={filterGroup.label}>
+                  <ExpansionPanel
+                    key={filterGroup.label}
+                    disabled={!filterGroup.enabled && !editingMode}
                   >
-                    <Typography key={uuid.v4()} className={classes.heading}>
-                      {filterGroup.label}
-                    </Typography>
-                    {editingMode && (
-                      <div>
-                        <FormControlLabel
-                          key={uuid.v4()}
-                          control={
-                            <Switch
-                              key={uuid.v4()}
-                              checked={filterGroup.enabled}
-                              value={filterGroup.enabled}
-                              color="primary"
-                            />
-                          }
-                          label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
-                        />
-                        <FormControlLabel
-                          key={uuid.v4()}
-                          control={
-                            <Switch
-                              key={uuid.v4()}
-                              checked={filterGroup.visible}
-                              value={filterGroup.visible}
-                              color="primary"
-                            />
-                          }
-                          label={filterGroup.visible ? 'Visible' : 'Hidden'}
-                        />
-                      </div>
+                    <ExpansionPanelSummary
+                      id={filterGroup.label}
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography className={classes.heading}>
+                        {filterGroup.label}
+                      </Typography>
+                      {editingMode && (
+                        <div>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={filterGroup.enabled}
+                                value={filterGroup.enabled}
+                                color="primary"
+                              />
+                            }
+                            label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
+                          />
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={filterGroup.visible}
+                                value={filterGroup.visible}
+                                color="primary"
+                              />
+                            }
+                            label={filterGroup.visible ? 'Visible' : 'Hidden'}
+                          />
+                        </div>
+                      )}
+                    </ExpansionPanelSummary>
+                    {this.getFilter(
+                      filterGroup.type,
+                      filterGroup.label,
+                      filterGroup.options
                     )}
                   </ExpansionPanelSummary>
                   {this.getFilter(

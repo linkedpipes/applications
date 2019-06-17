@@ -10,7 +10,18 @@ const INITIAL_STATE = {
 const filtersReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case types.SET_SELECTED_SCHEME:
-      return { nodes: null, selectedScheme: [action.selectedScheme] };
+      return {
+        filtersState: {
+          ...state.filtersState,
+          filterGroups: {
+            ...state.filtersState.filterGroups,
+            schemeFilter: {
+              ...state.filtersState.filterGroups.schemeFilter,
+              options: action.schemes
+            }
+          }
+        }
+      };
     case types.SET_SELECTED_NODES:
       return {
         filtersState: {
@@ -19,7 +30,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
             ...state.filtersState.filterGroups,
             nodesFilter: {
               ...state.filtersState.filterGroups.nodesFilter,
-              selectedOptions: { items: action.nodes }
+              options: action.nodes
             }
           }
         }
@@ -59,8 +70,8 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Nodes',
                   enabled: true,
                   visible: true,
-                  filterType: 'NODES_FILTER',
-                  selectedOptions: { items: [] }
+                  type: 'NODES_FILTER',
+                  options: []
                 }
               }
             }
@@ -75,15 +86,8 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   label: 'Scheme',
                   enabled: true,
                   visible: true,
-                  filterType: 'SCHEME_FILTER',
-                  selectedOptions: { items: [] }
-                },
-                nodesFilter: {
-                  label: 'Nodes',
-                  enabled: true,
-                  visible: true,
-                  filterType: 'NODES_FILTER',
-                  selectedOptions: { items: [] }
+                  type: 'SCHEME_FILTER',
+                  options: []
                 }
               }
             }

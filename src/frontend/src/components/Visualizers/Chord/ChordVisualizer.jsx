@@ -5,6 +5,8 @@ import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
+import uuid from 'uuid';
+import _ from 'lodash';
 
 type Props = {
   classes: {
@@ -15,9 +17,13 @@ type Props = {
   selectedPipelineExecution: string,
   isPublished: boolean,
   theme: Object,
-  height: number,
-  width: number,
-  selectedNodes: Array<{ label: string, uri: string }>
+  nodes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
 };
 
 type State = {
@@ -42,13 +48,34 @@ const styles = theme => ({
 });
 
 const areEqual = (
-  a: Array<{ label: string, uri: string }>,
-  b: Array<{ label: string, uri: string }>
+  a: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  b: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
 ) => {
   if (!a || !b) return false;
   if (a.length !== b.length) return false;
-  const aUris = new Set(a.map(node => node.uri));
-  return b.reduce((acc, node) => acc && aUris.has(node.uri), true);
+  for (let i = 0; i < a.length; i += 1) {
+    let eq = false;
+    for (let j = 0; j < b.length; j += 1) {
+      if (_.isEqual(a[i], b[j])) {
+        eq = true;
+        break;
+      }
+    }
+    if (!eq) return false;
+  }
+  return true;
 };
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
@@ -78,9 +105,13 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   // }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedResultGraphIri
+    } = this.props;
     this.elementVizDiv = document.getElementById('viz-div');
-    const selectedNodes = this.props.selectedNodes || [];
+    const nodes = this.props.nodes || [];
 
     if (this.elementVizDiv) {
       if (!isPublished) {
@@ -93,8 +124,8 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         });
       }
 
-      // If there are no selected nodes, then bring all the data
-      if (selectedNodes.length === 0) {
+      // Should never happen
+      if (nodes.length === 0) {
         const nodesRequest = await VisualizersService.getChordNodes(
           this.props.selectedResultGraphIri
         );
@@ -124,11 +155,12 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         });
       } else {
         // Fetch data
+        const selectedNodes = nodes.filter(node => node.selected);
         const labels = selectedNodes.map(node => node.label);
 
         const matrixRequest = await VisualizersService.getChordData(
-          this.props.selectedResultGraphIri,
-          selectedNodes.map(node => node.uri)
+          selectedResultGraphIri,
+          nodes.map(node => node.uri)
         );
         const matrixData = await matrixRequest.data;
 
@@ -152,16 +184,18 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidUpdate(prevProps) {
-    this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
-    const size = Math.min(
-      this.elementVizDiv.clientHeight,
-      this.elementVizDiv.clientWidth
-    );
+    // this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
+    // const size = Math.min(
+    //   this.elementVizDiv.clientHeight,
+    //   this.elementVizDiv.clientWidth
+    // );
     // Typical usage (don't forget to compare props):
-    if (!areEqual(prevProps.selectedNodes, this.props.selectedNodes)) {
-      const selectedNodes = this.props.selectedNodes;
+    if (!areEqual(prevProps.nodes, this.props.nodes)) {
+      // TODO: Dispatch action to setup selectedNodes
+      const nodes = this.props.nodes;
       // If there are no selected nodes, then bring all the data
-      if (selectedNodes.length === 0) {
+      // (should never happen)
+      if (this.props.nodes.length === 0) {
         const nodesRequest = await VisualizersService.getChordNodes(
           this.props.selectedResultGraphIri
         );
@@ -179,6 +213,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           color => `#${color}`
         );
 
+        // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           dataLoadingStatus: 'ready',
           matrix: matrixData,
@@ -187,6 +222,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         });
       } else {
         // Fetch data
+        const selectedNodes = nodes.filter(node => node.selected);
         const labels = selectedNodes.map(node => node.label);
 
         const matrixRequest = await VisualizersService.getChordData(
@@ -199,6 +235,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           color => `#${color}`
         );
 
+        // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           dataLoadingStatus: 'ready',
           matrix: matrixData,

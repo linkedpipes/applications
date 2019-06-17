@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import uuid from 'uuid';
-import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 
 type Props = {
@@ -19,7 +18,13 @@ type Props = {
   handleSetCurrentApplicationData: Function,
   selectedPipelineExecution: Function,
   isPublished: boolean,
-  selectedScheme: string
+  schemes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
 };
 
 type State = {
@@ -73,11 +78,18 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
+  // static getDerivedStateFromProps(props, state) {
+  //   const newSelectedScheme = props.selectedScheme && props.selectedScheme.uri;
+  //   if (newSelectedScheme && newSelectedScheme !== state.selectedScheme.uri) {
+  //     this.handleSchemeChange(props.selectedScheme.uri);
+  //   }
+  // }
+
   async componentDidMount() {
     const {
       handleSetCurrentApplicationData,
       isPublished,
-      selectedScheme,
+      schemes,
       selectedResultGraphIri
     } = this.props;
 
@@ -88,11 +100,12 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         graphIri: this.props.selectedResultGraphIri,
         etlExecutionIri: this.props.selectedPipelineExecution,
         visualizerType: 'TREEMAP'
+        conceptIri: schemes.find(s => s.selected),
       });
     }
 
     this.conceptsFetched = new Set();
-
+    const selectedScheme = this.props.schemes.find(s => s.selected);
     this.chartEvents = [
       {
         eventName: 'ready',
@@ -108,7 +121,13 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
           // The first row in the data is the headers row. Ignore if got chosen
           const index = chartWrapper.getChart().getSelection()[0].row;
           if (!index) return;
-          const selectedItem = this.state.chartData[index + 1];
+          const selectedItem: {
+            label: string,
+            uri: string,
+            visible: boolean,
+            enabled: boolean,
+            selected: boolean
+          } = this.state.chartData[index + 1];
           const iri = selectedItem[0].v;
 
           // If data for this conceptIri has been fetched, then return
@@ -116,7 +135,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            this.props.selectedScheme,
+            selectedScheme.uri,
             this.props.selectedResultGraphIri,
             iri
           );
@@ -140,14 +159,24 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         }
       }
     ];
-    if (selectedResultGraphIri && selectedScheme) {
-      this.handleSchemeChange(selectedScheme);
+
+    if (selectedResultGraphIri && selectedScheme && selectedScheme.uri) {
+      this.handleSchemeChange(selectedScheme.uri);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedScheme !== this.props.selectedScheme) {
-      this.handleSchemeChange(nextProps.selectedScheme);
+    const currentSchemes = this.props.schemes;
+    const currentSelectedScheme = currentSchemes.find(s => s.selected);
+    const newSchemes = nextProps.schemes;
+    const newSelectedScheme = newSchemes.find(s => s.selected);
+    if (
+      newSelectedScheme &&
+      newSelectedScheme.uri !==
+        (currentSelectedScheme && currentSelectedScheme.uri)
+    ) {
+      // this aint been callfinded. ty vole
+      this.handleSchemeChange(newSelectedScheme.uri);
     }
     return null;
   }
@@ -176,16 +205,19 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
     this.props.handleSetCurrentApplicationData({
       applicationData: { conceptIri: this.props.selectedScheme }
+      conceptIri: scheme
     });
   };
 
   handleGoUpClick = () => {};
 
   render() {
-    const { classes } = this.props;
+    const { classes, schemes } = this.props;
+    const selectedScheme = schemes.find(s => s.selected);
     return (
       <div className={classes.wrapper}>
-        {this.props.selectedScheme &&
+        {selectedScheme &&
+          selectedScheme.uri &&
           (this.state.dataLoadingStatus === 'ready' ? (
             <div className={classes.wrapper}>
               <Button
@@ -225,10 +257,4 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    selectedScheme: state.filters.selectedScheme || ownProps.selectedScheme
-  };
-};
-
-export default connect(mapStateToProps)(withStyles(styles)(TreemapVisualizer));
+export default withStyles(styles)(TreemapVisualizer);
