@@ -178,7 +178,7 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
-        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
     }
 
     /**
