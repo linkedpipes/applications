@@ -5,7 +5,7 @@ import jsonToFormData from 'json-form-data';
 const DiscoveryService = {
   async postDiscoverFromInputFile({ rdfFile, rdfDataSampleFile, webId }) {
     const requestObject = {
-      dataSample: rdfDataSampleFile,
+      dataSampleFile: rdfDataSampleFile,
       rdfFile
     };
 
