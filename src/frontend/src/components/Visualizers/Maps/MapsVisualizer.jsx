@@ -37,7 +37,7 @@ type Props = {
 };
 
 type State = {
-  markers: Array<{ coordinates: { lat: number, lon: number } }>,
+  markers: Array<{ coordinates: { lat: number, lng: number } }>,
   center: Array<number>,
   zoom: number
 };

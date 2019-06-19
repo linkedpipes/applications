@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
@@ -14,10 +13,8 @@ registerPlugin(FilePondPluginFileValidateType);
 
 type Props = {
   classes: { textField: {}, gridRoot: {}, itemGrid: {} },
-  discoveryIsLoading: boolean,
-  dataSampleIri: string,
-  handleDataSampleTextFieldChange: Function,
-  onHandleSetRdfFile: Function
+  onHandleSetRdfFile: Function,
+  onHandleSetRdfDataSampleFile: Function
 };
 
 const styles = () => ({
@@ -48,34 +45,15 @@ const extensionMap = {
 
 const DiscoverRdfFileDropInComponent = ({
   classes,
-  discoveryIsLoading,
   onHandleSetRdfFile,
-  handleDataSampleTextFieldChange,
-  dataSampleIri
+  onHandleSetRdfDataSampleFile
 }: Props) => (
   <div className={classes.gridRoot}>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={12}>
-        <TextField
-          id="outlined-bare"
-          label="Data sample IRI"
-          disabled={discoveryIsLoading}
-          className={classes.textField}
-          multiline
-          onChange={handleDataSampleTextFieldChange}
-          placeholder="Input your data sample IRI..."
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          InputLabelProps={{
-            shrink: true
-          }}
-          value={dataSampleIri}
-        />
-      </Grid>
-      <Grid item xs={12} sm={12}>
         <FilePond
           // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
+          labelIdle="Drag & Drop your RDF file"
           allowMultiple={false}
           allowFileTypeValidation
           acceptedFileTypes={[
@@ -110,6 +88,36 @@ const DiscoverRdfFileDropInComponent = ({
           onupdatefiles={fileItems => {
             // Set current file objects to this.state
             onHandleSetRdfFile(
+              fileItems.length === 1 ? fileItems[0].file : undefined
+            );
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={12}>
+        <FilePond
+          // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
+          labelIdle="Drag & Drop your RDF data sample file"
+          allowMultiple={false}
+          allowFileTypeValidation
+          acceptedFileTypes={['text/turtle']}
+          fileValidateTypeLabelExpectedTypesMap={{
+            'text/turtle': '.ttl'
+          }}
+          fileValidateTypeDetectType={(file, type) =>
+            new Promise(resolve => {
+              Log.info(file, type);
+              if (type === '') {
+                const extension = file.name.split('.').pop();
+                resolve(extension === 'ttl' ? 'text/turtle' : '');
+              }
+              resolve(type);
+            })
+          }
+          className={classes.itemGrid}
+          maxFiles={1}
+          onupdatefiles={fileItems => {
+            // Set current file objects to this.state
+            onHandleSetRdfDataSampleFile(
               fileItems.length === 1 ? fileItems[0].file : undefined
             );
           }}

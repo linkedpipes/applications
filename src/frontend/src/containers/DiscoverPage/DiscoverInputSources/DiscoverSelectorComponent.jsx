@@ -37,6 +37,7 @@ type Props = {
   onHandleRdfInputIriTextFieldChange: Function,
   rdfInputIri: string,
   onHandleSetRdfFile: Function,
+  onHandleSetRdfDataSampleFile: Function,
   onHandleTabIndexChange: Function,
   tabIndex: Number
 };
@@ -82,6 +83,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       onHandleRdfInputIriTextFieldChange,
       rdfInputIri,
       onHandleSetRdfFile,
+      onHandleSetRdfDataSampleFile,
       tabIndex,
       onHandleTabIndexChange
     } = this.props;
@@ -108,8 +110,10 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                       label="From URL with RDF"
                       disabled={discoveryIsLoading}
                     />
-                    <Tab label="From File with RDF" 
-                    disabled={discoveryIsLoading}/>
+                    <Tab
+                      label="From File with RDF"
+                      disabled={discoveryIsLoading}
+                    />
                   </Tabs>
                 </AppBar>
               </Grid>
@@ -141,6 +145,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                   <DiscoverRdfFileDropIn
                     discoveryIsLoading={discoveryIsLoading}
                     onHandleSetRdfFile={onHandleSetRdfFile}
+                    onHandleSetRdfDataSampleFile={onHandleSetRdfDataSampleFile}
                     handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
                     dataSampleIri={dataSampleIri}
                     clea

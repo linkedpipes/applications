@@ -79,7 +79,7 @@ const areEqual = (
 };
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
-  elementVizDiv: { clientHeight: number, clientWidth: number };
+  elementVizDiv: any;
 
   constructor(props: Props) {
     super(props);

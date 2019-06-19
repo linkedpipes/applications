@@ -83,6 +83,13 @@ const setRdfFile = rdfFile => {
   };
 };
 
+const setRdfDataSampleFile = rdfDataSampleFile => {
+  return {
+    type: types.SET_RDF_DATA_SAMPLE_FILE,
+    value: rdfDataSampleFile
+  };
+};
+
 const setActiveDiscoverTabIndex = tabIndex => {
   return {
     type: types.SET_ACTIVE_DISCOVER_INPUT_TAB,
@@ -110,6 +117,7 @@ export default {
   setDataSampleIri,
   setRdfInputIri,
   setRdfFile,
+  setRdfDataSampleFile,
   setActiveDiscoverTabIndex,
   setActiveDiscoverTabIndexAsync
 };
