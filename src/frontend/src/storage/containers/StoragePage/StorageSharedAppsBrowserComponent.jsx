@@ -1,12 +1,13 @@
 // @flow
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import StorageAppsBrowserCardComponent from './children/StorageAppsBrowserCardComponent';
 import Emoji from 'react-emoji-render';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
-import uuid from 'uuid';
+import uuid from 'uuid'
 
 const styles = () => ({
   root: {
@@ -30,25 +31,25 @@ type Props = {
     root: {},
     gridArea: {}
   },
-  applicationsMetadata: Array<ApplicationMetadata>,
+  sharedApplicationsMetadata: Array<ApplicationMetadata>,
   onHandleApplicationDeleted: Function,
   setApplicationLoaderStatus: Function
 };
 
-function StorageAppsBrowserComponent(props: Props) {
+function StorageSharedAppsBrowserComponent(props: Props) {
   const {
     classes,
-    applicationsMetadata,
+    sharedApplicationsMetadata,
     onHandleApplicationDeleted,
     setApplicationLoaderStatus
   } = props;
 
   return (
     <div className={classes.root}>
-      {applicationsMetadata.length !== 0 ? (
+      {sharedApplicationsMetadata.length !== 0 ? (
         <div className={classes.gridArea}>
-          <Grid container spacing={1}>
-            {applicationsMetadata.map((metadata, index) => (
+          <Grid key={uuid.v4()} container spacing={8}>
+            {sharedApplicationsMetadata.map((metadata, index) => (
               <Grid key={uuid.v4()} item xs={3} sm={3} md={3} lg={2} xl={2}>
                 <StorageAppsBrowserCardComponent
                   key={uuid.v4()}
@@ -78,4 +79,8 @@ function StorageAppsBrowserComponent(props: Props) {
   );
 }
 
-export default withStyles(styles)(StorageAppsBrowserComponent);
+StorageSharedAppsBrowserComponent.propTypes = {
+  classes: PropTypes.object.isRequired
+};
+
+export default withStyles(styles)(StorageSharedAppsBrowserComponent);

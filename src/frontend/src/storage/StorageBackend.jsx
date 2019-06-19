@@ -1,9 +1,26 @@
-/* eslint-disable */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-unused-vars */
+/* eslint-disable-next-line no-await-in-loop */
 import * as $rdf from 'rdflib';
 import { Utils } from './utils';
-import { AppConfiguration, Person } from './models';
+import {
+  ApplicationMetadata,
+  ApplicationConfiguration,
+  SharedApplicationConfiguration,
+  Person,
+  Invitation,
+  AcceptedInvitation,
+  AccessControl
+} from './models';
 import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
+import StorageSparqlClient from './StorageSparqlClient';
+// eslint-disable-next-line import/newline-after-import
+const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
+// const N3 = require('n3');
+const Q = require('q');
+const newEngine = require('@comunica/actor-init-sparql-rdfjs').newEngine;
+const as = require('activitystrea.ms');
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
@@ -15,13 +32,11 @@ const SIOC = $rdf.Namespace('http://rdfs.org/sioc/ns#');
 const XSD = $rdf.Namespace('http://www.w3.org/2001/XMLSchema#');
 const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
 const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
-const AS = $rdf.Namespace('https://www.w3.org/ns/activitystreams#');
+const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 
 // Definitions of the concrete RDF node objects.
 const POST = SIOC('Post');
 const TIME = XSD('dateTime');
-const LIKE = AS('Like');
-const COMMENT = AS('Note');
 const CONTROL = ACL('Control');
 const READ = ACL('Read');
 const WRITE = ACL('Write');
@@ -33,53 +48,37 @@ const APPEND = ACL('Append');
  */
 class SolidBackend {
   /** A store graph used to store the fetched/created/updated documents. */
-  _store: $rdf.IndexedFormula;
+  store: $rdf.IndexedFormula;
 
   /** A fetcher responsible for fetching documents. */
-  _fetcher: $rdf.Fetcher;
+  fetcher: $rdf.Fetcher;
 
   /** An updater responsible for updating documents. */
-  _updater: $rdf.UpdateManager;
+  updater: $rdf.UpdateManager;
+
+  /** Flag to indicate whether fetcher requires single force reload */
+  requiresForceReload: Boolean;
 
   constructor() {
-    this._store = $rdf.graph();
-    this._fetcher = new $rdf.Fetcher(this.store);
-    this._updater = new $rdf.UpdateManager(this.store);
-  }
-
-  set store(store) {
-    this._store = store;
-  }
-
-  set fetcher(fetcher) {
-    this._fetcher = fetcher;
-  }
-
-  set updater(updater) {
-    this._updater = updater;
-  }
-
-  get store() {
-    return this._store;
-  }
-
-  get fetcher() {
-    return this._fetcher;
-  }
-
-  get updater() {
-    return this._updater;
+    this.store = $rdf.graph();
+    this.fetcher = new $rdf.Fetcher(this.store);
+    this.updater = new $rdf.UpdateManager(this.store);
+    this.alreadyCheckedResources = [];
+    this.alreadyAddedDownstreamListeners = [];
+    this.requiresForceReload = false;
   }
 
   /**
    * Fetches and loads a given document to the store.
    * @param {$rdf.NamedNode} document A given document to fetch and load.
    */
-  async load(document: $rdf.NamedNode, forceReload = true) {
+  async load(document: $rdf.NamedNode) {
+    const reloadRequired = this.requiresForceReload;
+    this.requiresForceReload = false;
     try {
-      return await this.fetcher.load(document, {
-        force: forceReload,
-        clearPreviousData: true
+      return this.fetcher.load(document, {
+        force: reloadRequired,
+        clearPreviousData: reloadRequired
       });
     } catch (err) {
       return Promise.reject(new Error('Could not fetch the document.'));
@@ -93,14 +92,11 @@ class SolidBackend {
    */
   async update(deletions: $rdf.Statement[], insertions: $rdf.Statement[]) {
     try {
-      await this.updater.update(
-        deletions,
-        insertions,
-        (uri, ok, message, response) => {
-          if (ok) console.log('Resource updated.');
-          else console.log(message);
-        }
-      );
+      return this.updater.update(deletions, insertions, (uri, ok, message) => {
+        if (ok) Log.info('Resource updated.', 'StorageBackend');
+        else Log.warn(message);
+        return Promise.resolve(message);
+      });
     } catch (err) {
       return Promise.reject(new Error('Could not update the document.'));
     }
@@ -109,10 +105,14 @@ class SolidBackend {
   /**
    * Registers a given document for the updater to listen to the remote
    * changes of the document.
-   * @param {$rdf.NamedNode} document A given document to register.
+   * @param {string} URL to a given resource.
    */
-  registerChanges(document: $rdf.NamedNode) {
-    // this.updater.addDownstreamChangeListener(document, () => {});
+  registerChanges(url: string, callbackOnRefresh: Function = undefined) {
+    if (this.alreadyAddedDownstreamListeners.indexOf(url) === -1) {
+      const doc = $rdf.sym(url).doc();
+      this.updater.addDownstreamChangeListener(doc, callbackOnRefresh);
+      this.alreadyAddedDownstreamListeners.push(url);
+    }
   }
 
   /**
@@ -146,7 +146,7 @@ class SolidBackend {
     } catch (err) {
       return Promise.reject(err);
     }
-    const wantedFolders = ['configurations'];
+    const wantedFolders = ['configurations', 'sharedConfigurations'];
     const subFolders = this.store
       .match(null, $rdf.sym(RDF('type')), $rdf.sym(LDP('Container')), folder)
       .map(st => st.subject.value)
@@ -166,6 +166,9 @@ class SolidBackend {
    * @return {Promise<string>} The user's valid application folder.
    */
   async getValidAppFolder(webId: string): Promise<string> {
+    if (!webId.includes('#me')) {
+      webId = webId.concat('#me');
+    }
     try {
       const folder = await this.getAppFolder(webId);
       if (folder) {
@@ -192,26 +195,70 @@ class SolidBackend {
     const configurationsUrl = `${url}/${folderTitle}`;
 
     try {
-      await StorageFileClient.createFolder(url, folderTitle).then(success => {
+      await StorageFileClient.createFolder(url, folderTitle).then(() => {
         Log.info(`Created folder ${folderUrl}.`);
       });
+
+      await StorageFileClient.updateItem(
+        `${folderUrl}`,
+        '.acl',
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/`,
+          [READ],
+          true,
+          null
+        ),
+        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      ).then(() => {
+        Log.info(`Created access list ${folderUrl}/.acl`);
+      });
+
       await StorageFileClient.createFolder(
         configurationsUrl,
         'configurations'
-      ).then(success => {
+      ).then(() => {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
+
       await StorageFileClient.updateItem(
-        folderUrl,
+        `${folderUrl}/configurations`,
         '.acl',
-        this.createFolderAccessList(webId, folderUrl, [READ], true, null)
-          .join('\n')
-          .toString(),
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/configurations/`,
+          [READ],
+          true,
+          null
+        ),
         '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(fileCreated => {
-        Log.info(`Created access list ${fileCreated}.`);
+      ).then(() => {
+        Log.info(`Created access list ${folderUrl}/configurations/.acl`);
       });
-      await this.updateAppFolder(webId, folderUrl).then(success => {
+
+      await StorageFileClient.createFolder(
+        configurationsUrl,
+        'sharedConfigurations'
+      ).then(() => {
+        Log.info(`Created folder ${configurationsUrl}.`);
+      });
+
+      await StorageFileClient.updateItem(
+        `${folderUrl}/sharedConfigurations`,
+        '.acl',
+        await this.createFolderAccessList(
+          webId,
+          `${folderUrl}/sharedConfigurations/`,
+          [READ],
+          true,
+          null
+        ),
+        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      ).then(() => {
+        Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
+      });
+
+      await this.updateAppFolder(webId, folderUrl).then(() => {
         Log.info(`Updated app folder in profile.`);
       });
     } catch (err) {
@@ -221,27 +268,85 @@ class SolidBackend {
     return true;
   }
 
-  async createAppFolderForCopying(
+  async copyFoldersRecursively(
     webId: string,
-    folderTitle: string
+    originalFolder: string,
+    destinationFolder: string
   ): Promise<boolean> {
-    const url = `${Utils.getBaseUrlConcat(webId)}`;
-    const folderUrl = `${url}/${folderTitle}`;
-    const configurationsUrl = `${url}/${folderTitle}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
 
-    try {
-      await StorageFileClient.createFolder(url, folderTitle).then(success => {
-        Log.info(`Created folder ${folderUrl}.`);
-      });
+    const copyFolderResult = await this.fetcher
+      .recursiveCopy(originalFolder, destinationFolder, {
+        copyACL: true,
+        fetch: authClient.fetch
+      })
+      .then(
+        res => {
+          return true;
+        },
+        e => {
+          Log.error(`Error copying : ${e}`);
+          return false;
+        }
+      );
 
-      await this.updateAppFolder(webId, folderUrl).then(success => {
-        Log.info(`Updated app folder in profile.`);
-      });
-    } catch (err) {
-      Log.error(err);
-      return false;
-    }
-    return true;
+    const updateProfileLinkResult = await this.updateAppFolder(
+      webId,
+      destinationFolder
+    ).then(() => {
+      return true;
+    });
+
+    return updateProfileLinkResult && copyFolderResult;
+  }
+
+  async moveFolderRecursively(
+    webId: string,
+    originalFolder: string,
+    destinationFolder: string
+  ): Promise<boolean> {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const copySuccess = await this.fetcher
+      .recursiveCopy(originalFolder, destinationFolder, {
+        copyACL: true,
+        fetch: authClient.fetch
+      })
+      .then(
+        () => {
+          return true;
+        },
+        e => {
+          Log.err(`Error copying : ${e}`);
+          return false;
+        }
+      );
+
+    const removeOldSuccess = await StorageFileClient.removeFolderContents(
+      Utils.getFolderUrlFromPathUrl(originalFolder),
+      Utils.getFilenameFromPathUrl(originalFolder)
+    ).then(
+      res => {
+        return true;
+      },
+      e => {
+        Log.err(`Error copying : ${e}`);
+        return false;
+      }
+    );
+
+    const updateProfileLinkResult = await this.updateAppFolder(
+      webId,
+      destinationFolder
+    ).then(() => {
+      return true;
+    });
+
+    return removeOldSuccess && copySuccess && updateProfileLinkResult;
   }
 
   /**
@@ -254,30 +359,125 @@ class SolidBackend {
     metadataUrl: string,
     newTitle: string
   ): Promise<boolean> {
-    const metadataFile = $rdf.sym(metadataUrl);
-    const predicate = $rdf.sym(DCT('title'));
-    const title = $rdf.lit(newTitle);
-    const metadata = metadataFile.doc();
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:title ?titleValue . }
+            INSERT
+            { ?configuration lpa:title "${newTitle}" .}
+            WHERE
+            { ?configuration lpa:title ?titleValue . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
     try {
-      await this.load(metadata);
+      await this.load($rdf.sym(metadataUrl).doc());
     } catch (err) {
-      console.log('Could not load a metadata document.');
+      Log.error('Could not load a metadata document.', 'StorageBackend');
       return false;
     }
-    const ins = [$rdf.st(metadataFile, predicate, title, metadata)];
-    const del = this.store.statementsMatching(
-      metadataFile,
-      predicate,
-      null,
-      metadata
-    );
+    return true;
+  }
+
+  async setFiltersStateEnabled(
+    metadataUrl: string,
+    isEnabled: Boolean
+  ): Promise<boolean> {
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled ?test . }
+            INSERT
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled "${
+                isEnabled ? 'true' : 'false'
+              }" . }
+            WHERE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:enabled ?test . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
     try {
-      await this.updateResource(metadata.value, ins, del);
+      await this.load($rdf.sym(metadataUrl).doc());
     } catch (err) {
-      Log.error(err);
+      Log.error('Could not load a metadata document.', 'StorageBackend');
       return false;
     }
-    // this.registerChanges(metadataFile);
+    return true;
+  }
+
+  async setFiltersStateVisible(
+    metadataUrl: string,
+    isVisible: Boolean
+  ): Promise<boolean> {
+    const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible ?test . }
+            INSERT
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible "${
+                isVisible ? 'true' : 'false'
+              }" . }
+            WHERE
+            { ?configuration lpa:filteredBy ?filterConfiguration .
+              ?filterConfiguration lpa:visible ?test . }
+    `;
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
+
+    try {
+      await this.load($rdf.sym(metadataUrl).doc());
+    } catch (err) {
+      Log.error('Could not load a metadata document.', 'StorageBackend');
+      return false;
+    }
+
+    return true;
+  }
+
+  async setSelectedFilterOptions(
+    metadataUrl: string,
+    nodes: Array<Object>
+  ): Promise<boolean> {
+    const promises = [];
+
+    for (const node of nodes) {
+      const sparqlQuery = `
+            @prefix lpa: <https://w3id.org/def/lpapps#> .
+
+            DELETE
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:selected ?optionSelected . }
+            INSERT
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:selected "${node.selected}" . }
+            WHERE
+            { ?optionToUpdate lpa:uri "${node.uri}" .
+              ?optionToUpdate lpa:selected ?optionSelected . }
+    `;
+      promises.push(
+        StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery)
+      );
+    }
+
+    await Promise.all(promises);
+
+    try {
+      await this.load($rdf.sym(metadataUrl).doc());
+    } catch (err) {
+      Log.error('Could not load a metadata document.', 'StorageBackend');
+      return false;
+    }
+
     return true;
   }
 
@@ -295,7 +495,7 @@ class SolidBackend {
     try {
       await this.load(profile);
     } catch (err) {
-      console.log('Could not load a profile document.');
+      Log.error('Could not load a profile document.', 'StorageBackend');
       return false;
     }
     const ins = [$rdf.st(user, predicate, folder, profile)];
@@ -323,7 +523,7 @@ class SolidBackend {
     try {
       folder = appFolder || (await this.getValidAppFolder(webId));
     } catch (err) {
-      console.log(err);
+      Log.error(err, 'StorageBackend');
       return [];
     }
     if (!folder) return [];
@@ -332,7 +532,7 @@ class SolidBackend {
     try {
       await this.load(configurationsFolder);
     } catch (err) {
-      console.log(err);
+      Log.error(err, 'StorageBackend');
       return [];
     }
     const files = this.store.each(
@@ -341,248 +541,167 @@ class SolidBackend {
       null,
       configurationsFolder
     );
-    for (const i in files) {
-      if (String(files[i].value).endsWith('.ttl')) {
-        await this.getAppConfigurationMetadata(files[i].value)
-          .then(appConfigMetadata => {
-            configurationsMetadata.push(appConfigMetadata);
-          })
-          .catch(err => console.log(err));
+
+    const promises = [];
+
+    for (const file of files) {
+      if (String(file.value).endsWith('.ttl')) {
+        promises.push(
+          this.getAppConfigurationMetadata(file.value)
+            .then(appConfigMetadata => {
+              configurationsMetadata.push(appConfigMetadata);
+            })
+            .catch(err => Log.error(err, 'StorageBackend'))
+        );
       }
     }
-    // this.registerChanges(configurationsFolder);
+
+    await Promise.all(promises);
+
     return configurationsMetadata.sort((a, b) =>
-      Utils.sortByDateAsc(a.createdAt, b.createdAt)
+      Utils.sortByDateAsc(a.configuration.published, b.configuration.published)
     );
   }
 
   /**
    * Fetches a single image.
    * @param {string} url An URL of the given image.
-   * @return {Promise<AppConfiguration>} Fetched image.
+   * @return {Promise<ApplicationMetadata>} Fetched image.
    */
-  async getAppConfigurationMetadata(url: string): Promise<AppConfiguration> {
+  async getAppConfigurationMetadata(
+    url: string,
+    callbackOnRefresh: Function = undefined,
+    forceReload: Boolean = false
+  ): Promise<ApplicationMetadata> {
     const fileUrl = $rdf.sym(url);
     const file = fileUrl.doc();
+
     try {
+      if (forceReload) {
+        this.requiresForceReload = forceReload;
+      }
       await this.load(file);
     } catch (err) {
       return Promise.reject(err);
     }
-    const type = this.store.match(fileUrl, RDF('type'), POST, file);
+
+    const type = this.store.match(
+      fileUrl,
+      RDF('type'),
+      LPA('VisualizerConfiguration'),
+      file
+    );
+
     if (type) {
-      const configurationUrl = this.store.any(
+      const applicationConfiguration = ApplicationConfiguration.fromTurtle(
+        this.store,
         fileUrl,
-        FOAF('depiction'),
-        null,
         file
       );
-      const title = this.store.any(fileUrl, DCT('title'), null, file);
-      const endpoint = this.store.any(fileUrl, DCT('identifier'), null, file);
-      const creator = this.store.any(fileUrl, DCT('creator'), null, file);
-      const color = this.store.any(fileUrl, VCARD('label'), null, file);
-      const created = this.store.any(fileUrl, DCT('created'), null, file);
-      return new AppConfiguration(
-        url.toString(),
-        configurationUrl.value,
-        title.value,
-        endpoint.value,
-        creator.value,
-        color.value,
-        new Date(created.value)
-      );
+
+      const appConfigurationFileTitle = `${Utils.getFilenameFromPathUrl(url)}`;
+      const appConfigurationFullPath = url;
+
+      this.registerChanges(url, callbackOnRefresh);
+
+      return ApplicationMetadata.from({
+        solidFileTitle: appConfigurationFileTitle,
+        solidFileUrl: appConfigurationFullPath,
+        configuration: applicationConfiguration
+      });
     }
-    return Promise.reject(new Error('App configuration not found.'));
+
+    return Promise.reject(new Error('Configuration not found!'));
   }
 
   /**
    * Uploads a new image to the user's POD.
-   * @param {string} appConfigurationFile An app file data.
-   * @param {string} webId A WebID of the image's creator.
+   * @param {Object} applicationConfiguration Partially constructed jsonld configuration.
    * @param {string} appFolder An application folder of the application's creator.
-   * @param {boolean} isPublic Whether the image is public or private.
-   * @param {string} color Color for application card.
-   * @param {string[]} allowedUsers An array of the user's which are allowed to access the application.
+   * @param {string} webId A WebID of the image's creator.
    * @return {Promise<ApplicationConfiguration>} Uploaded image.
    */
-  async uploadAppConfiguration(
-    appConfigurationFile: File,
-    appTitle: string,
-    appEndpoint: string,
-    webId: string,
-    appFolder: string,
-    isPublic: boolean,
-    color: string,
-    allowedUsers: string[]
-  ): Promise<AppConfiguration> {
+  async uploadApplicationConfiguration(
+    applicationConfiguration: ApplicationConfiguration,
+    appFolder,
+    webId
+  ): Promise<ApplicationMetadata> {
     const appConfigurationFilePath = `${appFolder}/configurations`;
     const appConfigurationFileTitle = `${Utils.getName()}`;
-    let appConfigurationUrl;
-    const created = new Date(Date.now());
+    const appConfigurationFullPath = `${appConfigurationFilePath}/${appConfigurationFileTitle}.ttl`;
+    const applicationConfigurationTurtle = await applicationConfiguration.toTurtle(
+      appConfigurationFullPath
+    );
+
+    $rdf.parse(
+      applicationConfigurationTurtle,
+      this.store,
+      appConfigurationFullPath
+    );
+
+    Log.info(applicationConfigurationTurtle, 'StorageBackend');
+
     try {
       await StorageFileClient.createFile(
         appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json`,
-        appConfigurationFile
+        `${appConfigurationFileTitle}.ttl`,
+        applicationConfigurationTurtle
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
           Log.info(`Created file at ${filePath}.`);
+          this.load($rdf.sym(appConfigurationFullPath).doc());
         }
       });
-      const appConfigFileTtl = this.createUploadAppConfigurationStatement(
-        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-        `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
-        appTitle,
-        appEndpoint,
-        webId,
-        color,
-        created
-      );
+
       await StorageFileClient.createFile(
         appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.ttl`,
-        appConfigFileTtl.join('\n').toString()
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.acl`,
-        this.createFileAccessList(
+        `${appConfigurationFileTitle}.ttl.acl`,
+        await this.createFileAccessList(
           webId,
-          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
+          appConfigurationFullPath,
           [READ],
-          isPublic,
-          allowedUsers
+          true,
+          []
         )
-          .join('\n')
-          .toString()
       ).then(response => {
         if (response.status === 201) {
           const filePath = response.url;
           Log.info(`Created file at ${filePath}.`);
         }
       });
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.json.ttl.acl`,
-        this.createFileAccessList(
-          webId,
-          `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-          [APPEND, READ],
-          isPublic,
-          allowedUsers
-        )
-          .join('\n')
-          .toString()
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-        }
-      });
+
+      this.requiresForceReload = true;
+
+      return Promise.resolve(
+        ApplicationMetadata.from({
+          solidFileTitle: appConfigurationFileTitle,
+          solidFileUrl: appConfigurationFullPath,
+          configuration: applicationConfiguration
+        })
+      );
     } catch (err) {
       Log.info(err);
       return Promise.reject(err);
     }
-    return new AppConfiguration(
-      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json.ttl`,
-      `${appConfigurationFilePath}/${appConfigurationFileTitle}.json`,
-      appTitle,
-      appEndpoint,
-      webId,
-      color,
-      created
-    );
   }
 
-  async deepCopy(src, dest, options, indent) {
-    indent = indent || '';
-    options = options || {};
-    console.log(indent + 'from ' + src + '\n' + indent + 'to ' + dest);
-    src = typeof src === 'string' ? $rdf.sym(src) : src;
-    dest = typeof dest === 'string' ? $rdf.sym(dest) : dest;
-    src.uri = src.uri.match(/\/$/) ? src.uri : src.uri + '/';
-    dest.uri = dest.uri.match(/\/$/) ? dest.uri : dest.uri + '/';
-    const self = this;
-    let promises = [];
-    return new Promise(function(resolve, reject) {
-      function mapURI(src, dest, x) {
-        if (!x.uri.startsWith(src.uri)) {
-          throw new Error("source '" + x + "' is not in tree " + src);
-        }
-        return self.store.sym(dest.uri + x.uri.slice(src.uri.length));
-      }
-      self.fetcher
-        .load(src)
-        .then(function(response) {
-          if (!response.ok)
-            throw new Error(
-              'Error reading container ' + src + ' : ' + response.status
-            );
-          let contents = self.store.each(src, LDP('contains'));
-          for (let i = 0; i < contents.length; i++) {
-            let here = contents[i];
-            let there = mapURI(src, dest, here);
-            if (self.store.holds(here, RDF('type'), LDP('Container'))) {
-              promises.push(self.deepCopy(here, there, options, indent + '  '));
-            } else {
-              // copy a leaf
-              console.log('copying ' + there.value);
-              /*
-            complains if no type, but then ignores what it is set to???
-          */
-              let type = 'text/turtle';
-              promises.push(
-                self.fetcher.webCopy(here, there, { contentType: type })
-              );
-            }
-          }
-          Promise.all(promises)
-            .then(resolve('Copying Successful'))
-            .catch(function(e) {
-              console.log('Overall promise rejected: ' + e);
-              reject(e);
-            });
-        })
-        .catch(function(error) {
-          reject('Load error: ' + error);
-        });
-    });
-  }
-
-  async removeAppConfiguration(
+  // eslint-disable-next-line class-methods-use-this
+  async removeApplicationConfiguration(
     appFolder: string,
-    appConfiguration: AppConfiguration
+    appMetadata: ApplicationMetadata
   ): Promise<Boolean> {
     try {
       const folderPath = `${Utils.getFolderUrlFromPathUrl(
-        appConfiguration.url
+        appMetadata.solidFileUrl
       )}`;
-      const metadataFileTitle = `${Utils.getFilenameFromPathUrl(
-        appConfiguration.url
-      )}`;
-      const fileTitle = `${Utils.getFilenameFromPathUrl(
-        appConfiguration.object
-      )}`;
+      const metadataFileTitle = appMetadata.solidFileTitle;
 
       await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
         response => {
           if (response.status === 200) {
             const filePath = response.url;
             Log.info(`Removed ${metadataFileTitle} at ${filePath}.`);
-          }
-        }
-      );
-      await StorageFileClient.removeItem(folderPath, fileTitle).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${fileTitle} at ${filePath}.`);
           }
         }
       );
@@ -595,99 +714,12 @@ class SolidBackend {
           Log.info(`Removed ${metadataFileTitle}.acl at ${filePath}.`);
         }
       });
-      await StorageFileClient.removeItem(folderPath, `${fileTitle}.acl`).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${fileTitle}.acl ${filePath}.`);
-          }
-        }
-      );
     } catch (err) {
-      console.log('Could not delete a profile document.');
+      Log.error('Could not delete a profile document.', 'StorageBackend');
       return Promise.reject(err);
     }
 
     return true;
-  }
-
-  /**
-   * Creates appropriate RDF statements for the new application configuration to upload.
-   * @param {string} appConfigurationMetadataPath An URL of the new RDF Turtle image file.
-   * @param {string} appConfigurationUrl An URL of the new image file.
-   * @param {string} appTitle A title of an application configuration.
-   * @param {string} appEndpoint An endpoint of application configuration
-   * @param {string} user A WebID of the image's creator.
-   * @param {string} cardColor Color to be used for card visualizing the app
-   * @param {Date} createdAt A creation date of the image.
-   * @return {$rdf.Statement[]} An array of the image RDF statements.
-   */
-  // eslint-disable-next-line class-methods-use-this
-  createUploadAppConfigurationStatement(
-    appConfigurationMetadataPath: string,
-    appConfigurationUrl: string,
-    appTitle: string,
-    appEndpoint: string,
-    user: string,
-    cardColor: String,
-    createdAt: Date
-  ): $rdf.Statement[] {
-    const appConfigFile = $rdf.sym(appConfigurationMetadataPath);
-    const appConfig = $rdf.sym(appConfigurationUrl);
-    const title = $rdf.lit(appTitle);
-    const endpoint = $rdf.lit(appEndpoint);
-    const creator = $rdf.sym(user);
-    const color = $rdf.lit(cardColor);
-    const doc = appConfigFile.doc();
-    return [
-      $rdf.st(appConfigFile, RDF('type'), SIOC('Post'), doc),
-      $rdf.st(appConfigFile, FOAF('depiction'), appConfig, doc),
-      $rdf.st(appConfigFile, DCT('title'), title, doc),
-      $rdf.st(appConfigFile, DCT('identifier'), endpoint, doc),
-      $rdf.st(appConfigFile, DCT('creator'), creator, doc),
-      $rdf.st(appConfigFile, VCARD('label'), color, doc),
-      $rdf.st(
-        appConfigFile,
-        DCT('created'),
-        $rdf.lit(createdAt.toISOString(), null, TIME),
-        doc
-      )
-    ];
-  }
-
-  /**
-   * Creates appropriate RDF statements for the new image to upload.
-   * @param {string} imageFileUrl An URL of the new RDF Turtle image file.
-   * @param {string} imageUrl An URL of the new image file.
-   * @param {string} imageDescription A description of the new image.
-   * @param {string} user A WebID of the image's creator.
-   * @param {Date} createdAt A creation date of the image.
-   * @return {$rdf.Statement[]} An array of the image RDF statements.
-   */
-  createUploadImageStatement(
-    imageFileUrl: string,
-    imageUrl: string,
-    imageDescription: string,
-    user: string,
-    createdAt: Date
-  ): $rdf.Statement[] {
-    const imageFile = $rdf.sym(imageFileUrl);
-    const image = $rdf.sym(imageUrl);
-    const desc = $rdf.lit(imageDescription);
-    const creator = $rdf.sym(user);
-    const doc = imageFile.doc();
-    return [
-      $rdf.st(imageFile, RDF('type'), SIOC('Post'), doc),
-      $rdf.st(imageFile, FOAF('depiction'), image, doc),
-      $rdf.st(imageFile, DCT('description'), desc, doc),
-      $rdf.st(imageFile, DCT('creator'), creator, doc),
-      $rdf.st(
-        imageFile,
-        DCT('created'),
-        $rdf.lit(createdAt.toISOString(), null, TIME),
-        doc
-      )
-    ];
   }
 
   /**
@@ -701,7 +733,7 @@ class SolidBackend {
     try {
       await this.load(doc);
     } catch (err) {
-      console.log('Could not load a profile document.');
+      Log.error('Could not load a profile document.', 'StorageBackend');
       return Promise.reject(err);
     }
     return this.store
@@ -724,8 +756,8 @@ class SolidBackend {
     }
     const nameLd = this.store.any(user, FOAF('name'), null, profile);
     const name = nameLd ? nameLd.value : '';
-    const emailLd = this.store.any(user, FOAF('mbox'), null, profile);
-    const email = emailLd ? emailLd.value : '';
+    // const emailLd = this.store.any(user, FOAF('mbox'), null, profile);
+    // const email = emailLd ? emailLd.value : '';
     let imageLd = this.store.any(user, FOAF('img'), null, profile);
     imageLd = imageLd || this.store.any(user, VCARD('hasPhoto'), null, profile);
     const image = imageLd ? imageLd.value : '/img/icon/empty-profile.svg';
@@ -739,13 +771,21 @@ class SolidBackend {
    */
   async getPersons(userIds: string[]): Promise<Person[]> {
     const users = [];
-    for (const i in userIds) {
-      await this.getPerson(userIds[i])
-        .then(person => {
-          users.push(person);
-        })
-        .catch(err => console.log(err));
+
+    const promises = [];
+
+    for (const value of userIds) {
+      promises.push(
+        this.getPerson(value)
+          .then(person => {
+            users.push(person);
+          })
+          .catch(err => Log.error(err, 'StorageBackend'))
+      );
     }
+
+    await Promise.all(promises);
+
     return users.flat();
   }
 
@@ -756,7 +796,7 @@ class SolidBackend {
    */
   async getFriends(webId: string): Promise<Person[]> {
     const friendsIds = await this.getFriendsWebId(webId);
-    return await this.getPersons(friendsIds);
+    return this.getPersons(friendsIds);
   }
 
   /**
@@ -783,21 +823,35 @@ class SolidBackend {
    * @param {string[]} allowedUsers An array of the user's which are allowed to access the folder.
    * @return {$rdf.Statement[]} An array of the access list RDF statements.
    */
-  createFolderAccessList(
+  async createFolderAccessList(
     webId: string,
     folderUrl: string,
     modes: $rdf.NamedNode[],
     isPublic: boolean,
     allowedUsers: string[]
   ): $rdf.Statement[] {
-    return this.createAccessList(
+    const folderAcl = this.createAccessList(
       webId,
       folderUrl,
       modes,
       isPublic,
       allowedUsers,
       true
+    )
+      .join('\n')
+      .toString();
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(folderAcl, newStore, folderUrl);
+    const response = await $rdf.serialize(
+      null,
+      newStore,
+      `${folderUrl}.acl`,
+      'text/turtle'
     );
+
+    return response;
   }
 
   /**
@@ -809,21 +863,35 @@ class SolidBackend {
    * @param {string[]} allowedUsers An array of the user's which are allowed to access the file.
    * @return {$rdf.Statement[]} An array of the access list RDF statements.
    */
-  createFileAccessList(
+  async createFileAccessList(
     webId: string,
     fileUrl: string,
     modes: $rdf.NamedNode[],
     isPublic: boolean,
     allowedUsers: string[]
   ): $rdf.Statement[] {
-    return this.createAccessList(
+    const fileAcl = this.createAccessList(
       webId,
       fileUrl,
       modes,
       isPublic,
       allowedUsers,
       false
+    )
+      .join('\n')
+      .toString();
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(fileAcl, newStore, fileUrl);
+    const response = await $rdf.serialize(
+      null,
+      newStore,
+      `${fileUrl}.acl`,
+      'text/turtle'
     );
+
+    return response;
   }
 
   /**
@@ -869,12 +937,12 @@ class SolidBackend {
     } else if (allowedUsers) {
       allowedUsers.forEach(userId => {
         const userGroup = $rdf.sym(accessListUrl);
-        const user = $rdf.sym(userId);
+        const friendWebId = $rdf.sym(userId);
         acl = acl.concat(
           this.createAccessStatement(
             userGroup,
             resource,
-            user,
+            friendWebId,
             isFolder,
             doc,
             modes
@@ -882,6 +950,7 @@ class SolidBackend {
         );
       });
     }
+
     return acl;
   }
 
@@ -937,9 +1006,311 @@ class SolidBackend {
     try {
       await this.load(resource);
       await this.update(deletions, insertions);
+      return Promise.resolve('Resource updated!');
     } catch (err) {
       return Promise.reject(err);
     }
+  }
+
+  sendFileToInbox(recipientWebId, data, type) {
+    const inboxUrl = `${Utils.getBaseUrlConcat(recipientWebId)}/inbox`;
+    StorageFileClient.sendFileToUrl(inboxUrl, data, type);
+  }
+
+  rejectInvitation(invitation) {
+    const folderTitle = Utils.getFolderUrlFromPathUrl(invitation.invitationUrl);
+    const inviteTitle = Utils.getFilenameFromPathUrl(invitation.invitationUrl);
+
+    StorageFileClient.removeItem(folderTitle, inviteTitle).then(response => {
+      if (response.status === 200) {
+        Log.info(`Removed ${inviteTitle}.`);
+      }
+    });
+  }
+
+  async generateInvitationFile(metadataUrl, userWebId, opponentWebId) {
+    return new Promise(resolve => {
+      as.invite()
+        .name('lpapps_invite')
+        .actor(`${userWebId}`)
+        .target(`${opponentWebId}`)
+        .object(as.link().href(`${metadataUrl}`))
+        .publishedNow()
+        .prettyWrite((err, doc) => {
+          if (err) throw err;
+          resolve(doc);
+        });
+    });
+  }
+
+  generateResponseToInvitation(invitation, response) {
+    return new Promise(resolve => {
+      as.import(invitation.object, (err, invitationObject) => {
+        if (err) throw err;
+        else {
+          as.accept()
+            .name('lpapps_invite_response')
+            .actor(`${invitation.recipientWebId}`)
+            .target(`${invitation.senderWebId}`)
+            .object(invitationObject)
+            .publishedNow()
+            .prettyWrite((writeError, doc) => {
+              if (writeError) throw writeError;
+              resolve(doc);
+            });
+        }
+      });
+    });
+  }
+
+  async checkSharedConfigurationsFolder(folderUrl) {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const deferred = Q.defer();
+    const newResources = [];
+    const rdfjsSource = await rdfjsSourceFromUrl(folderUrl, authClient.fetch);
+    const engine = newEngine();
+
+    engine
+      .query(
+        `SELECT ?resource {
+      ?resource a <http://www.w3.org/ns/ldp#Resource>.
+    }`,
+        { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+      )
+      .then(result => {
+        result.bindingsStream.on('data', data => {
+          data = data.toObject();
+
+          const resource = data['?resource'].value;
+
+          newResources.push(resource);
+        });
+
+        result.bindingsStream.on('end', () => {
+          deferred.resolve(newResources);
+        });
+      });
+
+    return deferred.promise;
+  }
+
+  async checkInboxFolder(inboxUrl) {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    const deferred = Q.defer();
+    const newResources = [];
+    const rdfjsSource = await rdfjsSourceFromUrl(inboxUrl, authClient.fetch);
+    const self = this;
+    const engine = newEngine();
+
+    engine
+      .query(
+        `SELECT ?resource { ?resource a <http://www.w3.org/ns/ldp#Resource>. }`,
+        { sources: [{ type: 'rdfjsSource', value: rdfjsSource }] }
+      )
+      .then(result => {
+        result.bindingsStream.on('data', data => {
+          data = data.toObject();
+
+          const resource = data['?resource'].value;
+
+          // if (self.alreadyCheckedResources.indexOf(resource) === -1) {
+          newResources.push(resource);
+          self.alreadyCheckedResources.push(resource);
+          // }
+        });
+
+        result.bindingsStream.on('end', () => {
+          deferred.resolve(newResources);
+        });
+      });
+
+    return deferred.promise;
+  }
+
+  async parseInvite(invitationUrl, userWebId) {
+    const invitation = await StorageFileClient.fetchJsonLDFromUrl(
+      invitationUrl
+    );
+
+    const sender = await this.getPerson(invitation.actor);
+    const recipient = await this.getPerson(invitation.target);
+
+    if (invitation.type === 'Accept') {
+      return new AcceptedInvitation(
+        sender,
+        recipient,
+        invitation,
+        invitationUrl
+      );
+    }
+    return new Invitation(sender, recipient, invitation, invitationUrl);
+  }
+
+  async parseSharedConfiguration(configurationUrl) {
+    const sharedAppConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
+      configurationUrl
+    );
+
+    const appMetadataUrl = sharedAppConfiguration.url;
+    const appMetadata = await this.getAppConfigurationMetadata(appMetadataUrl);
+
+    return new SharedApplicationConfiguration(
+      sharedAppConfiguration,
+      appMetadata
+    );
+  }
+
+  async processAcceptSharedInvite(sharedInvitation) {
+    const metadataUrl = sharedInvitation.invitation.appMetadataUrl;
+    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
+    const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
+    const collaboratorWebId = sharedInvitation.senderWebId;
+    const webId = sharedInvitation.recipientWebId;
+
+    const currentAccessControl = await this.fetchAccessControlFile(
+      `${metadataUrl}.acl`
+    );
+    const collaboratorWebIds = currentAccessControl.getCollaborators();
+    const isPublic = currentAccessControl.isPublic();
+    if (!collaboratorWebIds.includes(collaboratorWebId)) {
+      collaboratorWebIds.push(collaboratorWebId);
+    }
+
+    const accessListConfiguration = await this.createFileAccessList(
+      webId,
+      metadataUrl,
+      [READ, WRITE],
+      isPublic,
+      collaboratorWebIds
+    );
+    await StorageFileClient.updateFile(
+      `${fileMetadataFolder}/`,
+      `${fileMetadataTitle}.acl`,
+      accessListConfiguration,
+      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+    ).then(() => {
+      Log.info(`Created access list ${fileMetadataTitle}.acl`);
+    });
+
+    await this.removeInvitation(sharedInvitation.invitationUrl).then(
+      response => {
+        if (response.status === 200) {
+          const filePath = response.url;
+          Log.info(`Removed ${filePath}.`);
+        }
+      }
+    );
+  }
+
+  async createSharedMetadataFromInvite(invitation) {
+    const webId = invitation.recipientWebId;
+    const configurationsFolderTitle = 'sharedConfigurations';
+
+    const folderUrl = await this.getValidAppFolder(webId).catch(async error => {
+      Log.error(error, 'StorageBackend');
+    });
+
+    const destinationPath = `${folderUrl}/${configurationsFolderTitle}`;
+
+    const self = this;
+
+    return new Promise(resolve => {
+      as.document()
+        .url(`${invitation.appMetadataUrl}`)
+        .attributedTo(as.person().url(`${invitation.senderWebId}`))
+        .publishedNow()
+        .prettyWrite(async (err, doc) => {
+          if (err) throw err;
+          else {
+            const uniqueFileName = `${Utils.getName()}.jsonld`;
+            await StorageFileClient.createFile(
+              destinationPath,
+              uniqueFileName,
+              doc
+            );
+            await StorageFileClient.createFile(
+              destinationPath,
+              `${uniqueFileName}.acl`,
+              await self.createFileAccessList(
+                webId,
+                `${destinationPath}/${uniqueFileName}`,
+                [READ],
+                false,
+                undefined
+              )
+            );
+            resolve(true);
+          }
+        });
+    });
+  }
+
+  async removeInvitation(invitationUrl) {
+    return StorageFileClient.removeItem(
+      Utils.getFolderUrlFromPathUrl(invitationUrl),
+      Utils.getFilenameFromPathUrl(invitationUrl)
+    );
+  }
+
+  async fetchAccessControlFile(aclUrl) {
+    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl);
+
+    const newStore = $rdf.graph();
+
+    $rdf.parse(fetchResponse, newStore, aclUrl, 'text/turtle');
+
+    const response = await new Promise((resolve, reject) => {
+      $rdf.serialize(
+        null,
+        newStore,
+        aclUrl,
+        'application/ld+json',
+        async (err, data) => {
+          if (err) {
+            reject(err);
+          }
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
+        }
+      );
+    });
+
+    return new AccessControl(response, aclUrl);
+  }
+
+  async updateAccessControlFile(
+    webId: string,
+    metadataUrl: string,
+    isPublic: boolean,
+    contacts: Array<Person>
+  ) {
+    const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
+    const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
+
+    const accessListConfiguration = await this.createFileAccessList(
+      webId,
+      metadataUrl,
+      [READ, WRITE],
+      isPublic,
+      contacts.map(contact => {
+        return contact.webId;
+      })
+    );
+
+    return StorageFileClient.updateFile(
+      `${fileMetadataFolder}/`,
+      `${fileMetadataTitle}.acl`,
+      accessListConfiguration,
+      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+    ).then(() => {
+      Log.info(`Updated access list ${fileMetadataTitle}.acl`);
+    });
   }
 }
 

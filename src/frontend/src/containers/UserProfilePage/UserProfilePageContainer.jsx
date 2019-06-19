@@ -2,7 +2,12 @@
 import React, { PureComponent } from 'react';
 import UserProfilePageComponent from './UserProfilePageComponent';
 import { connect } from 'react-redux';
-import { withAuthorization, GlobalUtils, GoogleAnalyticsWrapper } from '@utils';
+import {
+  withAuthorization,
+  GlobalUtils,
+  GoogleAnalyticsWrapper,
+  Log
+} from '@utils';
 
 type Props = {
   userProfile: Object,
@@ -32,7 +37,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
-      // console.log(`Error: ${error}`);
+      Log.error(error);
     }
   };
 

@@ -1,21 +1,8 @@
 import types from './types';
 
-const addSingleExecution = ({ id, executionIri } = {}) => ({
-  type: types.ADD_EXECUTION,
-  pipelineId: id,
-  executionValues: {
-    executionIri
-  }
-});
-
-const removeSingleExecution = ({ id } = {}) => ({
-  type: types.REMOVE_EXECUTION,
-  id
-});
-
-const removeSingleExport = ({ id } = {}) => ({
-  type: types.REMOVE_EXPORT,
-  id
+const addSelectedPipelineExecution = ({ data } = {}) => ({
+  type: types.SET_EXECUTION,
+  selectedPipelineExecution: data
 });
 
 const addSelectedResultGraphIriAction = ({ data } = {}) => ({
@@ -36,9 +23,7 @@ const setSelectedPipelineExecution = pipelineExecution => ({
 });
 
 export default {
-  addSingleExecution,
-  removeSingleExecution,
-  removeSingleExport,
+  addSelectedPipelineExecution,
   addSelectedResultGraphIriAction,
   setPipelineIdAction,
   setSelectedPipelineExecution
