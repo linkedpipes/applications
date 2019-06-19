@@ -67,12 +67,7 @@ class DiscoveryControllerTests {
 
     @Test
     void testStartDiscoveryFromInputNull() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null, null,null));
-    }
-
-    @Test
-    void testStartDiscoveryFromInputEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, "", "", null));
+        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null, null));
     }
 
     @Test

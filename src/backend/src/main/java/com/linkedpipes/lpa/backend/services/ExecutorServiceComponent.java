@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
+import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
@@ -11,8 +12,10 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
+import com.linkedpipes.lpa.backend.util.GitHubUtils;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
+import com.linkedpipes.lpa.backend.util.RdfUtils;
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -28,8 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -166,19 +171,39 @@ public class ExecutorServiceComponent implements ExecutorService {
      */
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
-        String turtleRdfData;
-
-        if (rdfLanguage != RDFLanguages.TTL) {
-            //read rdf data into model to transform it to ttl
-            ModelBuilder mb = ModelBuilder.fromString(rdfData, rdfLanguage);
-            turtleRdfData = mb.toString();
-        }
-        else
-            turtleRdfData = rdfData;
-
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
+        String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
         return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+    }
+
+    /**
+     * Start a discovery using provided RDF data, by uploading the RDF data into our Virtuoso
+     * instance, and proceed to start the discovery using our Virtuoso's SPARQL endpoint
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfFile RDF data in file
+     * @param dataSampleFile data sample in file
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @NotNull MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
+        System.out.println("FILENAME: " + rdfFile.getName());
+        System.out.println("CONTENT TYPE: " + rdfFile.getContentType());
+        System.out.println("FILENAME: " + dataSampleFile.getName());
+        System.out.println("CONTENT TYPE: " + dataSampleFile.getContentType());
+        Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
+        Lang dataSampleFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(dataSampleFile.getContentType());
+
+        if (rdfFileLanguage == null || dataSampleFileLanguage == null){
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "File content type not supported");
+        }
+
+        String dataSampleIri = GitHubUtils.uploadGistFile(dataSampleFile.getName(), RdfUtils.RdfDataToTurtleFormat(new String(dataSampleFile.getBytes()), dataSampleFileLanguage));
+
+        return startDiscoveryFromInput(new String(rdfFile.getBytes()), rdfFileLanguage, userId, dataSampleIri);
     }
 
     /**

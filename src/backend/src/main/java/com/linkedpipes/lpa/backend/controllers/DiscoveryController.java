@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -64,8 +65,8 @@ public class DiscoveryController {
 
     /**
      * Start discovery of pipelines from received RDF data
-     * @param rdfInput RDF data
-     * @param dataSampleIri
+     * @param rdfFile main RDF data file
+     * @param dataSampleFile data sample for main file
      * @param webId
      * @return
      * @throws LpAppsException
@@ -73,22 +74,19 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
-                                                             @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                             @Nullable @RequestBody String rdfInput,
-                                                             @RequestHeader("Content-Type") String contentType) throws LpAppsException {
-        if (rdfInput == null || rdfInput.isEmpty()) {
+                                                             @RequestParam("RdfFile") MultipartFile rdfFile,
+                                                             @RequestParam("DataSampleFile") MultipartFile rdfDataSampleFile) throws LpAppsException, IOException {
+        if (rdfFile == null || rdfFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
 
-        Lang rdfLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(contentType);
-
-        if (rdfLanguage == null){
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Content type not supported");
+        if (rdfDataSampleFile == null || rdfDataSampleFile.isEmpty()) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF data sample not provided");
         }
 
         try {
             userService.addUserIfNotPresent(webId);
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(rdfInput, rdfLanguage, webId, dataSampleIri));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, rdfDataSampleFile, webId));
 
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
