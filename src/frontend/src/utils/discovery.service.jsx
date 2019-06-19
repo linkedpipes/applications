@@ -6,13 +6,14 @@ const DiscoveryService = {
   async postDiscoverFromInputFile({ rdfFile, rdfDataSampleFile, webId }) {
     const requestObject = {
       dataSample: rdfDataSampleFile,
-      rdfFile,
-      webId
+      rdfFile
     };
 
     const formData = jsonToFormData(requestObject, {});
 
-    return lpaAxios.post('/pipelines/discoverFromInput', formData);
+    return lpaAxios.post('/pipelines/discoverFromInput', formData, {
+      params: { webId }
+    });
   },
 
   // Params should be sent in body, coordinate with backend guys
