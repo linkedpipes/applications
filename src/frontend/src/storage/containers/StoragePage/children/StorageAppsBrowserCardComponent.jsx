@@ -73,8 +73,8 @@ type Props = {
   handleSetFiltersState: Function,
   history: Object,
   applicationsFolder: string,
-  indexNumber: Number
-  // webId: string
+  indexNumber: Number,
+  webId: string
 };
 
 type State = {
@@ -106,10 +106,10 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
-      // const deleteAppResponse = await UserService.deleteApplication(
-      //   this.props.webId,
-      //   this.props.applicationMetadata.url
-      // );
+      await UserService.deleteApplication(
+        this.props.webId,
+        this.props.applicationMetadata.solidFileUrl
+      );
 
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
@@ -318,11 +318,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(

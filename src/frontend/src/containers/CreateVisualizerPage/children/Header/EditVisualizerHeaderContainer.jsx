@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';
 import { GoogleAnalyticsWrapper } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import UserService from '@utils/user.service';
 
 type Props = {
   selectedApplication: any,
@@ -24,7 +25,8 @@ type Props = {
   selectedApplicationMetadata: ApplicationMetadata,
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationMetadata: Function,
-  handleUpdateAccessControlDialogState: Function
+  handleUpdateAccessControlDialogState: Function,
+  webId: string
 };
 
 type State = {
@@ -149,7 +151,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus,
       selectedApplicationMetadata,
       applicationsFolder,
-      // webId,
+      webId,
       history
     } = this.props;
 
@@ -162,21 +164,21 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        webId,
+        selectedApplicationMetadata.solidFileUrl
+      );
+
+      GoogleAnalyticsWrapper.trackEvent({
+        category: 'CreateApp',
+        action: 'Pressed delete app',
+        label: `type : '${selectedApplicationMetadata.endpoint}'`
+      });
+
       history.push({
         pathname: '/dashboard'
       });
     }
-
-    // const deleteAppResponse = await UserService.deleteApplication(
-    //   webId,
-    //   selectedApplicationMetadata.url
-    // );
-
-    GoogleAnalyticsWrapper.trackEvent({
-      category: 'CreateApp',
-      action: 'Pressed delete app',
-      label: `type : '${selectedApplicationMetadata.endpoint}'`
-    });
   };
 
   handleOpenAccessControlDialog = () => {

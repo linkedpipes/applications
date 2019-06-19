@@ -43,8 +43,7 @@ type Props = {
   applicationsFolder: String,
   location: Object,
   tabIndex: number,
-  handleSetHomepageTabIndex: Function,
-  handleSetSelectedPipelineExecution: Function
+  handleSetHomepageTabIndex: Function
 };
 type State = {
   applicationsMetadata: Array<ApplicationMetadata>,
@@ -166,9 +165,7 @@ class HomeContainer extends PureComponent<Props, State> {
       ) {
         socket.emit('join', pipelineRecord.executionIri);
         Log.info(
-          `Sending join to pipeline execution room ${
-            pipelineRecord.executionIri
-          }`
+          `Sending join to pipeline execution room ${pipelineRecord.executionIri}`
         );
       }
       return pipelineRecord;
@@ -221,7 +218,6 @@ class HomeContainer extends PureComponent<Props, State> {
           visualizer: { visualizerCode: visualizerType }
         };
 
-        handleSetSelectedPipelineExecution(pipelineExecution);
         handleSetResultPipelineIri(resultGraphIri);
         handleSetPipelineExecutionIri(executionIri);
         handleSetSelectedVisualizer(selectedVisualiser);
@@ -288,7 +284,7 @@ class HomeContainer extends PureComponent<Props, State> {
     }
   };
 
-  handleDeleteApp = async applicationMetadata => {
+  handleDeleteApp = async (applicationMetadata: ApplicationMetadata) => {
     const { setApplicationLoaderStatus } = this;
 
     await setApplicationLoaderStatus(true);
@@ -298,10 +294,10 @@ class HomeContainer extends PureComponent<Props, State> {
       applicationMetadata
     );
     if (result) {
-      // const deleteAppResponse = await UserService.deleteApplication(
-      //   this.props.webId,
-      //   applicationMetadata.url
-      // );
+      await UserService.deleteApplication(
+        this.props.webId,
+        applicationMetadata.solidFileUrl
+      );
       this.handleApplicationDeleted(applicationMetadata);
     }
 
@@ -320,9 +316,7 @@ class HomeContainer extends PureComponent<Props, State> {
     });
 
     toast.success(
-      `Removed application:\n${
-        applicationConfigurationMetadata.solidFileTitle
-      }`,
+      `Removed application:\n${applicationConfigurationMetadata.solidFileTitle}`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000
@@ -425,18 +419,10 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setSelectedInputExample(sample));
 
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetPipelineExecutionIri = executionIri => {
-    dispatch(
-      etlActions.addSelectedPipelineExecution({
-        data: executionIri
-      })
-    );
+    dispatch(etlActions.setSelectedPipelineExecution(executionIri));
   };
 
   const handleSetSelectedVisualizer = visualizerData =>
@@ -464,9 +450,6 @@ const mapDispatchToProps = dispatch => {
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));
 
-  const handleSetSelectedPipelineExecution = pipelineExecution =>
-    dispatch(etlActions.setSelectedPipelineExecution(pipelineExecution));
-
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -478,7 +461,6 @@ const mapDispatchToProps = dispatch => {
     handleSetUserProfileAsync,
     handleSetHomepageTabIndex,
     handleSetFiltersState
-    handleSetSelectedPipelineExecution
   };
 };
 
