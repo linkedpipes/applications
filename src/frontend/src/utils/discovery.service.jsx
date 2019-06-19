@@ -1,22 +1,16 @@
 // eslint-disable-next-line import/order
 import lpaAxios from './api.service';
-
-const FormData = require('form-data');
+import jsonToFormData from 'json-form-data';
 
 const DiscoveryService = {
   async postDiscoverFromInputFile({ rdfFile, rdfDataSampleFile, webId }) {
-    const formData = new FormData();
-    const dataSampleFileName = 'DataSampleFile';
-    const dataSampleFileBuffer = await new Response(
-      rdfDataSampleFile
-    ).arrayBuffer();
-    const rdfFileName = 'RdfFile';
-    const rdfFileBuffer = await new Response(rdfFile).arrayBuffer();
-    const webIdName = 'WebId';
+    const requestObject = {
+      dataSample: rdfDataSampleFile,
+      rdfFile,
+      webId
+    };
 
-    formData.append(dataSampleFileName, dataSampleFileBuffer);
-    formData.append(rdfFileName, rdfFileBuffer);
-    formData.append(webIdName, webId);
+    const formData = jsonToFormData(requestObject, {});
 
     return lpaAxios.post('/pipelines/discoverFromInput', formData);
   },
