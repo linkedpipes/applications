@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import uuid from 'uuid';
 import { VisualizersService } from '@utils';
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
