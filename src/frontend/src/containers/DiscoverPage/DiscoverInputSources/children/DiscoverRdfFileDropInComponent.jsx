@@ -94,7 +94,7 @@ const DiscoverRdfFileDropInComponent = ({
               const resolvedType = extensionMap[extension];
               file = new File([file], file.name, { type: resolvedType });
             }
-            onHandleSetRdfDataSampleFile(file);
+            onHandleSetRdfFile(file);
           }}
         />
       </Grid>
