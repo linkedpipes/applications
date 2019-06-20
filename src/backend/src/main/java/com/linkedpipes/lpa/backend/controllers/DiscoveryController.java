@@ -74,8 +74,8 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
-                                                             @RequestParam("RdfFile") MultipartFile rdfFile,
-                                                             @RequestParam("DataSampleFile") MultipartFile rdfDataSampleFile) throws LpAppsException, IOException {
+                                                             @RequestParam("rdfFile") MultipartFile rdfFile,
+                                                             @RequestParam("dataSampleFile") MultipartFile rdfDataSampleFile) throws LpAppsException, IOException {
         if (rdfFile == null || rdfFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
