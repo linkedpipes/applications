@@ -88,12 +88,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
       .then(json => {
         const response = json;
 
-        // TODO: refactor
-        // onAddSingleExport(
-        //   response.pipelineId,
-        //   response.etlPipelineIri,
-        //   response.resultGraphIri
-        // );
         handleSetResultPipelineIri(response.resultGraphIri);
 
         self.setState({
@@ -119,8 +113,6 @@ class DiscoverPipelinesExecutorContainer extends PureComponent<Props, State> {
       .then(json => {
         const executionIri = json.iri;
 
-        // TODO: refactor
-        // onAddSingleExecution(pipelineId, executionIri);
         handleSetPipelineExecutionIri(executionIri);
 
         self.setState({
@@ -218,18 +210,10 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setEtlExecutionStatus(status));
 
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetPipelineExecutionIri = executionIri => {
-    dispatch(
-      etlActions.addSelectedPipelineExecution({
-        data: executionIri
-      })
-    );
+    dispatch(etlActions.setSelectedPipelineExecution(executionIri));
   };
 
   return {

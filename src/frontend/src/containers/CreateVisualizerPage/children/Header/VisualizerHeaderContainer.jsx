@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GoogleAnalyticsWrapper } from '@utils';
+import { GoogleAnalyticsWrapper, UserService } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
@@ -80,6 +80,12 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       currentApplicationMetadata.configuration.endpoint
     );
 
+    await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.etlExecutionIri
+    );
+
     setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
 
@@ -120,6 +126,12 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
     );
 
     this.setState({ currentApplicationMetadata });
+
+    await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.etlExecutionIri
+    );
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
       currentApplicationMetadata.solidFileUrl,

@@ -15,7 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService } from '@utils';
+import { GlobalUtils, VisualizersService, UserService } from '@utils';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -73,7 +73,8 @@ type Props = {
   handleSetFiltersState: Function,
   history: Object,
   applicationsFolder: string,
-  indexNumber: Number
+  indexNumber: Number,
+  webId: string
 };
 
 type State = {
@@ -105,6 +106,11 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        this.props.webId,
+        this.props.applicationMetadata.solidFileUrl
+      );
+
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
 
@@ -305,17 +311,14 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    applicationsFolder: state.user.applicationsFolder
+    applicationsFolder: state.user.applicationsFolder,
+    webId: state.user.webId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(

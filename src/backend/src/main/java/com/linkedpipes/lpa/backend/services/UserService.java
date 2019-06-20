@@ -13,4 +13,6 @@ public interface UserService {
     UserProfile deleteExecution(String user, String executionIri) throws UserNotFoundException;
     UserProfile deleteDiscovery(String user, String discoveryId) throws UserNotFoundException;
     UserProfile setUserColorScheme(String user, String color) throws UserNotFoundException;
+    UserProfile addApplication(String user, String executionIri, String solidIri) throws UserNotFoundException;
+    UserProfile deleteApplication(String user, String solidIri) throws UserNotFoundException; 
 }

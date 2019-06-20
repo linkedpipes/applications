@@ -99,11 +99,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const handleSetSelectedPipelineId = pipelineId =>
-    dispatch(
-      etlActions.setPipelineIdAction({
-        id: pipelineId
-      })
-    );
+    dispatch(etlActions.setPipelineIdAction(pipelineId));
 
   const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
 
