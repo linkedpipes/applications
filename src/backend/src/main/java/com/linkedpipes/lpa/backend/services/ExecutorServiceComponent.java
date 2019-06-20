@@ -190,10 +190,6 @@ public class ExecutorServiceComponent implements ExecutorService {
      */
     @NotNull @Override
     public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @NotNull MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
-        System.out.println("FILENAME: " + rdfFile.getName());
-        System.out.println("CONTENT TYPE: " + rdfFile.getContentType());
-        System.out.println("FILENAME: " + dataSampleFile.getName());
-        System.out.println("CONTENT TYPE: " + dataSampleFile.getContentType());
         Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
         Lang dataSampleFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(dataSampleFile.getContentType());
 

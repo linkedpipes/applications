@@ -14,9 +14,8 @@ public final class GitHubUtils {
         //TODO move creds to config
         GitHubClient client = new GitHubClient().setCredentials("LinkedPipesApps", "linked_pipes_team");
         Gist gist = new Gist().setDescription("RDF file in Turtle format, uploaded by user for use in discovery.");
-        GistFile file = new GistFile().setContent(fileContent);
-        gist.setFiles(Collections.singletonMap(fileName, file));
+        gist.setFiles(Collections.singletonMap(fileName, new GistFile().setContent(fileContent)));
         gist = new GistService(client).createGist(gist);
-        return gist.getHtmlUrl();
+        return gist.getFiles().get(fileName).getRawUrl();
     }
 }
