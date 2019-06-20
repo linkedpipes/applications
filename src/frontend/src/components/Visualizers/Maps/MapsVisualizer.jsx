@@ -32,12 +32,13 @@ type Props = {
     progress: number
   },
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean
 };
 
 type State = {
-  markers: Array<{ coordinates: { lat: number, lon: number } }>,
+  markers: Array<{ coordinates: { lat: number, lng: number } }>,
   center: Array<number>,
   zoom: number
 };
@@ -56,15 +57,16 @@ class MapsVisualizer extends PureComponent<Props, State> {
     const {
       selectedResultGraphIri,
       handleSetCurrentApplicationData,
-      isPublished
+      isPublished,
+      selectedPipelineExecution
     } = this.props;
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'map',
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        etlExecutionIri: selectedPipelineExecution,
+        graphIri: selectedResultGraphIri,
+        visualizerType: 'MAP'
       });
     }
 
@@ -87,17 +89,21 @@ class MapsVisualizer extends PureComponent<Props, State> {
   };
 
   updateMarkersState = async (markers: []) => {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedPipelineExecution,
+      selectedResultGraphIri
+    } = this.props;
     const { center, zoom } = averageGeolocation(markers);
     this.setState({ center, zoom });
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'map',
-        markers,
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        etlExecutionIri: selectedPipelineExecution,
+        graphIri: selectedResultGraphIri,
+        visualizerType: 'MAP'
       });
     }
   };
