@@ -428,9 +428,8 @@ public class UserServiceComponent implements UserService {
 
     @Override
     public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
-        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-            return getPipelineExecutionFromDao(e);
-        }
+        List<ExecutionDao> lst = executionRepository.findByExecutionIri(executionIri);
+        if (!lst.isEmpty()) return getPipelineExecutionFromDao(lst.get(0));
         throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
 
