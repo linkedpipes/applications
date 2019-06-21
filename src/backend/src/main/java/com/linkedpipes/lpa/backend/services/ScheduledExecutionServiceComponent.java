@@ -37,11 +37,9 @@ public class ScheduledExecutionServiceComponent implements ScheduledExecutionSer
     private UserRepository userRepository;
 
     @NotNull private final ExecutorService executorService;
-    @NotNull private final VirtuosoService virtuosoService;
 
     public ScheduledExecutionServiceComponent(ApplicationContext context) {
         this.executorService = context.getBean(ExecutorService.class);
-        this.virtuosoService = context.getBean(VirtuosoService.class);
     }
 
     @Override
@@ -88,7 +86,7 @@ public class ScheduledExecutionServiceComponent implements ScheduledExecutionSer
                     if (!e.isScheduled()){
                         throw new PollingCompletedException();
                     } else {
-                        virtuosoService.deleteNamedGraph(e.getPipeline().getResultGraphIri());
+                        VirtuosoService.deleteNamedGraph(e.getPipeline().getResultGraphIri());
                         executorService.executePipeline(e.getPipeline().getEtlPipelineIri(), userId, selectedVisualiser, false);
                     }
                 }
