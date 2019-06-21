@@ -49,7 +49,6 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private ApplicationRepository appRepository;
 
-
     /**
     * Returns the user's profile. If user doesn't exist yet we add them.
     *

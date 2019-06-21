@@ -496,7 +496,4 @@ public class ExecutorServiceComponent implements ExecutorService {
             logger.warn("Failed to cancel discovery " + discoveryId, ex);
         }
     }
-
-
-
 }
