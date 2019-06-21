@@ -3,7 +3,13 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DiscoveryService, GlobalUtils, SocketContext, Log, GoogleAnalyticsWrapper } from '@utils';
+import {
+  DiscoveryService,
+  GlobalUtils,
+  SocketContext,
+  Log,
+  GoogleAnalyticsWrapper
+} from '@utils';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
@@ -22,7 +28,16 @@ type Props = {
   handleSetDataSampleIriFieldValue: Function,
   resetFieldsAndExamples: Function,
   // eslint-disable-next-line react/no-unused-prop-types
-  webId: string
+  webId: string,
+  rdfInputIri: string,
+  handleSetRdfInputIriUrlFieldValue: Function,
+  inputType: string,
+  handleSetRdfFile: Function,
+  handleSetRdfDataSampleFile: Function,
+  rdfFile: Object,
+  rdfDataSampleFile: Object,
+  activeDiscoverTabIndex: Number,
+  handleSetActiveDiscoverTabIndex: Function
 };
 
 type State = {
@@ -46,9 +61,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.isMounted = false;
   };
 
-  postStartFromFile = async instance => {
-    return DiscoveryService.postDiscoverFromTtl({
-      webId: instance.props.webId
+  postStartFromRdfInputFile = async () => {
+    return DiscoveryService.postDiscoverFromInputFile({
+      webId: this.props.webId,
+      rdfFile: this.props.rdfFile,
+      rdfDataSampleFile: this.props.rdfDataSampleFile
     }).then(response => {
       return response;
     });
@@ -65,8 +82,29 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     });
   };
 
+  postStartFromRdfInputIri = async () => {
+    const { rdfInputIri, webId, dataSampleIri } = this.props;
+    return DiscoveryService.postDiscoverFromInputIri({
+      rdfInputIri,
+      webId,
+      dataSampleIri
+    }).then(response => {
+      return response;
+    });
+  };
+
   handleDiscoveryInputCase = () => {
-    return this.postStartFromSparqlEndpoint();
+    const { inputType } = this.props;
+    switch (inputType) {
+      case 'RDF_INPUT_IRI':
+        return this.postStartFromRdfInputIri();
+
+      case 'RDF_INPUT_FILE':
+        return this.postStartFromRdfInputFile();
+
+      default:
+        return this.postStartFromSparqlEndpoint();
+    }
   };
 
   handleProcessStartDiscovery = () => {
@@ -194,17 +232,56 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.resetFieldsAndExamples();
   };
 
+  handleRdfInputIriTextFieldChange = e => {
+    const rawText = e.target.value;
+    Log.info('Rdf field changed', 'DiscoverSelectorContainer');
+    Log.info(rawText, 'DiscoverSelectorContainer');
+    this.props.handleSetRdfInputIriUrlFieldValue(rawText);
+  };
+
+  handleSetRdfFile = file => {
+    if (!file) {
+      Log.info('Rdf file deselected', 'DiscoverSelectorContainer');
+    } else {
+      Log.info('Rdf file selected', 'DiscoverSelectorContainer');
+      this.props.handleSetRdfFile(file);
+    }
+  };
+
+  handleSetRdfDataSampleFile = file => {
+    if (!file) {
+      Log.info('Rdf data sample file deselected', 'DiscoverSelectorContainer');
+    } else {
+      Log.info('Rdf data sample file selected', 'DiscoverSelectorContainer');
+      this.props.handleSetRdfDataSampleFile(file);
+    }
+  };
+
+  handleTabIndexChange = (event, newValue) => {
+    const { activeDiscoverTabIndex } = this.props;
+    if (activeDiscoverTabIndex !== newValue) {
+      this.props.handleSetActiveDiscoverTabIndex(newValue);
+    }
+  };
+
   render() {
     const {
       dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
-      namedGraph
+      namedGraph,
+      rdfInputIri,
+      inputType,
+      activeDiscoverTabIndex
     } = this.props;
 
     const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
     const inputFieldsAreNotFilled =
-      sparqlEndpointIri === '' || namedGraph === '' || dataSampleIri === '';
+      (inputType === 'SPARQL_ENDPOINT' &&
+        (sparqlEndpointIri === '' ||
+          namedGraph === '' ||
+          dataSampleIri === '')) ||
+      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '');
 
     return (
       <DiscoverSelectorComponent
@@ -220,6 +297,14 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         onHandleSetNamedGraph={this.handleSetNamedGraph}
         onHandleSetDataSampleIri={this.handleSetDataSampleIri}
         onHandleSetSparqlIri={this.handleSetSparqlIri}
+        onHandleRdfInputIriTextFieldChange={
+          this.handleRdfInputIriTextFieldChange
+        }
+        onHandleSetRdfFile={this.handleSetRdfFile}
+        onHandleSetRdfDataSampleFile={this.handleSetRdfDataSampleFile}
+        rdfInputIri={rdfInputIri}
+        tabIndex={activeDiscoverTabIndex}
+        onHandleTabIndexChange={this.handleTabIndexChange}
       />
     );
   }
@@ -241,7 +326,12 @@ const mapStateToProps = state => {
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
     namedGraph: state.discover.namedGraph,
-    webId: state.user.webId
+    webId: state.user.webId,
+    rdfInputIri: state.discover.rdfInputIri,
+    rdfFile: state.discover.rdfFile,
+    rdfDataSampleFile: state.discover.rdfDataSampleFile,
+    inputType: state.discover.inputType,
+    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex
   };
 };
 
@@ -265,8 +355,23 @@ const mapDispatchToProps = dispatch => {
   const handleSetDataSampleIriFieldValue = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
 
+  const handleSetRdfInputIriUrlFieldValue = rdfInputIri =>
+    dispatch(discoverActions.setRdfInputIri(rdfInputIri));
+
   const resetFieldsAndExamples = () => {
     dispatch(discoverActions.resetSelectedInputExample());
+  };
+
+  const handleSetRdfFile = file => {
+    dispatch(discoverActions.setRdfFile(file));
+  };
+
+  const handleSetRdfDataSampleFile = file => {
+    dispatch(discoverActions.setRdfDataSampleFile(file));
+  };
+
+  const handleSetActiveDiscoverTabIndex = tabIndex => {
+    dispatch(discoverActions.setActiveDiscoverTabIndexAsync(tabIndex));
   };
 
   return {
@@ -275,7 +380,11 @@ const mapDispatchToProps = dispatch => {
     handleSetDataSampleIriFieldValue,
     handleSetNamedGraphFieldValue,
     handleSetSparqlIriFieldValue,
-    resetFieldsAndExamples
+    handleSetRdfInputIriUrlFieldValue,
+    resetFieldsAndExamples,
+    handleSetRdfFile,
+    handleSetRdfDataSampleFile,
+    handleSetActiveDiscoverTabIndex
   };
 };
 

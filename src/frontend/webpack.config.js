@@ -57,6 +57,7 @@ module.exports = () => {
         '@storage': path.resolve(__dirname, './src/storage'),
         '@constants': path.resolve(__dirname, './src/constants'),
         '@layouts': path.resolve(__dirname, './src/layouts'),
+        '@assets': path.resolve(__dirname, './assets'),
         'material-ui': 'material-ui/es'
       }
     },
@@ -74,6 +75,15 @@ module.exports = () => {
             'css-loader',
             'sass-loader',
             'webpack-conditional-loader'
+          ]
+        },
+        {
+          test: /\.(svg|png)$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {}
+            }
           ]
         }
       ]

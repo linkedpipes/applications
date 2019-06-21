@@ -9,36 +9,51 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import uuid from 'uuid';
-import { AppConfiguration, StorageToolbox } from '@storage';
+import { StorageToolbox } from '@storage';
 import moment from 'moment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import IconButton from '@material-ui/core/IconButton';
+import RemoveIcon from '@material-ui/icons/RemoveCircle';
+import { withStyles } from '@material-ui/core/styles';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+
+const styles = () => ({
+  root: {
+    overflowX: 'auto'
+  }
+});
 
 type Props = {
-  applicationsList: Array<AppConfiguration>,
+  applicationsList: Array<ApplicationMetadata>,
   onHandleAppClicked: Function,
-  onHandleShareAppClicked: Function
+  onHandleShareAppClicked: Function,
+  onHandleDeleteAppClicked: Function,
+  classes: Object
 };
 
 const ApplicationsTableComponent = ({
   applicationsList,
   onHandleShareAppClicked,
-  onHandleAppClicked
+  onHandleAppClicked,
+  onHandleDeleteAppClicked,
+  classes
 }: Props) => (
   <div>
     {(applicationsList && applicationsList.length) > 0 ? (
-      <Paper>
+      <Paper classes={classes} elevation={2}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
               <TableCell align="center">Action</TableCell>
               <TableCell align="center">Share</TableCell>
+              <TableCell align="center">Remove</TableCell>
               <TableCell align="center">Title</TableCell>
               <TableCell align="center">Type</TableCell>
               <TableCell align="center">Created At</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {applicationsList.map(metadata => (
+            {applicationsList.map((metadata, index) => (
               <TableRow key={uuid()}>
                 <TableCell
                   align="center"
@@ -65,8 +80,8 @@ const ApplicationsTableComponent = ({
                 >
                   <CopyToClipboard
                     text={StorageToolbox.appIriToPublishUrl(
-                      metadata.object,
-                      metadata.endpoint
+                      metadata.solidFileUrl,
+                      metadata.configuration.endpoint
                     )}
                     onCopy={onHandleShareAppClicked}
                   >
@@ -75,20 +90,37 @@ const ApplicationsTableComponent = ({
                     </Button>
                   </CopyToClipboard>
                 </TableCell>
-                <TableCell align="center" component="th" scope="row">
-                  {metadata.title}
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_application_session_button_${index}`}
+                    key={`button_application_${metadata.solidFileTitle}`}
+                    aria-label="Decline"
+                    onClick={() => onHandleDeleteAppClicked(metadata)}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
                 </TableCell>
-                <TableCell align="center">{metadata.endpoint}</TableCell>
-                <TableCell align="center">{`${moment(metadata.createdAt).format(
-                  'lll'
-                )}`}</TableCell>
+                <TableCell align="center" component="th" scope="row">
+                  {metadata.configuration.title}
+                </TableCell>
+                <TableCell align="center">
+                  {metadata.configuration.endpoint}
+                </TableCell>
+                <TableCell align="center">{`${moment(
+                  metadata.configuration.published
+                ).format('lll')}`}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Paper>
     ) : (
-      <Paper>
+      <Paper elevation={2}>
         <Typography variant="body1" gutterBottom>
           No applications found
         </Typography>
@@ -97,4 +129,4 @@ const ApplicationsTableComponent = ({
   </div>
 );
 
-export default ApplicationsTableComponent;
+export default withStyles(styles)(ApplicationsTableComponent);

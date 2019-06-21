@@ -1,5 +1,5 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { discoverActions } from '../duck';
 import { etlActions } from '@ducks/etlDuck';
@@ -7,7 +7,22 @@ import DiscoverPipelinesPickerComponent from './DiscoverPipelinesPickerComponent
 import ErrorBoundary from 'react-error-boundary';
 import { GoogleAnalyticsWrapper } from '@utils';
 
-class DiscoverPipelinesPickerContainer extends PureComponent {
+type Props = {
+  dataSourceGroups: [],
+  discoveryId: string,
+  handleSetSelectedPipelineId: Function,
+  onNextClicked: Function
+};
+
+type State = {
+  order: string,
+  orderBy: string,
+  page: number,
+  rowsPerPage: number,
+  loadingButtons: {}
+};
+
+class DiscoverPipelinesPickerContainer extends PureComponent<Props, State> {
   state = {
     order: 'asc',
     orderBy: 'id',
@@ -69,29 +84,6 @@ class DiscoverPipelinesPickerContainer extends PureComponent {
   }
 }
 
-DiscoverPipelinesPickerContainer.propTypes = {
-  dataSourceGroups: PropTypes.any,
-  discoveryId: PropTypes.any,
-  handleSetSelectedPipelineId: PropTypes.any,
-  onNextClicked: PropTypes.any
-};
-
-const mapDispatchToProps = dispatch => {
-  const handleSetSelectedPipelineId = pipelineId =>
-    dispatch(
-      etlActions.setPipelineIdAction({
-        id: pipelineId
-      })
-    );
-
-  const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
-
-  return {
-    handleSetSelectedPipelineId,
-    onNextClicked
-  };
-};
-
 const mapStateToProps = state => {
   return {
     exportsDict: state.etl.exports,
@@ -102,6 +94,18 @@ const mapStateToProps = state => {
       state.globals.selectedVisualizer !== undefined
         ? state.globals.selectedVisualizer.dataSourceGroups
         : []
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const handleSetSelectedPipelineId = pipelineId =>
+    dispatch(etlActions.setPipelineIdAction(pipelineId));
+
+  const onNextClicked = () => dispatch(discoverActions.incrementActiveStep(1));
+
+  return {
+    handleSetSelectedPipelineId,
+    onNextClicked
   };
 };
 

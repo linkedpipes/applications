@@ -1,8 +1,17 @@
+// eslint-disable-next-line import/order
 import lpaAxios from './api.service';
+import jsonToFormData from 'json-form-data';
 
 const DiscoveryService = {
-  async postDiscoverFromTtl({ ttlFile, webId }) {
-    return lpaAxios.post('/pipelines/discoverFromInput', ttlFile, {
+  async postDiscoverFromInputFile({ rdfFile, rdfDataSampleFile, webId }) {
+    const requestObject = {
+      dataSampleFile: rdfDataSampleFile,
+      rdfFile
+    };
+
+    const formData = jsonToFormData(requestObject, {});
+
+    return lpaAxios.post('/pipelines/discoverFromInput', formData, {
       params: { webId }
     });
   },
@@ -16,6 +25,12 @@ const DiscoveryService = {
   }) {
     return lpaAxios.post('/pipelines/discoverFromEndpoint', null, {
       params: { sparqlEndpointIri, dataSampleIri, namedGraphs, webId }
+    });
+  },
+
+  async postDiscoverFromInputIri({ rdfInputIri, webId, dataSampleIri }) {
+    return lpaAxios.post('/pipelines/discoverFromInputIri', null, {
+      params: { rdfInputIri, webId, dataSampleIri }
     });
   },
 

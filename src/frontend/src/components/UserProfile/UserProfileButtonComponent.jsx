@@ -6,7 +6,9 @@ import Menu from '@material-ui/core/Menu/Menu';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PersonIcon from '@material-ui/icons/Person';
 import RemoveIcon from '@material-ui/icons/Remove';
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import AccountCircle from '@material-ui/icons/AccountCircleTwoTone';
+import NotificationsIcon from '@material-ui/icons/NotificationsTwoTone';
+import Badge from '@material-ui/core/Badge';
 import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 
@@ -17,7 +19,9 @@ type Props = {
   onHandleMenuOpen: Function,
   profileMenuIsOpen: Function,
   onHandleOpenProfile: Function,
-  onHandleOpenSettings: Function
+  onHandleOpenSettings: Function,
+  onHandleSetInboxDialogOpen: Function,
+  currentInboxInvitations: Array<Object>
 };
 
 const UserProfileButtonComponent = ({
@@ -27,9 +31,17 @@ const UserProfileButtonComponent = ({
   onHandleMenuOpen,
   onHandleLogoutClicked,
   onHandleOpenProfile,
-  onHandleOpenSettings
+  onHandleOpenSettings,
+  onHandleSetInboxDialogOpen,
+  currentInboxInvitations
 }: Props) => (
   <div>
+    <IconButton color="inherit" onClick={onHandleSetInboxDialogOpen}>
+      <Badge badgeContent={currentInboxInvitations.length} color="secondary">
+        <NotificationsIcon />
+      </Badge>
+    </IconButton>
+
     <IconButton color="inherit" onClick={onHandleMenuOpen}>
       <AccountCircle />
     </IconButton>
@@ -51,19 +63,19 @@ const UserProfileButtonComponent = ({
         <ListItemIcon>
           <PersonIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Profile" />
+        <ListItemText primary="Profile" />
       </MenuItem>
       <MenuItem onClick={onHandleOpenSettings}>
         <ListItemIcon>
           <SettingsIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Settings" />
+        <ListItemText primary="Settings" />
       </MenuItem>
       <MenuItem onClick={onHandleLogoutClicked}>
         <ListItemIcon>
           <RemoveIcon />
         </ListItemIcon>
-        <ListItemText inset primary="Logout" />
+        <ListItemText primary="Logout" />
       </MenuItem>
     </Menu>
   </div>

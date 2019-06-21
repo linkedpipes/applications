@@ -285,13 +285,13 @@ public class UserServiceComponent implements UserService {
                 for (ExecutionDao e : executions) {
                     executionRepository.delete(e);
                 }
+
+                if (pipelineInformationToDelete != null) {
+                    pipelineRepository.delete(pipelineInformationToDelete);
+                }
             } else {
                 toDelete.setRemoved(true);
                 executionRepository.save(toDelete);
-            }
-
-            if (pipelineInformationToDelete != null) {
-                pipelineRepository.delete(pipelineInformationToDelete);
             }
 
             repository.save(user);

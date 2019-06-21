@@ -2,21 +2,20 @@
 import React, { PureComponent } from 'react';
 import StorageAppsBrowserComponent from './StorageAppsBrowserComponent';
 // eslint-disable-next-line import/order
-import { Log, GoogleAnalyticsWrapper } from '@utils';
-import StorageBackend from '../../StorageBackend';
+import { Log } from '@utils';
 import { connect } from 'react-redux';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
+import StorageToolbox from '../../StorageToolbox';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   webId: string,
-  applicationsFolder: string,
-  location: Object
+  applicationsFolder: string
 };
 
 type State = {
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   loadingAppIsActive: boolean
 };
 
@@ -40,9 +39,6 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    const page = this.props.location.pathname;
-    GoogleAnalyticsWrapper.trackPage(page);
-
     this.loadStoredApplications();
     this.isMounted = true;
   }
@@ -72,7 +68,7 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
   loadStoredApplications = async () => {
     const { webId, applicationsFolder } = this.props;
     if (webId) {
-      const metadata = await StorageBackend.getAppConfigurationsMetadata(
+      const metadata = await StorageToolbox.getAppConfigurationsMetadata(
         webId,
         applicationsFolder
       );
@@ -91,11 +87,15 @@ class StorageAppsBrowserContainer extends PureComponent<Props, State> {
     const newApplicationsMetadata = this.state.applicationsMetadata;
 
     const filteredMetadata = newApplicationsMetadata.filter(value => {
-      return value.url !== applicationConfigurationMetadata.url;
+      return (
+        value.solidFileUrl !== applicationConfigurationMetadata.solidFileUrl
+      );
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.title}`,
+      `Removed application:\n${
+        applicationConfigurationMetadata.solidFileTitle
+      }`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000

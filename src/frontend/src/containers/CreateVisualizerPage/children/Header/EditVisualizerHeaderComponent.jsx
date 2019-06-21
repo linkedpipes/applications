@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GlobalUtils } from '@utils';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   classes: { root: {}, header: {}, textField: {} },
@@ -35,9 +35,8 @@ type Props = {
   handleChangeWidth: Function,
   height: number,
   width: number,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   deleteAppDialogOpen: boolean,
-  handleDeleteApp: Function,
   handleDeleteAppDismissed: Function,
   handleDeleteAppConfirmed: Function,
   handleDeleteAppClicked: Function,
@@ -49,6 +48,7 @@ type Props = {
   handleOpenRenameDialog: Function,
   handleCloseRenameDialog: Function,
   handleRenameConfirmed: Function,
+  handleOpenAccessControlDialog: Function,
   renameDialogOpen: boolean
 };
 
@@ -57,8 +57,7 @@ const styles = theme => ({
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
-      .spacing.unit * 3}px`
+    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`
   },
   textField: {
     flexGrow: 1,
@@ -67,7 +66,7 @@ const styles = theme => ({
     marginTop: '1rem'
   },
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing()
   }
 });
 
@@ -89,10 +88,10 @@ const EditVisualizerHeaderComponent = ({
   handleChangeWidth,
   selectedApplicationMetadata,
   deleteAppDialogOpen,
-  handleDeleteApp,
   handleDeleteAppDismissed,
   handleDeleteAppConfirmed,
   handleDeleteAppClicked,
+  handleOpenAccessControlDialog,
   handleMenuClose,
   handleMenuClick,
   anchorEl,
@@ -104,11 +103,16 @@ const EditVisualizerHeaderComponent = ({
   renameDialogOpen
 }: Props) => (
   <div className={classes.root}>
-    <Paper className={classes.header} position="static" color="default">
+    <Paper
+      elevation={2}
+      className={classes.header}
+      position="static"
+      color="default"
+    >
       <Grid
         container
         direction="column"
-        spacing={16}
+        spacing={2}
         justify="center"
         alignItems="center"
       >
@@ -126,7 +130,7 @@ const EditVisualizerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
-              value={selectedApplicationMetadata.title}
+              value={selectedApplicationMetadata.configuration.title}
               className={classes.textField}
               readOnly
               variant="outlined"
@@ -140,13 +144,13 @@ const EditVisualizerHeaderComponent = ({
             <Typography align="center" variant="h6">
               {selectedVisualizer
                 ? GlobalUtils.getBeautifiedVisualizerTitle(
-                    selectedApplicationMetadata.endpoint
+                    selectedApplicationMetadata.configuration.endpoint
                   )
                 : 'Unkown visualizer type'}
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={16} justify="center">
+        <Grid container spacing={2} justify="center">
           <Grid item>
             <Button
               id="edit-app-publish-button"
@@ -187,7 +191,9 @@ const EditVisualizerHeaderComponent = ({
     >
       <MenuItem onClick={handlePublishClicked}>Get Published URL</MenuItem>
       <MenuItem onClick={handleEmbedClicked}>Get Embed URL</MenuItem>
-      <MenuItem onClick={handleDeleteApp}>Access control</MenuItem>
+      <MenuItem onClick={handleOpenAccessControlDialog}>
+        Access control
+      </MenuItem>
     </Menu>
 
     <Dialog

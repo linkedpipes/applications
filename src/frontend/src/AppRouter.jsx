@@ -17,12 +17,13 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, UserService } from '@utils';
-import { StoragePage, StorageBackend } from '@storage';
+import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
+import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -55,8 +56,7 @@ const styles = () => ({
 type Props = {
   classes: any,
   webId: ?string,
-  // eslint-disable-next-line react/no-unused-prop-types
-  userProfile: Object,
+  // eslint-disable-ne
   handleSetSolidUserProfileAsync: Function,
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
@@ -65,7 +65,13 @@ type Props = {
   handleUpdateApplicationsFolder: Function,
   handleSetUserWebId: Function,
   handleDeleteDiscoverySession: Function,
-  handleDeleteExecutionSession: Function
+  handleDeleteExecutionSession: Function,
+  handleSetUserInboxInvitations: Function,
+  currentInboxInvitations: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoverySessions: Array<Object>,
+  // eslint-disable-next-line react/no-unused-prop-types
+  pipelineExecutions: Array<Object>
 };
 
 type State = {
@@ -116,12 +122,65 @@ class AppRouter extends React.PureComponent<Props, State> {
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
-    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    const me = await StorageToolbox.getPerson(updatedProfileData.webId);
     await this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
       me.image
     );
+  };
+
+  checkInbox = async () => {
+    const {
+      webId,
+      handleSetUserInboxInvitations,
+      currentInboxInvitations
+    } = this.props;
+    const inboxInvitations = await StorageToolbox.getInboxMessages(webId);
+    const invitations = [];
+
+    await Promise.all(
+      inboxInvitations.map(async fileUrl => {
+        const invitation = await StorageToolbox.readInboxInvite(fileUrl, webId);
+
+        if (invitation instanceof Invitation) {
+          Log.info(invitation);
+          invitations.push(invitation);
+        } else {
+          await StorageToolbox.processAcceptShareInvite(invitation);
+
+          toast.info(
+            `${
+              invitation.sender.name
+            } - accepted your invitation to collaborate!`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
+        }
+      })
+    );
+
+    if (
+      !(
+        currentInboxInvitations.length === invitations.length &&
+        currentInboxInvitations.sort().every((value, index) => {
+          return (
+            value.invitationUrl === invitations.sort()[index].invitationUrl
+          );
+        })
+      )
+    ) {
+      handleSetUserInboxInvitations(invitations);
+
+      if (invitations.length > 0) {
+        toast.info(`New notifications received! Check your inbox.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
+    }
   };
 
   setupSessionTracker = async () => {
@@ -151,11 +210,11 @@ class AppRouter extends React.PureComponent<Props, State> {
 
             socket.emit('join', session.webId);
 
-            const folder = await StorageBackend.getValidAppFolder(
+            const folder = await StorageToolbox.getValidAppFolder(
               session.webId
             ).catch(async error => {
               Log.error(error, 'HomeContainer');
-              await StorageBackend.createAppFolders(
+              await StorageToolbox.createAppFolders(
                 session.webId,
                 'linkedpipes'
               ).then(created => {
@@ -171,6 +230,8 @@ class AppRouter extends React.PureComponent<Props, State> {
             if (folder) {
               Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
+              await self.checkInbox();
+              setInterval(self.checkInbox, 10000);
             }
           })
           .catch(error => {
@@ -291,8 +352,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const parsedData = JSON.parse(data);
       if (parsedData.status.isFinished) {
         socket.emit('leave', parsedData.discoveryId);
-        const userProfile = self.props.userProfile;
-        if (userProfile.discoverySessions.length > 0) {
+        if (self.props.discoverySessions.length > 0) {
           const discoveryRecord = {};
 
           discoveryRecord.discoveryId = parsedData.discoveryId;
@@ -322,8 +382,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const newStatus = parsedData.status.status;
 
       socket.emit('leave', executionIri);
-      const userProfile = self.props.userProfile;
-      if (userProfile.pipelineExecutions.length > 0) {
+      if (self.props.pipelineExecutions.length > 0) {
         const pipelineRecord = {};
         pipelineRecord.status = newStatus;
         pipelineRecord.started = parsedData.started;
@@ -400,6 +459,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
+                <StorageInboxDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>
@@ -414,7 +474,10 @@ const mapStateToProps = state => {
     webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight,
-    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
+    discoverySessions: state.user.discoverySessions,
+    pipelineExecutions: state.user.pipelineExecutions,
+    currentInboxInvitations: state.user.inboxInvitations
   };
 };
 
@@ -461,6 +524,9 @@ const mapDispatchToProps = dispatch => {
     });
   };
 
+  const handleSetUserInboxInvitations = inboxInvitations =>
+    dispatch(userActions.setUserInboxInvitations(inboxInvitations));
+
   return {
     handleSetSolidUserProfileAsync,
     handleSetUserWebId,
@@ -471,7 +537,8 @@ const mapDispatchToProps = dispatch => {
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
-    handleUpdateUserDetails
+    handleUpdateUserDetails,
+    handleSetUserInboxInvitations
   };
 };
 

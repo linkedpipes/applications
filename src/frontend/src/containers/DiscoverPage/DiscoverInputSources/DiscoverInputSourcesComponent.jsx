@@ -23,7 +23,7 @@ const DiscoverInputSourcesComponent = ({
   onNextClicked
 }: Props) => (
   <div className={classes.root}>
-    <Grid container spacing={24}>
+    <Grid container spacing={3}>
       <Grid item xs={8} sm={8}>
         <DiscoverSelectorContainer
           onInputExampleClicked={onInputExampleClicked}

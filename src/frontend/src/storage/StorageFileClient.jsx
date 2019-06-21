@@ -13,6 +13,20 @@ class StorageFileClient {
     }
   };
 
+  fetchJsonLDFromUrl = async url => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    return authClient.fetch(url).then(this.assertSuccessfulResponseWithJson);
+  };
+
+  fetchFileFromUrl = async url => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    return authClient.fetch(url).then(this.assertSuccessfulResponseWithText);
+  };
+
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
     const authClient = await import(
@@ -71,6 +85,29 @@ class StorageFileClient {
     return authClient.fetch(path, request);
   };
 
+  removeFile = async (path, itemName) => {
+    const url = `${path}${itemName}`;
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    const response = await authClient.fetch(url, {
+      method: 'DELETE'
+    });
+    Log.info(response);
+    if (response.status === 409 || response.status === 301) {
+      // Solid pod returns 409 if the item is a folder and is not empty
+      // Solid pod returns 301 if is attempted to read a folder url without
+      // '/' at the end (from buildFileUrl)
+      return this.removeFolderRecursively(path, itemName);
+    }
+    if (response.status === 404) {
+      // Don't throw if the item didn't exist
+      return response;
+    }
+    this.assertSuccessfulResponse(response);
+    return response;
+  };
+
   removeItem = async (path, itemName) => {
     const url = `${path}/${itemName}`;
     const authClient = await import(
@@ -123,22 +160,14 @@ class StorageFileClient {
     return this.removeItem(path, folderName);
   };
 
-  updateItem = async (path, itemName, content, contentType) => {
-    await this.removeItem(path, itemName);
+  updateFile = async (path, itemName, content, contentType) => {
+    await this.removeFile(path, itemName);
     return this.createItem(path, itemName, content, contentType);
   };
 
-  buildFolderUrl = async (path, folderName = '') => {
-    return `${path}/${folderName}/`;
-  };
-
-  buildFileUrl = async (path, fileName = '') => {
-    let url =
-      fileName === '.acl' ? `${path}${fileName}` : `${path}/${fileName}`;
-    while (url.slice(-1) === '/') url = url.slice(0, -1);
-    Log.info(url);
-
-    return url;
+  updateItem = async (path, itemName, content, contentType) => {
+    await this.removeItem(path, itemName);
+    return this.createItem(path, itemName, content, contentType);
   };
 
   copyFile = async (
@@ -210,9 +239,47 @@ class StorageFileClient {
     return new Response();
   };
 
+  sendFileToUrl = async (url, data, type) => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    return authClient.fetch(url, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Content-Type': type
+      }
+    });
+  };
+
   assertSuccessfulResponse = (response: Response) => {
     if (!response.ok) throw response;
     return response;
+  };
+
+  assertSuccessfulResponseWithJson = (response: Response) => {
+    if (!response.ok) throw response;
+    return response.json();
+  };
+
+  assertSuccessfulResponseWithText = (response: Response) => {
+    if (!response.ok) throw response;
+    return response.text();
+  };
+
+  executeSPARQLUpdateForUser = async (url, query) => {
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+
+    return authClient.fetch(url, {
+      method: 'PATCH',
+      body: query,
+      headers: {
+        'Content-Type': 'application/sparql-update'
+      }
+    });
   };
 }
 

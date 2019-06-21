@@ -2,24 +2,27 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
+import { filtersActions } from '@ducks/filtersDuck';
 import CreateVisualizerComponent from './CreateVisualizerComponent';
-import AppConfiguration from '@storage/models/AppConfiguration';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedVisualizer: Object,
   headerParams: Object,
-  filters: Object,
   selectedResultGraphIri: string,
   selectedApplication: Object,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedPipelineExecution: string,
+  selectedApplicationMetadata: ApplicationMetadata,
   handleSetCurrentApplicationData: Function,
   handleResetCurrentApplicationData: Function,
-  handleResetCurrentApplicationTitle: Function,
   handleResetCurrentApplicationMetadata: Function,
+  handleSetDefaultFiltersState: Function,
+  handleResetFilters: Function,
   history: Object,
   selectedNodes?: Set<string>,
-  location: Object
+  location: Object,
+  filtersState: {}
 };
 
 type State = {
@@ -43,7 +46,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
 
@@ -58,13 +61,19 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         pathname: '/dashboard'
       });
     }
+    // Set default filters state for given visualizer
+    if (!this.props.selectedApplicationMetadata) {
+      await this.props.handleSetDefaultFiltersState(
+        selectedVisualizer.visualizer.visualizerCode
+      );
+    }
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
     this.props.handleResetCurrentApplicationData();
-    this.props.handleResetCurrentApplicationTitle();
     this.props.handleResetCurrentApplicationMetadata();
+    this.props.handleResetFilters();
   }
 
   setApplicationLoaderStatus(isLoading) {
@@ -82,20 +91,21 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
     const {
       selectedVisualizer,
       headerParams,
-      filters,
       selectedResultGraphIri,
+      selectedPipelineExecution,
       selectedApplication,
       selectedApplicationMetadata,
       handleSetCurrentApplicationData,
-      selectedNodes
+      selectedNodes,
+      filtersState
     } = this.props;
 
     return (
       <CreateVisualizerComponent
         selectedVisualizer={selectedVisualizer}
         headerParams={headerParams}
-        filters={filters}
         selectedResultGraphIri={selectedResultGraphIri}
+        selectedPipelineExecution={selectedPipelineExecution}
         selectedApplication={selectedApplication}
         selectedApplicationMetadata={selectedApplicationMetadata}
         handleSetCurrentApplicationData={handleSetCurrentApplicationData}
@@ -104,6 +114,7 @@ class CreateVisualizerContainer extends PureComponent<Props, State> {
         width={this.state.width}
         height={this.state.height}
         selectedNodes={selectedNodes}
+        filtersState={filtersState}
       />
     );
   }
@@ -113,15 +124,19 @@ const mapStateToProps = state => {
   return {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
-    filters: state.visualizers.filters,
     selectedResultGraphIri: state.etl.selectedResultGraphIri,
+    selectedPipelineExecution: state.etl.selectedPipelineExecution,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
-    selectedNodes: state.filters.nodes
+    selectedNodes: state.filters.nodes,
+    filtersState: state.filters.filtersState
   };
 };
 
 const mapDispatchToProps = dispatch => {
+  const handleSetDefaultFiltersState = visualizerCode =>
+    dispatch(filtersActions.setDefaultFiltersState(visualizerCode));
+
   const handleSetCurrentApplicationData = applicationData =>
     dispatch(applicationActions.setApplication(applicationData));
 
@@ -131,14 +146,14 @@ const mapDispatchToProps = dispatch => {
   const handleResetCurrentApplicationMetadata = () =>
     dispatch(applicationActions.resetApplicationMetadata());
 
-  const handleResetCurrentApplicationTitle = () =>
-    dispatch(applicationActions.resetApplicationTitle());
+  const handleResetFilters = () => dispatch(filtersActions.resetFilters());
 
   return {
     handleSetCurrentApplicationData,
     handleResetCurrentApplicationData,
     handleResetCurrentApplicationMetadata,
-    handleResetCurrentApplicationTitle
+    handleSetDefaultFiltersState,
+    handleResetFilters
   };
 };
 

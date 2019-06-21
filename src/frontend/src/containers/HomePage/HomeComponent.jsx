@@ -42,7 +42,8 @@ type Props = {
   onHandleAppClicked: Function,
   onHandleShareAppClicked: Function,
   onSetApplicationLoaderStatus: Function,
-  onHandlePipelineExecutionRowDeleteClicked: Function
+  onHandlePipelineExecutionRowDeleteClicked: Function,
+  onHandleDeleteAppClicked: Function
 };
 
 const styles = theme => ({
@@ -53,23 +54,23 @@ const styles = theme => ({
     marginRight: '4%'
   },
   paper: {
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     width: '90%'
   },
   createBtn: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     width: '90%',
     backgroundColor: theme.palette.primary.dark,
     color: 'white',
     textTransform: 'none'
   },
   templatesBtn: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
     width: '90%',
     backgroundColor: theme.palette.secondary.main,
     color: 'white',
@@ -92,13 +93,14 @@ class HomeComponent extends PureComponent<Props> {
       onHandleAppClicked,
       onHandleShareAppClicked,
       onSetApplicationLoaderStatus,
-      onHandlePipelineExecutionRowDeleteClicked
+      onHandlePipelineExecutionRowDeleteClicked,
+      onHandleDeleteAppClicked
     } = this.props;
     return (
       <div className={classes.root}>
-        <Grid container spacing={24}>
+        <Grid container spacing={2}>
           <Grid item xs={4}>
-            <Paper className={classes.paper}>
+            <Paper elevation={2} className={classes.paper}>
               <Typography variant="subtitle1" gutterBottom>
                 Create a new application
               </Typography>
@@ -170,6 +172,7 @@ class HomeComponent extends PureComponent<Props> {
                   applicationsList={applicationsList}
                   onHandleShareAppClicked={onHandleShareAppClicked}
                   onHandleAppClicked={onHandleAppClicked}
+                  onHandleDeleteAppClicked={onHandleDeleteAppClicked}
                 />
               )}
             </div>

@@ -7,7 +7,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 // It's optional.
 const darkTheme = createMuiTheme({
   typography: {
-    useNextVariants: true,
     fontFamily: ['"Roboto"', 'sans-serif'].join(',')
   },
   palette: {
@@ -26,7 +25,6 @@ const darkTheme = createMuiTheme({
 
 const lightTheme = createMuiTheme({
   typography: {
-    useNextVariants: true,
     fontFamily: ['"Roboto"', 'sans-serif'].join(',')
   },
   palette: {
