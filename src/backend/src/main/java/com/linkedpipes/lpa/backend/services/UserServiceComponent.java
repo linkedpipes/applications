@@ -203,20 +203,7 @@ public class UserServiceComponent implements UserService {
         profile.pipelineExecutions = new ArrayList<>();
         if (user.getExecutions() != null) {
             for (ExecutionDao e : user.getExecutions()) {
-                PipelineExecution exec = new PipelineExecution();
-                exec.status = e.getStatus();
-                exec.executionIri = e.getExecutionIri();
-                exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-                exec.selectedVisualiser = e.getSelectedVisualiser();
-                exec.started = e.getStarted().getTime() / 1000L;
-                exec.scheduleOn = e.isScheduled();
-                exec.startedByUser = e.isStartedByUser();
-                if (e.getFinished() != null) {
-                    exec.finished = e.getFinished().getTime() / 1000L;
-                } else {
-                    exec.finished = -1;
-                }
-                profile.pipelineExecutions.add(exec);
+                profile.pipelineExecutions.add(getPipelineExecutionFromDao(e));
             }
         }
 
@@ -422,23 +409,27 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
+    private PipelineExecution getPipelineExecutionFromDao(final ExecutionDao e) {
+        PipelineExecution exec = new PipelineExecution();
+        exec.status = e.getStatus();
+        exec.executionIri = e.getExecutionIri();
+        exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
+        exec.selectedVisualiser = e.getSelectedVisualiser();
+        exec.started = e.getStarted().getTime() / 1000L;
+        exec.scheduleOn = e.isScheduled();
+        exec.startedByUser = e.isStartedByUser();
+        if (e.getFinished() != null) {
+            exec.finished = e.getFinished().getTime() / 1000L;
+        } else {
+            exec.finished = -1;
+        }
+        return exec;
+    }
+
     @Override
     public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-            PipelineExecution exec = new PipelineExecution();
-            exec.status = e.getStatus();
-            exec.executionIri = e.getExecutionIri();
-            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-            exec.selectedVisualiser = e.getSelectedVisualiser();
-            exec.started = e.getStarted().getTime() / 1000L;
-            exec.scheduleOn = e.isScheduled();
-            exec.startedByUser = e.isStartedByUser();
-            if (e.getFinished() != null) {
-                exec.finished = e.getFinished().getTime() / 1000L;
-            } else {
-                exec.finished = -1;
-            }
-            return exec;
+            return getPipelineExecutionFromDao(e);
         }
         throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
