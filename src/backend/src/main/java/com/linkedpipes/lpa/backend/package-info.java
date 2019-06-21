@@ -1,3 +1,5 @@
+package com.linkedpipes.lpa.backend;
+
 /**
  * <p>
  * Backend provides API for the LinkedPipes Applications.
