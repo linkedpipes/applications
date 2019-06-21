@@ -2,6 +2,7 @@ package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
+import com.linkedpipes.lpa.backend.entities.profile.PipelineExecution;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
@@ -108,6 +109,12 @@ public class PipelineController {
                                 @NotNull @RequestParam(value="executionIri") String executionIri)
                                 throws LpAppsException {
         scheduledExecutionService.stopScheduledExecution(repeat, executionIri);
+    }
+
+    @NotNull
+    @GetMapping("/api/pipeline/execution")
+    public ResponseEntity<PipelineExecution> getExecution(@NotNull @RequestParam(value="executionIri") String executionIri) throws LpAppsException {
+        return ResponseEntity.ok(userService.getExecution(executionIri));
     }
 
 }

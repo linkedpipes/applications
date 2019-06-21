@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
@@ -418,6 +420,27 @@ public class UserServiceComponent implements UserService {
         }
 
         return transformUserProfile(user);
+    }
+
+    @Override
+    public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
+        for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
+            PipelineExecution exec = new PipelineExecution();
+            exec.status = e.getStatus();
+            exec.executionIri = e.getExecutionIri();
+            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
+            exec.selectedVisualiser = e.getSelectedVisualiser();
+            exec.started = e.getStarted().getTime() / 1000L;
+            exec.scheduleOn = e.isScheduled();
+            exec.startedByUser = e.isStartedByUser();
+            if (e.getFinished() != null) {
+                exec.finished = e.getFinished().getTime() / 1000L;
+            } else {
+                exec.finished = -1;
+            }
+            return exec;
+        }
+        throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
 
 }
