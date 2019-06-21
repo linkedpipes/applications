@@ -6532,6 +6532,11 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+json-form-data@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/json-form-data/-/json-form-data-1.4.1.tgz#eb592e15813e986ebfae393f27c66dc864a153cd"
+  integrity sha512-h9Y1XK6WGo/M4z9t9cA5HZeW0kdFhWUtHeyICXjOHq11xYLh5/gJ3+eAdq953oBgXV73kjsIPC3Rw1+D/R3+lg==
+
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"

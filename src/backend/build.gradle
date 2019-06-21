@@ -61,6 +61,8 @@ dependencies {
 
     compile 'com.corundumstudio.socketio:netty-socketio:1.7.17'
 
+    compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.3.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'

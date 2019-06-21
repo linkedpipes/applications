@@ -102,7 +102,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     }
 
     this.conceptsFetched = new Set();
-    const selectedScheme = schemes.find(s => s.selected);
+    const selectedScheme: Object = schemes.find(s => s.selected);
     this.chartEvents = [
       {
         eventName: 'ready',
