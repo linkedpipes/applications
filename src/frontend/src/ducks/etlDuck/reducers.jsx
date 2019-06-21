@@ -8,12 +8,6 @@ const INITIAL_STATE = {
 
 const etlReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case types.SET_EXECUTION:
-      return {
-        ...state,
-        selectedPipelineExecution: action.selectedPipelineExecution
-      };
-
     case types.SET_SELECTED_RESULT_GRAPH_IRI:
       return {
         ...state,
@@ -22,6 +16,9 @@ const etlReducer = (state = INITIAL_STATE, action) => {
 
     case types.SET_PIPELINE_ID:
       return { ...state, pipelineId: action.pipeline.id };
+
+    case types.SET_PIPELINE_EXECUTION:
+      return { ...state, selectedPipelineExecution: action.pipelineExecution };
 
     default:
       return state;

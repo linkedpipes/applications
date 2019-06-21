@@ -2,9 +2,8 @@ package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.*;
+import org.apache.jena.update.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -30,4 +29,9 @@ public final class JenaUtils {
         return queryExecution.execAsk();
     }
 
+    public static void deleteGraph(String graphName) {
+        UpdateRequest request = UpdateFactory.create() ;
+        request.add(String.format("DROP SILENT GRAPH <%s>", graphName));
+        UpdateExecutionFactory.createRemote(request, ENDPOINT).execute();
+    }
 }

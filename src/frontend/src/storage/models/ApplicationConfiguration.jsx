@@ -71,9 +71,10 @@ export default class ApplicationConfiguration {
   }
 
   static createUploadFilterConfigurationStatement(filtersConfiguration) {
-    if (!filtersConfiguration) {
+    if (!filtersConfiguration || !filtersConfiguration.filtersState) {
       return '';
     }
+
     const filtersState = filtersConfiguration.filtersState;
 
     const { filterGroups } = filtersState;
@@ -397,44 +398,48 @@ export default class ApplicationConfiguration {
       file
     );
 
-    const filterGroupsParsed = {
-      '@type': 'FilterGroup'
-    };
+    let filterConfigurationParsed = { filterGroups: {} };
 
-    const nodesFilter = ApplicationConfiguration.getFilterStructureFromTurtle(
-      store,
-      file,
-      filterGroups,
-      'node'
-    );
+    if (filterGroups) {
+      const filterGroupsParsed = {
+        '@type': 'FilterGroup'
+      };
 
-    if (nodesFilter) {
-      filterGroupsParsed.nodesFilter = nodesFilter;
+      const nodesFilter = ApplicationConfiguration.getFilterStructureFromTurtle(
+        store,
+        file,
+        filterGroups,
+        'node'
+      );
+
+      if (nodesFilter) {
+        filterGroupsParsed.nodesFilter = nodesFilter;
+      }
+
+      const schemeFilter = ApplicationConfiguration.getFilterStructureFromTurtle(
+        store,
+        file,
+        filterGroups,
+        'scheme'
+      );
+
+      if (schemeFilter) {
+        filterGroupsParsed.schemeFilter = schemeFilter;
+      }
+
+      filterConfigurationParsed = {
+        '@type': 'FilterConfiguration',
+        enabled: ApplicationConfiguration.nodeToValue(
+          'enabled',
+          filteredByParams
+        ),
+        visible: ApplicationConfiguration.nodeToValue(
+          'visible',
+          filteredByParams
+        ),
+        filterGroups: filterGroupsParsed
+      };
     }
-
-    const schemeFilter = ApplicationConfiguration.getFilterStructureFromTurtle(
-      store,
-      file,
-      filterGroups,
-      'scheme'
-    );
-
-    if (schemeFilter) {
-      filterGroupsParsed.schemeFilter = schemeFilter;
-    }
-
-    const filterConfigurationParsed = {
-      '@type': 'FilterConfiguration',
-      enabled: ApplicationConfiguration.nodeToValue(
-        'enabled',
-        filteredByParams
-      ),
-      visible: ApplicationConfiguration.nodeToValue(
-        'visible',
-        filteredByParams
-      ),
-      filterGroups: filterGroupsParsed
-    };
 
     return new ApplicationConfiguration({
       '@context': LPA_CONTEXT,

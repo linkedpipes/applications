@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import uuid from 'uuid';
 import { VisualizersService } from '@utils';
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
@@ -32,6 +31,7 @@ type Props = {
     progress: number
   },
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean
 };
@@ -56,15 +56,16 @@ class MapsVisualizer extends PureComponent<Props, State> {
     const {
       selectedResultGraphIri,
       handleSetCurrentApplicationData,
-      isPublished
+      isPublished,
+      selectedPipelineExecution
     } = this.props;
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'map',
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        etlExecutionIri: selectedPipelineExecution,
+        graphIri: selectedResultGraphIri,
+        visualizerType: 'MAP'
       });
     }
 
@@ -87,17 +88,21 @@ class MapsVisualizer extends PureComponent<Props, State> {
   };
 
   updateMarkersState = async (markers: []) => {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedPipelineExecution,
+      selectedResultGraphIri
+    } = this.props;
     const { center, zoom } = averageGeolocation(markers);
     this.setState({ center, zoom });
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'map',
-        markers,
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'MAP'
+        endpoint: 'map',
+        etlExecutionIri: selectedPipelineExecution,
+        graphIri: selectedResultGraphIri,
+        visualizerType: 'MAP'
       });
     }
   };

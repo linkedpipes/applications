@@ -1,24 +1,24 @@
 import types from './types';
 
-const addSelectedPipelineExecution = ({ data } = {}) => ({
-  type: types.SET_EXECUTION,
-  selectedPipelineExecution: data
-});
-
-const addSelectedResultGraphIriAction = ({ data } = {}) => ({
+const addSelectedResultGraphIriAction = selectedResultGraphIri => ({
   type: types.SET_SELECTED_RESULT_GRAPH_IRI,
-  selectedResultGraphIri: data
+  selectedResultGraphIri
 });
 
-const setPipelineIdAction = ({ id } = {}) => ({
+const setPipelineIdAction = pipelineId => ({
   type: types.SET_PIPELINE_ID,
   pipeline: {
-    id
+    id: pipelineId
   }
 });
 
+const setSelectedPipelineExecution = pipelineExecution => ({
+  type: types.SET_PIPELINE_EXECUTION,
+  pipelineExecution
+});
+
 export default {
-  addSelectedPipelineExecution,
   addSelectedResultGraphIriAction,
-  setPipelineIdAction
+  setPipelineIdAction,
+  setSelectedPipelineExecution
 };
