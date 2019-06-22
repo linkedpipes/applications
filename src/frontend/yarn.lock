@@ -7588,10 +7588,10 @@ react-swipeable-views@^0.13.3:
     react-swipeable-views-utils "^0.13.3"
     warning "^4.0.1"
 
-react-toastify@5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-5.2.1.tgz#faa05bc4cd5066ee50bf56c7f8b8fd1492e71aca"
-  integrity sha512-OEZQld/jvjFCQnmXShb73dxVgslEuVz6Jb9/K22x+OcpQH5abtb278tO+Z9FwWsnu8aOvKiPuEYRrSfXC0HF8w==
+react-toastify@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-5.3.1.tgz#7438eb0d284cb992d6c485b00b539bcb362c0868"
+  integrity sha512-R6WVGHQ/kMpqq4Uwsybuo95hxNfaWEN713++ob3QC9674TdBrXEBa0B+5mutLT/O7ShOvHAwfVOzuQFPGAFm5Q==
   dependencies:
     "@babel/runtime" "^7.4.2"
     classnames "^2.2.6"
