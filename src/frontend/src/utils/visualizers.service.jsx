@@ -9,37 +9,37 @@ const VisualizersService = {
   },
 
   getTimelineInstants: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/instants', {
+    return lpaAxios.get('/timeline/instants', {
       params: { resultGraphIri }
     });
   },
 
   getTimelineThingsInstants: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/thingswithinstants', {
+    return lpaAxios.get('/timeline/thingswithinstants', {
       params: { resultGraphIri }
     });
   },
 
   getTimelineThingsWithThingsWithInstants: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/thingswiththingswithinstants', {
+    return lpaAxios.get('/timeline/thingswiththingswithinstants', {
       params: { resultGraphIri }
     });
   },
 
   getTimelineIntervals: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/intervals', {
+    return lpaAxios.get('/timeline/intervals', {
       params: { resultGraphIri }
     });
   },
 
   getTimelineThingsWithIntervals: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/thingswithintervals', {
+    return lpaAxios.get('/timeline/thingswithintervals', {
       params: { resultGraphIri }
     });
   },
 
   getTimelineThingsWithThingsWithIntervals: async resultGraphIri => {
-    return lpaAxios.get('/api/timeline/thingswiththingswithintervals', {
+    return lpaAxios.get('/timeline/thingswiththingswithintervals', {
       params: { resultGraphIri }
     });
   },
