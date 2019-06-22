@@ -1,13 +1,15 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, StorageBackend } from '@storage';
+import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import { globalActions } from '@ducks/globalDuck';
 import { GoogleAnalyticsWrapper } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import UserService from '@utils/user.service';
 
 type Props = {
   selectedApplication: any,
@@ -20,9 +22,11 @@ type Props = {
   selectedApplicationTitle: string,
   applicationsFolder: string,
   setApplicationLoaderStatus: Function,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   handleSetSelectedApplicationTitle: Function,
-  handleSetSelectedApplicationMetadata: Function
+  handleSetSelectedApplicationMetadata: Function,
+  handleUpdateAccessControlDialogState: Function,
+  webId: string
 };
 
 type State = {
@@ -60,8 +64,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppPublished(publishedUrl);
@@ -71,8 +75,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppEmbedded(publishedUrl);
@@ -147,6 +151,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus,
       selectedApplicationMetadata,
       applicationsFolder,
+      webId,
       history
     } = this.props;
 
@@ -159,16 +164,29 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        webId,
+        selectedApplicationMetadata.solidFileUrl
+      );
+
+      GoogleAnalyticsWrapper.trackEvent({
+        category: 'CreateApp',
+        action: 'Pressed delete app',
+        label: `type : '${selectedApplicationMetadata.endpoint}'`
+      });
+
       history.push({
         pathname: '/dashboard'
       });
     }
+  };
 
-    GoogleAnalyticsWrapper.trackEvent({
-      category: 'CreateApp',
-      action: 'Pressed delete app',
-      label: `type : '${selectedApplicationMetadata.endpoint}'`
-    });
+  handleOpenAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(true);
+  };
+
+  handleCloseAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(false);
   };
 
   handleOpenRenameDialog = () => {
@@ -184,6 +202,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus
     } = this.props;
 
+    const applicationMetadata = selectedApplicationMetadata;
+
     if (modifiedSelectedApplicationTitle === '') {
       toast.error('Error, provide a valid name for an application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -195,8 +215,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(true);
     this.handleCloseRenameDialog();
 
-    const isRenamed = await StorageBackend.renameAppConfiguration(
-      selectedApplicationMetadata.url,
+    const isRenamed = await StorageToolbox.renameAppConfiguration(
+      applicationMetadata.solidFileUrl,
       modifiedSelectedApplicationTitle
     );
 
@@ -206,9 +226,9 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
         autoClose: 2000
       });
 
-      selectedApplicationMetadata.title = modifiedSelectedApplicationTitle;
+      applicationMetadata.configuration.title = modifiedSelectedApplicationTitle;
       handleSetSelectedApplicationTitle(modifiedSelectedApplicationTitle);
-      handleSetSelectedApplicationMetadata(selectedApplicationMetadata);
+      handleSetSelectedApplicationMetadata(applicationMetadata);
     } else {
       toast.success('Error, unable to rename application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -256,6 +276,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       handleRenameConfirmed,
       handleCloseRenameDialog,
       handleOpenRenameDialog,
+      handleOpenAccessControlDialog,
+      handleCloseAccessControlDialog,
       handleRenameFieldChanged
     } = this;
     const {
@@ -270,40 +292,45 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       renameDialogOpen
     } = this.state;
     return (
-      <EditVisualizerHeaderComponent
-        handleAppTitleChanged={onHandleAppTitleChanged}
-        handlePublishClicked={handlePublishClicked}
-        handleEmbedClicked={handleEmbedClicked}
-        headerParams={headerParams}
-        onRefreshSwitchChange={onRefreshSwitchChange}
-        publishDialogOpen={publishDialogOpen}
-        embedDialogOpen={embedDialogOpen}
-        handleClosePublishDialog={handleClosePublishDialog}
-        handleCloseEmbedDialog={handleCloseEmbedDialog}
-        handleProceedToApplicationClicked={handleProceedToApplicationClicked}
-        handleCopyLinkClicked={handleCopyLinkClicked}
-        selectedVisualizer={selectedVisualizer}
-        selectedApplicationTitle={selectedApplicationTitle}
-        appIri={appIri}
-        height={height}
-        width={width}
-        handleChangeWidth={handleChangeWidth}
-        handleChangeHeight={handleChangeHeight}
-        selectedApplicationMetadata={selectedApplicationMetadata}
-        deleteAppDialogOpen={deleteAppDialogOpen}
-        handleMenuClose={handleMenuClose}
-        anchorEl={anchorEl}
-        handleMenuClick={handleMenuClick}
-        handleDeleteAppClicked={handleDeleteAppClicked}
-        handleDeleteAppDismissed={handleDeleteAppDismissed}
-        handleDeleteAppConfirmed={handleDeleteAppConfirmed}
-        modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
-        handleRenameFieldChanged={handleRenameFieldChanged}
-        handleOpenRenameDialog={handleOpenRenameDialog}
-        handleCloseRenameDialog={handleCloseRenameDialog}
-        handleRenameConfirmed={handleRenameConfirmed}
-        renameDialogOpen={renameDialogOpen}
-      />
+      <Fragment>
+        <EditVisualizerHeaderComponent
+          handleAppTitleChanged={onHandleAppTitleChanged}
+          handlePublishClicked={handlePublishClicked}
+          handleEmbedClicked={handleEmbedClicked}
+          headerParams={headerParams}
+          onRefreshSwitchChange={onRefreshSwitchChange}
+          publishDialogOpen={publishDialogOpen}
+          embedDialogOpen={embedDialogOpen}
+          handleClosePublishDialog={handleClosePublishDialog}
+          handleCloseEmbedDialog={handleCloseEmbedDialog}
+          handleProceedToApplicationClicked={handleProceedToApplicationClicked}
+          handleCopyLinkClicked={handleCopyLinkClicked}
+          selectedVisualizer={selectedVisualizer}
+          selectedApplicationTitle={selectedApplicationTitle}
+          appIri={appIri}
+          height={height}
+          width={width}
+          handleChangeWidth={handleChangeWidth}
+          handleChangeHeight={handleChangeHeight}
+          selectedApplicationMetadata={selectedApplicationMetadata}
+          deleteAppDialogOpen={deleteAppDialogOpen}
+          handleMenuClose={handleMenuClose}
+          anchorEl={anchorEl}
+          handleMenuClick={handleMenuClick}
+          handleDeleteAppClicked={handleDeleteAppClicked}
+          handleDeleteAppDismissed={handleDeleteAppDismissed}
+          handleDeleteAppConfirmed={handleDeleteAppConfirmed}
+          modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
+          handleOpenAccessControlDialog={handleOpenAccessControlDialog}
+          handleCloseAccessControlDialog={handleCloseAccessControlDialog}
+          handleRenameFieldChanged={handleRenameFieldChanged}
+          handleOpenRenameDialog={handleOpenRenameDialog}
+          handleCloseRenameDialog={handleCloseRenameDialog}
+          handleRenameConfirmed={handleRenameConfirmed}
+          renameDialogOpen={renameDialogOpen}
+        />
+        <StorageAccessControlDialog />
+      </Fragment>
     );
   }
 }
@@ -316,7 +343,7 @@ const mapStateToProps = state => {
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
-    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    selectedApplicationTitle: state.application.selectedApplication.title,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };
@@ -332,10 +359,14 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationTitle = applicationTitle =>
     dispatch(applicationActions.setApplicationTitle(applicationTitle));
 
+  const handleUpdateAccessControlDialogState = state =>
+    dispatch(globalActions.setAccessControlDialogState({ state }));
+
   return {
     handleAppTitleChanged,
     handleSetSelectedApplicationMetadata,
-    handleSetSelectedApplicationTitle
+    handleSetSelectedApplicationTitle,
+    handleUpdateAccessControlDialogState
   };
 };
 

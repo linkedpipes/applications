@@ -19,11 +19,13 @@ const jsx = (
   </Provider>
 );
 
-Sentry.init({
-  dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419',
-  environment: process.env.NODE_ENV,
-  debug: process.env.NODE_ENV !== 'production'
-});
+if (process.env.NODE_ENV === 'production') {
+  Sentry.init({
+    dsn: 'https://1da20b1a10f245cab2220da15f2a56a1@sentry.io/1283419',
+    environment: process.env.NODE_ENV,
+    debug: process.env.NODE_ENV !== 'production'
+  });
+}
 
 GoogleAnalyticsWrapper.initialize('UA-139954974-1');
 

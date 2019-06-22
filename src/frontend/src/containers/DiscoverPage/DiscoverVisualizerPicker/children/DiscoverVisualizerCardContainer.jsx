@@ -95,11 +95,7 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setActiveStep(3));
 
   const handleSetSelectedPipelineId = pipelineId =>
-    dispatch(
-      etlActions.setPipelineIdAction({
-        id: pipelineId
-      })
-    );
+    dispatch(etlActions.setPipelineIdAction(pipelineId));
 
   const onAddSelectedVisualizer = visualizerData =>
     dispatch(

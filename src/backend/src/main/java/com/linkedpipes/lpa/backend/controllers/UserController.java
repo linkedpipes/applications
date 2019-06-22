@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * User profile management endpoints.
+ */
 @RestController
 @Profile("!disableDB")
 public class UserController {
@@ -174,4 +177,30 @@ public class UserController {
         }
     }
 
+    @PostMapping("/api/user/application")
+    public ResponseEntity<UserProfile> addApplication(
+        @NotNull @RequestParam(value = "webId", required = true) String user,
+        @NotNull @RequestParam(value = "solidIri", required = true) String solidIri,
+        @NotNull @RequestParam(value = "executionIri", required = true) String executionIri)
+        throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.addApplication(user, executionIri, solidIri));
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + user);
+            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
+        }
+    }
+
+    @DeleteMapping("/api/user/application")
+    public ResponseEntity<UserProfile> deleteApplication(
+        @NotNull @RequestParam(value = "webId", required = true) String user,
+        @NotNull @RequestParam(value = "solidIri", required = true) String solidIri)
+        throws LpAppsException {
+        try {
+            return ResponseEntity.ok(userService.deleteApplication(user, solidIri));
+        } catch (UserNotFoundException e) {
+            logger.error("User not found: " + user);
+            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
+        }
+    }
 }

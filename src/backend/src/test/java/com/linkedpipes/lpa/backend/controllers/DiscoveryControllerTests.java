@@ -71,11 +71,6 @@ class DiscoveryControllerTests {
     }
 
     @Test
-    void testStartDiscoveryFromInputEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, "", ""));
-    }
-
-    @Test
     void testStartDiscoveryFromInputIriFake() {
         assertThrows(LpAppsException.class, () ->
                 discoveryController.startDiscoveryFromInputIri(USER_ID, "This is a fake Discovery IRI.", TEST_TREEMAP_DATA_SAMPLE_URI));

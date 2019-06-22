@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
+import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
@@ -11,8 +12,16 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
+import com.linkedpipes.lpa.backend.util.GitHubUtils;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
+import com.linkedpipes.lpa.backend.util.RdfUtils;
+import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,11 +31,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -125,20 +138,68 @@ public class ExecutorServiceComponent implements ExecutorService {
         return discovery;
     }
 
+    /**
+     * Start a discovery using a provided IRI referencing an RDF file, by reading the RDF data
+     * from the URI and proceeding to start discovery using that data
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfFileIri IRI to a file containing RDF data
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws IOException reading RDF data from URI failed
+     */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException, IOException {
+    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
         //read rdf data from iri and upload it to our virtuoso, create discovery config
-        //TODO consider using Jena Model instead of stream
-        InputStream inputStream = new URL(rdfFileIri).openStream();
-        String rdfData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
-        return startDiscoveryFromInput(rdfData, userId, dataSampleIri);
+        ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
+        //get rdf data in TTL format
+        String rdfData = mb.toString();
+        return startDiscoveryFromInput(rdfData, RDFLanguages.TTL, userId, dataSampleIri);
     }
 
+    /**
+     * Start a discovery using provided RDF data, by uploading the RDF data into our Virtuoso
+     * instance, and proceed to start the discovery using our Virtuoso's SPARQL endpoint
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfData RDF data
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
     @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull String rdfData, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
-        //upload rdf to our virtuoso, create discovery config and pass it to discovery
-        String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(rdfData);
-        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+    public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
+        //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
+        String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
+        String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
+        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+    }
+
+    /**
+     * Start a discovery using provided RDF data, by uploading the RDF data into our Virtuoso
+     * instance, and proceed to start the discovery using our Virtuoso's SPARQL endpoint
+     *
+     * @param userId web ID of the user who started the discovery
+     * @param rdfFile RDF data in file
+     * @param dataSampleFile data sample in file
+     * @return discovery ID wrapped in JSON object
+     * @throws LpAppsException call to discovery failed
+     * @throws UserNotFoundException user was not found
+     */
+    @NotNull @Override
+    public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @NotNull MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
+        Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
+        Lang dataSampleFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(dataSampleFile.getContentType());
+
+        if (rdfFileLanguage == null || dataSampleFileLanguage == null){
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "File content type not supported");
+        }
+
+        String dataSampleIri = GitHubUtils.uploadGistFile(dataSampleFile.getName(), RdfUtils.RdfDataToTurtleFormat(new String(dataSampleFile.getBytes()), dataSampleFileLanguage));
+
+        return startDiscoveryFromInput(new String(rdfFile.getBytes()), rdfFileLanguage, userId, dataSampleIri);
     }
 
     /**

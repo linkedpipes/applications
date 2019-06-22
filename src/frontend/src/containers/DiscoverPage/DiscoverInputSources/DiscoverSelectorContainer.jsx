@@ -33,7 +33,9 @@ type Props = {
   handleSetRdfInputIriUrlFieldValue: Function,
   inputType: string,
   handleSetRdfFile: Function,
+  handleSetRdfDataSampleFile: Function,
   rdfFile: Object,
+  rdfDataSampleFile: Object,
   activeDiscoverTabIndex: Number,
   handleSetActiveDiscoverTabIndex: Function
 };
@@ -62,8 +64,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   postStartFromRdfInputFile = async () => {
     return DiscoveryService.postDiscoverFromInputFile({
       webId: this.props.webId,
-      dataSampleIri: this.props.dataSampleIri,
-      rdfFile: this.props.rdfFile
+      rdfFile: this.props.rdfFile,
+      rdfDataSampleFile: this.props.rdfDataSampleFile
     }).then(response => {
       return response;
     });
@@ -246,6 +248,15 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     }
   };
 
+  handleSetRdfDataSampleFile = file => {
+    if (!file) {
+      Log.info('Rdf data sample file deselected', 'DiscoverSelectorContainer');
+    } else {
+      Log.info('Rdf data sample file selected', 'DiscoverSelectorContainer');
+      this.props.handleSetRdfDataSampleFile(file);
+    }
+  };
+
   handleTabIndexChange = (event, newValue) => {
     const { activeDiscoverTabIndex } = this.props;
     if (activeDiscoverTabIndex !== newValue) {
@@ -290,6 +301,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
           this.handleRdfInputIriTextFieldChange
         }
         onHandleSetRdfFile={this.handleSetRdfFile}
+        onHandleSetRdfDataSampleFile={this.handleSetRdfDataSampleFile}
         rdfInputIri={rdfInputIri}
         tabIndex={activeDiscoverTabIndex}
         onHandleTabIndexChange={this.handleTabIndexChange}
@@ -317,6 +329,7 @@ const mapStateToProps = state => {
     webId: state.user.webId,
     rdfInputIri: state.discover.rdfInputIri,
     rdfFile: state.discover.rdfFile,
+    rdfDataSampleFile: state.discover.rdfDataSampleFile,
     inputType: state.discover.inputType,
     activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex
   };
@@ -353,6 +366,10 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setRdfFile(file));
   };
 
+  const handleSetRdfDataSampleFile = file => {
+    dispatch(discoverActions.setRdfDataSampleFile(file));
+  };
+
   const handleSetActiveDiscoverTabIndex = tabIndex => {
     dispatch(discoverActions.setActiveDiscoverTabIndexAsync(tabIndex));
   };
@@ -366,6 +383,7 @@ const mapDispatchToProps = dispatch => {
     handleSetRdfInputIriUrlFieldValue,
     resetFieldsAndExamples,
     handleSetRdfFile,
+    handleSetRdfDataSampleFile,
     handleSetActiveDiscoverTabIndex
   };
 };

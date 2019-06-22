@@ -1,5 +1,6 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
@@ -7,6 +8,7 @@ import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.*;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
+import org.apache.jena.riot.Lang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -60,24 +63,45 @@ public class DiscoveryController {
         }
     }
 
+    /**
+     * Start discovery of pipelines from received RDF data
+     * @param rdfFile main RDF data file
+     * @param dataSampleFile data sample for main file
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
-                                                             @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                             @Nullable @RequestBody String rdfInput) throws LpAppsException {
-        if (rdfInput == null || rdfInput.isEmpty()) {
+                                                             @RequestParam("rdfFile") MultipartFile rdfFile,
+                                                             @RequestParam("dataSampleFile") MultipartFile dataSampleFile) throws LpAppsException, IOException {
+        if (rdfFile == null || rdfFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
+        }
+
+        if (dataSampleFile == null || dataSampleFile.isEmpty()) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF data sample not provided");
         }
 
         try {
             userService.addUserIfNotPresent(webId);
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(rdfInput, webId, dataSampleIri));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, dataSampleFile, webId));
 
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
+    /**
+     * Start discovery of pipelines using data referenced by IRI
+     * @param rdfFileIri IRI referencing a file with RDF data
+     * @param dataSampleIri
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     * @throws IOException reading RDF data from URI failed
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,

@@ -23,14 +23,28 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.typesafe.config.ConfigFactory.*;
 
+/**
+ * Backend entrypoint. SpringBoot and SocketIO server are initialized here, as
+ * well as the application scheduler for backend-side polling.
+ */
 @SpringBootApplication
 public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final Charset DEFAULT_CHARSET = Charset.defaultCharset();
+    /**
+     * Application-wide Socket.io server.
+     */
     public static final SocketIOServer SOCKET_IO_SERVER = getSocketIoServer();
+
+    /**
+     * Application-wide scheduler for backend-side polling.
+     */
     public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1);
 
+    /**
+     * CORS configuration.
+     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -50,6 +64,9 @@ public class Application {
         return new io.sentry.spring.SentryServletContextInitializer();
     }
 
+    /**
+     * Sentry exception handler.
+     */
     @Bean
     public HandlerExceptionResolver sentryExceptionResolver() {
         return new io.sentry.spring.SentryExceptionResolver() {
@@ -70,6 +87,10 @@ public class Application {
         };
     }
 
+    /**
+     * Socket.io server factory.
+     * @return Socket.io server
+     */
     @NotNull
     private static SocketIOServer getSocketIoServer() {
         Configuration config = new Configuration();

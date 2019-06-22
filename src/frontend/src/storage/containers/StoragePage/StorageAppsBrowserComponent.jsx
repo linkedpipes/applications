@@ -3,9 +3,10 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { StorageAppsBrowserCardComponent } from './children';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import StorageAppsBrowserCardComponent from './children/StorageAppsBrowserCardComponent';
 import Emoji from 'react-emoji-render';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import uuid from 'uuid';
 
 const styles = () => ({
   root: {
@@ -29,7 +30,7 @@ type Props = {
     root: {},
     gridArea: {}
   },
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   onHandleApplicationDeleted: Function,
   setApplicationLoaderStatus: Function
 };
@@ -48,16 +49,9 @@ function StorageAppsBrowserComponent(props: Props) {
         <div className={classes.gridArea}>
           <Grid container spacing={1}>
             {applicationsMetadata.map((metadata, index) => (
-              <Grid
-                key={metadata.createdAt}
-                item
-                xs={3}
-                sm={3}
-                md={3}
-                lg={2}
-                xl={2}
-              >
+              <Grid key={uuid.v4()} item xs={3} sm={3} md={3} lg={2} xl={2}>
                 <StorageAppsBrowserCardComponent
+                  key={uuid.v4()}
                   indexNumber={index}
                   applicationMetadata={metadata}
                   setApplicationLoaderStatus={setApplicationLoaderStatus}
