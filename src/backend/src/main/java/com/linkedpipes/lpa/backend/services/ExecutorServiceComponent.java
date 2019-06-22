@@ -280,13 +280,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-            PipelineExecution exec = new PipelineExecution();
-            exec.status = executionStatus.status;
-            exec.executionIri = e.getExecutionIri();
-            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-            exec.selectedVisualiser = e.getSelectedVisualiser();
-            exec.started = executionStatus.getStarted();
-            exec.finished = executionStatus.getFinished();
+            PipelineExecution exec = PipelineExecution.getPipelineExecutionFromDao(e);
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(exec));
         }
     }

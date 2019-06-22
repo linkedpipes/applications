@@ -203,7 +203,7 @@ public class UserServiceComponent implements UserService {
         profile.pipelineExecutions = new ArrayList<>();
         if (user.getExecutions() != null) {
             for (ExecutionDao e : user.getExecutions()) {
-                profile.pipelineExecutions.add(getPipelineExecutionFromDao(e));
+                profile.pipelineExecutions.add(PipelineExecution.getPipelineExecutionFromDao(e));
             }
         }
 
@@ -409,27 +409,12 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
-    private PipelineExecution getPipelineExecutionFromDao(final ExecutionDao e) {
-        PipelineExecution exec = new PipelineExecution();
-        exec.status = e.getStatus();
-        exec.executionIri = e.getExecutionIri();
-        exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-        exec.selectedVisualiser = e.getSelectedVisualiser();
-        exec.started = e.getStarted().getTime() / 1000L;
-        exec.scheduleOn = e.isScheduled();
-        exec.startedByUser = e.isStartedByUser();
-        if (e.getFinished() != null) {
-            exec.finished = e.getFinished().getTime() / 1000L;
-        } else {
-            exec.finished = -1;
-        }
-        return exec;
-    }
+
 
     @Override
     public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
         List<ExecutionDao> lst = executionRepository.findByExecutionIri(executionIri);
-        if (!lst.isEmpty()) return getPipelineExecutionFromDao(lst.get(0));
+        if (!lst.isEmpty()) return PipelineExecution.getPipelineExecutionFromDao(lst.get(0));
         throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
 
