@@ -46,7 +46,7 @@
     "pigeon-maps": "^0.13.0",
     "pigeon-marker": "^0.3.4",
     "prop-types": "15.7.2",
-    "query-string": "6.7.0",
+    "query-string": "6.8.1",
     "rdflib": "0.20.1",
     "react": "16.8.6",
     "react-chord-diagram": "1.2.0",
