@@ -1825,10 +1825,10 @@ babel-plugin-module-resolver@3.2.0:
     reselect "^3.0.1"
     resolve "^1.4.0"
 
-babel-plugin-smart-webpack-import@1.4.5:
-  version "1.4.5"
-  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.4.5.tgz#5f3ab6cb1473bedc8b69bc60f1f1b1d16a227527"
-  integrity sha512-9lmuZYWgMeZazhTcHm4ehq7KWvYQQ104k2wYgDrNQT9syzyTiyNKNtlQhi3FNlTm7xFpoa1AZP5HJz9tbkKzkw==
+babel-plugin-smart-webpack-import@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.4.6.tgz#c2b7ec81145085dae1e153fd2a9e4e1658473b89"
+  integrity sha512-FQ05z3Gkje13cNJ12zWkOH4ymuIPYaTJpqvoGm2xYtpbfzhJnhN7SSpI2TZVSvzh58PGOBuGD6GSLVvoMWa+nw==
   dependencies:
     app-root-dir "^1.0.2"
     base-x "^3.0.5"
