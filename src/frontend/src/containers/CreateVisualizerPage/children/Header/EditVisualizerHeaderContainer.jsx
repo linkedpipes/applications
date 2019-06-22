@@ -7,21 +7,19 @@ import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';
-import { GoogleAnalyticsWrapper, ETLService, Log } from '@utils';
+import { GoogleAnalyticsWrapper, ETLService } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import UserService from '@utils/user.service';
 
 const intervalTypeToHours = (interval, type) => {
   const numberInterval = Number(interval);
   switch (type) {
-    case 'Hours':
-      return interval;
     case 'Days':
       return `${numberInterval * 24}`;
     case 'Weeks':
       return `${numberInterval * 7 * 24}`;
     default:
-      break;
+      return interval;
   }
 };
 
@@ -40,8 +38,7 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleUpdateAccessControlDialogState: Function,
-  webId: string,
-  handleDataRefreshToggleClicked: Function
+  webId: string
 };
 
 type State = {

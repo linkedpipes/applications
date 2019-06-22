@@ -69,7 +69,11 @@ type Props = {
   dataRefreshDialogOpen: boolean,
   handleDataRefreshValueChange: Function,
   handleDataRefreshToggleClicked: Function,
-  selectedPipelineExecution: Object
+  selectedPipelineExecution: Object,
+  handleDataRefreshClicked: Function,
+  handleDataRefreshDismissed: Function,
+  selectedDataRefreshInterval: Function,
+  handleDataRefreshTypeChange: Function
 };
 
 const styles = theme => ({
