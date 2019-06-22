@@ -7,9 +7,23 @@ import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';
-import { GoogleAnalyticsWrapper } from '@utils';
+import { GoogleAnalyticsWrapper, ETLService, Log } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import UserService from '@utils/user.service';
+
+const intervalTypeToHours = (interval, type) => {
+  const numberInterval = Number(interval);
+  switch (type) {
+    case 'Hours':
+      return interval;
+    case 'Days':
+      return `${numberInterval * 24}`;
+    case 'Weeks':
+      return `${numberInterval * 7 * 24}`;
+    default:
+      break;
+  }
+};
 
 type Props = {
   selectedApplication: any,
@@ -26,7 +40,8 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleUpdateAccessControlDialogState: Function,
-  webId: string
+  webId: string,
+  handleDataRefreshToggleClicked: Function
 };
 
 type State = {
@@ -36,9 +51,13 @@ type State = {
   height: number,
   width: number,
   deleteAppDialogOpen: boolean,
-  anchorEl: Object,
+  sharingAnchorEl: Object,
+  settingsAnchorEl: Object,
   modifiedSelectedApplicationTitle: string,
-  renameDialogOpen: boolean
+  renameDialogOpen: boolean,
+  dataRefreshDialogOpen: boolean,
+  selectedDataRefreshInterval: { type: string, value: string },
+  selectedPipelineExecution: ?{ scheduleOn: boolean }
 };
 
 class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
@@ -49,16 +68,38 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     height: 400,
     width: 400,
     deleteAppDialogOpen: false,
-    anchorEl: undefined,
+    sharingAnchorEl: undefined,
+    settingsAnchorEl: undefined,
     modifiedSelectedApplicationTitle: '',
-    renameDialogOpen: false
+    renameDialogOpen: false,
+    dataRefreshDialogOpen: false,
+    selectedDataRefreshInterval: { value: '', type: 'Hours' },
+    selectedPipelineExecution: undefined
   };
 
   componentDidMount() {
     this.setState({
       modifiedSelectedApplicationTitle: this.props.selectedApplicationTitle
     });
+
+    this.fetchCurrentPipelineExecution();
   }
+
+  fetchCurrentPipelineExecution = async () => {
+    const { selectedApplicationMetadata } = this.props;
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+
+    const pipelineExecutionResponse = await ETLService.getPipelineExecution({
+      executionIri
+    });
+
+    if (pipelineExecutionResponse.status === 200) {
+      this.setState({
+        selectedPipelineExecution: pipelineExecutionResponse.data
+      });
+    }
+  };
 
   handlePublishClicked = async () => {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
@@ -129,12 +170,16 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ height: event.target.value });
   };
 
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  handleSharingMenuClick = event => {
+    this.setState({ sharingAnchorEl: event.currentTarget });
+  };
+
+  handleSettingsMenuClick = event => {
+    this.setState({ settingsAnchorEl: event.currentTarget });
   };
 
   handleMenuClose = () => {
-    this.setState({ anchorEl: null });
+    this.setState({ sharingAnchorEl: null, settingsAnchorEl: null });
   };
 
   handleDeleteAppClicked = () => {
@@ -250,6 +295,131 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ renameDialogOpen: false });
   };
 
+  handleDataRefreshClicked = () => {
+    this.handleMenuClose();
+    this.setState({ dataRefreshDialogOpen: true });
+  };
+
+  handleDataRefreshConfirmed = async () => {
+    const {
+      webId,
+      selectedApplicationMetadata,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
+    const { selectedDataRefreshInterval } = this.state;
+
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+    const selectedVisualiser = this.props.selectedVisualizer.visualizer
+      .visualizerCode;
+    const frequencyHours = intervalTypeToHours(
+      selectedDataRefreshInterval.value,
+      selectedDataRefreshInterval.type
+    );
+
+    const response = await ETLService.setupRepeatedPipelineExecution({
+      webId,
+      selectedVisualiser,
+      executionIri,
+      frequencyHours
+    });
+
+    if (response.status === 200) {
+      toast.success('Background data refreshing is enabled!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+    } else {
+      toast.error('Error! Unable to setup background data refreshing.', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+    }
+
+    this.setState({ dataRefreshDialogOpen: false });
+    await setApplicationLoaderStatus(false);
+  };
+
+  handleDataRefreshDismissed = async () => {
+    this.setState({ dataRefreshDialogOpen: false });
+  };
+
+  handleDataRefreshTypeChange = event => {
+    this.setState(prevState => {
+      return {
+        selectedDataRefreshInterval: {
+          value: prevState.selectedDataRefreshInterval.value,
+          type: event.target.value
+        }
+      };
+    });
+  };
+
+  handleDataRefreshValueChange = event => {
+    const value = event.target.value ? event.target.value : '';
+    this.setState(prevState => {
+      return {
+        selectedDataRefreshInterval: {
+          type: prevState.selectedDataRefreshInterval.type,
+          value
+        }
+      };
+    });
+  };
+
+  handleDataRefreshToggleClicked = async () => {
+    const {
+      selectedApplicationMetadata,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+    const pipelineExecution: any = this.state.selectedPipelineExecution;
+
+    pipelineExecution.scheduleOn = !pipelineExecution.scheduleOn;
+
+    if (pipelineExecution) {
+      const response = await ETLService.toggleRepeatedPipelineExecution({
+        executionIri,
+        repeat: pipelineExecution.scheduleOn
+      });
+      if (response.status === 200) {
+        this.setState({
+          selectedPipelineExecution: pipelineExecution,
+          dataRefreshDialogOpen: false
+        });
+
+        toast.success(
+          `Successfully ${
+            pipelineExecution.scheduleOn ? 'enabled' : 'disabled'
+          } data refreshing!`,
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      } else {
+        toast.error(
+          `Error! Unable to  ${
+            pipelineExecution.scheduleOn ? 'enable' : 'disable'
+          } data refreshing!`,
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      }
+    }
+
+    await setApplicationLoaderStatus(false);
+  };
+
   render() {
     const {
       headerParams,
@@ -269,7 +439,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       handleChangeHeight,
       handleChangeWidth,
       handleMenuClose,
-      handleMenuClick,
+      handleSharingMenuClick,
+      handleSettingsMenuClick,
       handleDeleteAppClicked,
       handleDeleteAppDismissed,
       handleDeleteAppConfirmed,
@@ -278,7 +449,13 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       handleOpenRenameDialog,
       handleOpenAccessControlDialog,
       handleCloseAccessControlDialog,
-      handleRenameFieldChanged
+      handleRenameFieldChanged,
+      handleDataRefreshClicked,
+      handleDataRefreshConfirmed,
+      handleDataRefreshDismissed,
+      handleDataRefreshTypeChange,
+      handleDataRefreshValueChange,
+      handleDataRefreshToggleClicked
     } = this;
     const {
       embedDialogOpen,
@@ -287,9 +464,13 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       height,
       width,
       deleteAppDialogOpen,
-      anchorEl,
+      sharingAnchorEl,
+      settingsAnchorEl,
       modifiedSelectedApplicationTitle,
-      renameDialogOpen
+      renameDialogOpen,
+      dataRefreshDialogOpen,
+      selectedDataRefreshInterval,
+      selectedPipelineExecution
     } = this.state;
     return (
       <Fragment>
@@ -315,11 +496,16 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
           selectedApplicationMetadata={selectedApplicationMetadata}
           deleteAppDialogOpen={deleteAppDialogOpen}
           handleMenuClose={handleMenuClose}
-          anchorEl={anchorEl}
-          handleMenuClick={handleMenuClick}
+          sharingAnchorEl={sharingAnchorEl}
+          settingsAnchorEl={settingsAnchorEl}
+          handleSharingMenuClick={handleSharingMenuClick}
+          handleSettingsMenuClick={handleSettingsMenuClick}
           handleDeleteAppClicked={handleDeleteAppClicked}
+          handleDataRefreshClicked={handleDataRefreshClicked}
+          handleDataRefreshDismissed={handleDataRefreshDismissed}
           handleDeleteAppDismissed={handleDeleteAppDismissed}
           handleDeleteAppConfirmed={handleDeleteAppConfirmed}
+          handleDataRefreshConfirmed={handleDataRefreshConfirmed}
           modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
           handleOpenAccessControlDialog={handleOpenAccessControlDialog}
           handleCloseAccessControlDialog={handleCloseAccessControlDialog}
@@ -328,6 +514,12 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
           handleCloseRenameDialog={handleCloseRenameDialog}
           handleRenameConfirmed={handleRenameConfirmed}
           renameDialogOpen={renameDialogOpen}
+          dataRefreshDialogOpen={dataRefreshDialogOpen}
+          selectedDataRefreshInterval={selectedDataRefreshInterval}
+          handleDataRefreshTypeChange={handleDataRefreshTypeChange}
+          handleDataRefreshValueChange={handleDataRefreshValueChange}
+          handleDataRefreshToggleClicked={handleDataRefreshToggleClicked}
+          selectedPipelineExecution={selectedPipelineExecution}
         />
         <StorageAccessControlDialog />
       </Fragment>
