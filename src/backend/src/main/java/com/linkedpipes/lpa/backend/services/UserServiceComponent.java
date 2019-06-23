@@ -6,6 +6,7 @@ import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
@@ -201,18 +203,7 @@ public class UserServiceComponent implements UserService {
         profile.pipelineExecutions = new ArrayList<>();
         if (user.getExecutions() != null) {
             for (ExecutionDao e : user.getExecutions()) {
-                PipelineExecution exec = new PipelineExecution();
-                exec.status = e.getStatus();
-                exec.executionIri = e.getExecutionIri();
-                exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-                exec.selectedVisualiser = e.getSelectedVisualiser();
-                exec.started = e.getStarted().getTime() / 1000L;
-                if (e.getFinished() != null) {
-                    exec.finished = e.getFinished().getTime() / 1000L;
-                } else {
-                    exec.finished = -1;
-                }
-                profile.pipelineExecutions.add(exec);
+                profile.pipelineExecutions.add(PipelineExecution.getPipelineExecutionFromDao(e));
             }
         }
 
@@ -246,7 +237,6 @@ public class UserServiceComponent implements UserService {
                                        throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
-        PipelineInformationDao pipelineInformationToDelete = null;
 
         for (ExecutionDao execution : user.getExecutions()) {
             if (execution.getExecutionIri().equals(executionIri)) {
@@ -255,6 +245,14 @@ public class UserServiceComponent implements UserService {
             }
         }
 
+        removeExecutionFromUser(user, toDelete);
+
+        return transformUserProfile(user);
+    }
+
+    private void removeExecutionFromUser(UserDao user, ExecutionDao toDelete) {
+        PipelineInformationDao pipelineInformationToDelete = null;
+
         if (toDelete != null) {
             user.removeExecution(toDelete);
 
@@ -262,12 +260,19 @@ public class UserServiceComponent implements UserService {
                 pipelineInformationToDelete = toDelete.getPipeline();
             }
 
-            if (toDelete.getApplications().isEmpty()) {
+            List<ExecutionDao> executions = new ArrayList<>();
+            for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(toDelete.getPipeline().getResultGraphIri())) {
+                executions.addAll(x.getExecutions());
+            }
+
+            if (toDelete.getApplications().isEmpty()) { //this is for repeated executions using the same NG
                 //no applications - delete from virtuoso
                 String graphName = toDelete.getPipeline().getResultGraphIri();
                 VirtuosoService.deleteNamedGraph(graphName);
 
-                executionRepository.delete(toDelete);
+                for (ExecutionDao e : executions) {
+                    executionRepository.delete(e);
+                }
 
                 if (pipelineInformationToDelete != null) {
                     pipelineRepository.delete(pipelineInformationToDelete);
@@ -279,8 +284,6 @@ public class UserServiceComponent implements UserService {
 
             repository.save(user);
         }
-
-        return transformUserProfile(user);
     }
 
     /**
@@ -362,8 +365,30 @@ public class UserServiceComponent implements UserService {
             if (app.getSolidIri().equals(solidIri)) {
                 ExecutionDao execution = app.getExecution();
                 if (null != execution) {
-                    if (execution.isRemoved()) {
-                        //execution was already removed
+                    if (execution.isScheduled()) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.getExecutionIri().equals(execution.getExecutionIri())) {
+                                    executionRepository.delete(y);
+                                }
+                            }
+                        }
+                    }
+
+                    boolean allRemoved = execution.isRemoved();
+                    if (allRemoved) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.isRemoved()) {
+                                    allRemoved = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (allRemoved) {
+                        //all executions were already removed
                         String graphName = app.getExecution().getPipeline().getResultGraphIri();
                         VirtuosoService.deleteNamedGraph(graphName);
 
@@ -382,6 +407,15 @@ public class UserServiceComponent implements UserService {
         }
 
         return transformUserProfile(user);
+    }
+
+
+
+    @Override
+    public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
+        List<ExecutionDao> lst = executionRepository.findByExecutionIri(executionIri);
+        if (!lst.isEmpty()) return PipelineExecution.getPipelineExecutionFromDao(lst.get(0));
+        throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
 
 }

@@ -18,7 +18,7 @@ public interface ExecutorService {
     Discovery startDiscoveryFromInputFiles(MultipartFile rdfFile, MultipartFile dataSampleFile, String userId) throws LpAppsException, IOException;
     Discovery startDiscoveryFromConfig(String discoveryConfig, String userId) throws LpAppsException, UserNotFoundException;
     Discovery startDiscoveryFromConfigIri(String discoveryConfigIri, String userId) throws LpAppsException, UserNotFoundException;
-    Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser) throws LpAppsException, UserNotFoundException;
+    Execution executePipeline(String etlPipelineIri, String userId, String selectedVisualiser, boolean startedByUser) throws LpAppsException, UserNotFoundException;
     void cancelExecution(String executionIri);
     void cancelDiscovery(String discoveryId);
 }

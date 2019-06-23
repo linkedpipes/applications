@@ -1,12 +1,11 @@
 // // Get etl executions
 
-// function getExecutionIriForGraph(executions, graphIri) {
-//   return executions.filter(source => {
-//     return source.url;
-//   });
-// }
+function getPipelineExecutionForExecutionIri(executions, executionIri) {
+  return executions.filter(source => {
+    return source.executionIri === executionIri;
+  });
+}
 
-// export default {
-//   getDatasourcesArray,
-//   getDatasourcesForTTLGenerator
-// };
+export default {
+  getPipelineExecutionForExecutionIri
+};
