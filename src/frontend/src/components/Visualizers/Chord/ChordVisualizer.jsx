@@ -9,9 +9,7 @@ import palette from 'google-palette';
 import _ from 'lodash';
 
 type Props = {
-  classes: {
-    progress: number
-  },
+  classes: {},
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   selectedPipelineExecution: string,
@@ -40,10 +38,6 @@ const styles = theme => ({
   },
   card: {},
   input: {},
-  progress: {
-    margin: theme.spacing(2),
-    alignItems: 'center'
-  },
   theme
 });
 
