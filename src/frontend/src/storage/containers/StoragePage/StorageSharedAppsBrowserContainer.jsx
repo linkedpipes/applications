@@ -83,9 +83,7 @@ class StorageSharedAppsBrowserContainer extends PureComponent<Props, State> {
     });
 
     toast.success(
-      `Removed application:\n${
-        applicationConfigurationMetadata.solidFileTitle
-      }`,
+      `Removed application:\n${applicationConfigurationMetadata.solidFileTitle}`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 2000
