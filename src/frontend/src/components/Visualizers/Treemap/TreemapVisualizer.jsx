@@ -42,7 +42,7 @@ const styles = theme => ({
     alignItems: 'center'
   },
   formControl: {
-    margin: theme.spacing(),
+    margin: theme.spacing(1),
     minWidth: 120
   },
   selectEmpty: {

@@ -24,6 +24,7 @@ const as = require('activitystrea.ms');
 
 // Definitions of the RDF namespaces.
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const LDP = $rdf.Namespace('http://www.w3.org/ns/ldp#');
 const SOLID = $rdf.Namespace('http://www.w3.org/ns/solid/terms#');
 const FOAF = $rdf.Namespace('http://xmlns.com/foaf/0.1/');
@@ -31,7 +32,6 @@ const DCT = $rdf.Namespace('http://purl.org/dc/terms/');
 const SIOC = $rdf.Namespace('http://rdfs.org/sioc/ns#');
 const XSD = $rdf.Namespace('http://www.w3.org/2001/XMLSchema#');
 const VCARD = $rdf.Namespace('http://www.w3.org/2006/vcard/ns#');
-const ACL = $rdf.Namespace('http://www.w3.org/ns/auth/acl#');
 const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 
 // Definitions of the concrete RDF node objects.
@@ -1259,27 +1259,11 @@ class SolidBackend {
   }
 
   async fetchAccessControlFile(aclUrl) {
-    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl);
-
-    const newStore = $rdf.graph();
-
-    $rdf.parse(fetchResponse, newStore, aclUrl, 'text/turtle');
-
-    const response = await new Promise((resolve, reject) => {
-      $rdf.serialize(
-        null,
-        newStore,
-        aclUrl,
-        'application/ld+json',
-        async (err, data) => {
-          if (err) {
-            reject(err);
-          }
-          const jsonData = JSON.parse(data);
-          resolve(jsonData);
-        }
-      );
+    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl, {
+      Accept: 'application/ld+json'
     });
+
+    const response = JSON.parse(fetchResponse)
 
     return new AccessControl(response, aclUrl);
   }

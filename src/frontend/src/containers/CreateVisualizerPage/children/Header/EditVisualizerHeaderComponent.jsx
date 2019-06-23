@@ -66,7 +66,7 @@ const styles = theme => ({
     marginTop: '1rem'
   },
   button: {
-    margin: theme.spacing()
+    margin: theme.spacing(1)
   }
 });
 
