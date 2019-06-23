@@ -9,7 +9,7 @@ const styles = theme => ({
     paddingTop: theme.spacing(20)
   },
   button: {
-    margin: theme.spacing()
+    margin: theme.spacing(1)
   },
   input: {
     display: 'none'

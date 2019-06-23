@@ -16,7 +16,7 @@ const styles = theme => ({
   },
   formControl: {
     width: '100%',
-    marginTop: theme.spacing()
+    marginTop: theme.spacing(1)
   }
 });
 
