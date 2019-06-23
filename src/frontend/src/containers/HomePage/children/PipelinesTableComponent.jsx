@@ -23,7 +23,8 @@ type Props = {
     executionIri: string,
     selectedVisualiser: string,
     startedByUser: boolean,
-    frequencyHours: number
+    frequencyHours: number,
+    scheduleOn: boolean
   }>,
   classes: Object,
   onHandleSelectPipelineExecutionClick: Function,
@@ -56,6 +57,7 @@ const PipelinesTableComponent = ({
               <TableCell align="center">
                 Data refresh interval (hours)
               </TableCell>
+              <TableCell align="center">Data refresh enabled</TableCell>
               <TableCell align="center">Executed by user</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
@@ -117,6 +119,9 @@ const PipelinesTableComponent = ({
                   {pipeline.frequencyHours === -1
                     ? 'Disabled'
                     : `${pipeline.frequencyHours}`}
+                </TableCell>
+                <TableCell align="center">
+                  {pipeline.scheduleOn ? 'Yes' : 'No'}
                 </TableCell>
                 <TableCell align="center">
                   {pipeline.startedByUser ? 'Yes' : 'No'}
