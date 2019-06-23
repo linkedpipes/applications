@@ -21,7 +21,9 @@ type Props = {
     started: number,
     finished: number,
     executionIri: string,
-    selectedVisualiser: string
+    selectedVisualiser: string,
+    startedByUser: boolean,
+    frequencyHours: number
   }>,
   classes: Object,
   onHandleSelectPipelineExecutionClick: Function,
@@ -51,6 +53,10 @@ const PipelinesTableComponent = ({
               <TableCell align="center">Execution IRI</TableCell>
               <TableCell align="center">Visualizer Type</TableCell>
               <TableCell align="center">Status</TableCell>
+              <TableCell align="center">
+                Data refresh interval (hours)
+              </TableCell>
+              <TableCell align="center">Executed by user</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
             </TableRow>
@@ -106,6 +112,14 @@ const PipelinesTableComponent = ({
                     ETL_STATUS_MAP[pipeline.status['@id']]) ||
                     (pipeline.status && pipeline.status.status) ||
                     'N/A'}
+                </TableCell>
+                <TableCell align="center">
+                  {pipeline.frequencyHours === -1
+                    ? 'Disabled'
+                    : `${pipeline.frequencyHours}`}
+                </TableCell>
+                <TableCell align="center">
+                  {pipeline.startedByUser ? 'Yes' : 'No'}
                 </TableCell>
                 <TableCell align="center">
                   {pipeline.started === -1

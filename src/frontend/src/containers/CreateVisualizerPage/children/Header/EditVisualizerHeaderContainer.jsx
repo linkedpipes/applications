@@ -92,8 +92,17 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     });
 
     if (pipelineExecutionResponse.status === 200) {
-      this.setState({
-        selectedPipelineExecution: pipelineExecutionResponse.data
+      let frequencyHours = `${pipelineExecutionResponse.data.frequencyHours}`;
+      frequencyHours = frequencyHours === '-1' ? '' : frequencyHours;
+
+      this.setState(prevState => {
+        return {
+          selectedPipelineExecution: pipelineExecutionResponse.data,
+          selectedDataRefreshInterval: {
+            value: frequencyHours,
+            type: prevState.selectedDataRefreshInterval.type
+          }
+        };
       });
     }
   };
