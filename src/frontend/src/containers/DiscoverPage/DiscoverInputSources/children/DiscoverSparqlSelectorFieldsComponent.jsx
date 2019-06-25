@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 
@@ -16,9 +17,14 @@ type Props = {
 };
 
 const styles = () => ({
+  gridRoot: {
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
   textField: {
+    margin: 'auto',
     width: '100%',
-    marginTop: '1rem'
+    marginTop: '0.5rem'
   }
 });
 
@@ -32,58 +38,66 @@ const DiscoverSparqlSelectorFields = ({
   dataSampleIri,
   namedGraph
 }: Props) => (
-  <div>
-    <TextField
-      id="outlined-bare"
-      label="SPARQL IRI"
-      disabled={discoveryIsLoading}
-      className={classes.textField}
-      multiline
-      autoFocus
-      onChange={handleSparqlTextFieldChange}
-      placeholder="Input your SPARQL IRI..."
-      fullWidth
-      margin="normal"
-      variant="outlined"
-      InputLabelProps={{
-        shrink: true
-      }}
-      value={sparqlEndpointIri}
-    />
+  <div className={classes.gridRoot}>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={12}>
+        <TextField
+          id="outlined-bare"
+          label="SPARQL IRI"
+          disabled={discoveryIsLoading}
+          className={classes.textField}
+          multiline
+          autoFocus
+          onChange={handleSparqlTextFieldChange}
+          placeholder="Input your SPARQL IRI..."
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          InputLabelProps={{
+            shrink: true
+          }}
+          value={sparqlEndpointIri}
+        />
+      </Grid>
 
-    <TextField
-      id="outlined-bare"
-      label="Data sample IRI"
-      disabled={discoveryIsLoading}
-      className={classes.textField}
-      multiline
-      onChange={handleDataSampleTextFieldChange}
-      placeholder="Input your data sample IRI..."
-      fullWidth
-      margin="normal"
-      variant="outlined"
-      InputLabelProps={{
-        shrink: true
-      }}
-      value={dataSampleIri}
-    />
+      <Grid item xs={12} sm={12}>
+        <TextField
+          id="outlined-bare"
+          label="Data sample IRI"
+          disabled={discoveryIsLoading}
+          className={classes.textField}
+          multiline
+          onChange={handleDataSampleTextFieldChange}
+          placeholder="Input your data sample IRI..."
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          InputLabelProps={{
+            shrink: true
+          }}
+          value={dataSampleIri}
+        />
+      </Grid>
 
-    <TextField
-      id="outlined-bare"
-      label="Named Graph IRI"
-      disabled={discoveryIsLoading}
-      className={classes.textField}
-      multiline
-      onChange={handleNamedGraphTextFieldChange}
-      placeholder="Input your named graph IRI..."
-      fullWidth
-      margin="normal"
-      variant="outlined"
-      InputLabelProps={{
-        shrink: true
-      }}
-      value={namedGraph}
-    />
+      <Grid item xs={12} sm={12}>
+        <TextField
+          id="outlined-bare"
+          label="Named Graph IRI"
+          disabled={discoveryIsLoading}
+          className={classes.textField}
+          multiline
+          onChange={handleNamedGraphTextFieldChange}
+          placeholder="Input your named graph IRI..."
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          InputLabelProps={{
+            shrink: true
+          }}
+          value={namedGraph}
+        />
+      </Grid>
+    </Grid>
   </div>
 );
 
