@@ -43,21 +43,18 @@ type Props = {
 };
 
 const styles = theme => ({
-  root: {
-    textAlign: 'center',
-    paddingTop: theme.spacing(20),
-    flex: 1
-  },
   gridRoot: {
     flexGrow: 1
   },
   itemGrid: {
     height: '100%',
-    width: '100%',
-    margin: 'auto'
+    width: '100%'
   },
   card: {
     flexGrow: 1
+  },
+  appBar: {
+    marginBottom: '1rem'
   }
 });
 
@@ -94,7 +91,11 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
           <div className={classes.gridRoot}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12}>
-                <AppBar position="static" color="default">
+                <AppBar
+                  className={classes.appBar}
+                  position="static"
+                  color="default"
+                >
                   <Tabs
                     value={tabIndex}
                     onChange={onHandleTabIndexChange}
@@ -116,10 +117,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     />
                   </Tabs>
                 </AppBar>
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <SwipeableViews animateHeight axis={'x'} index={tabIndex}>
+                <SwipeableViews index={tabIndex}>
                   <DiscoverSparqlSelectorFields
                     discoveryIsLoading={discoveryIsLoading}
                     handleSparqlTextFieldChange={onHandleSetSparqlIri}
@@ -148,7 +146,6 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     onHandleSetRdfDataSampleFile={onHandleSetRdfDataSampleFile}
                     handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
                     dataSampleIri={dataSampleIri}
-                    clea
                   />
                 </SwipeableViews>
               </Grid>
