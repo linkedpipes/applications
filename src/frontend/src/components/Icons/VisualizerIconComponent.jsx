@@ -13,7 +13,7 @@ type Props = {
   visualizerType: string
 };
 
-const VisualizerIconComponent = ({ visualizerType, style }: Props) => {
+export const VisualizerIcon = ({ visualizerType, style }: Props) => {
   switch (visualizerType.toUpperCase()) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
@@ -38,5 +38,3 @@ const VisualizerIconComponent = ({ visualizerType, style }: Props) => {
       return <UnkownIcon style={style} />;
   }
 };
-
-export default VisualizerIconComponent;

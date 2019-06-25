@@ -58,8 +58,7 @@ module.exports = () => {
         '@constants': path.resolve(__dirname, './src/constants'),
         '@layouts': path.resolve(__dirname, './src/layouts'),
         '@assets': path.resolve(__dirname, './assets'),
-        'material-ui': 'material-ui/es',
-        'react-dom': '@hot-loader/react-dom'
+        'material-ui': 'material-ui/es'
       }
     },
     module: {

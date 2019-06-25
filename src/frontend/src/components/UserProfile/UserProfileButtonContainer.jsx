@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import UserProfileButtonComponent from './UserProfileButtonComponent';
+import { UserProfileButtonComponent } from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';

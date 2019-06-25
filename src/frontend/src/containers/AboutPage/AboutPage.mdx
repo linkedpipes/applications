@@ -1,0 +1,30 @@
+---
+name: AboutPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { AboutPage } from './AboutPage';
+
+# AboutPage
+
+AboutPage is a container representing a page with `About` and `FAQ` information.
+
+# Structure
+
+`AboutPage` component exported from `AboutPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── AboutPage.jsx # React PureComponent, responsible for both UI and states
+└── index.js
+```
+
+## Properties
+
+<Props of={AboutPage} />
+
+## Example
+
+<Playground>
+  <AboutPage location={{ pathname: '/' }} />
+</Playground>
