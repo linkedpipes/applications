@@ -69,6 +69,13 @@ jobs:
         - yarn install --frozen-lockfile --check-files --network-concurrency 1
         - yarn run eslint
         - yarn run build
+        - yarn run docz:build
+        - git clone --quiet --branch=gh-pages --depth=1 https://${GITHUB_ACCESS_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
+        - rm -rf /tmp/gh-pages/docz; mv docs /tmp/gh-pages/docz
+        - cd /tmp/gh-pages
+        - git add -f .
+        - git commit -m "Lastest frontend docz on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
+        - git push -fq origin gh-pages > /dev/null
 
     - name: "Backend"
       language: java
