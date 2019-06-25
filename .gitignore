@@ -79,3 +79,5 @@ src/tests/venv/
 appdata/
 
 src/frontend/eslint/
+
+*.code-workspace
