@@ -66,6 +66,8 @@ const getVisualizer = (
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          visualizerCode
+          schemes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
         />
       );
     }

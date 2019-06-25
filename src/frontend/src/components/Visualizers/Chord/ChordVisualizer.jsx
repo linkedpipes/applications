@@ -5,7 +5,6 @@ import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
-// import uuid from 'uuid';
 import _ from 'lodash';
 
 type Props = {
@@ -171,15 +170,9 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     }
   }
 
-  async componentDidUpdate(prevProps) {
-    // this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
-    // const size = Math.min(
-    //   this.elementVizDiv.clientHeight,
-    //   this.elementVizDiv.clientWidth
-    // );
+  async componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!areEqual(prevProps.nodes, this.props.nodes)) {
-      // TODO: Dispatch action to setup selectedNodes
       const nodes = this.props.nodes;
       // If there are no selected nodes, then bring all the data
       // (should never happen)
