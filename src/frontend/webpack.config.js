@@ -48,7 +48,7 @@ module.exports = () => {
       chunkFilename: '[name].bundle.js'
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.jsx'],
+      extensions: ['.mjs', '.js', '.jsx', '.mdx'],
       alias: {
         '@components': path.resolve(__dirname, './src/components'),
         '@containers': path.resolve(__dirname, './src/containers'),
@@ -58,7 +58,8 @@ module.exports = () => {
         '@constants': path.resolve(__dirname, './src/constants'),
         '@layouts': path.resolve(__dirname, './src/layouts'),
         '@assets': path.resolve(__dirname, './assets'),
-        'material-ui': 'material-ui/es'
+        'material-ui': 'material-ui/es',
+        'react-dom': '@hot-loader/react-dom'
       }
     },
     module: {
@@ -85,6 +86,10 @@ module.exports = () => {
               options: {}
             }
           ]
+        },
+        {
+          test: /\.mdx?$/,
+          use: ['babel-loader', '@mdx-js/loader']
         }
       ]
     },

@@ -1,0 +1,41 @@
+---
+name: LinearLoader
+menu: Components
+---
+
+import { Playground, Props } from 'docz';
+import { LinearLoader } from './LinearLoaderComponent';
+
+# LinearLoader
+
+LinearLoader is a wrapper around [LinearProgress](https://material-ui.com/api/linear-progress/), that adds extra [Typography](https://material-ui.com/components/typography/) label centered above the component to indicate the loading status.
+
+# Structure
+
+`LinearLoader` component exported from `Loaders` folder is represented by a single stateless react component.
+
+```.md
+├── LinearLoaderComponent.jsx # Stateless react component
+└── index.js
+```
+
+## Properties
+
+<Props of={LinearLoader} />
+
+## Basic usage
+
+### Variant `query`
+
+<Playground>
+  <LinearLoader variant={'query'} labelText={'I am an amazing LPApps loader'} />
+</Playground>
+
+### Variant `buffer`
+
+<Playground>
+  <LinearLoader
+    variant={'buffer'}
+    labelText={'I am an amazing LPApps loader'}
+  />
+</Playground>

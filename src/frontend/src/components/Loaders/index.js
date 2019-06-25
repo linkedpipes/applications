@@ -1,3 +1,3 @@
-import LinearLoader from './LinearLoaderComponent';
+import { LinearLoader } from './LinearLoaderComponent';
 
 export default LinearLoader;

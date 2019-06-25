@@ -1,5 +1,5 @@
 {
-  "name": "assistant",
+  "name": "lpapps",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Altynbek Orumbayev",
@@ -11,7 +11,9 @@
     "startLocalProdSockets": "cross-env NODE_ENV=production BASE_SERVER_PORT=9001 BASE_BACKEND_URL=http://localhost:9005/api/ BASE_SOCKET_URL=http://localhost:9092 SOCKET_RECONNECT=true webpack-dev-server --progress",
     "startDockerDev": "cross-env NODE_ENV=development BASE_SERVER_PORT=9001 SOCKET_RECONNECT=true webpack-dev-server --progress",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack --progress",
-    "buildWithPreview": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production BUNDLE_ANALYZER_ENABLED=true SOCKET_RECONNECT=true webpack --progress"
+    "buildWithPreview": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production BUNDLE_ANALYZER_ENABLED=true SOCKET_RECONNECT=true webpack --progress",
+    "docz:dev": "docz dev",
+    "docz:build": "docz build"
   },
   "precommit": [
     "NODE_ENV=development lint-staged",
@@ -91,6 +93,7 @@
     "@babel/preset-env": "7.4.5",
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
+    "@mdx-js/loader": "^1.0.0-rc.4",
     "@sentry/webpack-plugin": "1.6.2",
     "babel-cli": "6.26.0",
     "babel-eslint": "10.0.2",
@@ -100,6 +103,9 @@
     "babel-preset-flow": "6.23.0",
     "cross-env": "5.2.0",
     "css-loader": "3.0.0",
+    "docz": "^1.2.0",
+    "docz-plugin-css": "^0.11.0",
+    "docz-theme-default": "^1.2.0",
     "eslint": "6.0.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-config-prettier": "5.0.0",
@@ -120,6 +126,7 @@
     "node-sass": "4.12.0",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.1",
+    "react-hot-loader": "^4.11.1",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
     "webpack": "4.35.0",
