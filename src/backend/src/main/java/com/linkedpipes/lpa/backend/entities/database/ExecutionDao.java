@@ -34,6 +34,15 @@ public class ExecutionDao implements Serializable {
     @Column(nullable = false)
     private boolean removed = false;
 
+    @Column(nullable = false, name="repeat")
+    private boolean scheduled = false;
+
+    @Column(nullable = false, name="native")
+    private boolean startedByUser = true;
+
+    @Column(nullable = false)
+    private long frequencyHours = -1;
+
     @ManyToOne
     @JoinColumn(name="user_web_id")
     private UserDao user;
@@ -144,5 +153,29 @@ public class ExecutionDao implements Serializable {
 
     public void setRemoved(boolean removed) {
         this.removed = removed;
+    }
+
+    public boolean isScheduled() {
+        return this.scheduled;
+    }
+
+    public void setScheduled(boolean scheduled) {
+        this.scheduled = scheduled;
+    }
+
+    public long getFrequencyHours() {
+        return this.frequencyHours;
+    }
+
+    public void setFrequencyHours(long freq) {
+        this.frequencyHours = freq;
+    }
+
+    public boolean isStartedByUser() {
+        return this.startedByUser;
+    }
+
+    public void setStartedByUser(boolean user) {
+        this.startedByUser = user;
     }
 }

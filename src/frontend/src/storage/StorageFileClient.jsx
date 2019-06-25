@@ -20,11 +20,13 @@ class StorageFileClient {
     return authClient.fetch(url).then(this.assertSuccessfulResponseWithJson);
   };
 
-  fetchFileFromUrl = async url => {
+  fetchFileFromUrl = async (url, headers = {}) => {
     const authClient = await import(
       /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
     );
-    return authClient.fetch(url).then(this.assertSuccessfulResponseWithText);
+    return authClient
+      .fetch(url, { headers })
+      .then(this.assertSuccessfulResponseWithText);
   };
 
   fetchFile = async (path, fileName = '') => {
