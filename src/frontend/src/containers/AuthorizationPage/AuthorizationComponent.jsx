@@ -55,7 +55,7 @@ type Props = {
   providerTitle: String
 };
 
-const AuthorizationComponent = ({
+const Authorization = ({
   classes,
   onWebIdFieldChange,
   onSignInClick,
@@ -117,4 +117,4 @@ const AuthorizationComponent = ({
   </main>
 );
 
-export default withStyles(styles)(AuthorizationComponent);
+export const AuthorizationComponent = withStyles(styles)(Authorization);

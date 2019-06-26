@@ -263,7 +263,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withRouter(
+export const ApplicationPage = withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps

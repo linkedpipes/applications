@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import AuthorizationComponent from './AuthorizationComponent';
+import { AuthorizationComponent } from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
