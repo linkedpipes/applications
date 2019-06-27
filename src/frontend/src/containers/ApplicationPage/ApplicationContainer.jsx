@@ -93,6 +93,10 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const parsed = queryString.parse(this.props.location.search);
     const applicationMetadataUrl = parsed.applicationIri;
 
+    if (parsed.colorScheme) {
+      this.props.setColorTheme(parsed.colorScheme !== 'dark');
+    }
+
     const applicationMetadata = await StorageToolbox.getAppMetadata(
       applicationMetadataUrl,
       this.loadApplicationMetadata,
@@ -129,10 +133,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
-
-    Log.info(applicationType);
-    Log.info(applicationConfiguration);
-    Log.info(filtersState);
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
@@ -266,6 +266,10 @@ const mapDispatchToProps = dispatch => {
     handleSetFiltersState
   };
 };
+
+export const ApplicationPageDemo = withRouter(
+  connect(mapStateToProps)(withStyles(styles)(ApplicationContainer))
+);
 
 export const ApplicationPage = withRouter(
   connect(

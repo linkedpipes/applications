@@ -4,11 +4,11 @@ menu: Containers
 ---
 
 import { Playground, Props } from 'docz';
-import { SettingsPageComponent } from './SettingsPageComponent';
+import { ApplicationPageDemo } from './ApplicationContainer';
 
-# SettingsPage
+# ApplicationPage
 
-UserProfilePage is a container representing a `UserProfile` page.
+ApplicationPage is a container representing a `ApplicationPage` page.
 
 # Main funcionality
 
@@ -17,27 +17,49 @@ UserProfilePage is a container representing a `UserProfile` page.
 
 # Structure
 
-`SettingsPage` component exported from `SettingsPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+`ApplicationPage` component exported from `ApplicationPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
 
 ```.md
-├── SettingsPageComponent.jsx # Stateless react component, responsible for ui
-├── SettingsPageContainer.jsx # React PureComponent, responsible for both UI and states
+├── ApplicationContainer.jsx # React PureComponent, responsible for both UI and states
+├── ApplicationPage.mdx # Documentation markdown that you are currently looking at
 └── index.js
 ```
 
 ## Properties
 
-<Props of={SettingsPageComponent} />
+<Props of={ApplicationPageDemo} />
 
 ## Example
 
+Due to the implementation of LinkedPipes Applications, it is not possible to render
+the component and all it's sub-components in isolated static environment. Therefore, the following examples use the real embedded and published applications from `applications.linkedpipes.com` platform.
+
+### Chord
+
 <Playground>
-  <SettingsPageComponent
-    userProfile={{
-      webId: 'your amazing webID',
-      name: 'cool name',
-      applicationsFolder: 'solid folder url goes here'
-    }}
-    location={{ pathname: '/' }}
-  />
+  <iframe
+    src="https://applications.linkedpipes.com/chord?applicationIri=https://aorumbayev5.solid.community/linkedpipes6663/configurations/1561645470261.8767.ttl&colorScheme=dark"
+    height="500"
+    width="100%"
+  ></iframe>
+</Playground>
+
+### Maps
+
+<Playground>
+  <iframe
+    src="https://applications.linkedpipes.com/map?applicationIri=https://aorumbayev5.solid.community/linkedpipes6663/configurations/1561646102720.6782.ttl&colorScheme=dark"
+    height="500"
+    width="100%"
+  ></iframe>
+</Playground>
+
+### Treemap
+
+<Playground>
+  <iframe
+    src="https://applications.linkedpipes.com/treemap?applicationIri=https://aorumbayev5.solid.community/linkedpipes6663/configurations/1561646150699.0203.ttl&colorScheme=dark"
+    height="500"
+    width="100%"
+  ></iframe>
 </Playground>
