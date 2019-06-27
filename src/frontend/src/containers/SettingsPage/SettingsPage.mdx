@@ -1,0 +1,43 @@
+---
+name: SettingsPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { SettingsPageComponent } from './SettingsPageComponent';
+
+# SettingsPage
+
+UserProfilePage is a container representing a `UserProfile` page.
+
+# Main funcionality
+
+- Change default folder for application configurations in SOLID.
+- Toggle light or dark mode UI theme.
+
+# Structure
+
+`SettingsPage` component exported from `SettingsPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── SettingsPageComponent.jsx # Stateless react component, responsible for ui
+├── SettingsPageContainer.jsx # React PureComponent, responsible for both UI and states
+└── index.js
+```
+
+## Properties
+
+<Props of={SettingsPageComponent} />
+
+## Example
+
+<Playground>
+  <SettingsPageComponent
+    userProfile={{
+      webId: 'your amazing webID',
+      name: 'cool name',
+      applicationsFolder: 'solid folder url goes here'
+    }}
+    location={{ pathname: '/' }}
+  />
+</Playground>

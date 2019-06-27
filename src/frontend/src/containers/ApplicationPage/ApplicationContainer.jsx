@@ -130,6 +130,10 @@ class ApplicationContainer extends PureComponent<Props, State> {
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
 
+    Log.info(applicationType);
+    Log.info(applicationConfiguration);
+    Log.info(filtersState);
+
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
       case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {

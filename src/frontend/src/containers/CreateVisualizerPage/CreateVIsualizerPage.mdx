@@ -1,0 +1,46 @@
+---
+name: CreateVisualizerPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { CreateVisualizerComponent } from './CreateVisualizerComponent';
+import { CreateVisualizerContainer } from './CreateVisualizerContainer';
+
+# CreateVisualizerPage
+
+CreateVisualizerPage is a container representing a `CreateVisualizerPage` webpage.
+
+# Main funcionality
+
+- Defining title for an application to be published. <br/>
+- Publishing application into SOLID storage and generating the link to share the
+  application. <br/>
+- Publishing application into SOLID storage and generating the iframe to embed
+  it.
+- Controlling filters configuration before publishing the application.
+
+# Structure
+
+`CreateVisualizerPage` component exported from `CreateVisualizerPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── CreateVisualizerComponent.jsx # Stateless react component, responsible for ui
+├── CreateVisualizerContainer.jsx # React PureComponent, responsible for both UI and states
+└── index.js
+```
+
+## Properties
+
+### Component
+
+<Props of={CreateVisualizerComponent} />
+
+## Example
+
+Example demonstrates the combination of PureComponent responsible for states and stateless component
+responsible for UI working together in an isolated Playground.
+
+<Playground>
+  <CreateVisualizerContainer />
+</Playground>
