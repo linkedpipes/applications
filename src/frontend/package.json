@@ -13,7 +13,7 @@
     "build": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production SOCKET_RECONNECT=true webpack --progress",
     "buildWithPreview": "NODE_OPTIONS=--max_old_space_size=8000 cross-env NODE_ENV=production BUNDLE_ANALYZER_ENABLED=true SOCKET_RECONNECT=true webpack --progress",
     "docz:dev": "docz dev",
-    "docz:build": "NODE_OPTIONS=--max_old_space_size=8000 docz build"
+    "docz:build": "CI=false NODE_OPTIONS=--max_old_space_size=8000 docz build"
   },
   "precommit": [
     "NODE_ENV=development lint-staged",
