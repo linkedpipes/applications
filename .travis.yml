@@ -79,7 +79,6 @@ jobs:
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-        - npm install netlify-cli -g
       cache:
         directories:
           - $HOME/.gradle/caches/
@@ -88,6 +87,7 @@ jobs:
         - cd src/backend
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
+        - npm install netlify-cli -g
       script:
         - ./gradlew assemble javadoc
         - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./build/docs/javadoc
