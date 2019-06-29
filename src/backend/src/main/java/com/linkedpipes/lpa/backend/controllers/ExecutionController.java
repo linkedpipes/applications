@@ -20,14 +20,15 @@ public class ExecutionController {
     }
 
     /**
-     * Get the result of a pipeline execution from the ETL service
-     * @param executionIri
-     * @return
-     * @throws LpAppsException
+     * Get the result of a pipeline execution from the ETL service.
+     *
+     * @param executionIri IRI of the ETL execution to get the result of
+     * @return the result
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     @GetMapping("/api/execution/result")
     @ResponseBody
-    public ResponseEntity<?> getResult(@NotNull @RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
+    public ResponseEntity<String> getResult(@NotNull @RequestParam(value = "executionIri") String executionIri) throws LpAppsException {
         String result = etlService.getExecutionResult(executionIri);
         return ResponseEntity.ok(result);
     }
