@@ -1,4 +1,4 @@
-// flow
+// @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -12,21 +12,6 @@ import ChordFiltersComponent from './children/ChordFilter';
 import TreemapFiltersComponent from './children/TreemapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
-
-type Props = {
-  classes: {
-    root: {},
-    filterTitle: {
-      paddingBottom: string
-    },
-    filterWrapper: { paddingBottom: string }
-  },
-  editingMode: boolean,
-  selectedResultGraphIri: string,
-  filtersState: {},
-  handleToggleEnabled: Function,
-  handleToggleVisible: Function
-};
 
 const styles = theme => ({
   root: {
@@ -52,7 +37,38 @@ const styles = theme => ({
   }
 });
 
-class FiltersComponent extends React.Component<Props> {
+type Props = {
+  classes: {
+    root: {},
+    filterTitle: {
+      paddingBottom: string
+    },
+    filterWrapper: { paddingBottom: string },
+    filterSpan: {},
+    heading: {}
+  },
+  editingMode: boolean,
+  selectedResultGraphIri: string,
+  filtersState: {
+    enabled: boolean,
+    visible: boolean,
+    filterGroup: {
+      label: string,
+      enabled: boolean,
+      options: {},
+      filterType: string,
+      visible: boolean
+    }
+  },
+  handleToggleEnabled: Function,
+  handleToggleVisible: Function
+};
+
+type State = {
+  filtersState: {}
+};
+
+class FiltersComponent extends React.Component<Props, State> {
   applyCallbacks: Array<Function> = [];
 
   registerCallback = callback => {
@@ -154,8 +170,8 @@ class FiltersComponent extends React.Component<Props> {
             </span>
           </Typography>
 
-          {(Object.values(filtersState.filterGroups) || []).map(
-            filterGroup =>
+          {(Object.values(filtersState.filterGroup) || []).map(
+            (filterGroup: Object) =>
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
                 <div className={classes.filterWrapper} key={filterGroup.label}>
