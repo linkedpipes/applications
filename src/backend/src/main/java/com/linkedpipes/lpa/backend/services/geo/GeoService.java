@@ -1,9 +1,9 @@
 package com.linkedpipes.lpa.backend.services.geo;
 
+import com.linkedpipes.lpa.backend.entities.MarkerFilterSetup;
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import com.linkedpipes.lpa.backend.entities.geo.Polygon;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.GeoPropertiesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.MarkerExtractor;
@@ -15,7 +15,6 @@ import com.linkedpipes.lpa.backend.util.JenaUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class GeoService {
         return JenaUtils.withQueryExecution(provider.get(graphIri), new MarkerExtractor()::extract);
     }
 
-    public static List<Property> getProperties(String graphIri) throws LpAppsException {
+    public static MarkerFilterSetup getProperties(String graphIri) throws LpAppsException {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), new GeoPropertiesExtractor()::extract);
     }
