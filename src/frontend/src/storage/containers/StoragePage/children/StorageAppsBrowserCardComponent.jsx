@@ -32,7 +32,8 @@ import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = {
   card: {
-    height: '280',
+    height: '100%',
+    display: 'flex',
     width: '190',
     flexDirection: 'column',
     marginRight: 5
@@ -50,6 +51,10 @@ const styles = {
     flexGrow: 1,
     width: '100%',
     marginTop: '1rem'
+  },
+
+  cardHeader: {
+    height: '100px'
   }
 };
 
@@ -60,7 +65,8 @@ type Props = {
     cardContent: {},
     media: {},
     spacing: {},
-    textField: {}
+    textField: {},
+    cardHeader: {}
   },
   applicationMetadata: ApplicationMetadata,
   handleSetResultPipelineIri: Function,
@@ -207,6 +213,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
+            className={classes.cardHeader}
+            noWrap
             action={
               <IconButton
                 aria-owns={anchorEl ? 'simple-menu' : undefined}
@@ -219,7 +227,11 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 <MoreVertIcon />
               </IconButton>
             }
-            title={applicationConfiguration.title}
+            title={
+              applicationConfiguration.title.length >= 25
+                ? `${applicationConfiguration.title.substr(0, 25)}...`
+                : applicationConfiguration.title
+            }
             subheader={GlobalUtils.getBeautifiedVisualizerTitle(
               applicationConfiguration.endpoint
             )}

@@ -99,7 +99,7 @@ class Home extends PureComponent<Props> {
     return (
       <div className={classes.root}>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <Paper elevation={2} className={classes.paper}>
               <Typography variant="subtitle1" gutterBottom>
                 Create a new application
@@ -136,7 +136,7 @@ class Home extends PureComponent<Props> {
               ))}
             </Paper>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={9}>
             <AppBar position="static" color="secondary">
               <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
                 <Tab id="discoveries_tab" label="Discoveries" />
