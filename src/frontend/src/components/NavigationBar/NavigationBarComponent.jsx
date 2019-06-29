@@ -102,7 +102,7 @@ type Props = {
   theme: Object
 };
 
-const NavigationBarComponent = ({
+const NavigationBar = ({
   classes,
   theme,
   drawerState,
@@ -219,6 +219,10 @@ const NavigationBarComponent = ({
   </div>
 );
 
-export default withRouter(
-  withTheme(withStyles(styles, { withTheme: true })(NavigationBarComponent))
+export const NavigationBarComponentDemo = withTheme(
+  withStyles(styles, { withTheme: true })(NavigationBar)
+);
+
+export const NavigationBarComponent = withRouter(
+  withTheme(withStyles(styles, { withTheme: true })(NavigationBar))
 );

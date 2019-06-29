@@ -1,3 +1,3 @@
-import ApplicationPage from './ApplicationContainer';
+import { ApplicationPage } from './ApplicationContainer';
 
 export default ApplicationPage;

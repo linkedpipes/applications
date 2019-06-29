@@ -93,6 +93,10 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const parsed = queryString.parse(this.props.location.search);
     const applicationMetadataUrl = parsed.applicationIri;
 
+    if (parsed.colorScheme) {
+      this.props.setColorTheme(parsed.colorScheme !== 'dark');
+    }
+
     const applicationMetadata = await StorageToolbox.getAppMetadata(
       applicationMetadataUrl,
       this.loadApplicationMetadata,
@@ -263,7 +267,11 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withRouter(
+export const ApplicationPageDemo = withRouter(
+  connect(mapStateToProps)(withStyles(styles)(ApplicationContainer))
+);
+
+export const ApplicationPage = withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps

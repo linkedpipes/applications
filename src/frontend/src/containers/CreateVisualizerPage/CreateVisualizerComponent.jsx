@@ -40,7 +40,7 @@ const styles = {
   input: {}
 };
 
-const CreateVisualizerComponent = ({
+const CreateVisualizer = ({
   classes,
   selectedVisualizer,
   headerParams,
@@ -88,4 +88,4 @@ const CreateVisualizerComponent = ({
   </LoadingOverlay>
 );
 
-export default withStyles(styles)(CreateVisualizerComponent);
+export const CreateVisualizerComponent = withStyles(styles)(CreateVisualizer);

@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import { filtersActions } from '@ducks/filtersDuck';
-import CreateVisualizerComponent from './CreateVisualizerComponent';
+import { CreateVisualizerComponent } from './CreateVisualizerComponent';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
@@ -31,7 +31,7 @@ type State = {
   height: number
 };
 
-class CreateVisualizerContainer extends PureComponent<Props, State> {
+class CreateVisualizer extends PureComponent<Props, State> {
   state = {
     loadingIsActive: false,
     width: 0,
@@ -157,7 +157,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
+export const CreateVisualizerContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(CreateVisualizerContainer);
+)(CreateVisualizer);
