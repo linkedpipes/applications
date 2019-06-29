@@ -11,4 +11,6 @@ public interface ExecutionRepository extends CrudRepository<ExecutionDao, Long> 
 
     @Query(value="select * from execution e where e.pipeline_id = ?1", nativeQuery=true)
     List<ExecutionDao> findExecutionsUsingPipelineNative(long pipelineId);
+
+    List<ExecutionDao> findByScheduled(boolean scheduled);
 }
