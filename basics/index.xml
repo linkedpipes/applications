@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Basics on </title>
+    <link>/basics/</link>
+    <description>Recent content in Basics on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 29 Jun 2019 00:40:22 +0200</lastBuildDate>
+    
+	<atom:link href="/basics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>First Content</title>
+      <link>/basics/first-content/</link>
+      <pubDate>Sat, 29 Jun 2019 00:46:48 +0200</pubDate>
+      
+      <guid>/basics/first-content/</guid>
+      <description>Lorem Ipsum.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Second Content on </title>
+    <link>/basics/second-content/</link>
+    <description>Recent content in Second Content on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 29 Jun 2019 00:46:48 +0200</lastBuildDate>
+    
+	<atom:link href="/basics/second-content/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>
