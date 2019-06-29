@@ -52,7 +52,7 @@ type Props = {
   onHandleChangeColorTheme: Function
 };
 
-const SettingsPageComponent = ({
+const SettingsPage = ({
   classes,
   userProfile,
   onHandleChangeFolder,
@@ -104,4 +104,4 @@ const SettingsPageComponent = ({
   );
 };
 
-export default withStyles(styles)(SettingsPageComponent);
+export const SettingsPageComponent = withStyles(styles)(SettingsPage);

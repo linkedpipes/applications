@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import HomeComponent from './HomeComponent';
+import { HomeComponent } from './HomeComponent';
 import { connect } from 'react-redux';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
@@ -464,7 +464,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withAuthorization(
+export const HomePage = withAuthorization(
   connect(
     mapStateToProps,
     mapDispatchToProps

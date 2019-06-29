@@ -78,7 +78,7 @@ const styles = theme => ({
   }
 });
 
-class HomeComponent extends PureComponent<Props> {
+class Home extends PureComponent<Props> {
   render() {
     const {
       classes,
@@ -183,4 +183,4 @@ class HomeComponent extends PureComponent<Props> {
   }
 }
 
-export default withStyles(styles)(HomeComponent);
+export const HomeComponent = withStyles(styles)(Home);

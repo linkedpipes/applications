@@ -24,4 +24,5 @@ chrome-user-data
 *.swp
 *.swo
 public/dist/*
+*.docz
 

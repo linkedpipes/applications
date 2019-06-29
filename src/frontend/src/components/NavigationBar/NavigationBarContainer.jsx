@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import NavigationBarComponent from './NavigationBarComponent';
+import { NavigationBarComponent } from './NavigationBarComponent';
 
 class NavigationBarContainer extends PureComponent {
   state = {
@@ -27,4 +27,4 @@ class NavigationBarContainer extends PureComponent {
   }
 }
 
-export default NavigationBarContainer;
+export const NavigationBar = NavigationBarContainer;

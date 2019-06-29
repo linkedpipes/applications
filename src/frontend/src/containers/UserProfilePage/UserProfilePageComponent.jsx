@@ -50,7 +50,7 @@ type Props = {
   onHandlePasswordReset: Function
 };
 
-const UserProfilePageContainer = ({
+const UserProfilePageComponent = ({
   classes,
   userProfile,
   onHandleLogoutClicked,
@@ -108,4 +108,4 @@ const UserProfilePageContainer = ({
   );
 };
 
-export default withStyles(styles)(UserProfilePageContainer);
+export const UserProfilePage = withStyles(styles)(UserProfilePageComponent);

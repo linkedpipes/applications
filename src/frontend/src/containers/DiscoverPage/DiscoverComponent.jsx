@@ -65,7 +65,7 @@ type Props = {
   onBackClicked: Function
 };
 
-const DiscoverComponent = ({
+const Discover = ({
   classes,
   activeStep,
   onBackClicked,
@@ -128,4 +128,4 @@ const DiscoverComponent = ({
   </div>
 );
 
-export default withStyles(styles)(DiscoverComponent);
+export const DiscoverComponent = withStyles(styles)(Discover);

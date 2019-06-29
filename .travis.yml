@@ -60,6 +60,7 @@ jobs:
         - cd src/frontend
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
         - export PATH="$HOME/.yarn/bin:$PATH"
+        - npm install netlify-cli -g
       cache:
         yarn: true
         directories:
@@ -69,6 +70,8 @@ jobs:
         - yarn install --frozen-lockfile --check-files --network-concurrency 1
         - yarn run eslint
         - yarn run build
+        - yarn run docz:build
+        - netlify deploy -s $NETLIFY_FRONTEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs
 
     - name: "Backend"
       language: java
@@ -84,14 +87,10 @@ jobs:
         - cd src/backend
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
+        - npm install netlify-cli -g
       script:
         - ./gradlew assemble javadoc
-        - git clone --quiet --branch=gh-pages --depth=1 https://${GITHUB_ACCESS_TOKEN}@github.com/linkedpipes/applications /tmp/gh-pages > /dev/null
-        - rm -rf /tmp/gh-pages/javadoc; mv build/docs/javadoc /tmp/gh-pages/javadoc
-        - cd /tmp/gh-pages
-        - git add -f .
-        - git commit -m "Lastest javadoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to gh-pages"
-        - git push -fq origin gh-pages > /dev/null
+        - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./build/docs/javadoc
 
     - stage: tests
       name: "Backend unit tests"

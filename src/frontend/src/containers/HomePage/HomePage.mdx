@@ -1,0 +1,45 @@
+---
+name: HomePage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { HomeComponent } from './HomeComponent';
+
+# HomePage
+
+HomePage is a container representing a `HomePage` webpage.
+
+# Main funcionality
+
+- Quick starting templates with sample data sources.
+- Browsing current list of executed `Discovery` sessions.
+- Browsing current list of executed `ETL` sessions.
+- Browsing current list of executed published `SOLID` applications.
+
+# Structure
+
+`HomePage` component exported from `HomePage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── HomeComponent.jsx # Stateless react component, responsible for ui
+├── HomeContainer.jsx # React PureComponent, responsible for both UI and states
+├── HomePage.mdx # Documentation markdown that you are currently looking at
+├── children/ # Children components used within 'HomeComponent.jsx'
+└── index.js
+```
+
+## Properties
+
+### Component
+
+<Props of={HomeComponent} />
+
+## Example
+
+Example demonstrates the combination of PureComponent responsible for states and stateless component
+responsible for UI working together in an isolated Playground.
+
+<Playground>
+  <HomeComponent onHandleSampleClick={() => {}} />
+</Playground>
