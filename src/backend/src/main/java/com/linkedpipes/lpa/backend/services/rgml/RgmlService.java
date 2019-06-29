@@ -1,9 +1,9 @@
 package com.linkedpipes.lpa.backend.services.rgml;
 
+import com.linkedpipes.lpa.backend.entities.EdgeDirection;
 import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
-import com.linkedpipes.lpa.backend.enums.EdgeDirection;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.EdgesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.GraphExtractor;
