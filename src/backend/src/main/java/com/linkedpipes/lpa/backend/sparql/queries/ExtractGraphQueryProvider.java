@@ -1,14 +1,7 @@
 package com.linkedpipes.lpa.backend.sparql.queries;
 
-import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
-import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
-import org.apache.jena.arq.querybuilder.WhereBuilder;
-import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
 
 public class ExtractGraphQueryProvider extends ConstructSparqlQueryProvider {
@@ -17,8 +10,6 @@ public class ExtractGraphQueryProvider extends ConstructSparqlQueryProvider {
     private static final String VAR_S = var("s");
     private static final String VAR_P = var("p");
     private static final String VAR_O = var("o");
-
-    public ExtractGraphQueryProvider() {}
 
     @NotNull
     @Override

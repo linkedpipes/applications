@@ -5,7 +5,6 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
-import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.DataSamplePipelineInputGenerator;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
@@ -78,7 +77,6 @@ public class EtlServiceComponent implements EtlService {
 
         private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
-        private final String URL_CREATE_PIPELINE = urlFrom(URL_BASE, "pipelines");
 
         private String executeDataSamplePipeline(String pipelineIri, String data) throws LpAppsException {
             String url = URL_EXECUTE_PIPELINE + "?pipeline=" + pipelineIri;
