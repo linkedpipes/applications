@@ -58,11 +58,14 @@ public class ExecutorServiceComponent implements ExecutorService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+    private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "https://applications.linkedpipes.com/graph/test-data-sample-graph";
+
 
     private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingTimeout);
     private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingTimeout);
     private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingFrequency);
     private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingFrequency);
+
 
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
@@ -188,10 +191,11 @@ public class ExecutorServiceComponent implements ExecutorService {
                 if (report.status.status.equals(EtlStatus.FINISHED)) {
                     logger.info("Pipeline finished, should extract sample now");
                     //extract data sample from graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
-                    String ttl = SparqlUtils.extractTTL("https://applications.linkedpipes.com/graph/test-data-sample-graph");
+                    String ttl = SparqlUtils.extractTTL(DATA_SAMPLE_RESULT_GRAPH_IRI);
                     String gistName = namedGraph.substring(VirtuosoController.GRAPH_NAME_PREFIX.length()) + ".ttl";
                     try {
                         String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
+                        VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
                         startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
