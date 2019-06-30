@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
+import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
@@ -189,17 +190,17 @@ public class ExecutorServiceComponent implements ExecutorService {
             public void execute(EtlStatusReport report) {
                 if (report.status.status.equals(EtlStatus.FINISHED)) {
                     logger.info("Pipeline finished, should extract sample now");
-                    //extract data sample from graph graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
+                    //extract data sample from graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
                     String ttl = SparqlUtils.extractTTL("https://applications.linkedpipes.com/graph/test-data-sample-graph");
-
+                    String gistName = namedGraph.substring(VirtuosoController.GRAPH_NAME_PREFIX.length()) + ".ttl";
                     try {
-                        String dataSampleIri = GitHubUtils.uploadGistFile(namedGraph, ttl);
+                        String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
                         startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
                         logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);
                     } catch (IOException e) {
-                        logger.error("Failed to export generated data sample to github, sample was:\n" + ttl);
+                        logger.error("Failed to export generated data sample to github (" + gistName + "), sample was:\n" + ttl, e);
                     }
                 } else {
                     logger.error("Data sample pipeline finished with errors");
