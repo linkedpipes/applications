@@ -1,7 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import DiscoverComponent from './DiscoverComponent';
+import { DiscoverComponent } from './DiscoverComponent';
 import { discoverActions } from './duck';
 import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions } from '@ducks/discoveryDuck';
@@ -103,7 +103,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
+export const DiscoverPage = connect(
   mapStateToProps,
   mapDispatchToProps
 )(DiscoverContainer);

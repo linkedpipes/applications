@@ -1,0 +1,41 @@
+---
+name: UserProfilePage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { UserProfilePage } from './UserProfilePageComponent';
+
+# UserProfilePage
+
+UserProfilePage is a container representing a `UserProfile` page.
+
+# Main funcionality
+
+- Reset password in SOLID.
+- Logout from LinkedPipes Applications platform.
+- Display current user's WebID and Name.
+
+# Structure
+
+`UserProfilePage` component exported from `UserProfilePage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── UserProfilePageComponent.jsx # Stateless react component, responsible for ui
+├── UserProfilePageContainer.jsx # React PureComponent, responsible for both UI and states
+├── UserProfilePage.mdx # Documentation markdown that you are currently looking at
+└── index.js
+```
+
+## Properties
+
+<Props of={UserProfilePage} />
+
+## Example
+
+<Playground>
+  <UserProfilePage
+    userProfile={{ webId: 'your amazing webID', name: 'cool name' }}
+    location={{ pathname: '/' }}
+  />
+</Playground>

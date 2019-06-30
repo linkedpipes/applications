@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.util.HashableTuple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -135,7 +136,7 @@ public class HandlerMethodIntrospector extends RequestMappingHandlerMapping {
                 throw new IllegalStateException("Some required request params were not assigned a value: " + quotedJoinedParams);
             }
 
-            String hostUri = Application.getConfig().getString("lpa.hostUrl");
+            String hostUri = Application.getConfig().getString(ApplicationPropertyKeys.HostUrl);
             String methodUriPath = methodInfo.getUriPattern();
             return new DefaultUriBuilderFactory()
                     .uriString(hostUri + methodUriPath)

@@ -21,7 +21,7 @@ const styles = theme => ({
     flexGrow: 1
   },
   label: {
-    marginTop: theme.spacing() + 5
+    marginTop: theme.spacing(1) + 5
   }
 });
 

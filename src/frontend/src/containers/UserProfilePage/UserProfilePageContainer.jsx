@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import UserProfilePageComponent from './UserProfilePageComponent';
+import { UserProfilePage } from './UserProfilePageComponent';
 import { connect } from 'react-redux';
 import {
   withAuthorization,
@@ -57,7 +57,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
     const { userProfile } = this.props;
     const { performLogout, performPasswordReset } = this;
     return (
-      <UserProfilePageComponent
+      <UserProfilePage
         userProfile={userProfile}
         onHandleLogoutClicked={performLogout}
         onHandlePasswordReset={performPasswordReset}

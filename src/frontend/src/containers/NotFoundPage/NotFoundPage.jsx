@@ -26,7 +26,7 @@ type Props = {
   location: Object
 };
 
-class NotFoundPage extends PureComponent<Props> {
+class NotFound extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
@@ -47,4 +47,4 @@ class NotFoundPage extends PureComponent<Props> {
   }
 }
 
-export default withStyles(styles)(NotFoundPage);
+export const NotFoundPage = withStyles(styles)(NotFound);

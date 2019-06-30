@@ -21,8 +21,8 @@ const styles = theme => ({
     flexGrow: 1
   },
   button: {
-    marginTop: theme.spacing(),
-    marginRight: theme.spacing()
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   actionsContainer: {
     marginBottom: theme.spacing(2)
@@ -65,7 +65,7 @@ type Props = {
   onBackClicked: Function
 };
 
-const DiscoverComponent = ({
+const Discover = ({
   classes,
   activeStep,
   onBackClicked,
@@ -128,4 +128,4 @@ const DiscoverComponent = ({
   </div>
 );
 
-export default withStyles(styles)(DiscoverComponent);
+export const DiscoverComponent = withStyles(styles)(Discover);

@@ -24,7 +24,7 @@ type Props = {
   currentInboxInvitations: Array<Object>
 };
 
-const UserProfileButtonComponent = ({
+export const UserProfileButtonComponent = ({
   anchorElement,
   profileMenuIsOpen,
   onHandleMenuClose,
@@ -37,7 +37,10 @@ const UserProfileButtonComponent = ({
 }: Props) => (
   <div>
     <IconButton color="inherit" onClick={onHandleSetInboxDialogOpen}>
-      <Badge badgeContent={currentInboxInvitations.length} color="secondary">
+      <Badge
+        badgeContent={(currentInboxInvitations || []).length}
+        color="secondary"
+      >
         <NotificationsIcon />
       </Badge>
     </IconButton>
@@ -80,5 +83,3 @@ const UserProfileButtonComponent = ({
     </Menu>
   </div>
 );
-
-export default UserProfileButtonComponent;

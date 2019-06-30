@@ -78,7 +78,7 @@ const styles = theme => ({
   }
 });
 
-class HomeComponent extends PureComponent<Props> {
+class Home extends PureComponent<Props> {
   render() {
     const {
       classes,
@@ -99,7 +99,7 @@ class HomeComponent extends PureComponent<Props> {
     return (
       <div className={classes.root}>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <Paper elevation={2} className={classes.paper}>
               <Typography variant="subtitle1" gutterBottom>
                 Create a new application
@@ -136,7 +136,7 @@ class HomeComponent extends PureComponent<Props> {
               ))}
             </Paper>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={9}>
             <AppBar position="static" color="secondary">
               <Tabs value={tabIndex} onChange={onHandleTabChange} centered>
                 <Tab id="discoveries_tab" label="Discoveries" />
@@ -183,4 +183,4 @@ class HomeComponent extends PureComponent<Props> {
   }
 }
 
-export default withStyles(styles)(HomeComponent);
+export const HomeComponent = withStyles(styles)(Home);

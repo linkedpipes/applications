@@ -1,3 +1,4 @@
+// @flow
 import React, { PureComponent } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,7 +10,7 @@ const styles = theme => ({
     paddingTop: theme.spacing(20)
   },
   button: {
-    margin: theme.spacing()
+    margin: theme.spacing(1)
   },
   input: {
     display: 'none'
@@ -21,7 +22,7 @@ type Props = {
   location: Object
 };
 
-class AboutPage extends PureComponent<Props> {
+class AboutPageContainer extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
@@ -43,4 +44,4 @@ class AboutPage extends PureComponent<Props> {
   }
 }
 
-export default withStyles(styles)(AboutPage);
+export const AboutPage = withStyles(styles)(AboutPageContainer);

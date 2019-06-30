@@ -17,10 +17,7 @@ import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 
 import com.linkedpipes.lpa.backend.util.RdfUtils;
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,18 +30,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
@@ -265,7 +258,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user not found
      */
     @NotNull @Override
-    public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser) throws LpAppsException, UserNotFoundException {
+    public Execution executePipeline(@NotNull String etlPipelineIri, @NotNull String userId, @NotNull String selectedVisualiser, @NotNull boolean startedByUser) throws LpAppsException, UserNotFoundException {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
         this.userService.setUserExecution(userId, execution.iri, etlPipelineIri, selectedVisualiser);  //this inserts execution in DB
         notifyExecutionStarted(execution.iri, userId);
@@ -287,13 +280,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     private void notifyExecutionStarted(String executionIri, String userId) throws LpAppsException {
         ExecutionStatus executionStatus = etlService.getExecutionStatus(executionIri);
         for (ExecutionDao e : executionRepository.findByExecutionIri(executionIri)) {
-            PipelineExecution exec = new PipelineExecution();
-            exec.status = executionStatus.status;
-            exec.executionIri = e.getExecutionIri();
-            exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-            exec.selectedVisualiser = e.getSelectedVisualiser();
-            exec.started = executionStatus.getStarted();
-            exec.finished = executionStatus.getFinished();
+            PipelineExecution exec = PipelineExecution.getPipelineExecutionFromDao(e);
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("executionAdded", OBJECT_MAPPER.writeValueAsString(exec));
         }
     }

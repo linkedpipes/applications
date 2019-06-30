@@ -1,0 +1,53 @@
+---
+name: VisualizerIcon
+menu: Components
+---
+
+import { Playground, Props } from 'docz';
+import { VisualizerIcon } from './VisualizerIconComponent';
+
+# VisualizerIcon
+
+VisualizerIcon is a universal component used in multiple places in the platform. The goal is to provide an easy access to custom Visualizer icons based on `VisualizerCode` property.
+
+# Structure
+
+`VisualizerIcon` component exported from `Icons` folder is represented by a stateless react component.
+
+```.md
+├── VisualizerIcon.jsx # stateless react component, responsible for ui
+└── index.js
+```
+
+## Properties
+
+<Props of={VisualizerIcon} />
+
+## Basic examples
+
+### Map visualizer icon
+
+<Playground>
+  <VisualizerIcon
+    visualizerType={'MAP'}
+    style={{ color: 'white', fontSize: '75px' }}
+  />
+</Playground>
+
+### Chord visualizer icon
+
+<Playground>
+  <VisualizerIcon
+    visualizerType={'CHORD'}
+    style={{ color: 'white', fontSize: '75px' }}
+  />
+</Playground>
+
+### Treemap visualizer icon
+
+<Playground>
+  <VisualizerIcon
+    visualizerType={'TREEMAP'}
+    style={{ color: 'white', fontSize: '75px' }}
+  />
+</Playground>

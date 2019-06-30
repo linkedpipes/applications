@@ -150,9 +150,7 @@ class AppRouter extends React.PureComponent<Props, State> {
           await StorageToolbox.processAcceptShareInvite(invitation);
 
           toast.info(
-            `${
-              invitation.sender.name
-            } - accepted your invitation to collaborate!`,
+            `${invitation.sender.name} - accepted your invitation to collaborate!`,
             {
               position: toast.POSITION.TOP_RIGHT,
               autoClose: 4000
@@ -325,6 +323,9 @@ class AppRouter extends React.PureComponent<Props, State> {
       pipelineRecord.started = parsedData.started;
       pipelineRecord.finished = parsedData.finished;
       pipelineRecord.executionIri = executionIri;
+      pipelineRecord.frequencyHours = parsedData.frequencyHours;
+      pipelineRecord.startedByUser = parsedData.startedByUser;
+      pipelineRecord.scheduleOn = parsedData.scheduleOn;
 
       socket.emit('join', pipelineRecord.executionIri);
       handleAddExecutionSession(pipelineRecord);

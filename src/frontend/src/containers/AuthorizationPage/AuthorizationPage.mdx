@@ -1,0 +1,45 @@
+---
+name: AuthorizationPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { AuthorizationContainer } from './AuthorizationContainer';
+import { AuthorizationComponent } from './AuthorizationComponent';
+
+# AuthorizationPage
+
+AuthorizationPage is a container representing a `AuthorizationPage` webpage.
+
+# Main funcionality
+
+- Selecting SOLID `Provider` for authentication.
+- Switching between login by `Provider` and login by `WebID`.
+- Redirecting user to SOLID authentication pane.
+
+# Structure
+
+`AuthorizationPage` component exported from `AuthorizationPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── AuthorizationComponent.jsx # Stateless react component, responsible for ui
+├── AuthorizationContainer.jsx # React PureComponent, responsible for both UI and states
+├── AuthorizationPage.mdx # Documentation markdown that you are currently looking at
+├── children/ # Children components used within 'AuthorizationComponent.jsx'
+└── index.js
+```
+
+## Properties
+
+### Component
+
+<Props of={AuthorizationComponent} />
+
+## Example
+
+Example demonstrates the combination of PureComponent responsible for states and stateless component
+responsible for UI working together in an isolated Playground.
+
+<Playground>
+  <AuthorizationContainer location={{ pathname: '/' }} />
+</Playground>

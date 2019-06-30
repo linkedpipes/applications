@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import AuthorizationComponent from './AuthorizationComponent';
+import { AuthorizationComponent } from './AuthorizationComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
@@ -25,7 +25,7 @@ type State = {
   providerTitle: string
 };
 
-class AuthorizationContainer extends PureComponent<Props, State> {
+class Authorization extends PureComponent<Props, State> {
   state = {
     webIdFieldValue: '',
     withWebIdStatus: false,
@@ -168,4 +168,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(AuthorizationContainer);
+export const AuthorizationContainer = connect(mapStateToProps)(Authorization);
