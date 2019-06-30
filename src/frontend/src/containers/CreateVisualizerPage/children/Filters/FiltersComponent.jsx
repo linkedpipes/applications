@@ -52,13 +52,15 @@ type Props = {
   filtersState: {
     enabled: boolean,
     visible: boolean,
-    filterGroup: {
-      label: string,
-      enabled: boolean,
-      options: {},
-      filterType: string,
-      visible: boolean
-    }
+    filterGroups: [
+      {
+        label: string,
+        enabled: boolean,
+        options: {},
+        filterType: string,
+        visible: boolean
+      }
+    ]
   },
   handleToggleEnabled: Function,
   handleToggleVisible: Function
@@ -170,7 +172,7 @@ class FiltersComponent extends React.Component<Props, State> {
             </span>
           </Typography>
 
-          {(Object.values(filtersState.filterGroup || [])).map(
+          {(Object.values(filtersState.filterGroups) || []).map(
             (filterGroup: Object) =>
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (

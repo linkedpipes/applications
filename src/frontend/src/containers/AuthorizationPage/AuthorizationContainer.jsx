@@ -9,7 +9,7 @@ import Particles from 'react-particles-js';
 
 const providers = {
   // Inrupt: 'https://inrupt.net/auth',
-  'Solid Community': 'https://solid.community/auth',
+  'LinkedPipes PODs': 'https://lpsolid.eu:8443/auth',
   '': ''
 };
 
