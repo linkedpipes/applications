@@ -170,7 +170,7 @@ class FiltersComponent extends React.Component<Props, State> {
             </span>
           </Typography>
 
-          {(Object.values(filtersState.filterGroup) || []).map(
+          {(Object.values(filtersState.filterGroup || [])).map(
             (filterGroup: Object) =>
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
