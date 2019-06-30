@@ -1,8 +1,8 @@
+// @flow
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import PropTypes from 'prop-types';
 import { withTheme, withStyles } from '@material-ui/core/styles';
 import { ToastContainer } from 'react-toastify';
 import UserProfileButton from '../UserProfile';
@@ -10,9 +10,9 @@ import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import MenuIcon from '@material-ui/icons/MenuTwoTone';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeftTwoTone';
+import ChevronRightIcon from '@material-ui/icons/ChevronRightTwoTone';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -20,7 +20,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import HelpIcon from '@material-ui/icons/Help';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
 
 const drawerWidth = 240;
 
@@ -69,9 +69,9 @@ const styles = theme => ({
       duration: theme.transitions.duration.leavingScreen
     }),
     overflowX: 'hidden',
-    width: theme.spacing.unit * 7 + 1,
+    width: theme.spacing(6),
     [theme.breakpoints.up('sm')]: {
-      width: theme.spacing.unit * 9 + 1
+      width: theme.spacing(8)
     }
   },
   toolbar: {
@@ -93,13 +93,23 @@ const styles = theme => ({
   }
 });
 
-const NavigationBarComponent = ({
+type Props = {
+  classes: Object,
+  drawerState: Boolean,
+  history: Object,
+  onHandleDrawerClose: Function,
+  onHandleDrawerOpen: Function,
+  theme: Object
+};
+
+const NavigationBar = ({
   classes,
   theme,
   drawerState,
   onHandleDrawerClose,
-  onHandleDrawerOpen
-}) => (
+  onHandleDrawerOpen,
+  history
+}: Props) => (
   <div>
     <AppBar
       position="absolute"
@@ -132,6 +142,7 @@ const NavigationBarComponent = ({
       </Toolbar>
       <ToastContainer className="toast-container" />
     </AppBar>
+
     <Drawer
       variant="permanent"
       className={classNames(classes.drawer, {
@@ -157,14 +168,18 @@ const NavigationBarComponent = ({
       </div>
       <Divider />
       <List>
-        <Link style={{ textDecoration: 'none' }} to="/dashboard">
-          <ListItem id="dashboard_navbar_button" button>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-        </Link>
+        <ListItem
+          id="dashboard_navbar_button"
+          button
+          onClick={() => {
+            history.push('/dashboard');
+          }}
+        >
+          <ListItemIcon>
+            <HomeIcon />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
 
         {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
           <ListItem button>
@@ -175,36 +190,39 @@ const NavigationBarComponent = ({
           </ListItem>
         </Link> */}
 
-        <Link style={{ textDecoration: 'none' }} to="/storage">
-          <ListItem id="storage_navbar_button" button>
-            <ListItemIcon>
-              <StorageIcon />
-            </ListItemIcon>
-            <ListItemText primary="Storage" />
-          </ListItem>
-        </Link>
+        <ListItem
+          id="storage_navbar_button"
+          button
+          onClick={() => {
+            history.push('/storage');
+          }}
+        >
+          <ListItemIcon>
+            <StorageIcon />
+          </ListItemIcon>
+          <ListItemText primary="Storage" />
+        </ListItem>
 
-        <Link style={{ textDecoration: 'none' }} to="/about">
-          <ListItem button>
-            <ListItemIcon>
-              <HelpIcon />
-            </ListItemIcon>
-            <ListItemText primary="About" />
-          </ListItem>
-        </Link>
+        <ListItem
+          button
+          onClick={() => {
+            history.push('/about');
+          }}
+        >
+          <ListItemIcon>
+            <HelpIcon />
+          </ListItemIcon>
+          <ListItemText primary="About" />
+        </ListItem>
       </List>
     </Drawer>
   </div>
 );
 
-NavigationBarComponent.propTypes = {
-  classes: PropTypes.any,
-  drawerState: PropTypes.any,
-  onHandleDrawerClose: PropTypes.any,
-  onHandleDrawerOpen: PropTypes.any,
-  theme: PropTypes.any
-};
+export const NavigationBarComponentDemo = withTheme(
+  withStyles(styles, { withTheme: true })(NavigationBar)
+);
 
-export default withTheme()(
-  withStyles(styles, { withTheme: true })(NavigationBarComponent)
+export const NavigationBarComponent = withRouter(
+  withTheme(withStyles(styles, { withTheme: true })(NavigationBar))
 );

@@ -6,6 +6,8 @@ import GlobalUtils from './global.utils';
 import SocketContext from './socket.service';
 import Log from './logger.service';
 import { withAuthorization } from './third-party';
+import GoogleAnalyticsWrapper from './google-analytics-wrapper';
+import AuthenticationService from './authentication.utils';
 
 export {
   VisualizersService,
@@ -17,5 +19,7 @@ export {
   ETL_STATUS_TYPE,
   Log,
   GlobalUtils,
-  withAuthorization
+  withAuthorization,
+  GoogleAnalyticsWrapper,
+  AuthenticationService
 };

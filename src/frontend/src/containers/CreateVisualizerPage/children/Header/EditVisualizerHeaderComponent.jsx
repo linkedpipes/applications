@@ -17,10 +17,23 @@ import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GlobalUtils } from '@utils';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import ShareIcon from '@material-ui/icons/ShareTwoTone';
+import SettingsIcon from '@material-ui/icons/SettingsTwoTone';
+import EditIcon from '@material-ui/icons/EditTwoTone';
+import { DataRefreshControlDialog } from './children';
 
 type Props = {
-  classes: { root: {}, header: {}, textField: {} },
+  classes: {
+    root: {},
+    header: {},
+    textField: {},
+    leftIcon: {},
+    margin: {},
+    formControl: {},
+    dataRefreshTextField: {},
+    menu: {}
+  },
   handlePublishClicked: Function,
   handleEmbedClicked: Function,
   handleAppTitleChanged: Function,
@@ -35,21 +48,32 @@ type Props = {
   handleChangeWidth: Function,
   height: number,
   width: number,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   deleteAppDialogOpen: boolean,
-  handleDeleteApp: Function,
   handleDeleteAppDismissed: Function,
   handleDeleteAppConfirmed: Function,
   handleDeleteAppClicked: Function,
   handleMenuClose: Function,
-  handleMenuClick: Function,
-  anchorEl: Object,
+  handleSharingMenuClick: Function,
+  handleSettingsMenuClick: Function,
+  sharingAnchorEl: Object,
+  settingsAnchorEl: Object,
   modifiedSelectedApplicationTitle: string,
   handleRenameFieldChanged: Function,
   handleOpenRenameDialog: Function,
   handleCloseRenameDialog: Function,
   handleRenameConfirmed: Function,
-  renameDialogOpen: boolean
+  handleOpenAccessControlDialog: Function,
+  renameDialogOpen: boolean,
+  handleDataRefreshConfirmed: Function,
+  dataRefreshDialogOpen: boolean,
+  handleDataRefreshValueChange: Function,
+  handleDataRefreshToggleClicked: Function,
+  selectedPipelineExecution: Object,
+  handleDataRefreshClicked: Function,
+  handleDataRefreshDismissed: Function,
+  selectedDataRefreshInterval: Function,
+  handleDataRefreshTypeChange: Function
 };
 
 const styles = theme => ({
@@ -57,17 +81,36 @@ const styles = theme => ({
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
-      .spacing.unit * 3}px`
+    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`
   },
+
   textField: {
     flexGrow: 1,
     width: '100%',
     fontSize: 30,
     marginTop: '1rem'
   },
+
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing(1)
+  },
+
+  leftIcon: {
+    marginRight: theme.spacing(1)
+  },
+
+  dataRefreshTextField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
+  },
+
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120
+  },
+
+  menu: {
+    width: 200
   }
 });
 
@@ -89,26 +132,42 @@ const EditVisualizerHeaderComponent = ({
   handleChangeWidth,
   selectedApplicationMetadata,
   deleteAppDialogOpen,
-  handleDeleteApp,
   handleDeleteAppDismissed,
   handleDeleteAppConfirmed,
   handleDeleteAppClicked,
+  handleOpenAccessControlDialog,
   handleMenuClose,
-  handleMenuClick,
-  anchorEl,
+  handleSharingMenuClick,
+  handleSettingsMenuClick,
+  sharingAnchorEl,
+  settingsAnchorEl,
   modifiedSelectedApplicationTitle,
   handleRenameFieldChanged,
   handleOpenRenameDialog,
   handleCloseRenameDialog,
   handleRenameConfirmed,
-  renameDialogOpen
+  renameDialogOpen,
+  handleDataRefreshClicked,
+  handleDataRefreshConfirmed,
+  dataRefreshDialogOpen,
+  handleDataRefreshDismissed,
+  selectedDataRefreshInterval,
+  handleDataRefreshTypeChange,
+  handleDataRefreshValueChange,
+  handleDataRefreshToggleClicked,
+  selectedPipelineExecution
 }: Props) => (
   <div className={classes.root}>
-    <Paper className={classes.header} position="static" color="default">
+    <Paper
+      elevation={2}
+      className={classes.header}
+      position="static"
+      color="default"
+    >
       <Grid
         container
         direction="column"
-        spacing={16}
+        spacing={2}
         justify="center"
         alignItems="center"
       >
@@ -126,7 +185,7 @@ const EditVisualizerHeaderComponent = ({
               inputProps={{
                 style: { textAlign: 'center' }
               }}
-              value={selectedApplicationMetadata.title}
+              value={selectedApplicationMetadata.configuration.title}
               className={classes.textField}
               readOnly
               variant="outlined"
@@ -140,13 +199,13 @@ const EditVisualizerHeaderComponent = ({
             <Typography align="center" variant="h6">
               {selectedVisualizer
                 ? GlobalUtils.getBeautifiedVisualizerTitle(
-                    selectedApplicationMetadata.endpoint
+                    selectedApplicationMetadata.configuration.endpoint
                   )
                 : 'Unkown visualizer type'}
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={16} justify="center">
+        <Grid container spacing={2} justify="center">
           <Grid item>
             <Button
               id="edit-app-publish-button"
@@ -154,6 +213,7 @@ const EditVisualizerHeaderComponent = ({
               color="primary"
               onClick={handleOpenRenameDialog}
             >
+              <EditIcon className={classes.leftIcon} />
               Rename
             </Button>
           </Grid>
@@ -161,8 +221,9 @@ const EditVisualizerHeaderComponent = ({
             <Button
               variant="outlined"
               color="primary"
-              onClick={handleMenuClick}
+              onClick={handleSharingMenuClick}
             >
+              <ShareIcon className={classes.leftIcon} />
               Share
             </Button>
           </Grid>
@@ -170,9 +231,10 @@ const EditVisualizerHeaderComponent = ({
             <Button
               variant="outlined"
               color="primary"
-              onClick={handleDeleteAppClicked}
+              onClick={handleSettingsMenuClick}
             >
-              Delete
+              <SettingsIcon className={classes.leftIcon} />
+              Settings
             </Button>
           </Grid>
         </Grid>
@@ -181,13 +243,27 @@ const EditVisualizerHeaderComponent = ({
 
     <Menu
       id="simple-menu"
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
+      anchorEl={sharingAnchorEl}
+      open={Boolean(sharingAnchorEl)}
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handlePublishClicked}>Get Published URL</MenuItem>
       <MenuItem onClick={handleEmbedClicked}>Get Embed URL</MenuItem>
-      <MenuItem onClick={handleDeleteApp}>Access control</MenuItem>
+      <MenuItem onClick={handleOpenAccessControlDialog}>
+        Access control
+      </MenuItem>
+    </Menu>
+
+    <Menu
+      id="simple-menu"
+      anchorEl={settingsAnchorEl}
+      open={Boolean(settingsAnchorEl)}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleDataRefreshClicked}>
+        Setup Data Refreshing
+      </MenuItem>
+      <MenuItem onClick={handleDeleteAppClicked}>Delete Application</MenuItem>
     </Menu>
 
     <Dialog
@@ -351,6 +427,18 @@ const EditVisualizerHeaderComponent = ({
         </Button>
       </DialogActions>
     </Dialog>
+
+    <DataRefreshControlDialog
+      handleDataRefreshClicked={handleDataRefreshClicked}
+      handleDataRefreshConfirmed={handleDataRefreshConfirmed}
+      dataRefreshDialogOpen={dataRefreshDialogOpen}
+      handleDataRefreshDismissed={handleDataRefreshDismissed}
+      selectedDataRefreshInterval={selectedDataRefreshInterval}
+      handleDataRefreshTypeChange={handleDataRefreshTypeChange}
+      handleDataRefreshValueChange={handleDataRefreshValueChange}
+      handleDataRefreshToggleClicked={handleDataRefreshToggleClicked}
+      selectedPipelineExecution={selectedPipelineExecution}
+    />
   </div>
 );
 

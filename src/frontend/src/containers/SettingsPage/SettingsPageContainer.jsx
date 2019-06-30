@@ -1,23 +1,29 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
-import SettingsPageComponent from './SettingsPageComponent';
+import { SettingsPageComponent } from './SettingsPageComponent';
 import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
-import { withAuthorization } from '@utils';
+import { withAuthorization, GoogleAnalyticsWrapper } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
   userProfile: Object,
   handleUpdateChooseFolderDialogState: Function,
   setColorTheme: Function,
-  colorThemeIsLight: Boolean
+  colorThemeIsLight: Boolean,
+  location: Object
 };
 
-class SettingsPageContainer extends PureComponent<Props> {
+class SettingsPage extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
     (this: any).handleChangeColor = this.handleChangeColor.bind(this);
+  }
+
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   handleChangeFolder() {
@@ -66,9 +72,9 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withAuthorization(
+export const SettingsPageContainer = withAuthorization(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(SettingsPageContainer)
+  )(SettingsPage)
 );

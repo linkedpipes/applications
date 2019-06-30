@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { PureComponent } from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
@@ -7,7 +7,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-import DiscoverSelectorFields from './children';
+import {
+  DiscoverSparqlSelectorFields,
+  DiscoverRdfUrlField,
+  DiscoverRdfFileDropIn
+} from './children';
+import SwipeableViews from 'react-swipeable-views';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 type Props = {
   classes: any,
@@ -25,120 +33,170 @@ type Props = {
   onHandleClearInputsClicked(): Function,
   sparqlEndpointIri: string,
   sparqlTextFieldValue: string,
-  ttlFile: any
+  inputFieldsAreNotFilled: boolean,
+  onHandleRdfInputIriTextFieldChange: Function,
+  rdfInputIri: string,
+  onHandleSetRdfFile: Function,
+  onHandleSetRdfDataSampleFile: Function,
+  onHandleTabIndexChange: Function,
+  tabIndex: Number
 };
 
-const styles = theme => ({
-  root: {
-    textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20,
-    flex: 1
-  },
+const styles = () => ({
   gridRoot: {
     flexGrow: 1
   },
   itemGrid: {
     height: '100%',
-    width: '100%',
-    margin: 'auto'
-  },
-  textField: {
-    margin: 'auto',
     width: '100%'
   },
   card: {
     flexGrow: 1
+  },
+  appBar: {
+    marginBottom: '1rem'
   }
 });
 
-const DiscoverSelectorComponent = ({
-  classes,
-  discoveryIsLoading,
-  discoveryLoadingLabel,
-  dataSourcesUris,
-  ttlFile,
-  sparqlEndpointIri,
-  dataSampleIri,
-  onHandleProcessStartDiscovery,
-  onHandleClearInputsClicked,
-  onHandleSetNamedGraph,
-  onHandleSetDataSampleIri,
-  onHandleSetSparqlIri,
-  namedGraph,
-  sparqlTextFieldValue,
-  namedTextFieldValue,
-  dataSampleTextFieldValue
-}: Props) => (
-  <Card className={classes.card}>
-    <CardContent>
-      <div className={classes.gridRoot}>
-        <Grid container spacing={24}>
-          <Grid item xs={12} sm={12}>
-            <DiscoverSelectorFields
-              discoveryIsLoading={discoveryIsLoading}
-              handleSparqlTextFieldChange={onHandleSetSparqlIri}
-              handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-              handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
-              sparqlEndpointIri={sparqlEndpointIri}
-              dataSampleIri={dataSampleIri}
-              namedGraph={namedGraph}
-              sparqlTextFieldValue={sparqlTextFieldValue}
-              namedTextFieldValue={namedTextFieldValue}
-              dataSampleTextFieldValue={dataSampleTextFieldValue}
-            />
-          </Grid>
+class DiscoverSelectorComponent extends PureComponent<Props> {
+  render() {
+    const {
+      classes,
+      discoveryIsLoading,
+      discoveryLoadingLabel,
+      dataSourcesUris,
+      sparqlEndpointIri,
+      dataSampleIri,
+      onHandleProcessStartDiscovery,
+      onHandleClearInputsClicked,
+      onHandleSetNamedGraph,
+      onHandleSetDataSampleIri,
+      onHandleSetSparqlIri,
+      namedGraph,
+      sparqlTextFieldValue,
+      namedTextFieldValue,
+      dataSampleTextFieldValue,
+      inputFieldsAreNotFilled,
+      onHandleRdfInputIriTextFieldChange,
+      rdfInputIri,
+      onHandleSetRdfFile,
+      onHandleSetRdfDataSampleFile,
+      tabIndex,
+      onHandleTabIndexChange
+    } = this.props;
 
-          <Grid item xs={12} sm={12}>
-            {discoveryIsLoading ? (
-              <LinearLoader labelText={discoveryLoadingLabel} />
-            ) : (
-              <Grid container spacing={16}>
-                <Grid item xs={6} sm={6}>
-                  <Button
-                    className={classes.itemGrid}
-                    variant="contained"
-                    component="span"
-                    color="primary"
-                    disabled={
-                      !ttlFile &&
-                      sparqlEndpointIri === '' &&
-                      dataSampleIri === '' &&
-                      namedGraph === ''
-                    }
-                    onClick={onHandleClearInputsClicked}
-                    size="small"
+    return (
+      <Card className={classes.card}>
+        <CardContent>
+          <div className={classes.gridRoot}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={12}>
+                <AppBar
+                  className={classes.appBar}
+                  position="static"
+                  color="default"
+                >
+                  <Tabs
+                    value={tabIndex}
+                    onChange={onHandleTabIndexChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="fullWidth"
                   >
-                    Clear inputs
-                  </Button>
-                </Grid>
+                    <Tab
+                      label="From SPARQL endpoint"
+                      disabled={discoveryIsLoading}
+                    />
+                    <Tab
+                      label="From URL with RDF"
+                      disabled={discoveryIsLoading}
+                    />
+                    <Tab
+                      label="From File with RDF"
+                      disabled={discoveryIsLoading}
+                    />
+                  </Tabs>
+                </AppBar>
+                <SwipeableViews index={tabIndex}>
+                  <DiscoverSparqlSelectorFields
+                    discoveryIsLoading={discoveryIsLoading}
+                    handleSparqlTextFieldChange={onHandleSetSparqlIri}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    handleNamedGraphTextFieldChange={onHandleSetNamedGraph}
+                    sparqlEndpointIri={sparqlEndpointIri}
+                    dataSampleIri={dataSampleIri}
+                    namedGraph={namedGraph}
+                    sparqlTextFieldValue={sparqlTextFieldValue}
+                    namedTextFieldValue={namedTextFieldValue}
+                    dataSampleTextFieldValue={dataSampleTextFieldValue}
+                  />
 
-                <Grid item xs={6} sm={6}>
-                  <Button
-                    className={classes.itemGrid}
-                    variant="contained"
-                    component="span"
-                    color="secondary"
-                    id="start-discovery-button"
-                    disabled={
-                      !ttlFile &&
-                      !dataSourcesUris &&
-                      sparqlEndpointIri === '' &&
-                      dataSampleIri === '' &&
-                      namedGraph === ''
+                  <DiscoverRdfUrlField
+                    discoveryIsLoading={discoveryIsLoading}
+                    handleRdfInputIriTextFieldChange={
+                      onHandleRdfInputIriTextFieldChange
                     }
-                    onClick={onHandleProcessStartDiscovery}
-                    size="small"
-                  >
-                    Start Discovery
-                  </Button>
-                </Grid>
+                    rdfInputIri={rdfInputIri}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    dataSampleIri={dataSampleIri}
+                  />
+                  <DiscoverRdfFileDropIn
+                    discoveryIsLoading={discoveryIsLoading}
+                    onHandleSetRdfFile={onHandleSetRdfFile}
+                    onHandleSetRdfDataSampleFile={onHandleSetRdfDataSampleFile}
+                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
+                    dataSampleIri={dataSampleIri}
+                  />
+                </SwipeableViews>
               </Grid>
-            )}
-          </Grid>
-        </Grid>
-      </div>
-    </CardContent>
-  </Card>
-);
+
+              <Grid item xs={12} sm={12}>
+                {discoveryIsLoading ? (
+                  <LinearLoader labelText={discoveryLoadingLabel} />
+                ) : (
+                  <Grid container spacing={2}>
+                    <Grid item xs={6} sm={6}>
+                      <Button
+                        className={classes.itemGrid}
+                        variant="contained"
+                        component="span"
+                        color="primary"
+                        disabled={
+                          dataSourcesUris &&
+                          sparqlEndpointIri === '' &&
+                          dataSampleIri === '' &&
+                          namedGraph === ''
+                        }
+                        onClick={onHandleClearInputsClicked}
+                        size="small"
+                      >
+                        Clear inputs
+                      </Button>
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
+                      <Button
+                        className={classes.itemGrid}
+                        variant="contained"
+                        component="span"
+                        color="secondary"
+                        id="start-discovery-button"
+                        disabled={inputFieldsAreNotFilled}
+                        onClick={onHandleProcessStartDiscovery}
+                        size="small"
+                      >
+                        Start Discovery
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+}
 
 export default withStyles(styles)(DiscoverSelectorComponent);

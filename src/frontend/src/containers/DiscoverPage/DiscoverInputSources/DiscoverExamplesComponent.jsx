@@ -1,5 +1,5 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import List from '@material-ui/core/List';
@@ -21,15 +21,21 @@ const styles = theme => ({
     flexGrow: 1
   },
   label: {
-    marginTop: theme.spacing.unit + 5
+    marginTop: theme.spacing(1) + 5
   }
 });
+
+type Props = {
+  classes: Object,
+  onHandleListItemClick: Function,
+  samples: []
+};
 
 const DiscoverExamplesComponent = ({
   classes,
   onHandleListItemClick,
   samples
-}) => (
+}: Props) => (
   <Card className={classes.card}>
     <Typography
       className={classes.label}
@@ -59,11 +65,5 @@ const DiscoverExamplesComponent = ({
     </List>
   </Card>
 );
-
-DiscoverExamplesComponent.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onHandleListItemClick: PropTypes.func,
-  samples: PropTypes.any
-};
 
 export default withStyles(styles)(DiscoverExamplesComponent);

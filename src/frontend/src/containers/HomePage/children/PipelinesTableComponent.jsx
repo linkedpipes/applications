@@ -21,7 +21,10 @@ type Props = {
     started: number,
     finished: number,
     executionIri: string,
-    selectedVisualiser: string
+    selectedVisualiser: string,
+    startedByUser: boolean,
+    frequencyHours: number,
+    scheduleOn: boolean
   }>,
   classes: Object,
   onHandleSelectPipelineExecutionClick: Function,
@@ -42,17 +45,22 @@ const PipelinesTableComponent = ({
 }: Props) => (
   <div>
     {(pipelinesList && pipelinesList.length) > 0 ? (
-      <Paper classes={classes}>
+      <Paper elevation={2} classes={classes}>
         <Table>
           <TableHead>
             <TableRow key={uuid()}>
               <TableCell align="center">Action</TableCell>
+              <TableCell align="center">Remove</TableCell>
               <TableCell align="center">Execution IRI</TableCell>
               <TableCell align="center">Visualizer Type</TableCell>
               <TableCell align="center">Status</TableCell>
+              <TableCell align="center">
+                Data refresh interval (hours)
+              </TableCell>
+              <TableCell align="center">Data refresh enabled</TableCell>
+              <TableCell align="center">Executed by user</TableCell>
               <TableCell align="center">Started at</TableCell>
               <TableCell align="center">Finished at</TableCell>
-              <TableCell align="center">Remove</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,6 +84,23 @@ const PipelinesTableComponent = ({
                     Create App
                   </Button>
                 </TableCell>
+                <TableCell
+                  align="center"
+                  component="th"
+                  scope="row"
+                  padding="checkbox"
+                >
+                  <IconButton
+                    id={`delete_execution_session_button_${index}`}
+                    key={`button_pipeline_${uuid.v4()}`}
+                    aria-label="Decline"
+                    onClick={() =>
+                      onHandlePipelineExecutionRowDeleteClicked(pipeline)
+                    }
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                </TableCell>
                 <TableCell align="center">
                   {pipeline.executionIri
                     ? pipeline.executionIri.split('/executions/')[1]
@@ -91,6 +116,17 @@ const PipelinesTableComponent = ({
                     'N/A'}
                 </TableCell>
                 <TableCell align="center">
+                  {pipeline.frequencyHours === -1
+                    ? 'Disabled'
+                    : `${pipeline.frequencyHours}`}
+                </TableCell>
+                <TableCell align="center">
+                  {pipeline.scheduleOn ? 'Yes' : 'No'}
+                </TableCell>
+                <TableCell align="center">
+                  {pipeline.startedByUser ? 'Yes' : 'No'}
+                </TableCell>
+                <TableCell align="center">
                   {pipeline.started === -1
                     ? 'N/A'
                     : moment.unix(pipeline.started).format('lll')}
@@ -100,36 +136,13 @@ const PipelinesTableComponent = ({
                     ? 'N/A'
                     : moment.unix(pipeline.finished).format('lll')}
                 </TableCell>
-                <TableCell
-                  align="center"
-                  component="th"
-                  scope="row"
-                  padding="checkbox"
-                >
-                  <IconButton
-                    id={`delete_execution_session_button_${index}`}
-                    key={`button_pipeline_${uuid.v4()}`}
-                    aria-label="Decline"
-                    onClick={() =>
-                      onHandlePipelineExecutionRowDeleteClicked(pipeline)
-                    }
-                    disabled={
-                      !(
-                        pipeline.status &&
-                        ETL_STATUS_MAP[pipeline.status['@id']] === 'Finished'
-                      )
-                    }
-                  >
-                    <RemoveIcon />
-                  </IconButton>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Paper>
     ) : (
-      <Paper>
+      <Paper elevation={2}>
         <Typography variant="body1" gutterBottom>
           No pipelines found
         </Typography>

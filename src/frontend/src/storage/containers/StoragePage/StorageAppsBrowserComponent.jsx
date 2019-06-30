@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { StorageAppsBrowserCardComponent } from './children';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import StorageAppsBrowserCardComponent from './children/StorageAppsBrowserCardComponent';
 import Emoji from 'react-emoji-render';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import uuid from 'uuid';
 
 const styles = () => ({
   root: {
@@ -30,7 +30,7 @@ type Props = {
     root: {},
     gridArea: {}
   },
-  applicationsMetadata: Array<AppConfiguration>,
+  applicationsMetadata: Array<ApplicationMetadata>,
   onHandleApplicationDeleted: Function,
   setApplicationLoaderStatus: Function
 };
@@ -47,18 +47,11 @@ function StorageAppsBrowserComponent(props: Props) {
     <div className={classes.root}>
       {applicationsMetadata.length !== 0 ? (
         <div className={classes.gridArea}>
-          <Grid container spacing={8}>
+          <Grid container spacing={1}>
             {applicationsMetadata.map((metadata, index) => (
-              <Grid
-                key={metadata.createdAt}
-                item
-                xs={3}
-                sm={3}
-                md={3}
-                lg={2}
-                xl={2}
-              >
+              <Grid key={uuid.v4()} item xs={12} sm={6} md={4}>
                 <StorageAppsBrowserCardComponent
+                  key={uuid.v4()}
                   indexNumber={index}
                   applicationMetadata={metadata}
                   setApplicationLoaderStatus={setApplicationLoaderStatus}
@@ -84,9 +77,5 @@ function StorageAppsBrowserComponent(props: Props) {
     </div>
   );
 }
-
-StorageAppsBrowserComponent.propTypes = {
-  classes: PropTypes.object.isRequired
-};
 
 export default withStyles(styles)(StorageAppsBrowserComponent);

@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import { GoogleAnalyticsWrapper, UserService } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 type Props = {
   selectedApplication: any,
@@ -20,7 +21,8 @@ type Props = {
   selectedApplicationTitle: string,
   applicationsFolder: string,
   setApplicationLoaderStatus: Function,
-  handleSetSelectedApplicationMetadata: Function
+  handleSetSelectedApplicationMetadata: Function,
+  filters: Object
 };
 
 type State = {
@@ -29,7 +31,7 @@ type State = {
   appIri: string,
   height: number,
   width: number,
-  currentApplicationMetadata: AppConfiguration
+  currentApplicationMetadata: ApplicationMetadata
 };
 
 class VisualizerHeaderContainer extends PureComponent<Props, State> {
@@ -48,7 +50,8 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationTitle,
       webId,
       applicationsFolder,
-      setApplicationLoaderStatus
+      setApplicationLoaderStatus,
+      filters
     } = this.props;
 
     setApplicationLoaderStatus(true);
@@ -65,30 +68,42 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
 
     const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
-      selectedApplicationTitle,
+      filters,
       webId,
-      applicationsFolder,
-      true
+      applicationsFolder
     );
 
     this.setState({ currentApplicationMetadata });
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      currentApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.endpoint
+    );
+
+    await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.etlExecutionIri
     );
 
     setApplicationLoaderStatus(false);
     this.handleAppPublished(publishedUrl);
+
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'CreateApp',
+      action: 'Pressed create app',
+      label: `type : '${currentApplicationMetadata.configuration.endpoint}'`
+    });
   };
 
   handleEmbedClicked = async () => {
     const {
       selectedApplication,
       selectedApplicationTitle,
-      applicationsFolder,
       webId,
-      setApplicationLoaderStatus
+      applicationsFolder,
+      setApplicationLoaderStatus,
+      filters
     } = this.props;
 
     setApplicationLoaderStatus(true);
@@ -105,21 +120,32 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
 
     const currentApplicationMetadata = await StorageToolbox.saveAppToSolid(
       selectedApplication,
-      selectedApplicationTitle,
+      filters,
       webId,
-      applicationsFolder,
-      true
+      applicationsFolder
     );
 
     this.setState({ currentApplicationMetadata });
 
+    await UserService.postApplication(
+      webId,
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.etlExecutionIri
+    );
+
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      currentApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      currentApplicationMetadata.solidFileUrl,
+      currentApplicationMetadata.configuration.endpoint
     );
 
     setApplicationLoaderStatus(false);
-    this.handleAppEmbedded(publishedUrl);
+    this.handleAppPublished(publishedUrl);
+
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'CreateApp',
+      action: 'Pressed embed app',
+      label: `type : '${currentApplicationMetadata.configuration.endpoint}'`
+    });
   };
 
   onHandleAppTitleChanged = e => {
@@ -227,10 +253,10 @@ const mapStateToProps = state => {
   return {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
-    filters: state.visualizers.filters,
+    filters: state.filters,
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
-    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    selectedApplicationTitle: state.application.selectedApplication.title,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };

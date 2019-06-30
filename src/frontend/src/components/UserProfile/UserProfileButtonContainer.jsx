@@ -1,14 +1,16 @@
 // @flow
 import React, { PureComponent } from 'react';
-import UserProfileButtonComponent from './UserProfileButtonComponent';
+import { UserProfileButtonComponent } from './UserProfileButtonComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { SocketContext, GlobalUtils } from '@utils';
-import GoogleAnalytics from 'react-ga'
+import { globalActions } from '@ducks/globalDuck';
+import { SocketContext, GlobalUtils, Log } from '@utils';
 
 type Props = {
   history: Object,
-  resetReduxStore: Function
+  resetReduxStore: Function,
+  handleSetInboxDialogState: Function,
+  currentInboxInvitations: Array<Object>
 };
 
 type State = {
@@ -33,12 +35,10 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       localStorage.removeItem('solid-auth-client');
       // Clear cookies
       GlobalUtils.clearCookies();
-      // Clear google analyics
-      GoogleAnalytics.set({ userId: undefined })
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
-      // console.log(`Error: ${error}`);
+      Log.error(error);
     }
   };
 
@@ -62,6 +62,11 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.handleMenuClose();
   };
 
+  handleSetInboxDialogOpen = () => {
+    const { handleSetInboxDialogState } = this.props;
+    handleSetInboxDialogState(true);
+  };
+
   render() {
     const { anchorElement } = this.state;
     const {
@@ -69,8 +74,10 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       handleMenuOpen,
       handleLogout,
       handleOpenProfile,
-      handleOpenSettings
+      handleOpenSettings,
+      handleSetInboxDialogOpen
     } = this;
+    const { currentInboxInvitations } = this.props;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
@@ -82,6 +89,8 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
         onHandleLogoutClicked={handleLogout}
         onHandleOpenProfile={handleOpenProfile}
         onHandleOpenSettings={handleOpenSettings}
+        onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
+        currentInboxInvitations={currentInboxInvitations}
       />
     );
   }
@@ -95,15 +104,20 @@ const UserProfileButtonContainerWithSockets = props => (
 
 const mapStateToProps = state => {
   return {
-    webId: state.user.webId
+    webId: state.user.webId,
+    currentInboxInvitations: state.user.inboxInvitations
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
 
+  const handleSetInboxDialogState = isOpen =>
+    dispatch(globalActions.setInboxDialogState(isOpen));
+
   return {
-    resetReduxStore
+    resetReduxStore,
+    handleSetInboxDialogState
   };
 };
 

@@ -1,14 +1,12 @@
+// @flow
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
 import uuid from 'uuid';
-import axios from 'axios';
-import { Log } from '@utils';
 
 export const samples = [
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Treemap Sample',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     namedGraph: 'http://linked.opendata.cz/resource/dataset/cpv-2008',
@@ -17,15 +15,8 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'ttlFile',
-    label: 'GoogleMaps Sample (File)',
-    fileUrl:
-      'https://gist.githubusercontent.com/aorumbayev/a36d768c1058ae7c24863126b16f29a0/raw/a7cb691063ff16b235993ca7e85154bb540b50e7/demo_maps.ttl'
-  },
-  {
-    id: uuid.v4(),
-    type: 'sparqlEndpoint',
-    label: 'GoogleMaps Sample',
+    inputType: 'SPARQL_ENDPOINT',
+    label: 'Maps Sample',
     sparqlEndpointIri: 'https://lpatest.opendata.cz/sparql',
     namedGraph: 'https://lpatest.opendata.cz/graphs/ruian-test-buildings',
     dataSampleIri:
@@ -33,7 +24,7 @@ export const samples = [
   },
   {
     id: uuid.v4(),
-    type: 'sparqlEndpoint',
+    inputType: 'SPARQL_ENDPOINT',
     label: 'Chord Sample',
     sparqlEndpointIri: 'http://lpa-virtuoso:8890/sparql',
     namedGraph: 'https://applications.linkedpipes.com/generated-data/chord',
@@ -42,24 +33,15 @@ export const samples = [
   }
 ];
 
-class DiscoverExamplesContainer extends PureComponent {
-  handleListItemClicked = item => {
+type Props = {
+  onInputExampleClicked: Function
+};
+
+class DiscoverExamplesContainer extends PureComponent<Props> {
+  handleListItemClicked = (item: Object) => {
     const { onInputExampleClicked } = this.props;
     const inputExample = item;
-    if (item.type === 'ttlFile') {
-      axios
-        .get(item.fileUrl)
-        .then(response => {
-          inputExample.dataSourcesUris = response.data;
-          onInputExampleClicked(inputExample);
-        })
-        .catch(error => {
-          // handle error
-          Log.error(error, 'DiscoverExamplesContainer');
-        });
-    } else {
-      onInputExampleClicked(inputExample);
-    }
+    onInputExampleClicked(inputExample);
   };
 
   render() {
@@ -73,9 +55,5 @@ class DiscoverExamplesContainer extends PureComponent {
     );
   }
 }
-
-DiscoverExamplesContainer.propTypes = {
-  onInputExampleClicked: PropTypes.func.isRequired
-};
 
 export default DiscoverExamplesContainer;

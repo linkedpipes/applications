@@ -17,20 +17,19 @@ import {
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
 import { SocketContext, Log, UserService } from '@utils';
-import { StoragePage, StorageBackend } from '@storage';
+import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
-import withTracker from './withTracker';
-import GoogleAnalytics from 'react-ga';
+import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
 // BASE_SOCKET_URL is not set
 
-var socket;
+let socket;
 
 const startSocketClient = () => {
   socket = io.connect(
@@ -57,15 +56,22 @@ const styles = () => ({
 type Props = {
   classes: any,
   webId: ?string,
-  // eslint-disable-next-line react/no-unused-prop-types
-  userProfile: Object,
+  // eslint-disable-ne
   handleSetSolidUserProfileAsync: Function,
   handleAddDiscoverySession: Function,
   handleAddExecutionSession: Function,
   handleUpdateDiscoverySession: Function,
   handleUpdateExecutionSession: Function,
   handleUpdateApplicationsFolder: Function,
-  handleSetUserWebId: Function
+  handleSetUserWebId: Function,
+  handleDeleteDiscoverySession: Function,
+  handleDeleteExecutionSession: Function,
+  handleSetUserInboxInvitations: Function,
+  currentInboxInvitations: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoverySessions: Array<Object>,
+  // eslint-disable-next-line react/no-unused-prop-types
+  pipelineExecutions: Array<Object>
 };
 
 type State = {
@@ -80,7 +86,6 @@ const errorHandler = webId => {
       scope.setLevel('error');
       scope.setExtra('component-stack', componentStack);
       Sentry.captureException(error);
-      Sentry.showReportDialog(); // Only if not production
     });
   };
 };
@@ -90,11 +95,7 @@ class AppRouter extends React.PureComponent<Props, State> {
     isExternalPath: false
   };
 
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
+  componentDidMount = async () => {
     const pathname = window.location.href;
 
     if (
@@ -104,25 +105,80 @@ class AppRouter extends React.PureComponent<Props, State> {
     ) {
       this.setState({ isExternalPath: true });
     } else {
-      this.setupSessionTracker();
+      await this.setupSessionTracker();
     }
 
     window.onbeforeunload = () => {
-      if (!this.state.isExternalPath && this.props.webId) {
+      if (
+        !this.state.isExternalPath &&
+        this.props.webId &&
+        socket !== undefined
+      ) {
         socket.emit('leave', this.props.webId);
         socket.removeAllListeners();
       }
     };
-  }
+  };
 
   setupProfileData = async jsonResponse => {
     const updatedProfileData = jsonResponse;
-    const me = await StorageBackend.getPerson(updatedProfileData.webId);
+    const me = await StorageToolbox.getPerson(updatedProfileData.webId);
     await this.props.handleSetSolidUserProfileAsync(
       updatedProfileData,
       me.name,
       me.image
     );
+  };
+
+  checkInbox = async () => {
+    const {
+      webId,
+      handleSetUserInboxInvitations,
+      currentInboxInvitations
+    } = this.props;
+    const inboxInvitations = await StorageToolbox.getInboxMessages(webId);
+    const invitations = [];
+
+    await Promise.all(
+      inboxInvitations.map(async fileUrl => {
+        const invitation = await StorageToolbox.readInboxInvite(fileUrl, webId);
+
+        if (invitation instanceof Invitation) {
+          Log.info(invitation);
+          invitations.push(invitation);
+        } else {
+          await StorageToolbox.processAcceptShareInvite(invitation);
+
+          toast.info(
+            `${invitation.sender.name} - accepted your invitation to collaborate!`,
+            {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 4000
+            }
+          );
+        }
+      })
+    );
+
+    if (
+      !(
+        currentInboxInvitations.length === invitations.length &&
+        currentInboxInvitations.sort().every((value, index) => {
+          return (
+            value.invitationUrl === invitations.sort()[index].invitationUrl
+          );
+        })
+      )
+    ) {
+      handleSetUserInboxInvitations(invitations);
+
+      if (invitations.length > 0) {
+        toast.info(`New notifications received! Check your inbox.`, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 4000
+        });
+      }
+    }
   };
 
   setupSessionTracker = async () => {
@@ -134,8 +190,6 @@ class AppRouter extends React.PureComponent<Props, State> {
 
     authClient.trackSession(session => {
       if (session) {
-        GoogleAnalytics.set({ webId: session.webId });
-
         handleSetUserWebId(session.webId);
 
         Log.info(session);
@@ -154,11 +208,11 @@ class AppRouter extends React.PureComponent<Props, State> {
 
             socket.emit('join', session.webId);
 
-            const folder = await StorageBackend.getValidAppFolder(
+            const folder = await StorageToolbox.getValidAppFolder(
               session.webId
             ).catch(async error => {
               Log.error(error, 'HomeContainer');
-              await StorageBackend.createAppFolders(
+              await StorageToolbox.createAppFolders(
                 session.webId,
                 'linkedpipes'
               ).then(created => {
@@ -174,6 +228,8 @@ class AppRouter extends React.PureComponent<Props, State> {
             if (folder) {
               Log.warn('Called internal global');
               handleUpdateApplicationsFolder(folder);
+              await self.checkInbox();
+              setInterval(self.checkInbox, 10000);
             }
           })
           .catch(error => {
@@ -182,7 +238,10 @@ class AppRouter extends React.PureComponent<Props, State> {
 
         Log.warn('Called global');
       } else {
-        socket.removeAllListeners();
+        // eslint-disable-next-line no-lonely-if
+        if (socket !== undefined) {
+          socket.removeAllListeners();
+        }
       }
     });
   };
@@ -264,6 +323,9 @@ class AppRouter extends React.PureComponent<Props, State> {
       pipelineRecord.started = parsedData.started;
       pipelineRecord.finished = parsedData.finished;
       pipelineRecord.executionIri = executionIri;
+      pipelineRecord.frequencyHours = parsedData.frequencyHours;
+      pipelineRecord.startedByUser = parsedData.startedByUser;
+      pipelineRecord.scheduleOn = parsedData.scheduleOn;
 
       socket.emit('join', pipelineRecord.executionIri);
       handleAddExecutionSession(pipelineRecord);
@@ -291,8 +353,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const parsedData = JSON.parse(data);
       if (parsedData.status.isFinished) {
         socket.emit('leave', parsedData.discoveryId);
-        const userProfile = self.props.userProfile;
-        if (userProfile.discoverySessions.length > 0) {
+        if (self.props.discoverySessions.length > 0) {
           const discoveryRecord = {};
 
           discoveryRecord.discoveryId = parsedData.discoveryId;
@@ -322,8 +383,7 @@ class AppRouter extends React.PureComponent<Props, State> {
       const newStatus = parsedData.status.status;
 
       socket.emit('leave', executionIri);
-      const userProfile = self.props.userProfile;
-      if (userProfile.pipelineExecutions.length > 0) {
+      if (self.props.pipelineExecutions.length > 0) {
         const pipelineRecord = {};
         pipelineRecord.status = newStatus;
         pipelineRecord.started = parsedData.started;
@@ -350,20 +410,16 @@ class AppRouter extends React.PureComponent<Props, State> {
               <SocketContext.Provider value={socket}>
                 <Switch>
                   <PublicLayout
-                    component={withTracker(AuthorizationPage)}
+                    component={AuthorizationPage}
                     path="/login"
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/dashboard"
-                    component={withTracker(HomePage)}
-                    exact
-                  />
+                  <PrivateLayout path="/dashboard" component={HomePage} exact />
 
                   <PrivateLayout
                     path="/create-app"
-                    component={withTracker(CreateVisualizerPage)}
+                    component={CreateVisualizerPage}
                     exact
                   />
 
@@ -375,7 +431,7 @@ class AppRouter extends React.PureComponent<Props, State> {
 
                   <PrivateLayout
                     path="/profile"
-                    component={withTracker(UserProfilePage)}
+                    component={UserProfilePage}
                     exact
                   />
 
@@ -385,23 +441,15 @@ class AppRouter extends React.PureComponent<Props, State> {
                     exact
                   />
 
-                  <PrivateLayout
-                    path="/about"
-                    component={withTracker(AboutPage)}
-                    exact
-                  />
+                  <PrivateLayout path="/about" component={AboutPage} exact />
 
                   <PrivateLayout
                     path="/storage"
-                    component={withTracker(StoragePage)}
+                    component={StoragePage}
                     exact
                   />
 
-                  <PublicLayout
-                    path="/404"
-                    component={withTracker(NotFoundPage)}
-                    exact
-                  />
+                  <Route path="/404" component={NotFoundPage} exact />
 
                   <Route path="/map" component={ApplicationPage} />
 
@@ -412,6 +460,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                   <Redirect from="/" to="/login" exact />
                   <Redirect to="/404" />
                 </Switch>
+                <StorageInboxDialog />
               </SocketContext.Provider>
             </div>
           </BrowserRouter>
@@ -426,7 +475,10 @@ const mapStateToProps = state => {
     webId: state.user.webId,
     userProfile: state.user,
     colorThemeIsLight: state.globals.colorThemeIsLight,
-    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen
+    chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
+    discoverySessions: state.user.discoverySessions,
+    pipelineExecutions: state.user.pipelineExecutions,
+    currentInboxInvitations: state.user.inboxInvitations
   };
 };
 
@@ -473,6 +525,9 @@ const mapDispatchToProps = dispatch => {
     });
   };
 
+  const handleSetUserInboxInvitations = inboxInvitations =>
+    dispatch(userActions.setUserInboxInvitations(inboxInvitations));
+
   return {
     handleSetSolidUserProfileAsync,
     handleSetUserWebId,
@@ -483,7 +538,8 @@ const mapDispatchToProps = dispatch => {
     handleUpdateDiscoverySession,
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
-    handleUpdateUserDetails
+    handleUpdateUserDetails,
+    handleSetUserInboxInvitations
   };
 };
 

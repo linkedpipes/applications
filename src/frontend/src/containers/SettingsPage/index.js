@@ -1,3 +1,3 @@
-import SettingsPage from './SettingsPageContainer';
+import { SettingsPageContainer as SettingsPage } from './SettingsPageContainer';
 
 export default SettingsPage;

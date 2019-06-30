@@ -5,17 +5,23 @@ import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
-import uuid from 'uuid';
+// import uuid from 'uuid';
+import _ from 'lodash';
 
 type Props = {
-  classes: {
-    progress: number
-  },
+  classes: {},
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: string,
   isPublished: boolean,
-  size: number,
-  selectedNodes: Set<string>
+  theme: Object,
+  nodes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
 };
 
 type State = {
@@ -32,50 +38,76 @@ const styles = theme => ({
   },
   card: {},
   input: {},
-  progress: {
-    margin: theme.spacing.unit * 2,
-    alignItems: 'center'
-  },
   theme
 });
 
-const eqSet = (as, bs) => {
-  if (!as || !bs) return false;
-  if (as.size !== bs.size) return false;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const a of as) if (!bs.has(a)) return false;
+const areEqual = (
+  a: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  b: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>
+) => {
+  if (!a || !b) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    let eq = false;
+    for (let j = 0; j < b.length; j += 1) {
+      if (_.isEqual(a[i], b[j])) {
+        eq = true;
+        break;
+      }
+    }
+    if (!eq) return false;
+  }
   return true;
 };
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
+  elementVizDiv: any;
+
   constructor(props: Props) {
     super(props);
+    this.elementVizDiv = null;
     this.state = {
       dataLoadingStatus: 'loading',
       matrix: [],
       groupColors: [],
       groupLabels: [],
-      size: 500
+      size: 150
     };
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
-    const elementVizDiv = document.getElementById('viz-div');
-    if (elementVizDiv) {
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedResultGraphIri
+    } = this.props;
+    this.elementVizDiv = document.getElementById('viz-div');
+    const nodes = this.props.nodes || [];
+
+    if (this.elementVizDiv) {
       if (!isPublished) {
         handleSetCurrentApplicationData({
-          id: uuid.v4(),
-          applicationEndpoint: 'chord',
-          selectedResultGraphIri: this.props.selectedResultGraphIri,
-          visualizerCode: 'CHORD',
-          selectedNodes: this.props.selectedNodes && [
-            ...this.props.selectedNodes
-          ]
+          endpoint: 'chord',
+          graphIri: this.props.selectedResultGraphIri,
+          etlExecutionIri: this.props.selectedPipelineExecution,
+          visualizerType: 'CHORD'
         });
       }
 
-      if (!this.props.selectedNodes || !this.props.selectedNodes.size) {
+      // Should never happen
+      if (nodes.length === 0) {
         const nodesRequest = await VisualizersService.getChordNodes(
           this.props.selectedResultGraphIri
         );
@@ -98,21 +130,19 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           matrix: matrixData,
           groupColors: colors,
           groupLabels: labels,
-          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+          size: Math.min(
+            this.elementVizDiv.clientHeight,
+            this.elementVizDiv.clientWidth
+          )
         });
       } else {
         // Fetch data
-        const nodesRequest = await VisualizersService.getChordNodes(
-          this.props.selectedResultGraphIri
-        );
-        const nodesResponse = await nodesRequest.data;
-        const labels = nodesResponse
-          .filter(node => this.props.selectedNodes.has(node.uri))
-          .map(node => node.label.languageMap.nolang);
+        const selectedNodes = nodes.filter(node => node.selected);
+        const labels = selectedNodes.map(node => node.label);
 
         const matrixRequest = await VisualizersService.getChordData(
-          this.props.selectedResultGraphIri,
-          [...this.props.selectedNodes]
+          selectedResultGraphIri,
+          selectedNodes.map(node => node.uri)
         );
         const matrixData = await matrixRequest.data;
 
@@ -126,58 +156,75 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           matrix: matrixData,
           groupColors: colors,
           groupLabels: labels,
-          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+          size: Math.min(
+            this.elementVizDiv.clientHeight,
+            this.elementVizDiv.clientWidth
+          )
         });
       }
     }
   }
 
   async componentDidUpdate(prevProps) {
+    // this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
+    // const size = Math.min(
+    //   this.elementVizDiv.clientHeight,
+    //   this.elementVizDiv.clientWidth
+    // );
     // Typical usage (don't forget to compare props):
-    if (
-      this.props.selectedNodes &&
-      !eqSet(prevProps.selectedNodes, this.props.selectedNodes)
-    ) {
-      // Fetch data
-      const nodesRequest = await VisualizersService.getChordNodes(
-        this.props.selectedResultGraphIri
-      );
-      const nodesResponse = await nodesRequest.data;
-      const labels = nodesResponse
-        .filter(node => this.props.selectedNodes.has(node.uri))
-        .map(node => node.label.languageMap.nolang);
+    if (!areEqual(prevProps.nodes, this.props.nodes)) {
+      // TODO: Dispatch action to setup selectedNodes
+      const nodes = this.props.nodes;
+      // If there are no selected nodes, then bring all the data
+      // (should never happen)
+      if (this.props.nodes.length === 0) {
+        const nodesRequest = await VisualizersService.getChordNodes(
+          this.props.selectedResultGraphIri
+        );
+        const nodesResponse = await nodesRequest.data;
+        const nodeUris = nodesResponse.map(node => node.uri);
+        const labels = nodesResponse.map(node => node.label.languageMap.nolang);
 
-      const matrixRequest = await VisualizersService.getChordData(
-        this.props.selectedResultGraphIri,
-        [...this.props.selectedNodes]
-      );
-      const matrixData = await matrixRequest.data;
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          nodeUris
+        );
+        const matrixData = await matrixRequest.data;
 
-      const colors = palette('sol-accent', labels.length).map(
-        color => `#${color}`
-      );
+        const colors = palette('sol-accent', nodeUris.length).map(
+          color => `#${color}`
+        );
 
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        dataLoadingStatus: 'ready',
-        matrix: matrixData,
-        groupColors: colors,
-        groupLabels: labels
-      });
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels
+        });
+      } else {
+        // Fetch data
+        const selectedNodes = nodes.filter(node => node.selected);
+        const labels = selectedNodes.map(node => node.label);
 
-      if (!this.props.isPublished) {
-        this.props.handleSetCurrentApplicationData({
-          selectedNodes: [...this.props.selectedNodes]
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          selectedNodes.map(node => node.uri)
+        );
+        const matrixData = await matrixRequest.data;
+
+        const colors = palette('sol-accent', labels.length).map(
+          color => `#${color}`
+        );
+
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels
         });
       }
-    }
-
-    const elementVizDiv = document.getElementById('viz-div');
-    if (elementVizDiv && prevProps.size !== this.props.size) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
-      });
     }
   }
 
@@ -197,10 +244,10 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         )}
         height={size}
         width={size}
-        style={{ font: '10px sans-serif' }}
+        style={{ font: '10px sans-serif', paddingBottom: '0' }}
       />
     );
   }
 }
 
-export default withStyles(styles)(withTheme()(ChordVisualizer));
+export default withStyles(styles)(withTheme(ChordVisualizer));

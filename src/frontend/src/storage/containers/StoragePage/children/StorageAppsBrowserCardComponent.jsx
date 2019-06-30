@@ -15,8 +15,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService } from '@utils';
-import { AppConfiguration } from '../../../models';
+import { GlobalUtils, VisualizersService, UserService } from '@utils';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -28,11 +27,13 @@ import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
 import ShareIcon from '@material-ui/icons/Share';
-import axios from 'axios';
+import { filtersActions } from '@ducks/filtersDuck';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 
 const styles = {
   card: {
-    height: '280',
+    height: '100%',
+    display: 'flex',
     width: '190',
     flexDirection: 'column',
     marginRight: 5
@@ -42,7 +43,7 @@ const styles = {
     textAlign: 'center'
   },
 
-  actions: {
+  spacing: {
     display: 'flex'
   },
 
@@ -50,6 +51,10 @@ const styles = {
     flexGrow: 1,
     width: '100%',
     marginTop: '1rem'
+  },
+
+  cardHeader: {
+    height: '100px'
   }
 };
 
@@ -59,10 +64,11 @@ type Props = {
     card: {},
     cardContent: {},
     media: {},
-    actions: {},
-    textField: {}
+    spacing: {},
+    textField: {},
+    cardHeader: {}
   },
-  applicationMetadata: AppConfiguration,
+  applicationMetadata: ApplicationMetadata,
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   onHandleApplicationDeleted: Function,
@@ -70,9 +76,11 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   setApplicationLoaderStatus: Function,
+  handleSetFiltersState: Function,
   history: Object,
   applicationsFolder: string,
-  indexNumber: Number
+  indexNumber: Number,
+  webId: string
 };
 
 type State = {
@@ -104,6 +112,11 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        this.props.webId,
+        this.props.applicationMetadata.solidFileUrl
+      );
+
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
 
@@ -138,25 +151,16 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
+      handleSetFiltersState,
       history
     } = this.props;
 
     await setApplicationLoaderStatus(true);
 
-    const appConfigurationResponse = await axios.get(
-      applicationMetadata.object
-    );
+    const applicationConfiguration = applicationMetadata.configuration;
 
-    if (appConfigurationResponse.status !== 200) {
-      toast.error('Error, unable to load!', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
-      });
-      await setApplicationLoaderStatus(false);
-    }
-    const applicationData = appConfigurationResponse.data.applicationData;
+    const resultGraphIri = applicationConfiguration.graphIri;
 
-    const resultGraphIri = applicationData.selectedResultGraphIri;
     let graphExists = true;
 
     await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
@@ -165,14 +169,15 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
     if (graphExists) {
       const selectedVisualiser = {
-        visualizer: { visualizerCode: applicationData.visualizerCode }
+        visualizer: { visualizerCode: applicationConfiguration.visualizerType }
       };
 
       await handleSetResultPipelineIri(resultGraphIri);
-      await handleSetSelectedApplicationTitle(applicationMetadata.title);
-      await handleSetSelectedApplicationData(applicationData);
+      await handleSetSelectedApplicationTitle(applicationConfiguration.title);
+      await handleSetSelectedApplicationData(applicationConfiguration);
       await handleSetSelectedApplicationMetadata(applicationMetadata);
       await handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetFiltersState(applicationConfiguration.filterConfiguration);
 
       await setApplicationLoaderStatus(false);
 
@@ -201,40 +206,51 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleApplicationClicked,
       handleCopyLinkClicked
     } = this;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
     return (
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
+            className={classes.cardHeader}
+            noWrap
             action={
               <IconButton
                 aria-owns={anchorEl ? 'simple-menu' : undefined}
                 aria-haspopup="true"
                 id={`more_icon_${indexNumber.toString()}_${
-                  applicationMetadata.title
+                  applicationConfiguration.title
                 }`}
                 onClick={handleMenuClick}
               >
                 <MoreVertIcon />
               </IconButton>
             }
-            title={applicationMetadata.title}
+            title={
+              applicationConfiguration.title.length >= 25
+                ? `${applicationConfiguration.title.substr(0, 25)}...`
+                : applicationConfiguration.title
+            }
             subheader={GlobalUtils.getBeautifiedVisualizerTitle(
-              applicationMetadata.endpoint
+              applicationConfiguration.endpoint
             )}
           />
           <CardActionArea onClick={handleApplicationClicked}>
             <div
               className={classes.media}
-              id={`${indexNumber.toString()}_${applicationMetadata.title}`}
-              style={{ backgroundColor: applicationMetadata.cardColor }}
+              id={`${indexNumber.toString()}_${applicationConfiguration.title}`}
+              style={{
+                backgroundColor: applicationConfiguration.backgroundColor
+              }}
             >
               <VisualizerIcon
-                visualizerType={applicationMetadata.endpoint}
+                visualizerType={applicationConfiguration.endpoint}
                 style={{ color: 'white', fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
-          <CardActions className={classes.actions} disableActionSpacing>
+          <CardActions className={classes.spacing} disableSpacing>
             <IconButton aria-label="Share" onClick={handleShareApp}>
               <ShareIcon />
             </IconButton>
@@ -248,7 +264,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
         >
           <MenuItem
             id={`delete_button_${indexNumber.toString()}_${
-              applicationMetadata.title
+              applicationConfiguration.title
             }`}
             onClick={handleDeleteApp}
           >
@@ -275,8 +291,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
           <DialogContent>
             <CopyToClipboard
               text={StorageToolbox.appIriToPublishUrl(
-                applicationMetadata.object,
-                applicationMetadata.endpoint
+                applicationMetadata.solidFileUrl,
+                applicationConfiguration.endpoint
               )}
               onCopy={handleCopyLinkClicked}
             >
@@ -287,8 +303,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 className={classes.textField}
                 fullWidth
                 value={StorageToolbox.appIriToPublishUrl(
-                  applicationMetadata.object,
-                  applicationMetadata.endpoint
+                  applicationMetadata.solidFileUrl,
+                  applicationConfiguration.endpoint
                 )}
                 autoFocus
               />
@@ -307,17 +323,14 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    applicationsFolder: state.user.applicationsFolder
+    applicationsFolder: state.user.applicationsFolder,
+    webId: state.user.webId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(
@@ -335,12 +348,16 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
+  const handleSetFiltersState = filters =>
+    dispatch(filtersActions.setFiltersState(filters));
+
   return {
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata
+    handleSetSelectedApplicationMetadata,
+    handleSetFiltersState
   };
 };
 

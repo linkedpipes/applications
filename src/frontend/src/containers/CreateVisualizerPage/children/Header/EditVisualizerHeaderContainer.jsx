@@ -1,12 +1,27 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, StorageBackend } from '@storage';
+import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import { globalActions } from '@ducks/globalDuck';
+import { GoogleAnalyticsWrapper, ETLService } from '@utils';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import UserService from '@utils/user.service';
+
+const intervalTypeToHours = (interval, type) => {
+  const numberInterval = Number(interval);
+  switch (type) {
+    case 'Days':
+      return `${numberInterval * 24}`;
+    case 'Weeks':
+      return `${numberInterval * 7 * 24}`;
+    default:
+      return interval;
+  }
+};
 
 type Props = {
   selectedApplication: any,
@@ -19,9 +34,11 @@ type Props = {
   selectedApplicationTitle: string,
   applicationsFolder: string,
   setApplicationLoaderStatus: Function,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   handleSetSelectedApplicationTitle: Function,
-  handleSetSelectedApplicationMetadata: Function
+  handleSetSelectedApplicationMetadata: Function,
+  handleUpdateAccessControlDialogState: Function,
+  webId: string
 };
 
 type State = {
@@ -31,9 +48,13 @@ type State = {
   height: number,
   width: number,
   deleteAppDialogOpen: boolean,
-  anchorEl: Object,
+  sharingAnchorEl: Object,
+  settingsAnchorEl: Object,
   modifiedSelectedApplicationTitle: string,
-  renameDialogOpen: boolean
+  renameDialogOpen: boolean,
+  dataRefreshDialogOpen: boolean,
+  selectedDataRefreshInterval: { type: string, value: string },
+  selectedPipelineExecution: ?{ scheduleOn: boolean }
 };
 
 class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
@@ -44,23 +65,54 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     height: 400,
     width: 400,
     deleteAppDialogOpen: false,
-    anchorEl: undefined,
+    sharingAnchorEl: undefined,
+    settingsAnchorEl: undefined,
     modifiedSelectedApplicationTitle: '',
-    renameDialogOpen: false
+    renameDialogOpen: false,
+    dataRefreshDialogOpen: false,
+    selectedDataRefreshInterval: { value: '', type: 'Hours' },
+    selectedPipelineExecution: undefined
   };
 
   componentDidMount() {
     this.setState({
       modifiedSelectedApplicationTitle: this.props.selectedApplicationTitle
     });
+
+    this.fetchCurrentPipelineExecution();
   }
+
+  fetchCurrentPipelineExecution = async () => {
+    const { selectedApplicationMetadata } = this.props;
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+
+    const pipelineExecutionResponse = await ETLService.getPipelineExecution({
+      executionIri
+    });
+
+    if (pipelineExecutionResponse.status === 200) {
+      let frequencyHours = `${pipelineExecutionResponse.data.frequencyHours}`;
+      frequencyHours = frequencyHours === '-1' ? '' : frequencyHours;
+
+      this.setState(prevState => {
+        return {
+          selectedPipelineExecution: pipelineExecutionResponse.data,
+          selectedDataRefreshInterval: {
+            value: frequencyHours,
+            type: prevState.selectedDataRefreshInterval.type
+          }
+        };
+      });
+    }
+  };
 
   handlePublishClicked = async () => {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppPublished(publishedUrl);
@@ -70,8 +122,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     const { selectedApplication, selectedApplicationMetadata } = this.props;
 
     const publishedUrl = StorageToolbox.appIriToPublishUrl(
-      selectedApplicationMetadata.object,
-      selectedApplication.applicationEndpoint
+      selectedApplicationMetadata.solidFileUrl,
+      selectedApplication.endpoint
     );
 
     this.handleAppEmbedded(publishedUrl);
@@ -124,12 +176,16 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ height: event.target.value });
   };
 
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  handleSharingMenuClick = event => {
+    this.setState({ sharingAnchorEl: event.currentTarget });
+  };
+
+  handleSettingsMenuClick = event => {
+    this.setState({ settingsAnchorEl: event.currentTarget });
   };
 
   handleMenuClose = () => {
-    this.setState({ anchorEl: null });
+    this.setState({ sharingAnchorEl: null, settingsAnchorEl: null });
   };
 
   handleDeleteAppClicked = () => {
@@ -146,6 +202,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus,
       selectedApplicationMetadata,
       applicationsFolder,
+      webId,
       history
     } = this.props;
 
@@ -158,10 +215,29 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       selectedApplicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        webId,
+        selectedApplicationMetadata.solidFileUrl
+      );
+
+      GoogleAnalyticsWrapper.trackEvent({
+        category: 'CreateApp',
+        action: 'Pressed delete app',
+        label: `type : '${selectedApplicationMetadata.endpoint}'`
+      });
+
       history.push({
         pathname: '/dashboard'
       });
     }
+  };
+
+  handleOpenAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(true);
+  };
+
+  handleCloseAccessControlDialog = () => {
+    this.props.handleUpdateAccessControlDialogState(false);
   };
 
   handleOpenRenameDialog = () => {
@@ -177,6 +253,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       setApplicationLoaderStatus
     } = this.props;
 
+    const applicationMetadata = selectedApplicationMetadata;
+
     if (modifiedSelectedApplicationTitle === '') {
       toast.error('Error, provide a valid name for an application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -188,8 +266,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(true);
     this.handleCloseRenameDialog();
 
-    const isRenamed = await StorageBackend.renameAppConfiguration(
-      selectedApplicationMetadata.url,
+    const isRenamed = await StorageToolbox.renameAppConfiguration(
+      applicationMetadata.solidFileUrl,
       modifiedSelectedApplicationTitle
     );
 
@@ -199,9 +277,9 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
         autoClose: 2000
       });
 
-      selectedApplicationMetadata.title = modifiedSelectedApplicationTitle;
+      applicationMetadata.configuration.title = modifiedSelectedApplicationTitle;
       handleSetSelectedApplicationTitle(modifiedSelectedApplicationTitle);
-      handleSetSelectedApplicationMetadata(selectedApplicationMetadata);
+      handleSetSelectedApplicationMetadata(applicationMetadata);
     } else {
       toast.success('Error, unable to rename application!', {
         position: toast.POSITION.TOP_RIGHT,
@@ -223,6 +301,131 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
     this.setState({ renameDialogOpen: false });
   };
 
+  handleDataRefreshClicked = () => {
+    this.handleMenuClose();
+    this.setState({ dataRefreshDialogOpen: true });
+  };
+
+  handleDataRefreshConfirmed = async () => {
+    const {
+      webId,
+      selectedApplicationMetadata,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
+    const { selectedDataRefreshInterval } = this.state;
+
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+    const selectedVisualiser = this.props.selectedVisualizer.visualizer
+      .visualizerCode;
+    const frequencyHours = intervalTypeToHours(
+      selectedDataRefreshInterval.value,
+      selectedDataRefreshInterval.type
+    );
+
+    const response = await ETLService.setupRepeatedPipelineExecution({
+      webId,
+      selectedVisualiser,
+      executionIri,
+      frequencyHours
+    });
+
+    if (response.status === 200) {
+      toast.success('Background data refreshing is enabled!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+    } else {
+      toast.error('Error! Unable to setup background data refreshing.', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000
+      });
+    }
+
+    this.setState({ dataRefreshDialogOpen: false });
+    await setApplicationLoaderStatus(false);
+  };
+
+  handleDataRefreshDismissed = async () => {
+    this.setState({ dataRefreshDialogOpen: false });
+  };
+
+  handleDataRefreshTypeChange = event => {
+    this.setState(prevState => {
+      return {
+        selectedDataRefreshInterval: {
+          value: prevState.selectedDataRefreshInterval.value,
+          type: event.target.value
+        }
+      };
+    });
+  };
+
+  handleDataRefreshValueChange = event => {
+    const value = event.target.value ? event.target.value : '';
+    this.setState(prevState => {
+      return {
+        selectedDataRefreshInterval: {
+          type: prevState.selectedDataRefreshInterval.type,
+          value
+        }
+      };
+    });
+  };
+
+  handleDataRefreshToggleClicked = async () => {
+    const {
+      selectedApplicationMetadata,
+      setApplicationLoaderStatus
+    } = this.props;
+
+    await setApplicationLoaderStatus(true);
+
+    const executionIri =
+      selectedApplicationMetadata.configuration.etlExecutionIri;
+    const pipelineExecution: any = this.state.selectedPipelineExecution;
+
+    pipelineExecution.scheduleOn = !pipelineExecution.scheduleOn;
+
+    if (pipelineExecution) {
+      const response = await ETLService.toggleRepeatedPipelineExecution({
+        executionIri,
+        repeat: pipelineExecution.scheduleOn
+      });
+      if (response.status === 200) {
+        this.setState({
+          selectedPipelineExecution: pipelineExecution,
+          dataRefreshDialogOpen: false
+        });
+
+        toast.success(
+          `Successfully ${
+            pipelineExecution.scheduleOn ? 'enabled' : 'disabled'
+          } data refreshing!`,
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      } else {
+        toast.error(
+          `Error! Unable to  ${
+            pipelineExecution.scheduleOn ? 'enable' : 'disable'
+          } data refreshing!`,
+          {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 2000
+          }
+        );
+      }
+    }
+
+    await setApplicationLoaderStatus(false);
+  };
+
   render() {
     const {
       headerParams,
@@ -242,14 +445,23 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       handleChangeHeight,
       handleChangeWidth,
       handleMenuClose,
-      handleMenuClick,
+      handleSharingMenuClick,
+      handleSettingsMenuClick,
       handleDeleteAppClicked,
       handleDeleteAppDismissed,
       handleDeleteAppConfirmed,
       handleRenameConfirmed,
       handleCloseRenameDialog,
       handleOpenRenameDialog,
-      handleRenameFieldChanged
+      handleOpenAccessControlDialog,
+      handleCloseAccessControlDialog,
+      handleRenameFieldChanged,
+      handleDataRefreshClicked,
+      handleDataRefreshConfirmed,
+      handleDataRefreshDismissed,
+      handleDataRefreshTypeChange,
+      handleDataRefreshValueChange,
+      handleDataRefreshToggleClicked
     } = this;
     const {
       embedDialogOpen,
@@ -258,45 +470,65 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       height,
       width,
       deleteAppDialogOpen,
-      anchorEl,
+      sharingAnchorEl,
+      settingsAnchorEl,
       modifiedSelectedApplicationTitle,
-      renameDialogOpen
+      renameDialogOpen,
+      dataRefreshDialogOpen,
+      selectedDataRefreshInterval,
+      selectedPipelineExecution
     } = this.state;
     return (
-      <EditVisualizerHeaderComponent
-        handleAppTitleChanged={onHandleAppTitleChanged}
-        handlePublishClicked={handlePublishClicked}
-        handleEmbedClicked={handleEmbedClicked}
-        headerParams={headerParams}
-        onRefreshSwitchChange={onRefreshSwitchChange}
-        publishDialogOpen={publishDialogOpen}
-        embedDialogOpen={embedDialogOpen}
-        handleClosePublishDialog={handleClosePublishDialog}
-        handleCloseEmbedDialog={handleCloseEmbedDialog}
-        handleProceedToApplicationClicked={handleProceedToApplicationClicked}
-        handleCopyLinkClicked={handleCopyLinkClicked}
-        selectedVisualizer={selectedVisualizer}
-        selectedApplicationTitle={selectedApplicationTitle}
-        appIri={appIri}
-        height={height}
-        width={width}
-        handleChangeWidth={handleChangeWidth}
-        handleChangeHeight={handleChangeHeight}
-        selectedApplicationMetadata={selectedApplicationMetadata}
-        deleteAppDialogOpen={deleteAppDialogOpen}
-        handleMenuClose={handleMenuClose}
-        anchorEl={anchorEl}
-        handleMenuClick={handleMenuClick}
-        handleDeleteAppClicked={handleDeleteAppClicked}
-        handleDeleteAppDismissed={handleDeleteAppDismissed}
-        handleDeleteAppConfirmed={handleDeleteAppConfirmed}
-        modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
-        handleRenameFieldChanged={handleRenameFieldChanged}
-        handleOpenRenameDialog={handleOpenRenameDialog}
-        handleCloseRenameDialog={handleCloseRenameDialog}
-        handleRenameConfirmed={handleRenameConfirmed}
-        renameDialogOpen={renameDialogOpen}
-      />
+      <Fragment>
+        <EditVisualizerHeaderComponent
+          handleAppTitleChanged={onHandleAppTitleChanged}
+          handlePublishClicked={handlePublishClicked}
+          handleEmbedClicked={handleEmbedClicked}
+          headerParams={headerParams}
+          onRefreshSwitchChange={onRefreshSwitchChange}
+          publishDialogOpen={publishDialogOpen}
+          embedDialogOpen={embedDialogOpen}
+          handleClosePublishDialog={handleClosePublishDialog}
+          handleCloseEmbedDialog={handleCloseEmbedDialog}
+          handleProceedToApplicationClicked={handleProceedToApplicationClicked}
+          handleCopyLinkClicked={handleCopyLinkClicked}
+          selectedVisualizer={selectedVisualizer}
+          selectedApplicationTitle={selectedApplicationTitle}
+          appIri={appIri}
+          height={height}
+          width={width}
+          handleChangeWidth={handleChangeWidth}
+          handleChangeHeight={handleChangeHeight}
+          selectedApplicationMetadata={selectedApplicationMetadata}
+          deleteAppDialogOpen={deleteAppDialogOpen}
+          handleMenuClose={handleMenuClose}
+          sharingAnchorEl={sharingAnchorEl}
+          settingsAnchorEl={settingsAnchorEl}
+          handleSharingMenuClick={handleSharingMenuClick}
+          handleSettingsMenuClick={handleSettingsMenuClick}
+          handleDeleteAppClicked={handleDeleteAppClicked}
+          handleDataRefreshClicked={handleDataRefreshClicked}
+          handleDataRefreshDismissed={handleDataRefreshDismissed}
+          handleDeleteAppDismissed={handleDeleteAppDismissed}
+          handleDeleteAppConfirmed={handleDeleteAppConfirmed}
+          handleDataRefreshConfirmed={handleDataRefreshConfirmed}
+          modifiedSelectedApplicationTitle={modifiedSelectedApplicationTitle}
+          handleOpenAccessControlDialog={handleOpenAccessControlDialog}
+          handleCloseAccessControlDialog={handleCloseAccessControlDialog}
+          handleRenameFieldChanged={handleRenameFieldChanged}
+          handleOpenRenameDialog={handleOpenRenameDialog}
+          handleCloseRenameDialog={handleCloseRenameDialog}
+          handleRenameConfirmed={handleRenameConfirmed}
+          renameDialogOpen={renameDialogOpen}
+          dataRefreshDialogOpen={dataRefreshDialogOpen}
+          selectedDataRefreshInterval={selectedDataRefreshInterval}
+          handleDataRefreshTypeChange={handleDataRefreshTypeChange}
+          handleDataRefreshValueChange={handleDataRefreshValueChange}
+          handleDataRefreshToggleClicked={handleDataRefreshToggleClicked}
+          selectedPipelineExecution={selectedPipelineExecution}
+        />
+        <StorageAccessControlDialog />
+      </Fragment>
     );
   }
 }
@@ -309,7 +541,7 @@ const mapStateToProps = state => {
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
-    selectedApplicationTitle: state.application.selectedApplicationTitle,
+    selectedApplicationTitle: state.application.selectedApplication.title,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId
   };
@@ -325,10 +557,14 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationTitle = applicationTitle =>
     dispatch(applicationActions.setApplicationTitle(applicationTitle));
 
+  const handleUpdateAccessControlDialogState = state =>
+    dispatch(globalActions.setAccessControlDialogState({ state }));
+
   return {
     handleAppTitleChanged,
     handleSetSelectedApplicationMetadata,
-    handleSetSelectedApplicationTitle
+    handleSetSelectedApplicationTitle,
+    handleUpdateAccessControlDialogState
   };
 };
 

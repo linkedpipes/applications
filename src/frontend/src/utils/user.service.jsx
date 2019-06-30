@@ -15,6 +15,18 @@ const UserService = {
     return lpaAxios.delete('/user/execution', {
       params: { webId, executionIri, socketId }
     });
+  },
+
+  postApplication(webId, solidIri, executionIri) {
+    return lpaAxios.post('/user/application', null, {
+      params: { webId, solidIri, executionIri }
+    });
+  },
+
+  deleteApplication(webId, solidIri) {
+    return lpaAxios.delete('/user/application', {
+      params: { webId, solidIri }
+    });
   }
 };
 

@@ -1,0 +1,121 @@
+---
+name: DiscoverPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { DiscoverComponent } from './DiscoverComponent';
+
+import DiscoverInputSources from './DiscoverInputSources/DiscoverSelectorComponent';
+import DiscoverVisualizerPicker from './DiscoverVisualizerPicker/DiscoverVisualizerPickerComponent';
+import DiscoverPipelinesPicker from './DiscoverPipelinesPicker/DiscoverPipelinesPickerComponent';
+import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor/DiscoverPipelinesExecutorComponent';
+
+# DiscoverPage
+
+DiscoverPage is a container representing a `DiscoverPage` webpage.
+
+# Main funcionality
+
+- Starting discovery from provided RDF files, URLs to RDF files, SPARQL endpoints and etc.
+- Picking discovered visualizers <br/>
+- Picking specific pipelines for selected visualizers.
+- Executing pipelines and storing processed data.
+- Redirecting to `create-app` page.
+
+# Structure
+
+`DiscoverPage` component exported from `DiscoverPage` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+
+├── DiscoverInputSources/ # Folder with components and containers repsonsible for accepting input data sources for discovery from users.
+├── DiscoverPipelinesExecutor/ # Folder with components and containers repsonsible for executing discovered pipeline.
+├── DiscoverPipelinesPicker/ # Folder with components and containers repsonsible for picking discovered pipelines.
+├── DiscoverVisualizerPicker/ # Folder with components and containers repsonsible for picking discovered visualizers.
+├── duck/ # Folder containing redux actions, reducers and etc. Redux state logic for DiscoverPage interactions.
+├── DiscoverContainer.jsx # Stateless react component, responsible for ui
+├── DiscoverComponent.jsx # React PureComponent, responsible for both UI and states
+├── DiscoverPage.mdx # Documentation markdown that you are currently looking at
+├── children/ # Children components used within 'DiscoverComponent.jsx'
+└── index.js
+```
+
+## Properties
+
+### Component
+
+<Props of={DiscoverComponent} />
+
+## Example
+
+Example demonstrates each individual component rendered at specific steps of the DiscoverPage MaterialUI stepper component.
+
+### Step 1
+
+<Playground>
+  <DiscoverInputSources />
+</Playground>
+
+### Step 2
+
+<Playground>
+  <DiscoverVisualizerPicker
+    visualizers={[
+      {
+        visualizer: {
+          visualizerCode: 'CHORD',
+          label: 'Chord Visualization Application'
+        }
+      },
+      {
+        visualizer: {
+          visualizerCode: 'MAP',
+          label: 'Map Visualization Application'
+        }
+      }
+    ]}
+  />
+</Playground>
+
+### Step 3
+
+<Playground>
+  <DiscoverPipelinesPicker
+    order={'asc'}
+    orderBy={'id'}
+    page={0}
+    rowsPerPage= {5}
+    loadingButtons= {[]}
+    dataSourceGroups={[
+      {
+        dataSources: [
+          {
+            uri: null,
+            label: 'SPARQL endpoint -> Chord Visualization Application'
+          }
+        ],
+        pipelines: [
+          {
+            id: 'some-id',
+            name:
+              '[Unspecified user-provided dataset template] -> Chord Visualization Application (Application) (3)',
+            descriptor:
+              'Unspecified user-provided dataset template;0;Unspecified user-provided dataset template extractor (SparqlConstructExtractor);;Chord Visualization Application (Application);1',
+            componentCount: 0,
+            minimalIteration: 1
+          }
+        ]
+      }
+    ]}
+/>
+
+</Playground>
+
+### Step 4
+
+<Playground>
+  <DiscoverPipelinesExecutor
+    loaderLabelText={'I am an amazing loader label text'}
+  />
+</Playground>

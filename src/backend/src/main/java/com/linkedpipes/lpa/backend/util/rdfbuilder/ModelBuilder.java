@@ -4,9 +4,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFLanguages;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.net.URL;
 
@@ -21,7 +24,15 @@ public class ModelBuilder {
     }
 
     private ModelBuilder(URL resource) {
-        model.read(resource.toString(), "TTL");
+        RDFDataMgr.read(model, resource.toString()) ;
+    }
+
+    private ModelBuilder(URL resource, Lang language) {
+        model.read(resource.toString(), language.toString());
+    }
+
+    private ModelBuilder(String rdfData, Lang language) {
+        RDFDataMgr.read(model, new ByteArrayInputStream(rdfData.getBytes()), language);
     }
 
     public ModelBuilder namespace(String prefix, String uri) {
@@ -37,6 +48,10 @@ public class ModelBuilder {
         return ResourceBuilder.of(resource, model);
     }
 
+    public Model build() {
+        return model;
+    }
+
     /**
      * @return TTL-formatted representation of the underlying RDF model
      */
@@ -48,13 +63,35 @@ public class ModelBuilder {
     }
 
     /**
-     * Initialize from a TTL-formatted resource.
+     * Initialize from a resource.
      *
-     * @param model the resource to initialize the model from
+     * @param uriToData the url of the resource to initialize the model from
      * @return a builder
      */
-    public static ModelBuilder from(URL model) {
-        return new ModelBuilder(model);
+    public static ModelBuilder from(URL uriToData) {
+        return new ModelBuilder(uriToData);
+    }
+
+    /**
+     * Initialize from a resource where the RDF data format is known.
+     *
+     * @param uriToData the url of the resource to initialize the model from
+     * @param language the language of the RDF data in the provided resource
+     * @return a builder
+     */
+    public static ModelBuilder from(URL uriToData, Lang language) {
+        return new ModelBuilder(uriToData, language);
+    }
+
+    /**
+     * Initialize from a string containing RDF data.
+     *
+     * @param rdfData RDF data to initialize the model from
+     * @param language the language of the RDF data
+     * @return a builder
+     */
+    public static ModelBuilder fromString(String rdfData, Lang language) {
+        return new ModelBuilder(rdfData, language);
     }
 
     public static ModelBuilder empty() {

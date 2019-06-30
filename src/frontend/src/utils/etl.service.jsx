@@ -58,5 +58,38 @@ export const ETLService = {
         pipelineIri
       }
     });
+  },
+
+  async getPipelineExecution({ executionIri }) {
+    return lpaAxios.get('/pipeline/execution', {
+      params: {
+        executionIri
+      }
+    });
+  },
+
+  async setupRepeatedPipelineExecution({
+    frequencyHours,
+    webId,
+    executionIri,
+    selectedVisualiser
+  }) {
+    return lpaAxios.post('/pipeline/repeat', null, {
+      params: {
+        frequencyHours,
+        webId,
+        executionIri,
+        selectedVisualiser
+      }
+    });
+  },
+
+  async toggleRepeatedPipelineExecution({ repeat, executionIri }) {
+    return lpaAxios.put('/pipeline/repeat', null, {
+      params: {
+        repeat,
+        executionIri
+      }
+    });
   }
 };

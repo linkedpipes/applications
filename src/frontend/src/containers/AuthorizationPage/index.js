@@ -1,3 +1,3 @@
-import AuthorizationPage from './AuthorizationContainer';
+import { AuthorizationContainer as AuthorizationPage } from './AuthorizationContainer';
 
 export default AuthorizationPage;

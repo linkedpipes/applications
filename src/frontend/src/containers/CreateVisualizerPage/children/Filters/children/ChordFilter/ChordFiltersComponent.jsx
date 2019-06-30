@@ -2,14 +2,15 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { VisualizersService } from '@utils';
-import FormControl from '@material-ui/core/FormControl';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
-import Button from '@material-ui/core/Button';
-import FormLabel from '@material-ui/core/FormLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Switch from '@material-ui/core/Switch';
+// import _ from 'lodash';
+import uuid from 'uuid';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -18,125 +19,188 @@ type Props = {
     formControl: string,
     selectEmpty: string
   },
-  nodes: Array<{ label: { languageMap: { nolang: string } }, uri: string }>,
-  onApplyFilter: Function
+  nodes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  onApplyFilter: Function,
+  editingMode: boolean,
+  registerCallback: Function,
+  name: string
 };
+
 type State = {
   nodes: Array<{
-    label: { languageMap: { nolang: string } },
+    label: string,
     uri: string,
-    checked: boolean
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
   }>
 };
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 100
   },
   selectEmpty: {
-    marginTop: theme.spacing.unit * 2
+    marginTop: theme.spacing(2)
   }
 });
 
+// const isArrayEqual = (x, y) => {
+//   return _(x)
+//     .differenceWith(y, _.isEqual)
+//     .isEmpty();
+// };
+
 class ChordFiltersComponent extends React.Component<Props, State> {
+  conceptsFetched: Set<string>;
+
+  isMounted = false;
+
   constructor(props: Props) {
     super(props);
+    (this: any).handleChange = this.handleChange.bind(this);
+    // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: [] // Initialize with the props
+      nodes: this.props.nodes || []
     };
   }
 
+  // Currently messing with state
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   if (nextProps.nodes.length && !areEqual(nextProps.nodes, prevState.nodes)) {
+  //     return { nodes: nextProps.nodes };
+  //   }
+  //   return null;
+  // }
+
   async componentDidMount() {
-    // Get nodes
-    const getNodesResponse = await VisualizersService.getChordNodes(
-      this.props.selectedResultGraphIri
-    );
-    const nodes = getNodesResponse.data;
-    if (nodes.length) {
-      this.setState({
-        nodes: nodes.map(node => {
-          return { ...node, checked: true };
-        })
-      });
+    this.isMounted = true;
+    // Get all the nodes
+    if (this.props.editingMode && !this.state.nodes.length) {
+      let nodes = [];
+      const getNodesResponse = await VisualizersService.getChordNodes(
+        this.props.selectedResultGraphIri
+      );
+      nodes = (getNodesResponse.data || []).map(node => ({
+        ...node,
+        label: node.label.languageMap.nolang,
+        visible: true,
+        enabled: true,
+        selected: true
+      }));
+
+      // Dispatch setNodes
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
+        }
+      );
+    } else {
+      // Dispatch setNodes
+      this.props.onApplyFilter(
+        this.props.name,
+        this.state.nodes,
+        this.props.editingMode
+      );
     }
+
+    // Register callback
+    this.props.registerCallback(this.handleApplyFilter);
   }
 
+  componentWillUnmount = () => {
+    this.isMounted = false;
+  };
+
   handleApplyFilter = async () => {
-    // dispatch set selected scheme
-    await this.props.onApplyFilter(this.state.nodes);
+    await this.props.onApplyFilter(
+      this.props.name,
+      this.state.nodes,
+      this.props.editingMode
+    );
   };
 
   handleChange = uri => event => {
-    const checked = event.target.checked;
-    this.setState(prevState => ({
-      nodes: prevState.nodes.map(node => {
-        if (node.uri === uri) {
-          return { ...node, checked };
-        }
-        return node;
-      })
-    }));
+    if (this.isMounted) {
+      const checked = event.target.checked;
+      this.setState(prevState => ({
+        nodes: prevState.nodes.map(node => {
+          if (node.uri === uri) {
+            return { ...node, selected: checked };
+          }
+          return node;
+        })
+      }));
+    }
   };
 
-  conceptsFetched: Set<string>;
-
-  // todo: add switch to define whether it is editable by users
   render() {
-    const { classes } = this.props;
     return (
-      <FormControl component="fieldset" className={classes.formControl}>
-        <FormLabel component="legend">
-          Nodes{' '}
-          <Button
-            onClick={this.handleApplyFilter}
-            disabled={!this.state.nodes.length}
-            variant="contained"
-            size="small"
-            color="primary"
-          >
-            Apply
-          </Button>
-        </FormLabel>
-        <FormGroup>
-          {(this.state.nodes || []).map(node => (
-            <FormControlLabel
-              key={node.uri}
-              control={
-                <Checkbox
-                  checked={node.checked}
-                  onChange={this.handleChange(node.uri)}
-                  value={node.uri}
-                />
-              }
-              label={node.label.languageMap.nolang}
-            />
+      <ExpansionPanelDetails>
+        <FormGroup row>
+          {this.state.nodes.map(node => (
+            <span key={node.uri}>
+              <FormControlLabel
+                key={uuid.v4()}
+                control={
+                  <Checkbox
+                    value={node.uri}
+                    checked={node.selected}
+                    onChange={this.handleChange(node.uri)}
+                  />
+                }
+                label={node.label}
+                disabled={!node.enabled}
+              />
+              {this.props.editingMode && (
+                <span>
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Enabled"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch checked value="checkedA" color="primary" />
+                    }
+                    label="Visible"
+                  />
+                </span>
+              )}
+            </span>
           ))}
         </FormGroup>
-      </FormControl>
+      </ExpansionPanelDetails>
     );
   }
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = nodes =>
+  const onApplyFilter = (filterName, nodes, isEditing) =>
     dispatch(
-      filtersActions.setSelectedNodes(
-        new Set(nodes.filter(node => node.checked).map(node => node.uri))
-      )
+      filtersActions.setSelectedNodesWithSolid(filterName, nodes, isEditing)
     );
   return {
     onApplyFilter
   };
 };
 
-const mapStateToProps = state => {
-  return {
-    nodes: state.filters.nodes
-  };
-};
-
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(withStyles(styles)(ChordFiltersComponent));

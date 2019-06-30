@@ -77,3 +77,7 @@ src/frontend/public/
 src/tests/venv/
 
 appdata/
+
+src/frontend/eslint/
+
+src/frontend/docs/

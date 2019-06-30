@@ -1,6 +1,8 @@
 package com.linkedpipes.lpa.backend.services.virtuoso;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
+import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.LPA;
 import com.linkedpipes.lpa.backend.util.JenaUtils;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +44,12 @@ public class VirtuosoService {
     @Value("classpath*:/com/linkedpipes/lpa/backend/services/virtuoso/data-*.ttl")
     private Resource[] resources;
 
-    public static boolean checkNamedGraphExists(String graphId){
-        return JenaUtils.graphExists(graphId);
+    public static boolean checkNamedGraphExists(String graphName){
+        return JenaUtils.graphExists(graphName);
+    }
+
+    public static void deleteNamedGraph(String graphName){
+        JenaUtils.deleteGraph(graphName);
     }
 
     @PostConstruct
@@ -59,31 +66,34 @@ public class VirtuosoService {
                     }
 
                     String ttlData = StreamUtils.copyToString(inputStream, Charset.defaultCharset());
-                    putTtlToVirtuoso(matcher.group(GRAPH_NAME_SUFFIX), ttlData);
+                    putTtlToVirtuoso(LPA.Generated.uri + matcher.group(GRAPH_NAME_SUFFIX), ttlData);
                 }
             }
 
             log.info("Done!");
-        } catch (IOException e) {
+        } catch (IOException | RestClientException e) {
             log.error("Failed to fill Virtuoso with test data!", e);
         }
     }
 
-    private static void putTtlToVirtuoso(@NotNull String graphNameSuffix, @NotNull String ttlData) {
-        log.info(">>> graph {}", LPA.Generated.uri + graphNameSuffix);
+    public static String putTtlToVirtuosoRandomGraph(@NotNull String ttlData){
+        String graphName = VirtuosoController.GRAPH_NAME_PREFIX + UUID.randomUUID().toString();
+        putTtlToVirtuoso(graphName, ttlData);
+        return graphName;
+    }
+
+    public static void putTtlToVirtuoso(@NotNull String graphName, @NotNull String ttlData) {
+        log.info(">>> graph {}", graphName);
 
         LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HttpHeaders.CONTENT_TYPE, "text/turtle");
         HttpEntity<String> entity = new HttpEntity<>(ttlData, headers);
         URI uri = new DefaultUriBuilderFactory()
-                .uriString(Application.getConfig().getString("lpa.virtuoso.crudEndpoint"))
-                .queryParam("graph", LPA.Generated.uri + graphNameSuffix)
+                .uriString(Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint))
+                .queryParam("graph", graphName)
                 .build();
-        try {
-            new RestTemplate().put(uri, entity);
-        } catch (RestClientException e) {
-            log.error("PUT to virtuoso failed", e);
-        }
+
+        new RestTemplate().put(uri, entity);
     }
 
 }

@@ -8,7 +8,8 @@ const INITIAL_STATE = {
   discoverySessions: [],
   pipelineExecutions: [],
   name: '',
-  image: undefined
+  image: undefined,
+  inboxInvitations: []
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -125,6 +126,12 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         applicationsFolder: action.value
+      };
+
+    case types.SET_USER_INBOX_INVITATIONS:
+      return {
+        ...state,
+        inboxInvitations: action.value
       };
 
     default:

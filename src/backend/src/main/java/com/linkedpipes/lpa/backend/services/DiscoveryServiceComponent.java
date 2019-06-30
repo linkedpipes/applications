@@ -5,19 +5,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.constants.Visualizers;
+import com.linkedpipes.lpa.backend.controllers.DataSourceController;
+import com.linkedpipes.lpa.backend.controllers.DiscoveryController;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import com.linkedpipes.lpa.backend.util.Streams;
+import com.linkedpipes.lpa.backend.util.ThrowableUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
@@ -34,23 +41,29 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     @NotNull private final ApplicationContext context;
     @NotNull private final HttpActions httpActions = new HttpActions();
+    @NotNull private final HandlerMethodIntrospector methodIntrospector;
 
-    public DiscoveryServiceComponent(ApplicationContext context) {
+    public DiscoveryServiceComponent(@NotNull ApplicationContext context) {
         this.context = context;
+        this.methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
+    }
+
+    @NotNull @Override
+    public Discovery startDiscoveryFromEndpoint(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull List<String> namedGraphs) throws LpAppsException {
+        String response = httpActions.startFromInput(getDiscoveryConfig(sparqlEndpointIri, dataSampleIri, namedGraphs));
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInput(@NotNull String discoveryConfig) throws LpAppsException {
         String response = httpActions.startFromInput(discoveryConfig);
-        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        return result;
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @NotNull @Override
     public Discovery startDiscoveryFromInputIri(@NotNull String discoveryConfigIri) throws LpAppsException {
         String response = httpActions.startFromInputIri(discoveryConfigIri);
-        Discovery result = OBJECT_MAPPER.readValue(response, Discovery.class);
-        return result;
+        return OBJECT_MAPPER.readValue(response, Discovery.class);
     }
 
     @NotNull @Override
@@ -133,9 +146,24 @@ public class DiscoveryServiceComponent implements DiscoveryService {
         httpActions.stop(discoveryId);
     }
 
+    @NotNull
+    private String getDiscoveryConfig(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull List<String> namedGraphs) {
+        Method templateDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
+                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, List.class));
+
+        String templateDescUri = methodIntrospector.getHandlerMethodUri(DataSourceController.class, templateDescriptionMethod)
+                .requestParam(DiscoveryController.SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
+                .requestParam(DiscoveryController.DATA_SAMPLE_IRI_PARAM, dataSampleIri)
+                .requestParam(DiscoveryController.NAMED_GRAPHS_PARAM, StringUtils.join(namedGraphs, ","))
+                .build()
+                .toString();
+
+        return TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
+    }
+
     private class HttpActions {
 
-        private final String URL_BASE = Application.getConfig().getString("lpa.discoveryServiceUrl");
+        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.DiscoveryServiceUrl);
         private final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
         private final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
         private final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");

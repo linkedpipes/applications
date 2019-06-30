@@ -1,11 +1,10 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import DiscoverComponent from './DiscoverComponent';
+import { DiscoverComponent } from './DiscoverComponent';
 import { discoverActions } from './duck';
-import { DiscoveryService, Log } from '@utils';
+import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions } from '@ducks/discoveryDuck';
-import withTracker from '../../withTracker';
 
 type Props = {
   activeStep: Number,
@@ -28,6 +27,10 @@ class DiscoverContainer extends PureComponent<Props> {
       onNextClicked,
       history
     } = this.props;
+
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+
     if (location.state && location.state.discoveryId) {
       Log.info(`Just received ${location.state.discoveryId}`);
       const discoveryId = location.state.discoveryId;
@@ -100,7 +103,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
+export const DiscoverPage = connect(
   mapStateToProps,
   mapDispatchToProps
-)(withTracker(DiscoverContainer));
+)(DiscoverContainer);

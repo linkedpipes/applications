@@ -1,14 +1,14 @@
 package com.linkedpipes.lpa.backend.controllers;
 
+import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.*;
-import com.linkedpipes.lpa.backend.util.ThrowableUtils;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.riot.Lang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -16,8 +16,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,23 +30,20 @@ public class DiscoveryController {
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final ExecutorService executorService;
     @NotNull private final UserService userService;
-    @NotNull
-    private final HandlerMethodIntrospector methodIntrospector;
 
-    static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
-    static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
-    static final String NAMED_GRAPHS_PARAM = "namedGraphs";
+    public static final String SPARQL_ENDPOINT_IRI_PARAM = "sparqlEndpointIri";
+    public static final String DATA_SAMPLE_IRI_PARAM = "dataSampleIri";
+    public static final String NAMED_GRAPHS_PARAM = "namedGraphs";
 
     public DiscoveryController(ApplicationContext context) {
         discoveryService = context.getBean(DiscoveryService.class);
         executorService = context.getBean(ExecutorService.class);
         userService = context.getBean(UserService.class);
-        methodIntrospector = context.getBean(HandlerMethodIntrospector.class);
     }
 
     @NotNull
-    @PostMapping("/api/pipelines/discover")
-    public ResponseEntity<Discovery> startDiscovery(@NotNull @RequestParam("webId") String webId,
+    @PostMapping("/api/pipelines/discoverFromDataSources")
+    public ResponseEntity<Discovery> startDiscoveryFromDataSources(@NotNull @RequestParam("webId") String webId,
                                                     @Nullable @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "No data sources were provided");
@@ -57,40 +56,70 @@ public class DiscoveryController {
         try {
             userService.addUserIfNotPresent(webId);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
-            Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
+            Discovery newDiscovery = executorService.startDiscoveryFromConfig(discoveryConfig, webId);
             return ResponseEntity.ok(newDiscovery);
         } catch(UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
+    /**
+     * Start discovery of pipelines from received RDF data
+     * @param rdfFile main RDF data file
+     * @param dataSampleFile data sample for main file
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
-                                                             @Nullable @RequestBody String discoveryConfig) throws LpAppsException {
-        if (discoveryConfig == null || discoveryConfig.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Discovery config not provided");
+                                                             @RequestParam("rdfFile") MultipartFile rdfFile,
+                                                             @RequestParam("dataSampleFile") MultipartFile dataSampleFile) throws LpAppsException, IOException {
+        if (rdfFile == null || rdfFile.isEmpty()) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
+        }
+
+        if (dataSampleFile == null || dataSampleFile.isEmpty()) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF data sample not provided");
         }
 
         try {
             userService.addUserIfNotPresent(webId);
-            Discovery newDiscovery = executorService.startDiscoveryFromInput(discoveryConfig, webId);
-            return ResponseEntity.ok(newDiscovery);
+            return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, dataSampleFile, webId));
+
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
+    /**
+     * Start discovery of pipelines using data referenced by IRI
+     * @param rdfFileIri IRI referencing a file with RDF data
+     * @param dataSampleIri
+     * @param webId
+     * @return
+     * @throws LpAppsException
+     * @throws IOException reading RDF data from URI failed
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
-                                                                @NotNull @RequestParam(value = "discoveryConfigIri") String discoveryConfigIri) throws LpAppsException {
+                                                                @NotNull @RequestParam(value = "rdfInputIri") String rdfFileIri,
+                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException, IOException {
+        if (rdfFileIri == null || rdfFileIri.isEmpty()) {
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF file IRI not provided");
+        }
+
         try {
             userService.addUserIfNotPresent(webId);
-            Discovery newDiscovery = executorService.startDiscoveryFromInputIri(discoveryConfigIri, webId);
-            return ResponseEntity.ok(newDiscovery);
+
+            return ResponseEntity.ok(executorService.startDiscoveryFromInputIri(rdfFileIri, webId, dataSampleIri));
+
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+        } catch(MalformedURLException e){
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Invalid rdf input IRI", e);
         }
     }
 
@@ -121,27 +150,11 @@ public class DiscoveryController {
 
         try {
             userService.addUserIfNotPresent(webId);
-            String templateDescUri = getTemplateDescUri(sparqlEndpointIri, dataSampleIri, namedGraphs);
-            String discoveryConfig = TtlGenerator.getDiscoveryConfig(List.of(new DataSource(templateDescUri)));
-            System.out.println(discoveryConfig);
 
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(discoveryConfig, webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
+            return ResponseEntity.ok(executorService.startDiscoveryFromEndpoint(webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
-    }
-
-    @NotNull
-    private String getTemplateDescUri(@NotNull String sparqlEndpointIri, @NotNull String dataSampleIri, @NotNull List<String> namedGraphs) {
-        Method templateDescriptionMethod = ThrowableUtils.rethrowAsUnchecked(() ->
-                DataSourceController.class.getDeclaredMethod("getTemplateDescription", String.class, String.class, List.class));
-
-        return methodIntrospector.getHandlerMethodUri(DataSourceController.class, templateDescriptionMethod)
-                .requestParam(SPARQL_ENDPOINT_IRI_PARAM, sparqlEndpointIri)
-                .requestParam(DATA_SAMPLE_IRI_PARAM, dataSampleIri)
-                .requestParam(NAMED_GRAPHS_PARAM, StringUtils.join(namedGraphs, ","))
-                .build()
-                .toString();
     }
 
     /**

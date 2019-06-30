@@ -11,8 +11,7 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
-import { ETL_STATUS_TYPE } from '@utils';
-import GoogleAnalytics from 'react-ga'
+import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 
 const styles = theme => ({
   root: {
@@ -22,14 +21,14 @@ const styles = theme => ({
     flexGrow: 1
   },
   button: {
-    marginTop: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   actionsContainer: {
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing(2)
   },
   resetContainer: {
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing(3)
   },
   createAppButtons: {
     justifyContent: 'center'
@@ -53,7 +52,7 @@ const getStepContent = step => {
 };
 
 const steps = [
-  'Add Data Source IRIs',
+  'Provide your input data sources',
   'Pick a visualizer',
   'Pick a source for execution',
   'Preview & create app'
@@ -66,7 +65,7 @@ type Props = {
   onBackClicked: Function
 };
 
-const DiscoverComponent = ({
+const Discover = ({
   classes,
   activeStep,
   onBackClicked,
@@ -107,7 +106,7 @@ const DiscoverComponent = ({
                           etlExecutionStatus !== ETL_STATUS_TYPE.Finished
                         }
                         onClick={() => {
-                          GoogleAnalytics.event({
+                          GoogleAnalyticsWrapper.trackEvent({
                             category: 'Discovery',
                             action: 'Pressed create app : step 4'
                           });
@@ -129,4 +128,4 @@ const DiscoverComponent = ({
   </div>
 );
 
-export default withStyles(styles)(DiscoverComponent);
+export const DiscoverComponent = withStyles(styles)(Discover);

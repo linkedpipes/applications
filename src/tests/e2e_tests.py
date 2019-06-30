@@ -32,7 +32,6 @@ class Runner():
 
     @staticmethod
     def parallel_execution(*name, options='by_module'):
-
         """
         name - name of the class with tests or module with classes that contain tests
         modules - name of the module with tests or with class that contains tests
@@ -44,18 +43,20 @@ class Runner():
 
         suite = unittest.TestSuite()
 
-        if (options=='by_method'):
+        if (options == 'by_method'):
             for object in name:
                 for method in dir(object):
                     if (method.startswith('test')):
                         suite.addTest(object(method))
-        elif (options=='by_class'):
+        elif (options == 'by_class'):
             for object in name:
-                suite.addTest(unittest.TestLoader().loadTestsFromTestCase(object))
+                suite.addTest(
+                    unittest.TestLoader().loadTestsFromTestCase(object))
 
-        elif (options=='by_module'):
+        elif (options == 'by_module'):
             for module in name:
-                suite.addTest(unittest.TestLoader().loadTestsFromModule(module))
+                suite.addTest(
+                    unittest.TestLoader().loadTestsFromModule(module))
         else:
             raise ValueError("Parameter 'options' is incorrect."
                              "Available options: 'by_method', 'by_class', 'by_module'")
@@ -64,7 +65,8 @@ class Runner():
             list_of_suites = list(suite)
             for test in range(len(list_of_suites)):
                 test_name = str(list_of_suites[test])
-                executor.submit(unittest.TextTestRunner().run, list_of_suites[test])
+                executor.submit(unittest.TextTestRunner().run,
+                                list_of_suites[test])
 
 
 class UntitledTestCase(unittest.TestCase):
@@ -188,12 +190,12 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa.inrupt.net/profile/card#me")
+            "https://seleniumlinked2.lpsolid.eu:8443/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlpa1")
+        driver.find_element_by_id("username").send_keys("seleniumlinked2")
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
         driver.find_element_by_id("password").send_keys("Selenium123!")
@@ -221,22 +223,25 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
 
-        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_treemap_app")
+        self.custom_wait_clickable_and_click(
+            "more_icon_0_test_selenium_treemap_app")
 
-        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_treemap_app")
+        self.custom_wait_clickable_and_click(
+            "delete_button_0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
-        self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
+        self.custom_wait_clickable_and_click(
+            "delete_discovery_session_button_0")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         self.custom_wait_clickable_and_click("pipeline_executions_tab")
 
-        self.custom_wait_clickable_and_click("delete_execution_session_button_0")
-
+        self.custom_wait_clickable_and_click(
+            "delete_execution_session_button_0")
 
         time.sleep(5)
 
@@ -248,12 +253,12 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlpa.inrupt.net/profile/card#me")
+            "https://seleniumlinked1.lpsolid.eu:8443/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlpa")
+        driver.find_element_by_id("username").send_keys("seleniumlinked1")
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
         driver.find_element_by_id("password").send_keys("Selenium123!")
@@ -281,21 +286,25 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
 
-        self.custom_wait_clickable_and_click("more_icon_0_test_selenium_chord_app")
+        self.custom_wait_clickable_and_click(
+            "more_icon_0_test_selenium_chord_app")
 
-        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_chord_app")
+        self.custom_wait_clickable_and_click(
+            "delete_button_0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
-        self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
+        self.custom_wait_clickable_and_click(
+            "delete_discovery_session_button_0")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         self.custom_wait_clickable_and_click("pipeline_executions_tab")
 
-        self.custom_wait_clickable_and_click("delete_execution_session_button_0")
+        self.custom_wait_clickable_and_click(
+            "delete_execution_session_button_0")
 
         time.sleep(5)
 

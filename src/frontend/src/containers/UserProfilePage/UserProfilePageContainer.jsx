@@ -1,16 +1,27 @@
 // @flow
 import React, { PureComponent } from 'react';
-import UserProfilePageComponent from './UserProfilePageComponent';
+import { UserProfilePage } from './UserProfilePageComponent';
 import { connect } from 'react-redux';
-import { withAuthorization, GlobalUtils } from '@utils';
+import {
+  withAuthorization,
+  GlobalUtils,
+  GoogleAnalyticsWrapper,
+  Log
+} from '@utils';
 
 type Props = {
   userProfile: Object,
   history: Object,
-  resetReduxStore: Function
+  resetReduxStore: Function,
+  location: Object
 };
 
 class UserProfilePageContainer extends PureComponent<Props> {
+  componentDidMount() {
+    const page = this.props.location.pathname;
+    GoogleAnalyticsWrapper.trackPage(page);
+  }
+
   performLogout = async () => {
     await this.props.resetReduxStore();
 
@@ -26,7 +37,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
       // Redirect to login page
       this.props.history.push('/login');
     } catch (error) {
-      // console.log(`Error: ${error}`);
+      Log.error(error);
     }
   };
 
@@ -46,7 +57,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
     const { userProfile } = this.props;
     const { performLogout, performPasswordReset } = this;
     return (
-      <UserProfilePageComponent
+      <UserProfilePage
         userProfile={userProfile}
         onHandleLogoutClicked={performLogout}
         onHandlePasswordReset={performPasswordReset}
