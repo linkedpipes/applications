@@ -167,19 +167,16 @@ public class ExecutorServiceComponent implements ExecutorService {
      */
     @Nullable @Override
     public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
-        //logger.error("Starting discovery from input files with DS pipeline");
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
 
-        logger.error(dataSampleIri);
-
         if (dataSampleIri == null) {
             //generate data sample from named graph here
-            logger.error("Will execute data sample pipeline");
+            logger.debug("Will execute data sample pipeline");
             Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
             startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph));
-            return null;
+            return null; //TODO: API change
         } else {
             return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
         }
@@ -222,7 +219,6 @@ public class ExecutorServiceComponent implements ExecutorService {
      */
     @NotNull @Override
     public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @Nullable MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
-        logger.error("Starting discovery from input files");
         Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
         if (rdfFileLanguage == null) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "File content type not supported");

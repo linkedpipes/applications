@@ -66,8 +66,7 @@ public class EtlServiceComponent implements EtlService {
     @Override
     public Execution executeDataSamplePipeline(String namedGraph) throws LpAppsException {
          String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph);
-         logger.error("Data sample input");
-         logger.error(transformed);
+         logger.info("Data sample input:\n" + transformed);
          String pipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DataSamplePipelineIri);
          String response = httpActions.executeDataSamplePipeline(pipelineIri, transformed);
          return OBJECT_MAPPER.readValue(response, Execution.class);

@@ -80,16 +80,12 @@ public class DiscoveryController {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
 
-        /*if (dataSampleFile == null || dataSampleFile.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF data sample not provided");
-        }*/
-
         try {
             userService.addUserIfNotPresent(webId);
             return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, dataSampleFile, webId));
 
         } catch (UserNotFoundException e) {
-            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
+            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
