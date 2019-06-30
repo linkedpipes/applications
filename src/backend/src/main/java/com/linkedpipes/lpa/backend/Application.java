@@ -59,15 +59,15 @@ public class Application {
         };
     }
 
-    @Bean
+    /*@Bean
     public ServletContextInitializer sentryServletContextInitializer() {
         return new io.sentry.spring.SentryServletContextInitializer();
-    }
+    }*/
 
     /**
      * Sentry exception handler.
      */
-    @Bean
+    /*@Bean
     public HandlerExceptionResolver sentryExceptionResolver() {
         return new io.sentry.spring.SentryExceptionResolver() {
             @Override
@@ -85,7 +85,7 @@ public class Application {
             }
 
         };
-    }
+    }*/
 
     /**
      * Socket.io server factory.

@@ -5,8 +5,11 @@ import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.entities.Execution;
 import com.linkedpipes.lpa.backend.entities.ExecutionStatus;
+import com.linkedpipes.lpa.backend.entities.PipelineExportResult;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
+import com.linkedpipes.lpa.backend.services.DataSamplePipelineInputGenerator;
 import com.linkedpipes.lpa.backend.util.HttpRequestSender;
+import com.linkedpipes.lpa.backend.util.HttpFileUploader;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,10 +63,28 @@ public class EtlServiceComponent implements EtlService {
         httpActions.cancelExecution(executionIri);
     }
 
+    @Override
+    public Execution executeDataSamplePipeline(String namedGraph) throws LpAppsException {
+         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph);
+         logger.error("Data sample input");
+         logger.error(transformed);
+         String pipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DataSamplePipelineIri);
+         String response = httpActions.executeDataSamplePipeline(pipelineIri, transformed);
+         return OBJECT_MAPPER.readValue(response, Execution.class);
+         //TODO: add bootstrap code to upload the pipeline and set IRI in config
+    }
+
+
     private class HttpActions {
 
         private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
+        private final String URL_CREATE_PIPELINE = urlFrom(URL_BASE, "pipelines");
+
+        private String executeDataSamplePipeline(String pipelineIri, String data) throws LpAppsException {
+            String url = URL_EXECUTE_PIPELINE + "?pipeline=" + pipelineIri;
+            return new HttpFileUploader().uploadTTL(url, data);
+        }
 
         private String executePipeline(String pipelineIri) throws LpAppsException {
             return new HttpRequestSender(context).to(URL_EXECUTE_PIPELINE)

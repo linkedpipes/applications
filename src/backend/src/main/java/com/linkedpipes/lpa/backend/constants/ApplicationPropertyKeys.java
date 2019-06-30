@@ -12,5 +12,5 @@ public class ApplicationPropertyKeys {
     public static final String EtlPollingFrequency = "lpa.timeout.etlPollingFrequencySecs";
     public static final String GithubUser = "lpa.github.user";
     public static final String GithubPassword = "lpa.github.password";
-
+    public static final String DataSamplePipelineIri = "lpa.dataSamplePipelineIri";
 }

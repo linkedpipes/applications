@@ -75,21 +75,21 @@ public class DiscoveryController {
     @PostMapping("/api/pipelines/discoverFromInput")
     public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
                                                              @RequestParam("rdfFile") MultipartFile rdfFile,
-                                                             @RequestParam("dataSampleFile") MultipartFile dataSampleFile) throws LpAppsException, IOException {
+                                                             @Nullable @RequestParam(value="dataSampleFile", required=false) MultipartFile dataSampleFile) throws LpAppsException, IOException {
         if (rdfFile == null || rdfFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
 
-        if (dataSampleFile == null || dataSampleFile.isEmpty()) {
+        /*if (dataSampleFile == null || dataSampleFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF data sample not provided");
-        }
+        }*/
 
         try {
             userService.addUserIfNotPresent(webId);
             return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, dataSampleFile, webId));
 
         } catch (UserNotFoundException e) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
+            throw new LpAppsException(HttpStatus.UNAUTHORIZED, "User not found", e);
         }
     }
 
