@@ -70,7 +70,4 @@ function fromString(str) {
   return deferred.promise;
 }
 
-module.exports = {
-  fromUrl,
-  fromString
-};
+export { fromUrl, fromString };

@@ -49,7 +49,7 @@ function StorageAppsBrowserComponent(props: Props) {
         <div className={classes.gridArea}>
           <Grid container spacing={1}>
             {applicationsMetadata.map((metadata, index) => (
-              <Grid key={uuid.v4()} item xs={3} sm={3} md={3} lg={2} xl={2}>
+              <Grid key={uuid.v4()} item xs={12} sm={6} md={4}>
                 <StorageAppsBrowserCardComponent
                   key={uuid.v4()}
                   indexNumber={index}

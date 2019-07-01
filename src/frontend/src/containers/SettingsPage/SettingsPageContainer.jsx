@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
-import SettingsPageComponent from './SettingsPageComponent';
+import { SettingsPageComponent } from './SettingsPageComponent';
 import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
 import { withAuthorization, GoogleAnalyticsWrapper } from '@utils';
@@ -14,7 +14,7 @@ type Props = {
   location: Object
 };
 
-class SettingsPageContainer extends PureComponent<Props> {
+class SettingsPage extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
@@ -72,9 +72,9 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withAuthorization(
+export const SettingsPageContainer = withAuthorization(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(SettingsPageContainer)
+  )(SettingsPage)
 );

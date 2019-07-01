@@ -1,0 +1,31 @@
+---
+name: NavigationBar
+menu: Components
+---
+
+import { Playground, Props } from 'docz';
+import { NavigationBarComponentDemo } from './NavigationBarComponent';
+
+# NavigationBar
+
+NavigationBar is a component used in the header of LinkedPipes Applications frontend. Contains main control elements, such as menu `hamburger button` in the left right corner, and fast navigation to `inbox` and `profile` controls.
+
+# Structure
+
+`NavigationBar` component exported from `NavigationBar` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── NavigationBarComponent.jsx # Stateless react component, responsible for ui
+├── NavigationBarContainer.jsx # React PureComponent, responsible for states
+└── index.js
+```
+
+## Properties
+
+<Props of={NavigationBarComponentDemo} />
+
+## Example
+
+<Playground>
+  <NavigationBarComponentDemo />
+</Playground>

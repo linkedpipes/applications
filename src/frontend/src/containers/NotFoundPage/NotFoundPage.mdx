@@ -1,0 +1,40 @@
+---
+name: NotFoundPage
+menu: Containers
+---
+
+import { Playground, Props } from 'docz';
+import { NotFoundPage } from './NotFoundPage';
+
+# NotFoundPage
+
+NotFoundPage is a container representing a `NotFoundPage` page.
+
+# Main funcionality
+
+- A default page being rendered on undefined routes.
+
+# Structure
+
+`NotFoundPage` component exported from `NotFoundPage` folder is represented by a stateless react component.
+
+```.md
+├── NotFoundPage.jsx # Stateless react component, responsible for ui
+├── NotFoundPage.mdx # Documentation markdown that you are currently looking at
+└── index.js
+```
+
+## Properties
+
+<Props of={NotFoundPage} />
+
+## Example
+
+<Playground>
+  <div
+    className="container"
+    style={{ width: '100%', height: '400px', position: 'relative' }}
+  >
+    <NotFoundPage location={{ pathname: '/' }} />
+  </div>
+</Playground>

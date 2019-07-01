@@ -48,7 +48,7 @@ module.exports = () => {
       chunkFilename: '[name].bundle.js'
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.jsx'],
+      extensions: ['.mjs', '.js', '.jsx', '.mdx'],
       alias: {
         '@components': path.resolve(__dirname, './src/components'),
         '@containers': path.resolve(__dirname, './src/containers'),
@@ -85,6 +85,10 @@ module.exports = () => {
               options: {}
             }
           ]
+        },
+        {
+          test: /\.mdx?$/,
+          use: ['babel-loader', '@mdx-js/loader']
         }
       ]
     },
