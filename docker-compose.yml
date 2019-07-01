@@ -23,6 +23,8 @@ services:
       - "9005:9005"
       - "9092:9092"
     restart: on-failure
+    volumes:
+      - ./appdata:/appdata
     depends_on:
       - etl
       - discovery

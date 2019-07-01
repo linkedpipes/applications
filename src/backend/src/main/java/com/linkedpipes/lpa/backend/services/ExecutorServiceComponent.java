@@ -22,6 +22,7 @@ import com.linkedpipes.lpa.backend.util.RdfUtils;
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,6 +46,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -59,6 +62,8 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
     private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "https://applications.linkedpipes.com/graph/test-data-sample-graph";
+    private static final String SHARED_VOLUME_DIR = "/appdata/datasamples";
+    private final AtomicInteger counter = new AtomicInteger(0);
 
 
     private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingTimeout);
@@ -177,6 +182,12 @@ public class ExecutorServiceComponent implements ExecutorService {
         if (dataSampleIri == null) {
             //generate data sample from named graph here
             logger.debug("Will execute data sample pipeline");
+            counter.compareAndSet(0, 1);
+            try {
+                FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR)); //make sure we have empty dir as we upload *.ttl to virtuoso
+            } catch (IOException ex) {
+                logger.warn("Failed to clean the shared folder before pipeline", ex);
+            }
             Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
             startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph));
             return null; //TODO: API change
@@ -188,6 +199,15 @@ public class ExecutorServiceComponent implements ExecutorService {
     private IExecutionCallback getSampleCallback(final String userId, final String namedGraph) {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
+                if (counter.get() != 1) {
+                    logger.warn("Executing sample callback while counter is not 1!");
+                }
+                try {
+                    FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR));
+                } catch (IOException ex) {
+                    logger.warn("Failed to clean the shared folder after pipeline", ex);
+                }
+
                 if (report.status.status.equals(EtlStatus.FINISHED)) {
                     logger.info("Pipeline finished, should extract sample now");
                     //extract data sample from graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
@@ -205,6 +225,10 @@ public class ExecutorServiceComponent implements ExecutorService {
                     }
                 } else {
                     logger.error("Data sample pipeline finished with errors");
+                }
+
+                if (counter.decrementAndGet() != 0) {
+                    logger.warn("Leaving sample callback with counter not 0");
                 }
             }
         };
@@ -400,6 +424,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     cancelExecution(e, executionIri);
                 }
             }
+            counter.lazySet(0); //make sure we unlock the data sample pipeline
         };
 
         logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
