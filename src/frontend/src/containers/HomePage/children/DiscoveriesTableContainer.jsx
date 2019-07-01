@@ -2,10 +2,10 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
-import { UserService, SocketContext } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import { UserService, SocketContext } from '@utils';
 
 type Props = {
   discoveriesList: Array<{ id: string, finished: boolean }>,

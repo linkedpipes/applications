@@ -12,10 +12,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService, UserService } from '@utils';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -29,6 +27,8 @@ import StorageToolbox from '../../../StorageToolbox';
 import ShareIcon from '@material-ui/icons/Share';
 import { filtersActions } from '@ducks/filtersDuck';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { GlobalUtils, VisualizersService, UserService } from '@utils';
+import { VisualizerIcon } from '@components';
 
 const styles = {
   card: {

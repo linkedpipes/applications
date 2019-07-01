@@ -1,9 +1,9 @@
-import { Log } from '@utils';
 import StorageBackend from './StorageBackend';
 import { Utils } from './utils';
 import ApplicationConfiguration from './models/ApplicationConfiguration';
 import { Person } from './models';
 import ApplicationMetadata from './models/ApplicationMetadata';
+import { Log } from '@utils';
 // eslint-disable-next-line import/order
 const os = require('os');
 

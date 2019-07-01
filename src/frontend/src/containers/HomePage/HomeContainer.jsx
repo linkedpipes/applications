@@ -7,8 +7,10 @@ import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
 import { filtersActions } from '@ducks/filtersDuck';
-import { StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
+import LoadingOverlay from 'react-loading-overlay';
+import { userActions } from '@ducks/userDuck';
+import { ApplicationMetadata } from '@storage/models';
 import {
   Log,
   SocketContext,
@@ -20,9 +22,7 @@ import {
   UserService,
   GoogleAnalyticsWrapper
 } from '@utils';
-import LoadingOverlay from 'react-loading-overlay';
-import { userActions } from '@ducks/userDuck';
-import { ApplicationMetadata } from '@storage/models';
+import { StorageToolbox } from '@storage';
 
 type Props = {
   history: { push: any },
