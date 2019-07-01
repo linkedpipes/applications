@@ -3,6 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
+import DiscoverSelectorComponent from './DiscoverSelectorComponent';
+import { discoverActions } from '../duck';
 import {
   DiscoveryService,
   GlobalUtils,
@@ -10,9 +13,6 @@ import {
   Log,
   GoogleAnalyticsWrapper
 } from '@utils';
-import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
-import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import { discoverActions } from '../duck';
 
 type Props = {
   dataSampleIri: string,

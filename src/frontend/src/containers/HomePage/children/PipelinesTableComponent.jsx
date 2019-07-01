@@ -11,9 +11,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/RemoveCircle';
-import { ETL_STATUS_MAP } from '@utils';
 import uuid from 'uuid';
 import moment from 'moment';
+import { ETL_STATUS_MAP } from '@utils';
 
 type Props = {
   pipelinesList: Array<{

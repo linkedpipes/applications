@@ -16,12 +16,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { GlobalUtils } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import ShareIcon from '@material-ui/icons/ShareTwoTone';
 import SettingsIcon from '@material-ui/icons/SettingsTwoTone';
 import EditIcon from '@material-ui/icons/EditTwoTone';
 import { DataRefreshControlDialog } from './children';
+import { GlobalUtils } from '@utils';
 
 type Props = {
   classes: {
