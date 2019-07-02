@@ -7,6 +7,7 @@ import {
   ChordVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
+import Header from './Header';
 
 export {
   NavigationBar,
@@ -15,5 +16,6 @@ export {
   TreemapVisualizer,
   MapsVisualizer,
   VisualizerIcon,
-  ChordVisualizer
+  ChordVisualizer,
+  Header
 };

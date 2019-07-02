@@ -42,11 +42,19 @@ const setSelectedHomepageTabIndex = tabIndex => {
   };
 };
 
+const setMobileDrawerState = drawerState => {
+  return {
+    type: types.SET_MOBILE_DRAWER_STATE,
+    value: drawerState
+  };
+};
+
 export default {
   addSelectedVisualizerAction,
   setAccessControlDialogState,
   setLightColorTheme,
   setChooseFolderDialogState,
   setSelectedHomepageTabIndex,
-  setInboxDialogState
+  setInboxDialogState,
+  setMobileDrawerState
 };

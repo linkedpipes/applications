@@ -9,7 +9,8 @@ const INITIAL_STATE = {
   homepageTabIndex: 0,
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
-  shareApplicationDialogIsOpen: false
+  shareApplicationDialogIsOpen: false,
+  drawerState: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -47,6 +48,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         homepageTabIndex: action.value
+      };
+
+    case types.SET_MOBILE_DRAWER_STATE:
+      return {
+        ...state,
+        drawerState: action.value
       };
 
     default:

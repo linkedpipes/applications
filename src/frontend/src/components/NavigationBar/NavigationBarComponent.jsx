@@ -21,75 +21,49 @@ import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import HelpIcon from '@material-ui/icons/Help';
 import classNames from 'classnames';
 import { withRouter } from 'react-router';
-
-const drawerWidth = 240;
+import clsx from 'clsx';
 
 const styles = theme => ({
-  flex: {
-    flexGrow: 1
+  categoryHeader: {
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2)
   },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    height: '4rem'
+  categoryHeaderPrimary: {
+    color: theme.palette.common.white
   },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
-  menuButton: {
-    marginLeft: 12,
-    marginRight: 36
-  },
-  hide: {
-    display: 'none'
-  },
-  drawer: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    flexShrink: 0
-  },
-  drawerOpen: {
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
-  },
-  drawerClose: {
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
-    overflowX: 'hidden',
-    width: theme.spacing(6),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(8)
+  item: {
+    paddingTop: 1,
+    paddingBottom: 1,
+    color: 'rgba(255, 255, 255, 0.7)',
+    '&:hover,&:focus': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)'
     }
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-    height: '4rem'
+  itemCategory: {
+    backgroundColor: '#232f3e',
+    boxShadow: '0 -1px 0 #404854 inset',
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2)
   },
-  chevronWrapper: {
-    textAlign: 'right'
+  firebase: {
+    fontSize: 24,
+    color: theme.palette.common.white
   },
-  chevron: {
-    marginTop: '0.5rem'
+  itemActiveItem: {
+    color: '#4fc3f7'
   },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar
+  itemPrimary: {
+    fontSize: 'inherit'
+  },
+  itemIcon: {
+    minWidth: 'auto',
+    marginRight: theme.spacing(2)
+  },
+  divider: {
+    marginTop: theme.spacing(2)
+  },
+  drawer: {
+    width: '256px'
   }
 });
 
@@ -108,66 +82,40 @@ const NavigationBar = ({
   drawerState,
   onHandleDrawerClose,
   onHandleDrawerOpen,
-  history
+  history,
+  ...other
 }: Props) => (
-  <div>
-    <AppBar
-      position="absolute"
-      className={classNames(classes.appBar, {
-        [classes.appBarShift]: drawerState
-      })}
-    >
-      <Toolbar disableGutters={!drawerState} className={classes.toolbar}>
-        <div className={classes.toolbarIcon}>
-          <IconButton
-            color="inherit"
-            aria-label="Open drawer"
-            onClick={onHandleDrawerOpen}
-            className={classNames(classes.menuButton, {
-              [classes.hide]: drawerState
-            })}
-          >
-            <MenuIcon />
-          </IconButton>
-        </div>
-        <Typography
-          color="inherit"
-          variant="h6"
-          className={classes.flex}
-          noWrap
+  <Drawer classes={classes.drawer} variant="permanent" {...other}>
+    <List disablePadding>
+      <ListItem
+        className={clsx(classes.firebase, classes.item, classes.itemCategory)}
+      >
+        Paperbase
+      </ListItem>
+      <ListItem className={clsx(classes.item, classes.itemCategory)}>
+        <ListItemIcon className={classes.itemIcon}>
+          <HomeIcon />
+        </ListItemIcon>
+        <ListItemText
+          classes={{
+            primary: classes.itemPrimary
+          }}
         >
-          LinkedPipes Applications
-        </Typography>
-        <UserProfileButton />
-      </Toolbar>
-      <ToastContainer className="toast-container" />
-    </AppBar>
+          Project Overview
+        </ListItemText>
+      </ListItem>
 
-    <Drawer
-      variant="permanent"
-      className={classNames(classes.drawer, {
-        [classes.drawerOpen]: drawerState,
-        [classes.drawerClose]: !drawerState
-      })}
-      classes={{
-        paper: classNames({
-          [classes.drawerOpen]: drawerState,
-          [classes.drawerClose]: !drawerState
-        })
-      }}
-      open={drawerState}
-    >
-      <div className={classNames(classes.toolbar, classes.chevronWrapper)}>
-        <IconButton className={classes.chevron} onClick={onHandleDrawerClose}>
-          {theme.direction === 'rtl' ? (
-            <ChevronRightIcon />
-          ) : (
-            <ChevronLeftIcon />
-          )}
-        </IconButton>
-      </div>
-      <Divider />
-      <List>
+      <React.Fragment key={'general-list-item-section'}>
+        <ListItem className={classes.categoryHeader}>
+          <ListItemText
+            classes={{
+              primary: classes.categoryHeaderPrimary
+            }}
+          >
+            General
+          </ListItemText>
+        </ListItem>
+
         <ListItem
           id="dashboard_navbar_button"
           button
@@ -181,14 +129,7 @@ const NavigationBar = ({
           <ListItemText primary="Dashboard" />
         </ListItem>
 
-        {/* <Link style={{ textDecoration: 'none' }} to="/create-app">
-          <ListItem button>
-            <ListItemIcon>
-              <ViewModuleIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Applications"/>
-          </ListItem>
-        </Link> */}
+        <Divider className={classes.divider} />
 
         <ListItem
           id="storage_navbar_button"
@@ -203,6 +144,8 @@ const NavigationBar = ({
           <ListItemText primary="Storage" />
         </ListItem>
 
+        <Divider className={classes.divider} />
+
         <ListItem
           button
           onClick={() => {
@@ -214,9 +157,15 @@ const NavigationBar = ({
           </ListItemIcon>
           <ListItemText primary="About" />
         </ListItem>
-      </List>
-    </Drawer>
-  </div>
+
+        {process.env.NODE_ENV !== 'production' && (
+          <ListItem>
+            <ListItemText primary="Development Build" />
+          </ListItem>
+        )}
+      </React.Fragment>
+    </List>
+  </Drawer>
 );
 
 export const NavigationBarComponentDemo = withTheme(
