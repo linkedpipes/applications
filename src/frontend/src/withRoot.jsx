@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 // A theme with custom primary and secondary color.
@@ -154,14 +155,14 @@ function withRoot(Component: Object) {
     // thanks to React context.
     const { colorThemeIsLight } = props;
     return (
-      <MuiThemeProvider theme={colorThemeIsLight ? lightTheme : darkTheme}>
+      <ThemeProvider theme={colorThemeIsLight ? lightTheme : darkTheme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Component
           {...props}
           theme={colorThemeIsLight ? lightTheme : darkTheme}
         />
-      </MuiThemeProvider>
+      </ThemeProvider>
     );
   }
   return WithRoot;

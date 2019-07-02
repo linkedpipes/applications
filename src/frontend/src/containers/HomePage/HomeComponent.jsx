@@ -48,10 +48,9 @@ type Props = {
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
-    marginTop: '2rem',
-    marginLeft: '4%',
-    marginRight: '4%'
+    minWidth: '920',
+    margin: 'auto',
+    overflow: 'hidden'
   },
   paper: {
     padding: theme.spacing(2),

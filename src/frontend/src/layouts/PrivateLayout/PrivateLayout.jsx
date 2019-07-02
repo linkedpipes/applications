@@ -1,9 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Route } from 'react-router-dom';
 import { NavigationBar, Header } from '@components';
 import { withStyles } from '@material-ui/core/styles';
 import { withAuthorization } from '@utils';
-import Typography from '@material-ui/core/Typography/Typography';
 import Hidden from '@material-ui/core/Hidden';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';

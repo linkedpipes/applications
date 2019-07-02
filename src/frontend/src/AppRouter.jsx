@@ -51,7 +51,6 @@ const styles = () => ({
 });
 
 type Props = {
-  classes: any,
   webId: ?string,
   // eslint-disable-ne
   handleSetSolidUserProfileAsync: Function,
@@ -398,7 +397,7 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, webId } = this.props;
+    const { webId } = this.props;
     return (
       <ErrorBoundary onError={errorHandler(webId)}>
         <BrowserRouter>
