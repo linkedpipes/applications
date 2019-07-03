@@ -62,7 +62,7 @@ public class EtlServiceComponent implements EtlService {
 
     private class HttpActions {
 
-        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
+        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.ETL_SERVICE_URL);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
 
         private String executePipeline(String pipelineIri) throws LpAppsException {

@@ -10,7 +10,8 @@ import static java.util.Map.entry;
  */
 public final class Visualizers {
 
-    /* Create array explicitly to allow for trailing comma after last array element, which improves diff readability.
+    /*
+        Create array explicitly to allow for trailing comma after last array element, which improves diff readability.
      */
     private static final Map.Entry[] mappings = {
             entry("https://discovery.linkedpipes.com/resource/application/timeline-with-labels/template", "LABELED_TIMELINE"),
@@ -29,10 +30,10 @@ public final class Visualizers {
      * The translation table between discovery application IRI and frontend
      * specific identifiers.
      */
-     @SuppressWarnings("unchecked")
-     public static final Map<String, String> map = Map.ofEntries(mappings);
+    @SuppressWarnings("unchecked")
+    public static final Map<String, String> map = Map.ofEntries(mappings);
 
+    private Visualizers() {
+    }
 
-     private Visualizers() {
-     }
 }
