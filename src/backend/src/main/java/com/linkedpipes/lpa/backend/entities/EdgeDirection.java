@@ -1,4 +1,4 @@
-package com.linkedpipes.lpa.backend.enums;
+package com.linkedpipes.lpa.backend.entities;
 
 public enum EdgeDirection {
     INCOMING,

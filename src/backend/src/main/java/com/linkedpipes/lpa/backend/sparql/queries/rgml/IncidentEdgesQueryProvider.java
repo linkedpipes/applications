@@ -1,6 +1,6 @@
 package com.linkedpipes.lpa.backend.sparql.queries.rgml;
 
-import com.linkedpipes.lpa.backend.enums.EdgeDirection;
+import com.linkedpipes.lpa.backend.entities.EdgeDirection;
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.RGML;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;

@@ -43,7 +43,7 @@ public class Application {
     public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1);
 
     /**
-     * CORS configuration.
+     * @return the CORS configuration
      */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -65,7 +65,7 @@ public class Application {
     }
 
     /**
-     * Sentry exception handler.
+     * @return the Sentry exception resolver
      */
     @Bean
     public HandlerExceptionResolver sentryExceptionResolver() {
@@ -75,12 +75,11 @@ public class Application {
                                                  HttpServletResponse response,
                                                  Object handler,
                                                  Exception ex) {
+                if (ex instanceof LpAppsException && ((LpAppsException) ex).getErrorStatus().is4xxClientError()) {
+                    return null;
+                }
 
-                    if (ex instanceof LpAppsException && ((LpAppsException) ex).getErrorStatus().is4xxClientError())
-                        return null;
-
-                    super.resolveException(request, response, handler, ex);
-
+                super.resolveException(request, response, handler, ex);
                 return null;
             }
 
@@ -88,7 +87,6 @@ public class Application {
     }
 
     /**
-     * Socket.io server factory.
      * @return Socket.io server
      */
     @NotNull
