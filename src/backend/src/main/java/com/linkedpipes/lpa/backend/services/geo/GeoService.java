@@ -12,6 +12,8 @@ import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.GeoPropertiesQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.MarkerQueryProvider;
 import com.linkedpipes.lpa.backend.util.JenaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,9 +24,11 @@ import java.util.Map;
 @Service
 public class GeoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(GeoService.class);
+
     public static List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new MarkerQueryProvider(filters);
-        System.out.println(provider.get(graphIri));
+        logger.info(provider.get(graphIri).toString());
         return JenaUtils.withQueryExecution(provider.get(graphIri), new MarkerExtractor()::extract);
     }
 

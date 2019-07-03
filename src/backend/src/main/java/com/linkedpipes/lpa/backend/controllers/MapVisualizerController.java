@@ -31,13 +31,14 @@ public class MapVisualizerController {
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                    @RequestBody(required = false) MapQueryData mapQueryData) throws LpAppsException {
 
-        if(mapQueryData == null)
+        if (mapQueryData == null) {
             mapQueryData = new MapQueryData();
+        }
 
         logger.info("Get markers: listing filters");
         for (String key : mapQueryData.filters.keySet()) {
             for (ValueFilter vf : mapQueryData.filters.get(key)) {
-                logger.info("Key: " + key + ", label: " + vf.label + ", dataType: " + vf.dataType + ", uri: " + vf.uri + ", isActive: " + (vf.isActive?"yes":"no"));
+                logger.info("Key: " + key + ", uri: " + vf.uri + ", isActive: " + (vf.isActive ? "yes" : "no"));
             }
         }
         logger.info("Done listing filters");
