@@ -40,7 +40,7 @@ public class LocalizedValue {
         put(literal.getLanguage(), literal.getString());
     }
 
-    public LocalizedValue(Resource resource, Property property){
+    public LocalizedValue(Resource resource, Property property) {
         Lists.reverse(resource.listProperties(property).toList()).forEach(l -> put(l.getLanguage(), l.getString()));
     }
 

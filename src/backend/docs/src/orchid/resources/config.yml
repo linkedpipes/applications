@@ -1,0 +1,37 @@
+javadoc:
+  sourceDirs:
+  - '../../../../src/main/java'
+  classPages:
+    menu:
+    - type: 'javadocClassLinks'
+  pages:
+    menu:
+    - type: 'javadocClasses'
+    - type: 'javadocPackages'
+
+site:
+  about:
+    siteName: 'LPA Backend Documentation'
+    avatar: '/assets/media/logo.jpg'
+
+theme:
+  social:
+    github: 'linkedpipes/applications'
+  menu:
+  - type: 'page'
+    title: 'Home'
+    url: '/g'
+  - type: 'page'
+    url: 'https://www.example.com'
+  #    - type: 'pages'
+  #      atRoot: true
+  extraCss:
+  - 'assets/css/extraCss.scss'
+  - 'assets/css/pygments.scss'
+  extraJs:
+  - 'assets/js/extraJs.js'
+
+services:
+  generators:
+    externalIndices:
+    - 'https://orchid.netlify.com/meta/all.index.json'
