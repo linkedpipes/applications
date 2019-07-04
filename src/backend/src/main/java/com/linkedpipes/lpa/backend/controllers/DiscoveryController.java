@@ -3,6 +3,8 @@ package com.linkedpipes.lpa.backend.controllers;
 import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.database.DiscoveryDao;
+import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
@@ -43,7 +45,7 @@ public class DiscoveryController {
 
     @NotNull
     @PostMapping("/api/pipelines/discoverFromDataSources")
-    public ResponseEntity<Discovery> startDiscoveryFromDataSources(@NotNull @RequestParam("webId") String webId,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromDataSources(@NotNull @RequestParam("webId") String webId,
                                                     @Nullable @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "No data sources were provided");
@@ -56,7 +58,7 @@ public class DiscoveryController {
         try {
             userService.addUserIfNotPresent(webId);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
-            Discovery newDiscovery = executorService.startDiscoveryFromConfig(discoveryConfig, webId);
+            DiscoverySession newDiscovery = executorService.startDiscoveryFromConfig(discoveryConfig, webId);
             return ResponseEntity.ok(newDiscovery);
         } catch(UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
@@ -73,7 +75,7 @@ public class DiscoveryController {
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
-    public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
                                                              @RequestParam("rdfFile") MultipartFile rdfFile,
                                                              @Nullable @RequestParam(value="dataSampleFile", required=false) MultipartFile dataSampleFile) throws LpAppsException, IOException {
         if (rdfFile == null || rdfFile.isEmpty()) {
@@ -100,7 +102,7 @@ public class DiscoveryController {
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
-    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
                                                                 @NotNull @RequestParam(value = "rdfInputIri") String rdfFileIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException, IOException {
         if (rdfFileIri == null || rdfFileIri.isEmpty()) {
@@ -130,7 +132,7 @@ public class DiscoveryController {
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
-    public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
                                                                 @NotNull @RequestParam("webId") String webId,
                                                                 @Nullable @RequestParam List<String> namedGraphs) throws LpAppsException {
@@ -147,7 +149,10 @@ public class DiscoveryController {
         try {
             userService.addUserIfNotPresent(webId);
 
-            return ResponseEntity.ok(executorService.startDiscoveryFromEndpoint(webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
+            DiscoveryDao d = userService.setUserDiscovery(webId);
+            long discoveryId = d.getId();
+
+            return ResponseEntity.ok(executorService.startDiscoveryFromEndpoint(webId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }

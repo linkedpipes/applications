@@ -90,29 +90,45 @@ public class UserServiceComponent implements UserService {
      * @param namedGraphs list of IRIs as provided on frontend
      * @throws UserNotFoundException user was not found in database
      */
-    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull final String username,
+    @Nullable @Override
+    public DiscoveryDao setUserDiscovery(@NotNull final long dbId,
                                  @NotNull final String discoveryId,
                                  @Nullable final String sparqlEndpointIri,
                                  @Nullable final String dataSampleIri,
                                  @Nullable final List<String> namedGraphs)
                                  throws UserNotFoundException {
-        UserDao user = getUser(username);
-        DiscoveryDao d = new DiscoveryDao();
-        d.setDiscoveryStarted(discoveryId, new Date());
-        d.setSparqlEndpointIri(sparqlEndpointIri);
-        d.setDataSampleIri(dataSampleIri);
-        if (namedGraphs != null) {
-            for (String namedGraph : namedGraphs) {
-                DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
-                ng.setNamedGraph(namedGraph);
-                d.addNamedGraph(ng);
-                ngRepository.save(ng);
+        for (DiscoveryDao d : discoveryRepository.findById(dbId)) {
+            d.setDiscoveryStarted(discoveryId, new Date());
+            d.setSparqlEndpointIri(sparqlEndpointIri);
+            d.setDataSampleIri(dataSampleIri);
+            if (namedGraphs != null) {
+                for (String namedGraph : namedGraphs) {
+                    DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+                    ng.setNamedGraph(namedGraph);
+                    d.addNamedGraph(ng);
+                    ngRepository.save(ng);
+                }
             }
+            discoveryRepository.save(d);
+            return d;
         }
-        user.addDiscovery(d);
-        discoveryRepository.save(d);
-        repository.save(user);
+        return null;
+    }
+
+
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public DiscoveryDao setUserDiscovery(@NotNull final String username)
+                                 throws UserNotFoundException {
+         UserDao user = getUser(username);
+         DiscoveryDao d = new DiscoveryDao();
+
+         d.setDiscoveryStarted("", new Date());
+         d.setExecuting(false);
+
+         user.addDiscovery(d);
+         discoveryRepository.save(d);
+         repository.save(user);
+         return d;
     }
 
     private UserDao getUser(final String username) throws UserNotFoundException {

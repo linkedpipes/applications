@@ -98,10 +98,16 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        processStartedDiscovery(discovery.id, userId, null, null, null);
-        return discovery;
+        DiscoveryDao d = this.userService.setUserDiscovery(userId);
+        long sessionId  = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        DiscoverySession s = new DiscoverySession();
+        s.isFinished = false;
+        s.isFailed = false;
+        s.sessionId = sessionId;
+        s.discoveryId = discovery.id;
+        return s;
     }
 
     /**
@@ -116,10 +122,16 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        processStartedDiscovery(discovery.id, userId, null, null, null);
-        return discovery;
+        DiscoveryDao d = this.userService.setUserDiscovery(userId);
+        long sessionId = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        DiscoverySession s = new DiscoverySession();
+        s.isFinished = false;
+        s.isFailed = false;
+        s.sessionId = sessionId;
+        s.discoveryId = discovery.id;
+        return s;
     }
 
     /**
@@ -136,10 +148,15 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromEndpoint(@NotNull String userId, @NotNull long discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
-        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
-        return discovery;
+        long sessionId = processStartedDiscovery(discovery.id, discoveryId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        DiscoverySession s = new DiscoverySession();
+        s.isFinished = false;
+        s.isFailed = false;
+        s.sessionId = sessionId;
+        s.discoveryId = discovery.id;
+        return s;
     }
 
     /**
@@ -154,7 +171,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws IOException reading RDF data from URI failed
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
+    public DiscoverySession startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
         //read rdf data from iri and upload it to our virtuoso, create discovery config
         ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
         //get rdf data in TTL format
@@ -174,10 +191,12 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @Nullable @Override
-    public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
+        DiscoveryDao d = userService.setUserDiscovery(userId);
+        long discoveryId = d.getId();
 
         if (dataSampleIri == null) {
             //generate data sample from named graph here
@@ -189,14 +208,19 @@ public class ExecutorServiceComponent implements ExecutorService {
                 logger.warn("Failed to clean the shared folder before pipeline", ex);
             }
             Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
-            startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph));
-            return null; //TODO: API change
+            startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph, discoveryId));
+
+            DiscoverySession s = new DiscoverySession();
+            s.sessionId = discoveryId;
+            s.isFinished = false;
+            s.isFailed = false;
+            return s;
         } else {
-            return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+            return startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
         }
     }
 
-    private IExecutionCallback getSampleCallback(final String userId, final String namedGraph) {
+    private IExecutionCallback getSampleCallback(final String userId, final String namedGraph, final long discoveryId) {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
                 if (counter.get() != 1) {
@@ -216,15 +240,39 @@ public class ExecutorServiceComponent implements ExecutorService {
                     try {
                         String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
                         VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
-                        startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+                        startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
                         logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);
+                        try {
+                            DiscoverySession session = new DiscoverySession();
+                            session.sessionId = discoveryId;
+                            session.isFailed = true;
+                            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+                        } catch (LpAppsException ex) {
+                            logger.error("Failed to report error", ex);
+                        }
                     } catch (IOException e) {
                         logger.error("Failed to export generated data sample to github (" + gistName + "), sample was:\n" + ttl, e);
+                        try {
+                            DiscoverySession session = new DiscoverySession();
+                            session.sessionId = discoveryId;
+                            session.isFailed = true;
+                            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+                        } catch (LpAppsException ex) {
+                            logger.error("Failed to report error", ex);
+                        }
                     }
                 } else {
                     logger.error("Data sample pipeline finished with errors");
+                    try {
+                        DiscoverySession session = new DiscoverySession();
+                        session.sessionId = discoveryId;
+                        session.isFailed = true;
+                        Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+                    } catch (LpAppsException ex) {
+                        logger.error("Failed to report error", ex);
+                    }
                 }
 
                 if (counter.decrementAndGet() != 0) {
@@ -246,7 +294,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @Nullable MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
+    public DiscoverySession startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @Nullable MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
         Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
         if (rdfFileLanguage == null) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "File content type not supported");
@@ -274,10 +322,11 @@ public class ExecutorServiceComponent implements ExecutorService {
     * @throws LpAppsException initial discovery status call failed
     * @throws UserNotFoundException user was not found
     */
-    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
-        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
+    private long processStartedDiscovery(String discoveryId, long dbId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        DiscoveryDao d = this.userService.setUserDiscovery(dbId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
+        return d.getId();
     }
 
     /**
@@ -296,7 +345,9 @@ public class ExecutorServiceComponent implements ExecutorService {
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
             DiscoverySession session = new DiscoverySession();
             session.discoveryId = d.getDiscoveryId();
+            session.sessionId = d.getId();
             session.isFinished = discoveryStatus.isFinished;
+            session.isFailed = false;
             session.started = d.getStarted().getTime() / 1000L;
             if (d.getFinished() != null) {
                 session.finished = d.getFinished().getTime() / 1000L;
