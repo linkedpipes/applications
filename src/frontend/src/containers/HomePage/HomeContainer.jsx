@@ -363,16 +363,11 @@ class HomeContainer extends PureComponent<Props, State> {
 
   getContent = tabIndex => {
     const {
-      handleChange,
       handleSampleClick,
       handleSelectDiscoveryClick,
       handleSelectPipelineExecutionClick,
-      handleAppClicked,
-      handleDeleteApp,
-      handleShareAppClicked,
       setApplicationLoaderStatus,
-      handlePipelineExecutionRowDeleteClicked,
-      getContent
+      handlePipelineExecutionRowDeleteClicked
     } = this;
 
     const { discoveriesList, pipelineExecutionsList } = this.props;
@@ -406,19 +401,7 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const {
-      handleChange,
-      handleSampleClick,
-      handleSelectDiscoveryClick,
-      onHandleSelectPipelineExecutionClick,
-      handleAppClicked,
-      handleDeleteApp,
-      handleShareAppClicked,
-      setApplicationLoaderStatus,
-      handlePipelineExecutionRowDeleteClicked,
-      getContent
-    } = this;
-    const { userProfile, dashboardTabIndex } = this.props;
+    const { dashboardTabIndex } = this.props;
     const { loadingAppIsActive } = this.state;
 
     return (
@@ -427,28 +410,6 @@ class HomeContainer extends PureComponent<Props, State> {
       </LoadingOverlay>
     );
   }
-}
-
-{
-  /* <HomeComponent
-          onHandleTabChange={handleChange}
-          onHandleSampleClick={handleSampleClick}
-          onHandleSelectDiscoveryClick={handleSelectDiscoveryClick}
-          onHandleSelectPipelineExecutionClick={
-            onHandleSelectPipelineExecutionClick
-          }
-          applicationsList={this.state.applicationsMetadata}
-          pipelinesList={userProfile.pipelineExecutions}
-          discoveriesList={userProfile.discoverySessions}
-          tabIndex={tabIndex}
-          onHandleAppClicked={handleAppClicked}
-          onHandleDeleteAppClicked={handleDeleteApp}
-          onHandleShareAppClicked={handleShareAppClicked}
-          onSetApplicationLoaderStatus={setApplicationLoaderStatus}
-          onHandlePipelineExecutionRowDeleteClicked={
-            handlePipelineExecutionRowDeleteClicked
-          }
-        /> */
 }
 
 const HomeContainerWithSocket = props => (

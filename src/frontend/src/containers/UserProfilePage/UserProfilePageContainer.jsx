@@ -44,7 +44,11 @@ class UserProfilePageContainer extends PureComponent<Props> {
   performPasswordReset = async () => {
     const { webId } = this.props.userProfile;
 
-    const domain = GlobalUtils.urlDomain(webId);
+    let domain = GlobalUtils.urlDomain(webId);
+
+    if (domain.includes('lpsolid')) {
+      domain = `${domain}:8443}`;
+    }
 
     const resetUrl = `https://${domain}/account/password/reset`;
 

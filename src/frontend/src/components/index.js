@@ -7,7 +7,13 @@ import {
   ChordVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
-import { Header, DashboardHeader, DiscoverHeader } from './Header';
+import {
+  Header,
+  DashboardHeader,
+  DiscoverHeader,
+  ApplicationHeader,
+  ApplicationsBrowserHeader
+} from './Header';
 
 export {
   NavigationBar,
@@ -19,5 +25,7 @@ export {
   ChordVisualizer,
   Header,
   DashboardHeader,
-  DiscoverHeader
+  DiscoverHeader,
+  ApplicationHeader,
+  ApplicationsBrowserHeader
 };

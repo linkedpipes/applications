@@ -158,7 +158,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     <Grid item xs={6} sm={6}>
                       <Button
                         className={classes.itemGrid}
-                        variant="contained"
+                        variant="outlined"
                         component="span"
                         color="primary"
                         disabled={
@@ -179,7 +179,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                         className={classes.itemGrid}
                         variant="contained"
                         component="span"
-                        color="secondary"
+                        color="primary"
                         id="start-discovery-button"
                         disabled={inputFieldsAreNotFilled}
                         onClick={onHandleProcessStartDiscovery}

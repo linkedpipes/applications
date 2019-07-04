@@ -6,8 +6,8 @@ import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
   onDrawerToggle: Function,
-  handleSetDashboardTabIndex: Function,
-  dashboardTabIndex: Number
+  handleSetDiscoverTabIndex: Function,
+  discoverTabIndex: Number
 };
 
 const tabTitle = [];
@@ -16,17 +16,17 @@ const sectionLabel = 'Create Application';
 
 class DiscoverHeaderContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
-    this.props.handleSetDashboardTabIndex(tabIndex);
+    this.props.handleSetDiscoverTabIndex(tabIndex);
   };
 
   render() {
-    const { onDrawerToggle, dashboardTabIndex } = this.props;
+    const { onDrawerToggle, discoverTabIndex } = this.props;
     const { handleTabChange } = this;
 
     return (
       <DiscoverHeaderComponent
         onDrawerToggle={onDrawerToggle}
-        dashboardTabIndex={dashboardTabIndex}
+        discoverTabIndex={discoverTabIndex}
         sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
@@ -37,16 +37,16 @@ class DiscoverHeaderContainer extends PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    dashboardTabIndex: state.globals.dashboardTabIndex
+    discoverTabIndex: state.globals.discoverTabIndex
   };
 };
 
 const mapDispatchToProps = dispatch => {
-  const handleSetDashboardTabIndex = index =>
-    dispatch(globalActions.setSelectedDashboardTabIndex(index));
+  const handleSetDiscoverTabIndex = index =>
+    dispatch(globalActions.setSelectedDiscverTabIndex(index));
 
   return {
-    handleSetDashboardTabIndex
+    handleSetDiscoverTabIndex
   };
 };
 

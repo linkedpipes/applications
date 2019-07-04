@@ -7,6 +7,9 @@ const INITIAL_STATE = {
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
   dashboardTabIndex: 0,
+  applicationSetupTabIndex: 0,
+  discoverTabIndex: 0,
+  applicationsBrowserTabIndex: 0,
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
   shareApplicationDialogIsOpen: false,
@@ -48,6 +51,24 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         dashboardTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_DISCOVER_TAB_INDEX:
+      return {
+        ...state,
+        discoverTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATION_SETUP_TAB_INDEX:
+      return {
+        ...state,
+        applicationSetupTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATIONS_BROWSER_TAB_INDEX:
+      return {
+        ...state,
+        applicationsBrowserTabIndex: action.value
       };
 
     case types.SET_MOBILE_DRAWER_STATE:

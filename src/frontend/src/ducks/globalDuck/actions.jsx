@@ -42,6 +42,27 @@ const setSelectedDashboardTabIndex = tabIndex => {
   };
 };
 
+const setSelectedDiscverTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_DISCOVER_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setSelectedApplicationSetupTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_APPLICATION_SETUP_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setSelectedApplicationsBrowserTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_APPLICATIONS_BROWSER_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
 const setMobileDrawerState = drawerState => {
   return {
     type: types.SET_MOBILE_DRAWER_STATE,
@@ -56,5 +77,8 @@ export default {
   setChooseFolderDialogState,
   setSelectedDashboardTabIndex,
   setInboxDialogState,
-  setMobileDrawerState
+  setMobileDrawerState,
+  setSelectedDiscverTabIndex,
+  setSelectedApplicationSetupTabIndex,
+  setSelectedApplicationsBrowserTabIndex
 };

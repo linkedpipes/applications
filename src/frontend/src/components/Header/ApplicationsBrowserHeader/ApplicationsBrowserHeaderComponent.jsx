@@ -22,7 +22,7 @@ type Props = {
   sectionLabel: string,
   tabTitles: [{ titleLabel: string }],
   onHandleTabChange: Function,
-  discoverTabIndex: Number
+  applicationsBrowserTabIndex: Number
 };
 
 const styles = theme => ({
@@ -47,14 +47,14 @@ const styles = theme => ({
   }
 });
 
-function DiscoverHeader(props: Props) {
+function ApplicationsBrowserHeader(props: Props) {
   const {
     classes,
     onDrawerToggle,
     sectionLabel,
     tabTitles,
     onHandleTabChange,
-    discoverTabIndex
+    applicationsBrowserTabIndex
   } = props;
 
   return (
@@ -124,7 +124,7 @@ function DiscoverHeader(props: Props) {
         elevation={0}
       >
         <Tabs
-          value={discoverTabIndex}
+          value={applicationsBrowserTabIndex}
           textColor="inherit"
           onChange={onHandleTabChange}
         >
@@ -137,4 +137,6 @@ function DiscoverHeader(props: Props) {
   );
 }
 
-export const DiscoverHeaderComponent = withStyles(styles)(DiscoverHeader);
+export const ApplicationsBrowserHeaderComponent = withStyles(styles)(
+  ApplicationsBrowserHeader
+);

@@ -5,7 +5,6 @@ import { globalActions } from '@ducks/globalDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { discoverActions } from '../../duck';
 import DiscoverVisualizerCardComponent from './DiscoverVisualizerCardComponent';
-import { toast } from 'react-toastify';
 import { GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
@@ -66,15 +65,6 @@ class DiscoverVisualizerPickerContainer extends PureComponent<Props> {
 
     handleSetSelectedPipelineId(pipelineId);
     setPipelineExecutorStep();
-
-    toast.info(
-      `Automatically skipping pipeline selection since
-      only one pipeline group discovered.`,
-      {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 4000
-      }
-    );
   };
 
   render() {

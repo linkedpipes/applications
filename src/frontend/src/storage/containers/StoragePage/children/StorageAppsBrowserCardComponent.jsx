@@ -26,20 +26,20 @@ import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
-import ShareIcon from '@material-ui/icons/Share';
 import { filtersActions } from '@ducks/filtersDuck';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { Typography } from '@material-ui/core';
+import moment from 'moment';
 
-const styles = {
+const styles = theme => ({
   card: {
     height: '100%',
     display: 'flex',
-    width: '190',
-    flexDirection: 'column',
-    marginRight: 5
+    flexDirection: 'column'
   },
 
   media: {
+    padding: theme.spacing(2),
     textAlign: 'center'
   },
 
@@ -56,7 +56,7 @@ const styles = {
   cardHeader: {
     height: '100px'
   }
-};
+});
 
 type Props = {
   classes: {
@@ -80,7 +80,8 @@ type Props = {
   history: Object,
   applicationsFolder: string,
   indexNumber: Number,
-  webId: string
+  webId: string,
+  isShared: Boolean
 };
 
 type State = {
@@ -197,7 +198,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   };
 
   render() {
-    const { classes, applicationMetadata, indexNumber } = this.props;
+    const { classes, applicationMetadata, indexNumber, isShared } = this.props;
     const { anchorEl } = this.state;
     const {
       handleMenuClick,
@@ -213,8 +214,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
-            className={classes.cardHeader}
-            noWrap
             action={
               <IconButton
                 aria-owns={anchorEl ? 'simple-menu' : undefined}
@@ -228,13 +227,51 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               </IconButton>
             }
             title={
-              applicationConfiguration.title.length >= 25
-                ? `${applicationConfiguration.title.substr(0, 25)}...`
-                : applicationConfiguration.title
+              <Typography
+                style={{
+                  whiteSpace: 'nowrap',
+                  width: '15rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                variant="subtitle1"
+              >
+                {applicationConfiguration.title}
+              </Typography>
             }
-            subheader={GlobalUtils.getBeautifiedVisualizerTitle(
-              applicationConfiguration.endpoint
-            )}
+            subheader={
+              <React.Fragment>
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Based on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {`${GlobalUtils.getBeautifiedVisualizerTitle(
+                    applicationConfiguration.endpoint
+                  )} visualizer`}
+                </Typography>
+                <br />
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Published on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {moment(applicationConfiguration.published).format('lll')}
+                </Typography>
+                {isShared && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Author:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      {applicationConfiguration.author}
+                    </Typography>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            }
           />
           <CardActionArea onClick={handleApplicationClicked}>
             <div
@@ -250,10 +287,17 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               />
             </div>
           </CardActionArea>
-          <CardActions className={classes.spacing} disableSpacing>
-            <IconButton aria-label="Share" onClick={handleShareApp}>
-              <ShareIcon />
-            </IconButton>
+          <CardActions className={classes.spacing}>
+            <Button
+              size="small"
+              onClick={handleApplicationClicked}
+              color="primary"
+            >
+              Edit
+            </Button>
+            <Button size="small" onClick={handleShareApp} color="primary">
+              Share
+            </Button>
           </CardActions>
         </Card>
         <Menu

@@ -21,7 +21,13 @@ import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
-import { Header, DashboardHeader, DiscoverHeader } from '@components';
+import {
+  Header,
+  DashboardHeader,
+  DiscoverHeader,
+  ApplicationHeader,
+  ApplicationsBrowserHeader
+} from '@components';
 import ErrorBoundary from 'react-error-boundary';
 import { toast, ToastContainer } from 'react-toastify';
 import { Invitation } from '@storage/models';
@@ -416,7 +422,7 @@ class AppRouter extends React.PureComponent<Props, State> {
               <PrivateLayout
                 path="/create-app"
                 component={CreateVisualizerPage}
-                headerComponent={Header}
+                headerComponent={ApplicationHeader}
                 exact
               />
 
@@ -451,7 +457,7 @@ class AppRouter extends React.PureComponent<Props, State> {
               <PrivateLayout
                 path="/storage"
                 component={StoragePage}
-                headerComponent={Header}
+                headerComponent={ApplicationsBrowserHeader}
                 exact
               />
 
