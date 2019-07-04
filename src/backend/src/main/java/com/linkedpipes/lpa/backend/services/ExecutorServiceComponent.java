@@ -249,8 +249,8 @@ public class ExecutorServiceComponent implements ExecutorService {
                             session.sessionId = discoveryId;
                             session.isFailed = true;
                             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
-                        } catch (LpAppsException ex) {
-                            logger.error("Failed to report error", ex);
+                        } catch (LpAppsException e) {
+                            logger.error("Failed to report error", e);
                         }
                     } catch (IOException e) {
                         logger.error("Failed to export generated data sample to github (" + gistName + "), sample was:\n" + ttl, e);
