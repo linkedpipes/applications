@@ -21,6 +21,7 @@ import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
+import { Header, DashboardHeader } from '@components';
 import ErrorBoundary from 'react-error-boundary';
 import { toast } from 'react-toastify';
 import { Invitation } from '@storage/models';
@@ -405,11 +406,17 @@ class AppRouter extends React.PureComponent<Props, State> {
             <Switch>
               <PublicLayout component={AuthorizationPage} path="/login" exact />
 
-              <PrivateLayout path="/dashboard" component={HomePage} exact />
+              <PrivateLayout
+                path="/dashboard"
+                component={HomePage}
+                headerComponent={DashboardHeader}
+                exact
+              />
 
               <PrivateLayout
                 path="/create-app"
                 component={CreateVisualizerPage}
+                headerComponent={Header}
                 exact
               />
 
@@ -418,14 +425,30 @@ class AppRouter extends React.PureComponent<Props, State> {
               <PrivateLayout
                 path="/profile"
                 component={UserProfilePage}
+                headerComponent={Header}
                 exact
               />
 
-              <PrivateLayout path="/settings" component={SettingsPage} exact />
+              <PrivateLayout
+                path="/settings"
+                component={SettingsPage}
+                headerComponent={Header}
+                exact
+              />
 
-              <PrivateLayout path="/about" component={AboutPage} exact />
+              <PrivateLayout
+                path="/about"
+                component={AboutPage}
+                headerComponent={Header}
+                exact
+              />
 
-              <PrivateLayout path="/storage" component={StoragePage} exact />
+              <PrivateLayout
+                path="/storage"
+                component={StoragePage}
+                headerComponent={Header}
+                exact
+              />
 
               <Route path="/404" component={NotFoundPage} exact />
 

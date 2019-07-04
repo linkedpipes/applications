@@ -7,7 +7,7 @@ import {
   ChordVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
-import Header from './Header';
+import { Header, DashboardHeader } from './Header';
 
 export {
   NavigationBar,
@@ -17,5 +17,6 @@ export {
   MapsVisualizer,
   VisualizerIcon,
   ChordVisualizer,
-  Header
+  Header,
+  DashboardHeader
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { NavigationBar, Header } from '@components';
+import { NavigationBar } from '@components';
 import { withStyles } from '@material-ui/core/styles';
 import { withAuthorization } from '@utils';
 import Hidden from '@material-ui/core/Hidden';
@@ -33,6 +33,7 @@ const styles = theme => ({
 type Props = {
   classes: any,
   component: any,
+  headerComponent: any,
   webId: any,
   drawerState: Boolean,
   handleSetMobileDrawerState: Function
@@ -41,6 +42,7 @@ type Props = {
 const PrivateLayout = ({
   classes,
   component: Component,
+  headerComponent: HeaderComponent,
   webId,
   drawerState,
   handleSetMobileDrawerState,
@@ -68,11 +70,7 @@ const PrivateLayout = ({
             </Hidden>
           </nav>
           <div className={classes.appContent}>
-            <Header
-              onDrawerToggle={() => {
-                handleSetMobileDrawerState(!drawerState);
-              }}
-            />
+            {HeaderComponent !== undefined && <HeaderComponent />}
             <main className={classes.mainContent}>
               <Component {...matchProps} />
             </main>

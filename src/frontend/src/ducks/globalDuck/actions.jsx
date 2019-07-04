@@ -35,9 +35,9 @@ const setLightColorTheme = isLight => {
   };
 };
 
-const setSelectedHomepageTabIndex = tabIndex => {
+const setSelectedDashboardTabIndex = tabIndex => {
   return {
-    type: types.SET_SELECTED_HOMEPAGE_TAB_INDEX,
+    type: types.SET_SELECTED_DASHBOARD_TAB_INDEX,
     value: tabIndex
   };
 };
@@ -54,7 +54,7 @@ export default {
   setAccessControlDialogState,
   setLightColorTheme,
   setChooseFolderDialogState,
-  setSelectedHomepageTabIndex,
+  setSelectedDashboardTabIndex,
   setInboxDialogState,
   setMobileDrawerState
 };

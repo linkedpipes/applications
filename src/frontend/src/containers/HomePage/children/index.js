@@ -1,5 +1,5 @@
-import DiscoveriesTable from './DiscoveriesTableContainer';
+import DiscoveriesCollection from './DiscoveriesTableContainer';
 import ApplicationsTable from './ApplicationsTableComponent';
-import PipelinesTable from './PipelinesTableComponent';
+import PipelinesCollection from './PipelinesTableComponent';
 
-export { DiscoveriesTable, ApplicationsTable, PipelinesTable };
+export { DiscoveriesCollection, ApplicationsTable, PipelinesCollection };

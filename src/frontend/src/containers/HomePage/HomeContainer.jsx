@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { HomeComponent } from './HomeComponent';
 import { connect } from 'react-redux';
 import { discoverActions } from '../DiscoverPage/duck';
 import { etlActions } from '@ducks/etlDuck';
@@ -23,12 +22,16 @@ import {
 import LoadingOverlay from 'react-loading-overlay';
 import { userActions } from '@ducks/userDuck';
 import { ApplicationMetadata } from '@storage/models';
+import { DiscoveriesCollection, PipelinesCollection } from './children';
+import QuickStartComponent from './QuickStart/QuickStartComponent';
 
 type Props = {
   history: { push: any },
   onInputExampleClicked: (sample: {}) => void,
   // eslint-disable-next-line react/no-unused-prop-types
   userProfile: Object,
+  discoveriesList: Array<Object>,
+  pipelineExecutionsList: Array<Object>,
   socket: Object,
   webId: Object,
   handleSetResultPipelineIri: Function,
@@ -42,7 +45,7 @@ type Props = {
   webId: string,
   applicationsFolder: String,
   location: Object,
-  tabIndex: number,
+  dashboardTabIndex: number,
   handleSetHomepageTabIndex: Function
 };
 type State = {
@@ -130,9 +133,9 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   setupDiscoveryListeners = () => {
-    const { userProfile, socket } = this.props;
+    const { discoveriesList, socket } = this.props;
     // eslint-disable-next-line array-callback-return
-    userProfile.discoverySessions.map(discoveryRecord => {
+    discoveriesList.map(discoveryRecord => {
       if (!discoveryRecord.finished) {
         socket.emit('join', discoveryRecord.id);
         Log.info(`Sending join to discovery room ${discoveryRecord.id}`);
@@ -142,9 +145,9 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   setupEtlExecutionsListeners = () => {
-    const { userProfile, socket } = this.props;
+    const { pipelineExecutionsList, socket } = this.props;
     // eslint-disable-next-line array-callback-return
-    userProfile.pipelineExecutions.map(pipelineRecord => {
+    pipelineExecutionsList.map(pipelineRecord => {
       const rawStatus = pipelineRecord.status;
 
       let status;
@@ -194,7 +197,7 @@ class HomeContainer extends PureComponent<Props, State> {
     });
   };
 
-  onHandleSelectPipelineExecutionClick = pipelineExecution => {
+  handleSelectPipelineExecutionClick = pipelineExecution => {
     const {
       history,
       handleSetResultPipelineIri,
@@ -358,6 +361,50 @@ class HomeContainer extends PureComponent<Props, State> {
     }
   };
 
+  getContent = tabIndex => {
+    const {
+      handleChange,
+      handleSampleClick,
+      handleSelectDiscoveryClick,
+      handleSelectPipelineExecutionClick,
+      handleAppClicked,
+      handleDeleteApp,
+      handleShareAppClicked,
+      setApplicationLoaderStatus,
+      handlePipelineExecutionRowDeleteClicked,
+      getContent
+    } = this;
+
+    const { discoveriesList, pipelineExecutionsList } = this.props;
+
+    switch (tabIndex) {
+      case 0:
+        return <QuickStartComponent onHandleSampleClick={handleSampleClick} />;
+      case 1:
+        return (
+          <DiscoveriesCollection
+            discoveriesList={discoveriesList}
+            onHandleSelectDiscoveryClick={handleSelectDiscoveryClick}
+            onSetApplicationLoaderStatus={setApplicationLoaderStatus}
+          />
+        );
+      case 2:
+        return (
+          <PipelinesCollection
+            pipelineExecutionsList={pipelineExecutionsList}
+            onHandlePipelineExecutionRowDeleteClicked={
+              handlePipelineExecutionRowDeleteClicked
+            }
+            onHandleSelectPipelineExecutionClick={
+              handleSelectPipelineExecutionClick
+            }
+          />
+        );
+      default:
+        return <QuickStartComponent onHandleSampleClick={handleSampleClick} />;
+    }
+  };
+
   render() {
     const {
       handleChange,
@@ -368,14 +415,22 @@ class HomeContainer extends PureComponent<Props, State> {
       handleDeleteApp,
       handleShareAppClicked,
       setApplicationLoaderStatus,
-      handlePipelineExecutionRowDeleteClicked
+      handlePipelineExecutionRowDeleteClicked,
+      getContent
     } = this;
-    const { userProfile, tabIndex } = this.props;
+    const { userProfile, dashboardTabIndex } = this.props;
     const { loadingAppIsActive } = this.state;
 
     return (
       <LoadingOverlay active={loadingAppIsActive} spinner>
-        <HomeComponent
+        {this.getContent(dashboardTabIndex)}
+      </LoadingOverlay>
+    );
+  }
+}
+
+{
+  /* <HomeComponent
           onHandleTabChange={handleChange}
           onHandleSampleClick={handleSampleClick}
           onHandleSelectDiscoveryClick={handleSelectDiscoveryClick}
@@ -393,10 +448,7 @@ class HomeContainer extends PureComponent<Props, State> {
           onHandlePipelineExecutionRowDeleteClicked={
             handlePipelineExecutionRowDeleteClicked
           }
-        />
-      </LoadingOverlay>
-    );
-  }
+        /> */
 }
 
 const HomeContainerWithSocket = props => (
@@ -407,10 +459,12 @@ const HomeContainerWithSocket = props => (
 
 const mapStateToProps = state => {
   return {
+    discoveriesList: state.user.discoverySessions,
+    pipelineExecutionsList: state.user.pipelineExecutions,
     userProfile: state.user,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId,
-    tabIndex: state.globals.homepageTabIndex
+    dashboardTabIndex: state.globals.dashboardTabIndex
   };
 };
 

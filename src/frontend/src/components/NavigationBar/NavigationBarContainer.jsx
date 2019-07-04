@@ -10,6 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 import StorageIcon from '@material-ui/icons/StorageTwoTone';
 import HelpIcon from '@material-ui/icons/Help';
+import LpaHeaderLogo from '@assets/lpa_header_logo.svg';
 import { withRouter } from 'react-router';
 import clsx from 'clsx';
 
@@ -54,6 +55,12 @@ const styles = theme => ({
   },
   divider: {
     marginTop: theme.spacing(2)
+  },
+
+  logo: {
+    margin: theme.spacing(2),
+    width: 240,
+    height: 60
   }
 });
 
@@ -86,7 +93,7 @@ class NavigationBarContainer extends PureComponent<Props, State> {
               classes.itemCategory
             )}
           >
-            Paperbase
+            <img className={classes.logo} src={LpaHeaderLogo} alt="" />
           </ListItem>
           <ListItem className={clsx(classes.item, classes.itemCategory)}>
             <ListItemIcon className={classes.itemIcon}>
@@ -150,7 +157,7 @@ class NavigationBarContainer extends PureComponent<Props, State> {
                 classes={{
                   primary: classes.itemPrimary
                 }}
-                primary="Storage"
+                primary="Applications"
               />
             </ListItem>
 

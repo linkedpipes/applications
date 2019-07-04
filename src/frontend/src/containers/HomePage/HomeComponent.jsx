@@ -28,7 +28,7 @@ type Props = {
   history: { push: any },
   discoveriesList: Array<{ id: string, finished: boolean }>,
   applicationsList: Array<any>,
-  pipelinesList: Array<{
+  pipelineExecutionsList: Array<{
     executionIri: string,
     selectedVisualiser: string,
     status: { '@id'?: string, status?: string },
@@ -83,7 +83,7 @@ class Home extends PureComponent<Props> {
       classes,
       discoveriesList,
       applicationsList,
-      pipelinesList,
+      pipelineExecutionsList,
       onHandleTabChange,
       onHandleSampleClick,
       onHandleSelectDiscoveryClick,
@@ -157,7 +157,7 @@ class Home extends PureComponent<Props> {
               )}
               {tabIndex === 1 && (
                 <PipelinesTable
-                  pipelinesList={pipelinesList}
+                  pipelineExecutionsList={pipelineExecutionsList}
                   onHandlePipelineExecutionRowDeleteClicked={
                     onHandlePipelineExecutionRowDeleteClicked
                   }

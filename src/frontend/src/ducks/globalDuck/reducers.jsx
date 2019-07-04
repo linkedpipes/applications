@@ -6,7 +6,7 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
-  homepageTabIndex: 0,
+  dashboardTabIndex: 0,
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
   shareApplicationDialogIsOpen: false,
@@ -44,10 +44,10 @@ const globalReducer = (state = INITIAL_STATE, action) => {
         colorThemeIsLight: action.value
       };
 
-    case types.SET_SELECTED_HOMEPAGE_TAB_INDEX:
+    case types.SET_SELECTED_DASHBOARD_TAB_INDEX:
       return {
         ...state,
-        homepageTabIndex: action.value
+        dashboardTabIndex: action.value
       };
 
     case types.SET_MOBILE_DRAWER_STATE:

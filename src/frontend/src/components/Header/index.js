@@ -1,3 +1,4 @@
 import { Header } from './HeaderContainer';
+import { DashboardHeader } from './DashboardHeader';
 
-export default Header;
+export { Header, DashboardHeader };
