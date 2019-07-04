@@ -71,7 +71,7 @@ const PipelinesTableComponent = ({
   <React.Fragment>
     <main>
       <Paper className={classes.heroContent}>
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <Typography
             component="h1"
             variant="h3"
@@ -89,9 +89,9 @@ const PipelinesTableComponent = ({
           >
             Browse Pipeline execution sessions. Click `Choose` to configure,
             publish and share your Application using data extracted by this
-            pipeline execution. If you setup automated LinkedData updater after publishing
-            an application, you will see details on data refreshing time
-            interval on that pipeline execution record.
+            pipeline execution. If you setup automated LinkedData updater after
+            publishing an application, you will see details on data refreshing
+            time interval on that pipeline execution record.
           </Typography>
         </Container>
       </Paper>

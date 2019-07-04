@@ -21,9 +21,9 @@ import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
-import { Header, DashboardHeader } from '@components';
+import { Header, DashboardHeader, DiscoverHeader } from '@components';
 import ErrorBoundary from 'react-error-boundary';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
@@ -420,7 +420,12 @@ class AppRouter extends React.PureComponent<Props, State> {
                 exact
               />
 
-              <PrivateLayout path="/discover" component={DiscoverPage} exact />
+              <PrivateLayout
+                path="/discover"
+                component={DiscoverPage}
+                headerComponent={DiscoverHeader}
+                exact
+              />
 
               <PrivateLayout
                 path="/profile"
@@ -464,6 +469,8 @@ class AppRouter extends React.PureComponent<Props, State> {
             <StorageInboxDialog />
           </SocketContext.Provider>
         </BrowserRouter>
+
+        <ToastContainer />
       </ErrorBoundary>
     );
   }

@@ -33,13 +33,19 @@ type Props = {
 };
 
 const styles = theme => ({
+  icon: {
+    marginRight: theme.spacing(2)
+  },
   heroContent: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(8, 0, 6)
   },
+  heroButtons: {
+    marginTop: theme.spacing(4)
+  },
   cardGrid: {
-    paddingTop: theme.spacing(6),
-    paddingBottom: theme.spacing(6)
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8)
   },
   card: {
     height: '100%',
@@ -51,8 +57,7 @@ const styles = theme => ({
     textAlign: 'center'
   },
   cardContent: {
-    flexGrow: 1,
-    paddingRight: theme.spacing(4)
+    flexGrow: 1
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
@@ -70,7 +75,7 @@ const DiscoveriesTableComponent = ({
   <React.Fragment>
     <main>
       <Paper className={classes.heroContent}>
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <Typography
             component="h1"
             variant="h3"

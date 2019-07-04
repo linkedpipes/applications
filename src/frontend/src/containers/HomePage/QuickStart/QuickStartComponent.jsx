@@ -59,7 +59,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
       <main>
         {/* Hero unit */}
         <Paper className={classes.heroContent}>
-          <Container maxWidth="md">
+          <Container maxWidth="lg">
             <Typography
               component="h1"
               variant="h3"
@@ -87,7 +87,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                     to="/discover"
                   >
                     <Button variant="contained" color="primary">
-                      Create an Application
+                      Create Application
                     </Button>
                   </Link>
                 </Grid>
