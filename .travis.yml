@@ -138,7 +138,7 @@ jobs:
         - docker run --name my-etl -p 8080:8080 -d linkedpipes/applications:etl_hang_fix
         - ./gradlew dockerRun
       script:
-        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.etlServiceUrl=http://localhost:8080/resources -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-graph-crud testIntegration
+        - ./gradlew -Dspring.datasource.url=jdbc:postgresql://localhost:5432/lpa -Dlpa.etlServiceUrl=http://localhost:8080/resources -Dlpa.discoveryServiceUrl=http://localhost:9000 -Dlpa.virtuoso.queryEndpoint=http://localhost:8890/sparql -Dlpa.virtuoso.crudEndpoint=http://localhost:8890/sparql-graph-crud testIntegration --debug
 
     - stage: deploy
       name: "Pushing Backend & Frontend to DockerHub"
