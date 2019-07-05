@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface ExecutorService {
 
-    DiscoverySession startDiscoveryFromEndpoint(String userId, long discoveryId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException;
+    DiscoverySession startDiscoveryFromEndpoint(String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException;
     DiscoverySession startDiscoveryFromInputIri(String rdfFileIri, String userId, String dataSampleIri) throws LpAppsException, IOException;
     DiscoverySession startDiscoveryFromInput(String rdfData, Lang rdfLanguage, String userId, String dataSampleIri) throws LpAppsException, UserNotFoundException;
     DiscoverySession startDiscoveryFromInputFiles(MultipartFile rdfFile, MultipartFile dataSampleFile, String userId) throws LpAppsException, IOException;

@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -137,26 +136,21 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
     public ResponseEntity<DiscoverySession> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
-                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+                                                                @Nullable @RequestParam(value=DATA_SAMPLE_IRI_PARAM, required=false) String dataSampleIri,
                                                                 @NotNull @RequestParam("webId") String webId,
                                                                 @Nullable @RequestParam List<String> namedGraphs) throws LpAppsException {
-        if(namedGraphs == null)
+        if (namedGraphs == null) {
             namedGraphs = new ArrayList<>();
+        }
 
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
-        }
-        if (dataSampleIri.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Data Sample IRI not provided");
         }
 
         try {
             userService.addUserIfNotPresent(webId);
 
-            DiscoveryDao d = userService.setUserDiscovery(webId);
-            long discoveryId = d.getId();
-
-            return ResponseEntity.ok(executorService.startDiscoveryFromEndpoint(webId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs));
+            return ResponseEntity.ok(executorService.startDiscoveryFromEndpoint(webId, sparqlEndpointIri, dataSampleIri, namedGraphs));
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }

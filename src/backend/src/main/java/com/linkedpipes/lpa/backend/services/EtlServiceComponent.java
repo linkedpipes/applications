@@ -67,8 +67,8 @@ public class EtlServiceComponent implements EtlService {
     }
 
     @Override
-    public Execution executeDataSamplePipeline(String namedGraph) throws LpAppsException {
-         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph);
+    public Execution executeDataSamplePipeline(String sparqlEndpointIri, String namedGraph) throws LpAppsException {
+         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph, sparqlEndpointIri);
          logger.info("Data sample input:\n" + transformed);
          String response = httpActions.executeDataSamplePipeline(dataSamplePipelineIri, transformed);
          return OBJECT_MAPPER.readValue(response, Execution.class);

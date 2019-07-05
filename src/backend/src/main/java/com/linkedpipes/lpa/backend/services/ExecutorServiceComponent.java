@@ -146,7 +146,18 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public DiscoverySession startDiscoveryFromEndpoint(@NotNull String userId, @NotNull long discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        DiscoveryDao d = userService.setUserDiscovery(userId);
+        long discoveryId = d.getId();
+
+        if (dataSampleIri == null) {
+            return runDataSamplePipeline(sparqlEndpointIri, namedGraphs, userId, discoveryId);
+        } else {
+            return executeDiscoveryFromEndpoint(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        }
+    }
+
+    private DiscoverySession executeDiscoveryFromEndpoint(@NotNull String userId, @NotNull long discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
         long sessionId = processStartedDiscovery(discovery.id, discoveryId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
         DiscoverySession s = new DiscoverySession();
@@ -193,18 +204,19 @@ public class ExecutorServiceComponent implements ExecutorService {
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
+        String endpoint = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT);
         DiscoveryDao d = userService.setUserDiscovery(userId);
         long discoveryId = d.getId();
 
         if (dataSampleIri == null) {
             //generate data sample from named graph here
-            return runDataSamplePipeline(namedGraph, userId, discoveryId);
+            return runDataSamplePipeline(endpoint, Arrays.asList(namedGraph), userId, discoveryId);
         } else {
-            return startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), dataSampleIri, Arrays.asList(namedGraph));
+            return executeDiscoveryFromEndpoint(userId, discoveryId, endpoint, dataSampleIri, Arrays.asList(namedGraph));
         }
     }
 
-    private DiscoverySession runDataSamplePipeline(final String namedGraph, final String userId, long discoveryId) throws LpAppsException {
+    private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long discoveryId) throws LpAppsException {
         logger.debug("Will execute data sample pipeline");
         counter.compareAndSet(0, 1);
         try {
@@ -212,8 +224,8 @@ public class ExecutorServiceComponent implements ExecutorService {
         } catch (IOException ex) {
             logger.warn("Failed to clean the shared folder before pipeline", ex);
         }
-        Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
-        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph, discoveryId));
+        Execution dsPipe = etlService.executeDataSamplePipeline(sparqlEndpointIri, namedGraphs.get(0));
+        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, sparqlEndpointIri, namedGraphs, discoveryId));
 
         DiscoverySession s = new DiscoverySession();
         s.sessionId = discoveryId;
@@ -222,7 +234,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         return s;
     }
 
-    private IExecutionCallback getSampleCallback(final String userId, final String namedGraph, final long discoveryId) {
+    private IExecutionCallback getSampleCallback(final String userId, final String sparqlEndpointIri, final List<String> namedGraphs, final long discoveryId) {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
                 if (counter.get() != 1) {
@@ -238,11 +250,11 @@ public class ExecutorServiceComponent implements ExecutorService {
                     logger.info("Pipeline finished, should extract sample now");
                     //extract data sample from graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
                     String ttl = SparqlUtils.extractTTL(DATA_SAMPLE_RESULT_GRAPH_IRI);
-                    String gistName = namedGraph.substring(VirtuosoController.GRAPH_NAME_PREFIX.length()) + ".ttl";
+                    String gistName = namedGraphs.get(0).substring(VirtuosoController.GRAPH_NAME_PREFIX.length()) + ".ttl";
                     try {
                         String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
                         VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
-                        startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), dataSampleIri, Arrays.asList(namedGraph));
+                        executeDiscoveryFromEndpoint(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
                         logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);

@@ -9,5 +9,5 @@ public interface EtlService {
     ExecutionStatus getExecutionStatus(String executionIri) throws LpAppsException;
     String getExecutionResult(String executionIri) throws LpAppsException;
     void cancelExecution(String executionIri) throws LpAppsException;
-    Execution executeDataSamplePipeline(String namedGraph) throws LpAppsException;
+    Execution executeDataSamplePipeline(String sparqlEndpointIri, String namedGraph) throws LpAppsException;
 }
