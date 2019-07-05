@@ -89,7 +89,7 @@ public class VirtuosoService {
         headers.add(HttpHeaders.CONTENT_TYPE, "text/turtle");
         HttpEntity<String> entity = new HttpEntity<>(ttlData, headers);
         URI uri = new DefaultUriBuilderFactory()
-                .uriString(Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint))
+                .uriString(Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_CRUD_ENDPOINT))
                 .queryParam("graph", graphName)
                 .build();
 
