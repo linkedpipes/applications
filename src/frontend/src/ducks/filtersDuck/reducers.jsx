@@ -92,6 +92,22 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
               }
             }
           };
+        case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
+          return {
+            filtersState: {
+              enabled: true,
+              visible: true,
+              filterGroups: {
+                nodesFilter: {
+                  label: 'Schemes',
+                  enabled: true,
+                  visible: true,
+                  filterType: 'MAP_SCHEME_FILTER',
+                  options: []
+                }
+              }
+            }
+          };
 
         case VISUALIZER_TYPE.RESET_FILTERS:
           return INITIAL_STATE;

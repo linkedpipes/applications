@@ -10,6 +10,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
 import TreemapFiltersComponent from './children/TreemapFilter';
+import MapSchemeFilterComponent from './children/MapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 
@@ -89,6 +90,16 @@ class FiltersComponent extends React.Component<Props, State> {
             name={filterLabel}
           />
         );
+      case 'MAP_SCHEME_FILTER':
+        return (
+          <MapSchemeFilterComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            nodes={options}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+          />
+        );
       case 'SCHEME_FILTER':
         return (
           <TreemapFiltersComponent
@@ -115,6 +126,8 @@ class FiltersComponent extends React.Component<Props, State> {
       };
     });
   };
+
+  // TODO: Component will unmount, reset all filters to default state
 
   render() {
     const {
