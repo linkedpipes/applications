@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
@@ -98,6 +99,17 @@ public class EtlServiceComponent implements EtlService {
         }
     }
 
+    @PreDestroy
+    public void removeDataSamplePipeline() {
+        logger.info("Deleting data sample pipeline");
+        try {
+            logger.debug(httpActions.deleteDataSamplePipeline(dataSamplePipelineIri));
+        } catch (LpAppsException e) {
+            logger.error("Failed to remove data sample pipeline from ETL, IRI was: " + dataSamplePipelineIri, e);
+        }
+    }
+
+
     private class HttpActions {
 
         private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.ETL_SERVICE_URL);
@@ -110,6 +122,14 @@ public class EtlServiceComponent implements EtlService {
                 .contentType("application/ld+json")
                 .acceptType("application/ld+json")
                 .send();
+        }
+
+        private String deleteDataSamplePipeline(String pipelineIri) throws LpAppsException {
+            String pipelineId = StringUtils.substringAfterLast(pipelineIri, "/");
+            String url = urlFrom(URL_CREATE_PIPELINE, pipelineId);
+            return new HttpRequestSender(context).to(url)
+                    .method(HttpRequestSender.HttpMethod.DELETE)
+                    .send();
         }
 
         private String executeDataSamplePipeline(String pipelineIri, String data) throws LpAppsException {
