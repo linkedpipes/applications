@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { UserProfileButtonComponent } from './UserProfileButtonComponent';
+import { HeaderControlsComponent } from './HeaderControlsComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -16,7 +16,7 @@ type Props = {
 type State = {
   anchorElement: Object
 };
-class UserProfileButtonContainer extends PureComponent<Props, State> {
+class HeaderControlsContainer extends PureComponent<Props, State> {
   state = {
     anchorElement: null
   };
@@ -81,7 +81,7 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
-      <UserProfileButtonComponent
+      <HeaderControlsComponent
         profileMenuIsOpen={profileMenuIsOpen}
         anchorElement={anchorElement}
         onHandleMenuOpen={handleMenuOpen}
@@ -96,9 +96,9 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
   }
 }
 
-const UserProfileButtonContainerWithSockets = props => (
+const HeaderControlsContainerWithSockets = props => (
   <SocketContext.Consumer>
-    {socket => <UserProfileButtonContainer {...props} socket={socket} />}
+    {socket => <HeaderControlsContainer {...props} socket={socket} />}
   </SocketContext.Consumer>
 );
 
@@ -124,4 +124,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(UserProfileButtonContainerWithSockets));
+)(withRouter(HeaderControlsContainerWithSockets));

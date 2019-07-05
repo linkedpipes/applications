@@ -106,14 +106,22 @@ const Discover = ({
             Application data preparation workflow
           </Typography>
           <Typography
-            variant="h6"
-            align="center"
+            variant="body1"
+            align="justify"
             color="textSecondary"
             paragraph
           >
-            Hop up on creating your own Applications based on LinkedData! Choose
-            one of our pre-defined templates for supported visualizers or start
-            by providing with your own data sources.
+            Follow the steps below to prepare the data to be visualized by your
+            application. Simply point out where LinkedPipes should search for
+            LinkedData sources, sit back and relax. During the second step,
+            platform will automatically attempt to extract and identify how this
+            data can be visualized and propose you possible visualizers to be
+            used, if no multiple choises available it will pick one for your
+            automatically. After that, it will transform the LinkedData into a
+            format supported by that visualizer by executing a special data
+            transformatio pipeline. Finally it will take you to the application
+            setup page where you will name your application and publish it to
+            share with anyone across the Web!
           </Typography>
         </Container>
       </Paper>
@@ -201,9 +209,7 @@ const Discover = ({
         <Typography variant="subtitle1" style={{ display: 'inline' }}>
           Named Graph IRIs:
         </Typography>{' '}
-        <Typography variant="body1">
-          {namedGraph || 'N/A'}
-        </Typography>
+        <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
       </Paper>
     )}
     {/* End footer */}

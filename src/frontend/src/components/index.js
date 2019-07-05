@@ -1,6 +1,6 @@
 import NavigationBar from './NavigationBar';
 import LinearLoader from './Loaders';
-import UserProfileButton from './UserProfile';
+import HeaderControls from './HeaderControls';
 import {
   TreemapVisualizer,
   MapsVisualizer,
@@ -18,7 +18,7 @@ import {
 export {
   NavigationBar,
   LinearLoader,
-  UserProfileButton,
+  HeaderControls,
   TreemapVisualizer,
   MapsVisualizer,
   VisualizerIcon,

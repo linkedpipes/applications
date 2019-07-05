@@ -182,7 +182,7 @@ const DiscoveriesTableComponent = ({
                     variant="contained"
                     color="secondary"
                     onClick={() => {
-                      onHandleSelectDiscoveryClick(discoveryItem.discoveryId);
+                      onHandleSelectDiscoveryClick(discoveryItem);
                     }}
                   >
                     Continue

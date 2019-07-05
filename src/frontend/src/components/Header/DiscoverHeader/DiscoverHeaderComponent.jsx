@@ -59,46 +59,6 @@ function DiscoverHeader(props: Props) {
 
   return (
     <React.Fragment>
-      <AppBar color="primary" position="sticky" elevation={0}>
-        <Toolbar>
-          <Grid container spacing={1} alignItems="center">
-            <Hidden smUp>
-              <Grid item>
-                <IconButton
-                  color="inherit"
-                  aria-label="Open drawer"
-                  onClick={onDrawerToggle}
-                  className={classes.menuButton}
-                >
-                  <MenuIcon />
-                </IconButton>
-              </Grid>
-            </Hidden>
-            <Grid item xs />
-            <Grid item>
-              <Typography className={classes.link} component="a" href="#">
-                Go to docs
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Tooltip title="Alerts • No alters">
-                <IconButton color="inherit">
-                  <NotificationsIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item>
-              <IconButton color="inherit" className={classes.iconButtonAvatar}>
-                <Avatar
-                  className={classes.avatar}
-                  src="/static/images/avatar/1.jpg"
-                  alt="My Avatar"
-                />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
       <AppBar
         component="div"
         className={classes.secondaryBar}

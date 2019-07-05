@@ -46,7 +46,10 @@ type Props = {
   applicationsFolder: String,
   location: Object,
   dashboardTabIndex: number,
-  handleSetHomepageTabIndex: Function
+  handleSetHomepageTabIndex: Function,
+  handleSetSparqlIri: Function,
+  handleSetNamedGraph: Function,
+  handleSetDataSampleIri: Function
 };
 type State = {
   applicationsMetadata: Array<ApplicationMetadata>,
@@ -188,10 +191,19 @@ class HomeContainer extends PureComponent<Props, State> {
   };
 
   // TODO: Refactor
-  handleSelectDiscoveryClick = discoveryId => {
-    const { history } = this.props;
+  handleSelectDiscoveryClick = async discovery => {
+    const {
+      history,
+      handleSetSparqlIri,
+      handleSetNamedGraph,
+      handleSetDataSampleIri
+    } = this.props;
+    const discoveryId = discovery.discoveryId;
     Log.info(`About to push with id ${discoveryId}`);
-    history.push({
+    await handleSetSparqlIri(discovery.sparqlEndpointIri);
+    await handleSetNamedGraph(discovery.namedGraphs.join(',\n'));
+    await handleSetDataSampleIri(discovery.dataSampleIri);
+    await history.push({
       pathname: '/discover',
       state: { discoveryId }
     });
@@ -465,6 +477,15 @@ const mapDispatchToProps = dispatch => {
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));
 
+  const handleSetSparqlIri = sparqlIri =>
+    dispatch(discoverActions.setSparqlEndpointIri(sparqlIri));
+
+  const handleSetNamedGraph = namedGraph =>
+    dispatch(discoverActions.setNamedGraph(namedGraph));
+
+  const handleSetDataSampleIri = dataSampleIri =>
+    dispatch(discoverActions.setDataSampleIri(dataSampleIri));
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -475,7 +496,10 @@ const mapDispatchToProps = dispatch => {
     handleSetSelectedApplicationMetadata,
     handleSetUserProfileAsync,
     handleSetHomepageTabIndex,
-    handleSetFiltersState
+    handleSetFiltersState,
+    handleSetSparqlIri,
+    handleSetNamedGraph,
+    handleSetDataSampleIri
   };
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { NavigationBar } from '@components';
+import { NavigationBar, HeaderControls } from '@components';
 import { withStyles } from '@material-ui/core/styles';
 import { withAuthorization } from '@utils';
 import Hidden from '@material-ui/core/Hidden';
@@ -70,6 +70,7 @@ const PrivateLayout = ({
             </Hidden>
           </nav>
           <div className={classes.appContent}>
+            <HeaderControls />
             {HeaderComponent !== undefined && <HeaderComponent />}
             <main className={classes.mainContent}>
               <Component {...matchProps} />
