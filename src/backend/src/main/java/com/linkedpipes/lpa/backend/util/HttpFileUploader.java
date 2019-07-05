@@ -16,12 +16,12 @@ import org.apache.http.impl.client.HttpClients;
 
 public class HttpFileUploader {
 
-    public String uploadTTL(String endpointUrl, String data) throws LpAppsException {
+    public String uploadTTL(String endpointUrl, String data, String field, String type) throws LpAppsException {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             HttpPost uploadFile = new HttpPost(endpointUrl);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addTextBody("input", data, ContentType.create("text/turtle"));
+            builder.addBinaryBody(field, data.getBytes(), ContentType.create(type), "input.ttl");
             HttpEntity multipart = builder.build();
             uploadFile.setEntity(multipart);
             CloseableHttpResponse response = httpClient.execute(uploadFile);

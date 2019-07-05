@@ -11,12 +11,14 @@ import com.linkedpipes.lpa.backend.util.HttpRequestSender;
 import com.linkedpipes.lpa.backend.util.HttpFileUploader;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import javax.annotation.PostConstruct;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
@@ -31,6 +33,8 @@ public class EtlServiceComponent implements EtlService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+
+    private static String dataSamplePipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DataSamplePipelineIri);
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -66,21 +70,53 @@ public class EtlServiceComponent implements EtlService {
     public Execution executeDataSamplePipeline(String namedGraph) throws LpAppsException {
          String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph);
          logger.info("Data sample input:\n" + transformed);
-         String pipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DataSamplePipelineIri);
-         String response = httpActions.executeDataSamplePipeline(pipelineIri, transformed);
+         String response = httpActions.executeDataSamplePipeline(dataSamplePipelineIri, transformed);
          return OBJECT_MAPPER.readValue(response, Execution.class);
-         //TODO: add bootstrap code to upload the pipeline and set IRI in config
     }
 
+    /*@PostConstruct
+    public void uploadDataSamplePipeline() throws LpAppsException, IOException, InterruptedException {
+        logger.info("Waiting for ETL to start");
+        while (true) {
+            try {
+                httpActions.getPipelines();
+                break;
+            } catch(LpAppsException e) {
+                Thread.sleep(1000);
+            }
+        }
+        logger.info("Uploading data sample pipeline to ETL");
+        try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
+            String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
+            logger.info("Pipeline:\n" + sample);
+            String response = httpActions.createDataSamplePipeline(sample);
+            logger.error("Got:\n"+response);
+            dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
+            logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+        }
+    }*/
 
     private class HttpActions {
 
         private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
+        private final String URL_CREATE_PIPELINE = urlFrom(URL_BASE, "pipelines");
+
+        private String getPipelines() throws LpAppsException {
+            return new HttpRequestSender(context).to(URL_CREATE_PIPELINE)
+                .method(HttpRequestSender.HttpMethod.GET)
+                .contentType("application/ld+json")
+                .acceptType("application/ld+json")
+                .send();
+        }
 
         private String executeDataSamplePipeline(String pipelineIri, String data) throws LpAppsException {
             String url = URL_EXECUTE_PIPELINE + "?pipeline=" + pipelineIri;
-            return new HttpFileUploader().uploadTTL(url, data);
+            return new HttpFileUploader().uploadTTL(url, data, "input", "text/turtle");
+        }
+
+        private String createDataSamplePipeline(String definition) throws LpAppsException {
+            return new HttpFileUploader().uploadTTL(URL_CREATE_PIPELINE, definition, "pipeline", "application/ld+json");
         }
 
         private String executePipeline(String pipelineIri) throws LpAppsException {
