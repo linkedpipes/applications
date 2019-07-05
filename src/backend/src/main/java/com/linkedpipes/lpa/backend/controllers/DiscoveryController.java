@@ -2,7 +2,6 @@ package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
-import com.linkedpipes.lpa.backend.entities.database.DiscoveryDao;
 import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
