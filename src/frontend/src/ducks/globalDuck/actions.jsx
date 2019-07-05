@@ -63,6 +63,13 @@ const setSelectedApplicationsBrowserTabIndex = tabIndex => {
   };
 };
 
+const setSelectedSettingsTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_SETTINGS_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
 const setMobileDrawerState = drawerState => {
   return {
     type: types.SET_MOBILE_DRAWER_STATE,
@@ -80,5 +87,6 @@ export default {
   setMobileDrawerState,
   setSelectedDiscverTabIndex,
   setSelectedApplicationSetupTabIndex,
-  setSelectedApplicationsBrowserTabIndex
+  setSelectedApplicationsBrowserTabIndex,
+  setSelectedSettingsTabIndex
 };

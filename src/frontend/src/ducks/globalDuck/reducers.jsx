@@ -9,6 +9,7 @@ const INITIAL_STATE = {
   dashboardTabIndex: 0,
   applicationSetupTabIndex: 0,
   discoverTabIndex: 0,
+  settingsTabIndex: 0,
   applicationsBrowserTabIndex: 0,
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
@@ -69,6 +70,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         applicationsBrowserTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_SETTINGS_TAB_INDEX:
+      return {
+        ...state,
+        settingsTabIndex: action.value
       };
 
     case types.SET_MOBILE_DRAWER_STATE:

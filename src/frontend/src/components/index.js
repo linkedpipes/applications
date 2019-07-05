@@ -12,7 +12,9 @@ import {
   DashboardHeader,
   DiscoverHeader,
   ApplicationHeader,
-  ApplicationsBrowserHeader
+  ApplicationsBrowserHeader,
+  SettingsHeader,
+  AboutHeader
 } from './Header';
 
 export {
@@ -27,5 +29,7 @@ export {
   DashboardHeader,
   DiscoverHeader,
   ApplicationHeader,
-  ApplicationsBrowserHeader
+  ApplicationsBrowserHeader,
+  SettingsHeader,
+  AboutHeader
 };

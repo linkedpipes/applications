@@ -53,11 +53,6 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
     this.setState({ anchorElement: null });
   };
 
-  handleOpenProfile = () => {
-    this.props.history.push('/profile');
-    this.handleMenuClose();
-  };
-
   handleOpenSettings = () => {
     this.props.history.push('/settings');
     this.handleMenuClose();
@@ -74,7 +69,6 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
       handleMenuClose,
       handleMenuOpen,
       handleLogout,
-      handleOpenProfile,
       handleOpenSettings,
       handleSetInboxDialogOpen
     } = this;
@@ -88,7 +82,6 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
         onHandleMenuOpen={handleMenuOpen}
         onHandleMenuClose={handleMenuClose}
         onHandleLogoutClicked={handleLogout}
-        onHandleOpenProfile={handleOpenProfile}
         onHandleOpenSettings={handleOpenSettings}
         onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
         currentInboxInvitations={currentInboxInvitations}

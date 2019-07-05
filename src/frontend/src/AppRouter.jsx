@@ -12,7 +12,6 @@ import {
   CreateVisualizerPage,
   AuthorizationPage,
   ApplicationPage,
-  UserProfilePage,
   SettingsPage
 } from '@containers';
 import { PrivateLayout, PublicLayout } from '@layouts';
@@ -22,11 +21,12 @@ import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import {
-  Header,
   DashboardHeader,
   DiscoverHeader,
   ApplicationHeader,
-  ApplicationsBrowserHeader
+  ApplicationsBrowserHeader,
+  SettingsHeader,
+  AboutHeader
 } from '@components';
 import ErrorBoundary from 'react-error-boundary';
 import { toast, ToastContainer } from 'react-toastify';
@@ -434,23 +434,16 @@ class AppRouter extends React.PureComponent<Props, State> {
               />
 
               <PrivateLayout
-                path="/profile"
-                component={UserProfilePage}
-                headerComponent={Header}
-                exact
-              />
-
-              <PrivateLayout
                 path="/settings"
                 component={SettingsPage}
-                headerComponent={Header}
+                headerComponent={SettingsHeader}
                 exact
               />
 
               <PrivateLayout
                 path="/about"
                 component={AboutPage}
-                headerComponent={Header}
+                headerComponent={AboutHeader}
                 exact
               />
 

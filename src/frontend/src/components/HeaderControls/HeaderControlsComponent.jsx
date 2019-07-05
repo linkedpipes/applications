@@ -4,7 +4,6 @@ import IconButton from '@material-ui/core/IconButton/IconButton';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import Menu from '@material-ui/core/Menu/Menu';
 import SettingsIcon from '@material-ui/icons/Settings';
-import PersonIcon from '@material-ui/icons/Person';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AccountCircle from '@material-ui/icons/AccountCircleTwoTone';
 import NotificationsIcon from '@material-ui/icons/NotificationsTwoTone';
@@ -53,7 +52,6 @@ type Props = {
   onHandleMenuClose: Function,
   onHandleMenuOpen: Function,
   profileMenuIsOpen: Function,
-  onHandleOpenProfile: Function,
   onHandleOpenSettings: Function,
   onHandleSetInboxDialogOpen: Function,
   currentInboxInvitations: Array<Object>,
@@ -67,7 +65,6 @@ const HeaderControls = ({
   onHandleMenuClose,
   onHandleMenuOpen,
   onHandleLogoutClicked,
-  onHandleOpenProfile,
   onHandleOpenSettings,
   onHandleSetInboxDialogOpen,
   currentInboxInvitations,
@@ -91,7 +88,11 @@ const HeaderControls = ({
           </Hidden>
           <Grid item xs />
           <Grid item>
-            <Typography className={classes.link} component="a" href="#">
+            <Typography
+              className={classes.link}
+              component="a"
+              href="htts://www.google.com"
+            >
               Go to docs
             </Typography>
           </Grid>
@@ -133,12 +134,6 @@ const HeaderControls = ({
       open={profileMenuIsOpen}
       onClose={onHandleMenuClose}
     >
-      <MenuItem onClick={onHandleOpenProfile}>
-        <ListItemIcon>
-          <PersonIcon />
-        </ListItemIcon>
-        <ListItemText primary="Profile" />
-      </MenuItem>
       <MenuItem onClick={onHandleOpenSettings}>
         <ListItemIcon>
           <SettingsIcon />
