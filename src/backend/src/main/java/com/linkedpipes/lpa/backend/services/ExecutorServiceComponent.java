@@ -1,17 +1,17 @@
 package com.linkedpipes.lpa.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
-import com.linkedpipes.lpa.backend.entities.profile.*;
+import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
+import com.linkedpipes.lpa.backend.entities.profile.PipelineExecution;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.PollingCompletedException;
+import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.util.GitHubUtils;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
@@ -25,10 +25,8 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
@@ -39,16 +37,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Wrapper to start discovery or execution while linking it on user
@@ -66,10 +64,10 @@ public class ExecutorServiceComponent implements ExecutorService {
     private final AtomicInteger counter = new AtomicInteger(0);
 
 
-    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingTimeout);
-    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingTimeout);
-    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DiscoveryPollingFrequency);
-    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.EtlPollingFrequency);
+    private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_TIMEOUT);
+    private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_TIMEOUT);
+    private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_FREQUENCY);
+    private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_FREQUENCY);
 
 
     @NotNull private final DiscoveryService discoveryService;
@@ -202,11 +200,11 @@ public class ExecutorServiceComponent implements ExecutorService {
             //generate data sample from named graph here
             return runDataSamplePipeline(namedGraph, userId, discoveryId);
         } else {
-            return startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+            return startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), dataSampleIri, Arrays.asList(namedGraph));
         }
     }
 
-    private DiscoverySession runDataSamplePipeline(final String namedGraph, final String userId, long discoveryId) {
+    private DiscoverySession runDataSamplePipeline(final String namedGraph, final String userId, long discoveryId) throws LpAppsException {
         logger.debug("Will execute data sample pipeline");
         counter.compareAndSet(0, 1);
         try {
@@ -244,7 +242,7 @@ public class ExecutorServiceComponent implements ExecutorService {
                     try {
                         String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
                         VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
-                        startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
+                        startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), dataSampleIri, Arrays.asList(namedGraph));
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
                         logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);

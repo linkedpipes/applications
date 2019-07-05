@@ -16,7 +16,10 @@ type Props = {
   onNextClicked: Function,
   history: Object,
   onResetClicked: Function,
-  onResetSelectedInput: Function
+  onResetSelectedInput: Function,
+  sparqlEndpointIri: String,
+  dataSampleIri: String,
+  namedGraph: String
 };
 class DiscoverContainer extends PureComponent<Props> {
   componentDidMount = () => {
@@ -59,12 +62,22 @@ class DiscoverContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { activeStep, onBackClicked, etlExecutionStatus } = this.props;
+    const {
+      activeStep,
+      onBackClicked,
+      etlExecutionStatus,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph
+    } = this.props;
     return (
       <DiscoverComponent
         activeStep={activeStep}
         onBackClicked={onBackClicked}
         etlExecutionStatus={etlExecutionStatus}
+        sparqlEndpointIri={sparqlEndpointIri}
+        dataSampleIri={dataSampleIri}
+        namedGraph={namedGraph}
       />
     );
   }
@@ -99,7 +112,10 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = state => {
   return {
     activeStep: state.discover.activeStep,
-    etlExecutionStatus: state.discover.etlExecutionStatus
+    etlExecutionStatus: state.discover.etlExecutionStatus,
+    sparqlEndpointIri: state.discover.sparqlEndpointIri,
+    dataSampleIri: state.discover.dataSampleIri,
+    namedGraph: state.discover.namedGraph
   };
 };
 

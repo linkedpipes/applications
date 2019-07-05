@@ -1,27 +1,10 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import SwipeableViews from 'react-swipeable-views';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import StorageSharedPage from './StorageSharedAppsBrowserContainer';
 import StoragePage from './StorageAppsBrowserContainer';
 import { GoogleAnalyticsWrapper } from '@utils';
-
-type TabContainerProps = {
-  children: Object,
-  dir: string
-};
-
-function TabContainer({ children, dir }: TabContainerProps) {
-  return (
-    <Typography component="div" dir={dir} style={{ padding: 8 * 3 }}>
-      {children}
-    </Typography>
-  );
-}
+import { connect } from 'react-redux';
 
 const styles = () => ({
   root: {
@@ -30,66 +13,44 @@ const styles = () => ({
 });
 
 type Props = {
-  classes: Object,
-  theme: Object,
-  location: Object
+  location: Object,
+  applicationsBrowserTabIndex: number
 };
 
-type State = {
-  value: number
-};
-
-class StoragePageController extends React.Component<Props, State> {
-  state = {
-    value: 0
-  };
-
+class StoragePageController extends React.Component<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
   }
 
-  handleChange = (event, value) => {
-    this.setState({ value });
-  };
-
-  handleChangeIndex = index => {
-    this.setState({ value: index });
+  getContent = tabIndex => {
+    switch (tabIndex) {
+      case 0:
+        return <StoragePage />;
+      case 1:
+        return <StorageSharedPage />;
+      default:
+        return <StoragePage />;
+    }
   };
 
   render() {
-    const { classes, theme } = this.props;
+    const { applicationsBrowserTabIndex } = this.props;
 
     return (
-      <div className={classes.root}>
-        <AppBar position="static" color="default">
-          <Tabs
-            value={this.state.value}
-            onChange={this.handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="fullWidth"
-            centered
-          >
-            <Tab label="My Applications" />
-            <Tab label="Shared Applications" />
-          </Tabs>
-        </AppBar>
-        <SwipeableViews
-          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-          index={this.state.value}
-          onChangeIndex={this.handleChangeIndex}
-        >
-          <TabContainer dir={theme.direction}>
-            <StoragePage />
-          </TabContainer>
-          <TabContainer dir={theme.direction}>
-            <StorageSharedPage />
-          </TabContainer>
-        </SwipeableViews>
-      </div>
+      <React.Fragment>
+        {this.getContent(applicationsBrowserTabIndex)}
+      </React.Fragment>
     );
   }
 }
 
-export default withStyles(styles, { withTheme: true })(StoragePageController);
+const mapStateToProps = state => {
+  return {
+    applicationsBrowserTabIndex: state.globals.applicationsBrowserTabIndex
+  };
+};
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(StoragePageController)
+);

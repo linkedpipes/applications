@@ -114,7 +114,7 @@ public class TtlGenerator {
     @NotNull
     public static String getVirtuosoServiceDescription(@NotNull String graphName) {
         ModelBuilder builder = ModelBuilder.from(DiscoveryServiceComponent.class.getResource("virtuoso_sd.ttl"), RDFLanguages.TTL);
-        String virtuosoEndpoint = Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoCrudEndpoint);
+        String virtuosoEndpoint = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_CRUD_ENDPOINT);
 
         builder.resource(virtuosoEndpoint + "/service")
                 .resource(SD.namedGraph)

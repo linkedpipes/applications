@@ -136,7 +136,7 @@ public class HandlerMethodIntrospector extends RequestMappingHandlerMapping {
                 throw new IllegalStateException("Some required request params were not assigned a value: " + quotedJoinedParams);
             }
 
-            String hostUri = Application.getConfig().getString(ApplicationPropertyKeys.HostUrl);
+            String hostUri = Application.getConfig().getString(ApplicationPropertyKeys.HOST_URL);
             String methodUriPath = methodInfo.getUriPattern();
             return new DefaultUriBuilderFactory()
                     .uriString(hostUri + methodUriPath)

@@ -2,26 +2,15 @@
 import React, { PureComponent } from 'react';
 import { UserProfilePage } from './UserProfilePageComponent';
 import { connect } from 'react-redux';
-import {
-  withAuthorization,
-  GlobalUtils,
-  GoogleAnalyticsWrapper,
-  Log
-} from '@utils';
+import { withAuthorization, GlobalUtils, Log } from '@utils';
 
 type Props = {
   userProfile: Object,
   history: Object,
-  resetReduxStore: Function,
-  location: Object
+  resetReduxStore: Function
 };
 
 class UserProfilePageContainer extends PureComponent<Props> {
-  componentDidMount() {
-    const page = this.props.location.pathname;
-    GoogleAnalyticsWrapper.trackPage(page);
-  }
-
   performLogout = async () => {
     await this.props.resetReduxStore();
 
@@ -44,7 +33,11 @@ class UserProfilePageContainer extends PureComponent<Props> {
   performPasswordReset = async () => {
     const { webId } = this.props.userProfile;
 
-    const domain = GlobalUtils.urlDomain(webId);
+    let domain = GlobalUtils.urlDomain(webId);
+
+    if (domain.includes('lpsolid')) {
+      domain = `${domain}:8443`;
+    }
 
     const resetUrl = `https://${domain}/account/password/reset`;
 

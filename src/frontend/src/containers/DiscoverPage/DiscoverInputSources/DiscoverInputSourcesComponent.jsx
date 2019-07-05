@@ -1,8 +1,6 @@
 // @flow
 import React from 'react';
-import DiscoverExamplesContainer from './DiscoverExamplesContainer';
 import DiscoverSelectorContainer from './DiscoverSelectorContainer';
-import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 type Props = {
@@ -23,19 +21,10 @@ const DiscoverInputSourcesComponent = ({
   onNextClicked
 }: Props) => (
   <div className={classes.root}>
-    <Grid container spacing={3}>
-      <Grid item xs={8} sm={8}>
-        <DiscoverSelectorContainer
-          onInputExampleClicked={onInputExampleClicked}
-          onNextClicked={onNextClicked}
-        />
-      </Grid>
-      <Grid item xs={4} sm={4}>
-        <DiscoverExamplesContainer
-          onInputExampleClicked={onInputExampleClicked}
-        />
-      </Grid>
-    </Grid>
+    <DiscoverSelectorContainer
+      onInputExampleClicked={onInputExampleClicked}
+      onNextClicked={onNextClicked}
+    />
   </div>
 );
 

@@ -1,5 +1,4 @@
-package com.linkedpipes.lpa.backend.constants;
-
 /**
- * Miscellaneous constants.
+ * Miscellaneous shared constants.
  */
+package com.linkedpipes.lpa.backend.constants;

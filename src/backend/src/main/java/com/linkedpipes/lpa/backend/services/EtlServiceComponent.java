@@ -34,7 +34,7 @@ public class EtlServiceComponent implements EtlService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private static String dataSamplePipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DataSamplePipelineIri);
+    private static String dataSamplePipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_PIPELINE_IRI);
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -96,7 +96,7 @@ public class EtlServiceComponent implements EtlService {
 
     private class HttpActions {
 
-        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.EtlServiceUrl);
+        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.ETL_SERVICE_URL);
         private final String URL_EXECUTE_PIPELINE = urlFrom(URL_BASE, "executions");
         private final String URL_CREATE_PIPELINE = urlFrom(URL_BASE, "pipelines");
 
