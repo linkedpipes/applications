@@ -1,14 +1,15 @@
 package com.linkedpipes.lpa.backend.controllers;
 
-import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.services.*;
+import com.linkedpipes.lpa.backend.services.DiscoveryService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
+import com.linkedpipes.lpa.backend.services.TtlGenerator;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
-import org.apache.jena.riot.Lang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -64,12 +65,14 @@ public class DiscoveryController {
     }
 
     /**
-     * Start discovery of pipelines from received RDF data
-     * @param rdfFile main RDF data file
+     * Start discovery of pipelines from received RDF data.
+     *
+     * @param webId          the logged-in user's web ID
+     * @param rdfFile        main RDF data file
      * @param dataSampleFile data sample for main file
-     * @param webId
-     * @return
-     * @throws LpAppsException
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
+     * @throws IOException if an I/O error occurs
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
@@ -95,19 +98,20 @@ public class DiscoveryController {
 
     /**
      * Start discovery of pipelines using data referenced by IRI
-     * @param rdfFileIri IRI referencing a file with RDF data
-     * @param dataSampleIri
-     * @param webId
-     * @return
-     * @throws LpAppsException
-     * @throws IOException reading RDF data from URI failed
+     *
+     * @param webId         the logged-in user's web ID
+     * @param rdfFileIri    IRI referencing a file with RDF data
+     * @param dataSampleIri IRI referencing a file containing a data sample for {@code rdfFileIri}
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
+     * @throws IOException if an I/O error occurs
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
                                                                 @NotNull @RequestParam(value = "rdfInputIri") String rdfFileIri,
                                                                 @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException, IOException {
-        if (rdfFileIri == null || rdfFileIri.isEmpty()) {
+        if (rdfFileIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF file IRI not provided");
         }
 
@@ -125,12 +129,12 @@ public class DiscoveryController {
 
     /**
      * Start discovery of pipelines using data in SPARQL endpoint
-     * @param sparqlEndpointIri
-     * @param dataSampleIri
-     * @param namedGraphs
-     * @param webId
-     * @return
-     * @throws LpAppsException
+     * @param sparqlEndpointIri IRI of the SPARQL endpoint containing the data
+     * @param dataSampleIri     IRI of the file containing a data sample of the data contained in {@code sparqlEndpointIri}
+     * @param webId             the logged-in user's web ID
+     * @param namedGraphs       a list of the named graphs in {@code sparqlEndpointIri} to query
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
@@ -158,10 +162,11 @@ public class DiscoveryController {
     }
 
     /**
-     * Get pipelines found for discovery, grouped by visualizer
-     * @param discoveryId
-     * @return
-     * @throws LpAppsException
+     * Get pipelines found for discovery, grouped by visualizer.
+     *
+     * @param discoveryId id of the Discovery to get pipeline groups from
+     * @return pipelines grouped by visualizer
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     @GetMapping("/api/discovery/{id}/pipelineGroups")
     public ResponseEntity<PipelineGroups> getPipelineGroups(@NotNull @PathVariable("id") String discoveryId) throws LpAppsException {

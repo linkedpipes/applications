@@ -1,6 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { UserProfileButtonComponent } from './UserProfileButtonComponent';
+import { HeaderControlsComponent } from './HeaderControlsComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -10,13 +10,14 @@ type Props = {
   history: Object,
   resetReduxStore: Function,
   handleSetInboxDialogState: Function,
-  currentInboxInvitations: Array<Object>
+  currentInboxInvitations: Array<Object>,
+  onDrawerToggle: Function
 };
 
 type State = {
   anchorElement: Object
 };
-class UserProfileButtonContainer extends PureComponent<Props, State> {
+class HeaderControlsContainer extends PureComponent<Props, State> {
   state = {
     anchorElement: null
   };
@@ -52,11 +53,6 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
     this.setState({ anchorElement: null });
   };
 
-  handleOpenProfile = () => {
-    this.props.history.push('/profile');
-    this.handleMenuClose();
-  };
-
   handleOpenSettings = () => {
     this.props.history.push('/settings');
     this.handleMenuClose();
@@ -73,32 +69,31 @@ class UserProfileButtonContainer extends PureComponent<Props, State> {
       handleMenuClose,
       handleMenuOpen,
       handleLogout,
-      handleOpenProfile,
       handleOpenSettings,
       handleSetInboxDialogOpen
     } = this;
-    const { currentInboxInvitations } = this.props;
+    const { currentInboxInvitations, onDrawerToggle } = this.props;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
-      <UserProfileButtonComponent
+      <HeaderControlsComponent
         profileMenuIsOpen={profileMenuIsOpen}
         anchorElement={anchorElement}
         onHandleMenuOpen={handleMenuOpen}
         onHandleMenuClose={handleMenuClose}
         onHandleLogoutClicked={handleLogout}
-        onHandleOpenProfile={handleOpenProfile}
         onHandleOpenSettings={handleOpenSettings}
         onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
         currentInboxInvitations={currentInboxInvitations}
+        onDrawerToggle={onDrawerToggle}
       />
     );
   }
 }
 
-const UserProfileButtonContainerWithSockets = props => (
+const HeaderControlsContainerWithSockets = props => (
   <SocketContext.Consumer>
-    {socket => <UserProfileButtonContainer {...props} socket={socket} />}
+    {socket => <HeaderControlsContainer {...props} socket={socket} />}
   </SocketContext.Consumer>
 );
 
@@ -124,4 +119,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(UserProfileButtonContainerWithSockets));
+)(withRouter(HeaderControlsContainerWithSockets));

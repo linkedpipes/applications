@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public final class JenaUtils {
 
-    private static final String ENDPOINT = Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint);
+    private static final String ENDPOINT = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT);
 
     public static <R> R withQueryExecution(Query query, Function<QueryExecution, R> action) throws LpAppsException {
         List<String> graphNames = query.getGraphURIs();

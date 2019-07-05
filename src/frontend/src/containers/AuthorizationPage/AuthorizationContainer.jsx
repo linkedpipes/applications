@@ -1,7 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { AuthorizationComponent } from './AuthorizationComponent';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
@@ -9,7 +9,7 @@ import Particles from 'react-particles-js';
 
 const providers = {
   // Inrupt: 'https://inrupt.net/auth',
-  'Solid Community': 'https://solid.community/auth',
+  'LinkedPipes PODs': 'https://lpsolid.eu:8443/auth',
   '': ''
 };
 
@@ -156,7 +156,6 @@ class Authorization extends PureComponent<Props, State> {
           providerTitle={providerTitle}
           handleProviderChange={handleProviderChange}
         />
-        <ToastContainer />
       </div>
     );
   }

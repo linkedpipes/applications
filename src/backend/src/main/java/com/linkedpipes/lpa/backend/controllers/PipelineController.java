@@ -6,11 +6,7 @@ import com.linkedpipes.lpa.backend.entities.profile.PipelineExecution;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.PipelineNotFoundException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.services.DiscoveryService;
-import com.linkedpipes.lpa.backend.services.ExecutorService;
-import com.linkedpipes.lpa.backend.services.PipelineExportService;
-import com.linkedpipes.lpa.backend.services.UserService;
-import com.linkedpipes.lpa.backend.services.ScheduledExecutionService;
+import com.linkedpipes.lpa.backend.services.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +46,12 @@ public class PipelineController {
     }
 
     /**
-     * Call discovery service to export pipeline to ETL
-     * @param discoveryId
-     * @param pipelineUri
-     * @return
-     * @throws LpAppsException
+     * Call Discovery service to export pipeline to ETL.
+     *
+     * @param discoveryId the ID of the Discovery to export the pipeline from
+     * @param pipelineUri the URI of the pipeline to export
+     * @return the result of the export operation
+     * @throws LpAppsException if the export fails for any reason
      */
     @GetMapping("/api/pipeline/export")
     public ResponseEntity<PipelineExportResult> exportPipeline(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
@@ -63,11 +60,12 @@ public class PipelineController {
 
     /**
      * Call discovery service to export pipeline to ETL, passing it the service description of our Virtuoso database
-     * for future use when storing pipeline execution results
-     * @param discoveryId
-     * @param pipelineUri
-     * @return
-     * @throws LpAppsException
+     * for future use when storing pipeline execution results.
+     *
+     * @param discoveryId the ID of the Discovery to export the pipeline from
+     * @param pipelineUri the URI of the pipeline to export
+     * @return the result of the export operation
+     * @throws LpAppsException if the export fails for any reason
      */
     @GetMapping("/api/pipeline/exportWithSD")
     public ResponseEntity<PipelineExportResult> exportPipelineWithSD(@NotNull @RequestParam(value = "discoveryId") String discoveryId, @NotNull @RequestParam(value = "pipelineUri") String pipelineUri) throws LpAppsException {
@@ -89,7 +87,6 @@ public class PipelineController {
         }
     }
 
-    @NotNull
     @PostMapping("/api/pipeline/repeat")
     public void executePipeline(@RequestParam(value="frequencyHours") long frequencyHours,
                                 @NotNull @RequestParam(value="webId") String webId,
@@ -106,8 +103,7 @@ public class PipelineController {
     @NotNull
     @PutMapping("/api/pipeline/repeat")
     public void executePipeline(@NotNull @RequestParam(value="repeat") boolean repeat,
-                                @NotNull @RequestParam(value="executionIri") String executionIri)
-                                throws LpAppsException {
+                                @NotNull @RequestParam(value = "executionIri") String executionIri) {
         scheduledExecutionService.stopScheduledExecution(repeat, executionIri);
     }
 
