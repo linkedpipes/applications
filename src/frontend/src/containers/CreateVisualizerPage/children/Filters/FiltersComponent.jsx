@@ -90,7 +90,7 @@ class FiltersComponent extends React.Component<Props, State> {
             name={filterLabel}
           />
         );
-      case 'MAP_SCHEME_FILTER':
+      case 'MAP_SCHEMES_FILTER':
         return (
           <MapSchemeFilterComponent
             editingMode={this.props.editingMode}

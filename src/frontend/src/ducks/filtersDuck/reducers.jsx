@@ -9,6 +9,19 @@ const INITIAL_STATE = {
 
 const filtersReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case types.SET_SELECTED_MAP_OPTIONS:
+      return {
+        filtersState: {
+          ...state.filtersState,
+          filterGroups: {
+            ...state.filtersState.filterGroups,
+            mapFilters: {
+              ...state.filtersState.filterGroups.mapFilters,
+              filters: action.filters
+            }
+          }
+        }
+      };
     case types.SET_SELECTED_SCHEME:
       return {
         filtersState: {
@@ -98,12 +111,12 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
               enabled: true,
               visible: true,
               filterGroups: {
-                nodesFilter: {
+                mapFilters: {
                   label: 'Schemes',
                   enabled: true,
                   visible: true,
-                  filterType: 'MAP_SCHEME_FILTER',
-                  options: []
+                  filterType: 'MAP_SCHEMES_FILTER',
+                  filters: []
                 }
               }
             }

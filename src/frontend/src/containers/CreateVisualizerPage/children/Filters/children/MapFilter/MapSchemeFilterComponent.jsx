@@ -12,6 +12,10 @@ import Switch from '@material-ui/core/Switch';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -143,20 +147,12 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
           filters
         },
         () => {
-          this.props.onApplyFilter(
-            this.props.name,
-            this.state.nodes,
-            this.props.editingMode
-          );
+          this.props.onApplyFilter(this.state.filters);
         }
       );
     } else {
       // Dispatch setNodes
-      this.props.onApplyFilter(
-        this.props.name,
-        this.state.nodes,
-        this.props.editingMode
-      );
+      this.props.onApplyFilter(this.state.filters);
     }
     // Register callback
     this.props.registerCallback(this.handleApplyFilter);
@@ -167,11 +163,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   };
 
   handleApplyFilter = async () => {
-    await this.props.onApplyFilter(
-      this.props.name,
-      this.state.filters,
-      this.props.editingMode
-    );
+    await this.props.onApplyFilter(this.state.filters);
   };
 
   handleChange = ({ filterUri, optionUri }) => event => {
@@ -234,10 +226,8 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = (filterName, nodes, isEditing) =>
-    dispatch(
-      filtersActions.setSelectedNodesWithSolid(filterName, nodes, isEditing)
-    );
+  const onApplyFilter = filters =>
+    dispatch(filtersActions.setSelectedMapOptions(filters));
   return {
     onApplyFilter
   };
