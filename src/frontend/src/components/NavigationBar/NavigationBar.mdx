@@ -4,7 +4,7 @@ menu: Components
 ---
 
 import { Playground, Props } from 'docz';
-import { NavigationBarComponentDemo } from './NavigationBarComponent';
+import { NavigationBarDemo } from './NavigationBarContainer';
 
 # NavigationBar
 
@@ -12,20 +12,19 @@ NavigationBar is a component used in the header of LinkedPipes Applications fron
 
 # Structure
 
-`NavigationBar` component exported from `NavigationBar` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+`NavigationBar` component exported from `NavigationBar` folder is represented by a react `PureComponent`.
 
 ```.md
-├── NavigationBarComponent.jsx # Stateless react component, responsible for ui
-├── NavigationBarContainer.jsx # React PureComponent, responsible for states
+├── NavigationBarContainer.jsx # React PureComponent, responsible for states and UI
 └── index.js
 ```
 
 ## Properties
 
-<Props of={NavigationBarComponentDemo} />
+<Props of={NavigationBarDemo} />
 
 ## Example
 
 <Playground>
-  <NavigationBarComponentDemo />
+  <NavigationBarDemo />
 </Playground>

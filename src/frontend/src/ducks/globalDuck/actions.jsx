@@ -35,10 +35,45 @@ const setLightColorTheme = isLight => {
   };
 };
 
-const setSelectedHomepageTabIndex = tabIndex => {
+const setSelectedDashboardTabIndex = tabIndex => {
   return {
-    type: types.SET_SELECTED_HOMEPAGE_TAB_INDEX,
+    type: types.SET_SELECTED_DASHBOARD_TAB_INDEX,
     value: tabIndex
+  };
+};
+
+const setSelectedDiscverTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_DISCOVER_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setSelectedApplicationSetupTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_APPLICATION_SETUP_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setSelectedApplicationsBrowserTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_APPLICATIONS_BROWSER_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setSelectedSettingsTabIndex = tabIndex => {
+  return {
+    type: types.SET_SELECTED_SETTINGS_TAB_INDEX,
+    value: tabIndex
+  };
+};
+
+const setMobileDrawerState = drawerState => {
+  return {
+    type: types.SET_MOBILE_DRAWER_STATE,
+    value: drawerState
   };
 };
 
@@ -47,6 +82,11 @@ export default {
   setAccessControlDialogState,
   setLightColorTheme,
   setChooseFolderDialogState,
-  setSelectedHomepageTabIndex,
-  setInboxDialogState
+  setSelectedDashboardTabIndex,
+  setInboxDialogState,
+  setMobileDrawerState,
+  setSelectedDiscverTabIndex,
+  setSelectedApplicationSetupTabIndex,
+  setSelectedApplicationsBrowserTabIndex,
+  setSelectedSettingsTabIndex
 };
