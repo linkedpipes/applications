@@ -88,9 +88,7 @@ public class EtlServiceComponent implements EtlService {
         logger.info("Uploading data sample pipeline to ETL");
         try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
             String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
-            logger.info("Pipeline:\n" + sample);
             String response = httpActions.createDataSamplePipeline(sample);
-            logger.error("Got:\n"+response);
             dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
             logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
         }

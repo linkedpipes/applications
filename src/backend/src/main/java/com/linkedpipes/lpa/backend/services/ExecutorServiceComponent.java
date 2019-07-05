@@ -200,24 +200,28 @@ public class ExecutorServiceComponent implements ExecutorService {
 
         if (dataSampleIri == null) {
             //generate data sample from named graph here
-            logger.debug("Will execute data sample pipeline");
-            counter.compareAndSet(0, 1);
-            try {
-                FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR)); //make sure we have empty dir as we upload *.ttl to virtuoso
-            } catch (IOException ex) {
-                logger.warn("Failed to clean the shared folder before pipeline", ex);
-            }
-            Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
-            startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph, discoveryId));
-
-            DiscoverySession s = new DiscoverySession();
-            s.sessionId = discoveryId;
-            s.isFinished = false;
-            s.isFailed = false;
-            return s;
+            return runDataSamplePipeline(namedGraph, userId, discoveryId);
         } else {
             return startDiscoveryFromEndpoint(userId, discoveryId, Application.getConfig().getString(ApplicationPropertyKeys.VirtuosoQueryEndpoint), dataSampleIri, Arrays.asList(namedGraph));
         }
+    }
+
+    private DiscoverySession runDataSamplePipeline(final String namedGraph, final String userId, long discoveryId) {
+        logger.debug("Will execute data sample pipeline");
+        counter.compareAndSet(0, 1);
+        try {
+            FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR)); //make sure we have empty dir as we upload *.ttl to virtuoso
+        } catch (IOException ex) {
+            logger.warn("Failed to clean the shared folder before pipeline", ex);
+        }
+        Execution dsPipe = etlService.executeDataSamplePipeline(namedGraph);
+        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, namedGraph, discoveryId));
+
+        DiscoverySession s = new DiscoverySession();
+        s.sessionId = discoveryId;
+        s.isFinished = false;
+        s.isFailed = false;
+        return s;
     }
 
     private IExecutionCallback getSampleCallback(final String userId, final String namedGraph, final long discoveryId) {
