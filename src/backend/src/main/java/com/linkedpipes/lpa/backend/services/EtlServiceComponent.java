@@ -75,7 +75,7 @@ public class EtlServiceComponent implements EtlService {
     }
 
     @PostConstruct
-    public void uploadDataSamplePipeline() throws LpAppsException, IOException, InterruptedException {
+    public void uploadDataSamplePipeline() throws IOException, InterruptedException {
         logger.info("Waiting for ETL to start");
         while (true) {
             try {
@@ -86,11 +86,15 @@ public class EtlServiceComponent implements EtlService {
             }
         }
         logger.info("Uploading data sample pipeline to ETL");
-        try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
-            String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
-            String response = httpActions.createDataSamplePipeline(sample);
-            dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
-            logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+        try {
+            try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
+                String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
+                String response = httpActions.createDataSamplePipeline(sample);
+                dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
+                logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+            }
+        } catch (LpAppsException e) {
+            logger.error("Failed to upload data sample pipeline to ETL", e);
         }
     }
 
