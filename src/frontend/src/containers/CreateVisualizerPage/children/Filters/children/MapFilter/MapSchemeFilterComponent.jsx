@@ -9,21 +9,47 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Switch from '@material-ui/core/Switch';
-import uuid from 'uuid';
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Divider from '@material-ui/core/Divider';
 
 type Props = {
   selectedResultGraphIri: string,
   classes: {
     progress: number,
     formControl: string,
-    selectEmpty: string
+    selectEmpty: string,
+    formControl: {
+      margin: number,
+      minWidth: number,
+      display: string
+    },
+    selectEmpty: {
+      marginTop: number
+    },
+    panelDetails: {
+      display: string
+    },
+    formGroup: {
+      display: string
+    },
+    option: {
+      display: string
+    },
+    divider: {
+      marginBottom: string
+    }
   },
-  nodes: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
+  filters: Array<{
+    filterUri: string,
+    filterLabel: string,
+    options: Array<{
+      uri: string,
+      label: string,
+      selected: boolean,
+      enabled: boolean,
+      visible: boolean
+    }>
   }>,
   onApplyFilter: Function,
   editingMode: boolean,
@@ -32,24 +58,61 @@ type Props = {
 };
 
 type State = {
-  nodes: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
+  filters: Array<{
+    filterUri: string,
+    filterLabel: string,
+    options: Array<{
+      uri: string,
+      label: string,
+      selected: boolean,
+      enabled: boolean,
+      visible: boolean
+    }>
   }>
 };
 
 const styles = theme => ({
   formControl: {
     margin: theme.spacing(),
-    minWidth: 100
+    minWidth: 100,
+    display: 'block'
   },
   selectEmpty: {
     marginTop: theme.spacing(2)
+  },
+  panelDetails: {
+    display: 'block'
+  },
+  formGroup: {
+    display: 'block'
+  },
+  option: {
+    display: 'block'
+  },
+  divider: {
+    marginBottom: '1rem'
   }
 });
+
+const processProperties = propertiesResponse => {
+  const filters = propertiesResponse;
+  return Object.entries(filters)
+    .map(entry => {
+      const topUri = entry[0];
+      return Object.entries(entry[1]).map(entry2 => ({
+        filterUri: topUri,
+        filterLabel: entry2[1].schemeLabel.languageMap.cs,
+        options: Object.entries(entry2[1].concepts).map(entry3 => ({
+          uri: entry3[0],
+          label: entry3[1].languageMap.cs,
+          selected: true,
+          visible: true,
+          enabled: true
+        }))
+      }));
+    })
+    .flat();
+};
 
 class MapSchemeFilterComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
@@ -61,32 +124,23 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
     (this: any).handleChange = this.handleChange.bind(this);
     // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: this.props.nodes || []
+      filters: this.props.filters || []
     };
   }
 
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (this.props.editingMode && !this.state.nodes.length) {
-      let nodes = [];
+    if (true) {
+      let filters = [];
       const getNodesResponse = await VisualizersService.getProperties(
         this.props.selectedResultGraphIri
       );
-      // node.label.languageMap.nolang
-      nodes = (getNodesResponse.data || []).map(node => ({
-        ...node,
-        uri: node.schemeUri,
-        label: node.label.languageMap.cs,
-        visible: true,
-        enabled: true,
-        selected: true
-      }));
-
+      filters = processProperties(getNodesResponse.data.filters);
       // Dispatch setNodes
       this.setState(
         {
-          nodes
+          filters
         },
         () => {
           this.props.onApplyFilter(
@@ -104,7 +158,6 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
         this.props.editingMode
       );
     }
-
     // Register callback
     this.props.registerCallback(this.handleApplyFilter);
   }
@@ -116,62 +169,65 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   handleApplyFilter = async () => {
     await this.props.onApplyFilter(
       this.props.name,
-      this.state.nodes,
+      this.state.filters,
       this.props.editingMode
     );
   };
 
-  handleChange = uri => event => {
+  handleChange = ({ filterUri, optionUri }) => event => {
     if (this.isMounted) {
       const checked = event.target.checked;
       this.setState(prevState => ({
-        nodes: prevState.nodes.map(node => {
-          if (node.uri === uri) {
-            return { ...node, selected: checked };
+        filters: prevState.filters.map(filter => {
+          if (filter.filterUri === filterUri) {
+            return {
+              ...filter,
+              options: filter.options.map(option => {
+                if (option.uri === optionUri) {
+                  return { ...option, selected: checked };
+                }
+                return option;
+              })
+            };
           }
-          return node;
+          return filter;
         })
       }));
     }
   };
 
   render() {
+    const { classes } = this.props;
+
     return (
-      <ExpansionPanelDetails>
-        <FormGroup row>
-          {this.state.nodes.map(node => (
-            <span key={node.uri}>
-              <FormControlLabel
-                key={uuid.v4()}
-                control={
-                  <Checkbox
-                    value={node.uri}
-                    checked={node.selected}
-                    onChange={this.handleChange(node.uri)}
-                  />
-                }
-                label={node.label}
-                disabled={!node.enabled}
-              />
-              {this.props.editingMode && (
-                <span>
+      <ExpansionPanelDetails className={classes.panelDetails}>
+        {this.state.filters.map(filter => (
+          <div key={filter.filterLabel}>
+            <FormControl row className={classes.formControl}>
+              <FormLabel component="legend">{filter.filterLabel}</FormLabel>
+              <FormGroup row className={classes.formGroup}>
+                {filter.options.map(option => (
                   <FormControlLabel
                     control={
-                      <Switch checked value="checkedA" color="primary" />
+                      <Checkbox
+                        onChange={this.handleChange({
+                          filterUri: filter.filterUri,
+                          optionUri: option.uri
+                        })}
+                        checked={option.selected}
+                        value={option}
+                      />
                     }
-                    label="Enabled"
+                    label={option.label}
+                    className={classes.option}
+                    key={option.uri}
                   />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Visible"
-                  />
-                </span>
-              )}
-            </span>
-          ))}
-        </FormGroup>
+                ))}
+              </FormGroup>
+            </FormControl>
+            <Divider className={classes.divider} variant="middle" />
+          </div>
+        ))}
       </ExpansionPanelDetails>
     );
   }
