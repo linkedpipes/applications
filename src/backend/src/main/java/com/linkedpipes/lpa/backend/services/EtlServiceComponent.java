@@ -74,7 +74,7 @@ public class EtlServiceComponent implements EtlService {
          return OBJECT_MAPPER.readValue(response, Execution.class);
     }
 
-    /*@PostConstruct
+    @PostConstruct
     public void uploadDataSamplePipeline() throws LpAppsException, IOException, InterruptedException {
         logger.info("Waiting for ETL to start");
         while (true) {
@@ -94,7 +94,7 @@ public class EtlServiceComponent implements EtlService {
             dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
             logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
         }
-    }*/
+    }
 
     private class HttpActions {
 
