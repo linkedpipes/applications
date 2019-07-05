@@ -5,7 +5,6 @@ import { ApplicationHeaderComponent } from './ApplicationHeaderComponent';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
-  onDrawerToggle: Function,
   handleSetApplicationSetupTabIndex: Function,
   applicationSetupTabIndex: Number
 };
@@ -20,12 +19,11 @@ class ApplicationHeaderContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { onDrawerToggle, applicationSetupTabIndex } = this.props;
+    const { applicationSetupTabIndex } = this.props;
     const { handleTabChange } = this;
 
     return (
       <ApplicationHeaderComponent
-        onDrawerToggle={onDrawerToggle}
         applicationSetupTabIndex={applicationSetupTabIndex}
         sectionLabel={sectionLabel}
         tabTitles={tabTitle}

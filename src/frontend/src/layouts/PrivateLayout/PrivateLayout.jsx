@@ -70,7 +70,11 @@ const PrivateLayout = ({
             </Hidden>
           </nav>
           <div className={classes.appContent}>
-            <HeaderControls />
+            <HeaderControls
+              onDrawerToggle={() => {
+                handleSetMobileDrawerState(!drawerState);
+              }}
+            />
             {HeaderComponent !== undefined && <HeaderComponent />}
             <main className={classes.mainContent}>
               <Component {...matchProps} />

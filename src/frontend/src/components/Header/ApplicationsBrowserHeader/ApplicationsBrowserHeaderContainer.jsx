@@ -5,7 +5,6 @@ import { ApplicationsBrowserHeaderComponent } from './ApplicationsBrowserHeaderC
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
-  onDrawerToggle: Function,
   handleSetApplicationsBrowserTabIndex: Function,
   applicationsBrowserTabIndex: Number
 };
@@ -23,12 +22,11 @@ class ApplicationsBrowserContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { onDrawerToggle, applicationsBrowserTabIndex } = this.props;
+    const { applicationsBrowserTabIndex } = this.props;
     const { handleTabChange } = this;
 
     return (
       <ApplicationsBrowserHeaderComponent
-        onDrawerToggle={onDrawerToggle}
         applicationsBrowserTabIndex={applicationsBrowserTabIndex}
         sectionLabel={sectionLabel}
         tabTitles={tabTitle}

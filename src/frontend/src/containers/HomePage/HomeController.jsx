@@ -56,7 +56,7 @@ type State = {
   loadingAppIsActive: boolean
 };
 
-class HomeContainer extends PureComponent<Props, State> {
+class HomeController extends PureComponent<Props, State> {
   isMounted = false;
 
   didLoadInitialMetadata = false;
@@ -424,9 +424,9 @@ class HomeContainer extends PureComponent<Props, State> {
   }
 }
 
-const HomeContainerWithSocket = props => (
+const HomeControllerWithSocket = props => (
   <SocketContext.Consumer>
-    {socket => <HomeContainer {...props} socket={socket} />}
+    {socket => <HomeController {...props} socket={socket} />}
   </SocketContext.Consumer>
 );
 
@@ -507,5 +507,5 @@ export const HomePage = withAuthorization(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(HomeContainerWithSocket)
+  )(HomeControllerWithSocket)
 );

@@ -47,7 +47,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
     let domain = GlobalUtils.urlDomain(webId);
 
     if (domain.includes('lpsolid')) {
-      domain = `${domain}:8443}`;
+      domain = `${domain}:8443`;
     }
 
     const resetUrl = `https://${domain}/account/password/reset`;

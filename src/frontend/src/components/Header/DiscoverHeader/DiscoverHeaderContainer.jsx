@@ -5,7 +5,6 @@ import { DiscoverHeaderComponent } from './DiscoverHeaderComponent';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
-  onDrawerToggle: Function,
   handleSetDiscoverTabIndex: Function,
   discoverTabIndex: Number
 };
@@ -20,12 +19,11 @@ class DiscoverHeaderContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { onDrawerToggle, discoverTabIndex } = this.props;
+    const { discoverTabIndex } = this.props;
     const { handleTabChange } = this;
 
     return (
       <DiscoverHeaderComponent
-        onDrawerToggle={onDrawerToggle}
         discoverTabIndex={discoverTabIndex}
         sectionLabel={sectionLabel}
         tabTitles={tabTitle}

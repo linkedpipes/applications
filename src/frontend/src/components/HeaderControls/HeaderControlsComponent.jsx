@@ -56,7 +56,8 @@ type Props = {
   onHandleOpenProfile: Function,
   onHandleOpenSettings: Function,
   onHandleSetInboxDialogOpen: Function,
-  currentInboxInvitations: Array<Object>
+  currentInboxInvitations: Array<Object>,
+  onDrawerToggle: Function
 };
 
 const HeaderControls = ({
@@ -69,7 +70,8 @@ const HeaderControls = ({
   onHandleOpenProfile,
   onHandleOpenSettings,
   onHandleSetInboxDialogOpen,
-  currentInboxInvitations
+  currentInboxInvitations,
+  onDrawerToggle
 }: Props) => (
   <React.Fragment>
     <AppBar color="primary" position="sticky" elevation={0}>
@@ -80,7 +82,7 @@ const HeaderControls = ({
               <IconButton
                 color="inherit"
                 aria-label="Open drawer"
-                // onClick={onDrawerToggle}
+                onClick={onDrawerToggle}
                 className={classes.menuButton}
               >
                 <MenuIcon />

@@ -5,7 +5,6 @@ import { DashboardHeaderComponent } from './DashboardHeaderComponent';
 import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
-  onDrawerToggle: Function,
   handleSetDashboardTabIndex: Function,
   dashboardTabIndex: Number
 };
@@ -24,12 +23,11 @@ class DashboardHeaderContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { onDrawerToggle, dashboardTabIndex } = this.props;
+    const { dashboardTabIndex } = this.props;
     const { handleTabChange } = this;
 
     return (
       <DashboardHeaderComponent
-        onDrawerToggle={onDrawerToggle}
         dashboardTabIndex={dashboardTabIndex}
         sectionLabel={sectionLabel}
         tabTitles={tabTitle}

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // @flow
 import React, { PureComponent } from 'react';
 import DiscoverExamplesComponent from './DiscoverExamplesComponent';
