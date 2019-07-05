@@ -97,6 +97,7 @@ public class UserServiceComponent implements UserService {
                                  @Nullable final String dataSampleIri,
                                  @Nullable final List<String> namedGraphs)
                                  throws UserNotFoundException {
+        DiscoveryDao out = null;
         for (DiscoveryDao d : discoveryRepository.findById(dbId)) {
             d.setDiscoveryStarted(discoveryId, new Date());
             d.setSparqlEndpointIri(sparqlEndpointIri);
@@ -110,9 +111,10 @@ public class UserServiceComponent implements UserService {
                 }
             }
             discoveryRepository.save(d);
-            return d;
+            out = d;
+            break;
         }
-        return null;
+        return out;
     }
 
 

@@ -1,7 +1,5 @@
 package com.linkedpipes.lpa.backend.util;
 
-import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
-import com.typesafe.config.Config;
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.client.GitHubClient;
