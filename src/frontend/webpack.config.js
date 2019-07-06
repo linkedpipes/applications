@@ -11,7 +11,8 @@ module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
     template: path.join(__dirname, './src/index.html'),
     filename: 'index.html',
-    inject: 'body'
+    inject: 'body',
+    title: 'Caching'
   });
 
   const plugins = [
@@ -44,8 +45,14 @@ module.exports = () => {
     entry: [path.join(__dirname, '/src/index.jsx')],
     output: {
       path: path.join(__dirname, '/public'),
-      filename: '[name].bundle.js',
-      chunkFilename: '[name].bundle.js'
+      filename:
+        process.env.NODE_ENV !== 'production'
+          ? '[name].[hash].js'
+          : '[name].[contenthash].js',
+      chunkFilename:
+        process.env.NODE_ENV !== 'production'
+          ? '[name].[hash].js'
+          : '[name].[chunkhash].js'
     },
     resolve: {
       extensions: ['.mjs', '.js', '.jsx', '.mdx'],
@@ -93,8 +100,15 @@ module.exports = () => {
       ]
     },
     optimization: {
+      runtimeChunk: 'single',
       splitChunks: {
-        chunks: 'all'
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all'
+          }
+        }
       }
     },
     devtool: dev ? 'inline-source-map' : 'source-map',
