@@ -19,8 +19,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import AcceptIcon from '@material-ui/icons/CheckTwoTone';
 import DeclineIcon from '@material-ui/icons/NotInterestedTwoTone';
-import { Log } from '@utils';
 import uuid from 'uuid';
+import { Log } from '@utils';
 
 const styles = theme => ({
   root: {
