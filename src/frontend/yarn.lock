@@ -4022,7 +4022,6 @@ bitcore-lib@^0.13.7:
 
 "bitcore-message@github:CoMakery/bitcore-message#dist":
   version "1.0.2"
-  uid "8799cc327029c3d34fc725f05b2cf981363f6ebf"
   resolved "https://codeload.github.com/CoMakery/bitcore-message/tar.gz/8799cc327029c3d34fc725f05b2cf981363f6ebf"
   dependencies:
     bitcore-lib "^0.13.7"

@@ -40,11 +40,7 @@ const DiscoverPipelinesExecutorComponent = ({
           labelText={loaderLabelText}
         />
       ) : (
-        <LinearLoader
-          className={classes.loader}
-          variant={'query'}
-          labelText={loaderLabelText}
-        />
+        <LinearLoader className={classes.loader} labelText={loaderLabelText} />
       )}
     </CardContent>
   </Card>

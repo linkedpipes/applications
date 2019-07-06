@@ -77,19 +77,19 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     } = this;
     const { selectedDiscovery, open } = this.state;
     return (
-      <div>
+      <React.Fragment>
+        <DiscoveryInformationDialog
+          selectedValue={selectedDiscovery}
+          open={open}
+          onClose={handleClose}
+        />
         <DiscoveriesTableComponent
           discoveriesList={discoveriesList}
           onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
           onHandleDiscoveryRowClicked={handleDiscoveryRowClicked}
           onHandleDiscoveryRowDeleteClicked={handleDiscoveryRowDeleteClicked}
         />
-        <DiscoveryInformationDialog
-          selectedValue={selectedDiscovery}
-          open={open}
-          onClose={handleClose}
-        />
-      </div>
+      </React.Fragment>
     );
   }
 }

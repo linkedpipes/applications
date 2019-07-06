@@ -21,7 +21,6 @@ import {
   CreateVisualizerPage,
   AuthorizationPage,
   ApplicationPage,
-  UserProfilePage,
   SettingsPage
 } from '@containers';
 
@@ -47,14 +46,10 @@ const stopSocketClient = () => {
 };
 
 const styles = () => ({
-  root: {
-    display: 'flex',
-    height: '100vh'
-  }
+  root: {}
 });
 
 type Props = {
-  classes: any,
   webId: ?string,
   // eslint-disable-ne
   handleSetSolidUserProfileAsync: Function,
@@ -401,71 +396,73 @@ class AppRouter extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, webId } = this.props;
+    const { webId } = this.props;
     return (
-      <div>
-        <ErrorBoundary onError={errorHandler(webId)}>
-          <BrowserRouter>
-            <div className={classes.root}>
-              <SocketContext.Provider value={socket}>
-                <Switch>
-                  <PublicLayout
-                    component={AuthorizationPage}
-                    path="/login"
-                    exact
-                  />
+      <ErrorBoundary onError={errorHandler(webId)}>
+        <BrowserRouter>
+          <SocketContext.Provider value={socket}>
+            <Switch>
+              <PublicLayout component={AuthorizationPage} path="/login" exact />
 
-                  <PrivateLayout path="/dashboard" component={HomePage} exact />
+              <PrivateLayout
+                path="/dashboard"
+                component={HomePage}
+                headerComponent={DashboardHeader}
+                exact
+              />
 
-                  <PrivateLayout
-                    path="/create-app"
-                    component={CreateVisualizerPage}
-                    exact
-                  />
+              <PrivateLayout
+                path="/create-app"
+                component={CreateVisualizerPage}
+                headerComponent={ApplicationHeader}
+                exact
+              />
 
-                  <PrivateLayout
-                    path="/discover"
-                    component={DiscoverPage}
-                    exact
-                  />
+              <PrivateLayout
+                path="/discover"
+                component={DiscoverPage}
+                headerComponent={DiscoverHeader}
+                exact
+              />
 
-                  <PrivateLayout
-                    path="/profile"
-                    component={UserProfilePage}
-                    exact
-                  />
+              <PrivateLayout
+                path="/settings"
+                component={SettingsPage}
+                headerComponent={SettingsHeader}
+                exact
+              />
 
-                  <PrivateLayout
-                    path="/settings"
-                    component={SettingsPage}
-                    exact
-                  />
+              <PrivateLayout
+                path="/about"
+                component={AboutPage}
+                headerComponent={AboutHeader}
+                exact
+              />
 
-                  <PrivateLayout path="/about" component={AboutPage} exact />
+              <PrivateLayout
+                path="/storage"
+                component={StoragePage}
+                headerComponent={ApplicationsBrowserHeader}
+                exact
+              />
 
-                  <PrivateLayout
-                    path="/storage"
-                    component={StoragePage}
-                    exact
-                  />
+              <Route path="/404" component={NotFoundPage} exact />
 
-                  <Route path="/404" component={NotFoundPage} exact />
+              <Route path="/map" component={ApplicationPage} />
 
-                  <Route path="/map" component={ApplicationPage} />
+              <Route path="/treemap" component={ApplicationPage} />
 
-                  <Route path="/treemap" component={ApplicationPage} />
+              <Route path="/chord" component={ApplicationPage} />
 
-                  <Route path="/chord" component={ApplicationPage} />
+              <Redirect from="/" to="/login" exact />
+              <Redirect to="/404" />
+            </Switch>
+            <StorageInboxDialog />
+          </SocketContext.Provider>
+        </BrowserRouter>
 
-                  <Redirect from="/" to="/login" exact />
-                  <Redirect to="/404" />
-                </Switch>
-                <StorageInboxDialog />
-              </SocketContext.Provider>
-            </div>
-          </BrowserRouter>
-        </ErrorBoundary>
-      </div>
+        <ToastContainer />
+      </ErrorBoundary>
     );
   }
 }

@@ -37,7 +37,11 @@ type Props = {
   rdfFile: Object,
   rdfDataSampleFile: Object,
   activeDiscoverTabIndex: Number,
-  handleSetActiveDiscoverTabIndex: Function
+  handleSetActiveDiscoverTabIndex: Function,
+  handleAddSelectedVisualizer: Function,
+  setPipelineExecutorStep: Function,
+  setPipelineSelectorStep: Function,
+  handleSetSelectedPipelineId: Function
 };
 
 type State = {
@@ -174,11 +178,16 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             action: 'Processed discovery : step 1'
           });
 
-          self.loadPipelineGroups(discoveryId).then(() => {
+          self.loadPipelineGroups(discoveryId).then(response => {
             self.setState({
               discoveryIsLoading: false
             });
-            onNextClicked();
+
+            if (response.length === 1) {
+              self.selectVisualizer(response[0]);
+            } else {
+              onNextClicked();
+            }
           });
         }
       }
@@ -198,8 +207,48 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       })
       .then(jsonResponse => {
         handleSetPipelineGroups(jsonResponse.pipelineGroups);
-        return jsonResponse;
+        return jsonResponse.pipelineGroups;
       });
+  };
+
+  addVisualizer = visualizerData => {
+    const { handleAddSelectedVisualizer } = this.props;
+    return new Promise(resolve => {
+      handleAddSelectedVisualizer(visualizerData);
+      resolve();
+    });
+  };
+
+  selectVisualizer = visualizerData => {
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'Discovery',
+      action: 'Automatically selected visualizer : step 2'
+    });
+
+    const { setPipelineSelectorStep } = this.props;
+
+    const dataSourceGroups = visualizerData.dataSourceGroups;
+
+    const self = this;
+
+    self.addVisualizer(visualizerData).then(() => {
+      if (dataSourceGroups.length === 1) {
+        self.handleSelectPipeline(dataSourceGroups[0]);
+      } else {
+        setPipelineSelectorStep();
+      }
+    });
+  };
+
+  handleSelectPipeline = datasourceAndPipelines => {
+    const { handleSetSelectedPipelineId, setPipelineExecutorStep } = this.props;
+    const pipelines = datasourceAndPipelines.pipelines;
+    pipelines.sort((a, b) => a.minimalIteration < b.minimalIteration);
+    const pipelineWithMinIterations = pipelines[0];
+    const pipelineId = pipelineWithMinIterations.id;
+
+    handleSetSelectedPipelineId(pipelineId);
+    setPipelineExecutorStep();
   };
 
   handleValidation = rawText => {
@@ -331,7 +380,8 @@ const mapStateToProps = state => {
     rdfFile: state.discover.rdfFile,
     rdfDataSampleFile: state.discover.rdfDataSampleFile,
     inputType: state.discover.inputType,
-    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex
+    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex,
+    visualizers: state.discovery.pipelineGroups
   };
 };
 
@@ -342,6 +392,15 @@ const mapDispatchToProps = dispatch => {
         id: discoveryId
       })
     );
+
+  const setPipelineSelectorStep = () =>
+    dispatch(discoverActions.setActiveStep(2));
+
+  const setPipelineExecutorStep = () =>
+    dispatch(discoverActions.setActiveStep(3));
+
+  const handleSetSelectedPipelineId = pipelineId =>
+    dispatch(etlActions.setPipelineIdAction(pipelineId));
 
   const handleSetPipelineGroups = pipelineGroups =>
     dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
@@ -374,6 +433,13 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setActiveDiscoverTabIndexAsync(tabIndex));
   };
 
+  const handleAddSelectedVisualizer = visualizerData =>
+    dispatch(
+      globalActions.addSelectedVisualizerAction({
+        data: visualizerData
+      })
+    );
+
   return {
     handleSetDiscoveryId,
     handleSetPipelineGroups,
@@ -384,7 +450,11 @@ const mapDispatchToProps = dispatch => {
     resetFieldsAndExamples,
     handleSetRdfFile,
     handleSetRdfDataSampleFile,
-    handleSetActiveDiscoverTabIndex
+    handleSetActiveDiscoverTabIndex,
+    handleAddSelectedVisualizer,
+    handleSetSelectedPipelineId,
+    setPipelineExecutorStep,
+    setPipelineSelectorStep
   };
 };
 

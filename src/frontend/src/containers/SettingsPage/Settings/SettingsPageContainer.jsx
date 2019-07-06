@@ -1,17 +1,16 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
 import { SettingsPageComponent } from './SettingsPageComponent';
-import { connect } from 'react-redux';
-import { globalActions } from '@ducks/globalDuck';
 import { StoragePickFolderDialog } from '@storage';
-import { withAuthorization, GoogleAnalyticsWrapper } from '@utils';
+import { connect } from 'react-redux';
+import { withAuthorization } from '@utils';
+import { globalActions } from '@ducks/globalDuck';
 
 type Props = {
   userProfile: Object,
   handleUpdateChooseFolderDialogState: Function,
   setColorTheme: Function,
-  colorThemeIsLight: Boolean,
-  location: Object
+  colorThemeIsLight: Boolean
 };
 
 class SettingsPage extends PureComponent<Props> {
@@ -19,11 +18,6 @@ class SettingsPage extends PureComponent<Props> {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
     (this: any).handleChangeColor = this.handleChangeColor.bind(this);
-  }
-
-  componentDidMount() {
-    const page = this.props.location.pathname;
-    GoogleAnalyticsWrapper.trackPage(page);
   }
 
   handleChangeFolder() {

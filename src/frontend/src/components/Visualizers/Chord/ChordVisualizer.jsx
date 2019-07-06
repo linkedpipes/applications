@@ -21,15 +21,16 @@ type Props = {
     visible: boolean,
     enabled: boolean,
     selected: boolean
-  }>
+  }>,
+  height: number,
+  width: number
 };
 
 type State = {
   dataLoadingStatus: string,
   matrix: Array<Array<any>>,
   groupColors: Array<string>,
-  groupLabels: Array<string>,
-  size: number
+  groupLabels: Array<string>
 };
 
 const styles = theme => ({
@@ -82,8 +83,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
       dataLoadingStatus: 'loading',
       matrix: [],
       groupColors: [],
-      groupLabels: [],
-      size: 150
+      groupLabels: []
     };
   }
 
@@ -129,11 +129,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           dataLoadingStatus: 'ready',
           matrix: matrixData,
           groupColors: colors,
-          groupLabels: labels,
-          size: Math.min(
-            this.elementVizDiv.clientHeight,
-            this.elementVizDiv.clientWidth
-          )
+          groupLabels: labels
         });
       } else {
         // Fetch data
@@ -155,11 +151,7 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           dataLoadingStatus: 'ready',
           matrix: matrixData,
           groupColors: colors,
-          groupLabels: labels,
-          size: Math.min(
-            this.elementVizDiv.clientHeight,
-            this.elementVizDiv.clientWidth
-          )
+          groupLabels: labels
         });
       }
     }
@@ -229,8 +221,8 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { theme } = this.props;
-    const size = Math.max(this.state.size, 150);
+    const { theme, height, width } = this.props;
+    const size = Math.max(150, Math.min(width, height) - 200);
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
     ) : (

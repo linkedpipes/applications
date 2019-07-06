@@ -20,10 +20,12 @@ public class MapVisualizerController {
     private static final Logger logger = LoggerFactory.getLogger(MapVisualizerController.class);
 
     /**
-     * Get markers for displaying on map
-     * @param graphIri
-     * @param mapQueryData
-     * @return
+     * Get markers for displaying on map.
+     *
+     * @param graphIri     IRI of the result graph present in the Virtuoso
+     * @param mapQueryData object containing filters to filter the markers by
+     * @return a list of map markers
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,

@@ -5,6 +5,7 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 from concurrent.futures import ThreadPoolExecutor
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 from selenium import webdriver
@@ -83,10 +84,7 @@ class UntitledTestCase(unittest.TestCase):
         desired_cap['project'] = self.pr_repo_title
 
         # self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        self.driver = webdriver.Remote(
-            command_executor='http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(self.browserstack_username,
-                                                                                    self.browserstack_access_key),
-            desired_capabilities=desired_cap)
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
         self.driver.implicitly_wait(30)
         self.accept_next_alert = True
         self.verificationErrors = []
@@ -185,7 +183,7 @@ class UntitledTestCase(unittest.TestCase):
     def test_treemap_flow(self):
         driver = self.driver
 
-        driver.get("https://applications.linkedpipes.com/login")
+        driver.get("http://localhost:9001/login")
         driver.find_element_by_id("with-web-id-checkbox").click()
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
@@ -207,7 +205,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
@@ -248,7 +245,7 @@ class UntitledTestCase(unittest.TestCase):
     def test_chord_flow(self):
         driver = self.driver
 
-        driver.get("https://applications.linkedpipes.com/login")
+        driver.get("http://localhost:9001/login")
         driver.find_element_by_id("with-web-id-checkbox").click()
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
@@ -270,7 +267,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 

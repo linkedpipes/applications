@@ -1,7 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { AuthorizationComponent } from './AuthorizationComponent';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from 'react-redux';
 import Particles from 'react-particles-js';
@@ -156,7 +156,6 @@ class Authorization extends PureComponent<Props, State> {
           providerTitle={providerTitle}
           handleProviderChange={handleProviderChange}
         />
-        <ToastContainer />
       </div>
     );
   }

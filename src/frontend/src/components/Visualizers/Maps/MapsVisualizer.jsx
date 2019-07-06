@@ -33,7 +33,9 @@ type Props = {
   selectedResultGraphIri: string,
   selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
-  isPublished: boolean
+  isPublished: boolean,
+  height: number,
+  width: number
 };
 
 type State = {
@@ -109,8 +111,13 @@ class MapsVisualizer extends PureComponent<Props, State> {
 
   render() {
     const { markers, center, zoom } = this.state;
+    const { height, width } = this.props;
+
+    const widthSize = Math.max(245, Math.min(width, height));
+    const heightSize = Math.max(165, widthSize - 250);
+
     return (
-      <Map center={center} zoom={zoom}>
+      <Map center={center} zoom={zoom} width={widthSize} height={heightSize}>
         <Cluster>
           {markers.map(marker => (
             <Marker

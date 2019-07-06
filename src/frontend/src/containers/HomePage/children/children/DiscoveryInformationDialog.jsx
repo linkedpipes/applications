@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -50,27 +49,30 @@ class DiscoveryInformationDialog extends PureComponent<Props> {
           Discovery Execution Info
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            <Typography
-              variant="body1"
-              component={'span'}
-              align="left"
-            >{`SPARQL IRI: ${selectedValue.sparqlEndpointIri}`}</Typography>
-            <Typography
-              variant="body1"
-              component={'span'}
-              align="left"
-            >{`Data sample IRI: ${selectedValue.dataSampleIri}`}</Typography>
-            <Typography
-              variant="body1"
-              component={'span'}
-              align="left"
-            >{`Named Graph IRIs: ${
-              selectedValue.namedGraphs
-                ? selectedValue.namedGraphs.join(',\n')
-                : '–'
-            }`}</Typography>
-          </DialogContentText>
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            SPARQL IRI:
+          </Typography>{' '}
+          <Typography variant="body1">
+            {selectedValue.sparqlEndpointIri
+              ? selectedValue.sparqlEndpointIri
+              : 'N/A'}
+          </Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Data sample IRI:
+          </Typography>{' '}
+          <Typography variant="body1">
+            {selectedValue.dataSampleIri ? selectedValue.dataSampleIri : 'N/A'}
+          </Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Named Graph IRIs:
+          </Typography>{' '}
+          <Typography variant="body1">
+            {selectedValue.namedGraphs
+              ? selectedValue.namedGraphs.join(',\n')
+              : 'N/A'}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleClose} color="primary" autoFocus>

@@ -9,7 +9,8 @@ import {
   TextField,
   MenuItem,
   DialogActions,
-  Button
+  Button,
+  Container
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/styles';
 
@@ -25,14 +26,9 @@ type Props = {
   selectedPipelineExecution: Object
 };
 
-const styles = theme => ({
-  dataRefreshTextField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1)
-  },
-
+const styles = () => ({
   menu: {
-    width: 200
+    width: '100%'
   }
 });
 
@@ -51,95 +47,95 @@ class DataRefreshControlDialog extends PureComponent<Props> {
     } = this.props;
 
     return (
-      <Dialog
-        open={dataRefreshDialogOpen}
-        aria-labelledby="responsive-dialog-title"
-      >
-        <DialogTitle id="delete-responsive-dialog-title">
-          Data refresh
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Configure whether application`s data needs to be refreshed within a
-            certain time interval...
-          </DialogContentText>
-        </DialogContent>
-        <Grid
-          container
-          direction="row"
-          spacing={2}
-          justify="center"
-          alignItems="center"
+      <Container maxWidth="lg">
+        <Dialog
+          open={dataRefreshDialogOpen}
+          aria-labelledby="responsive-dialog-title"
         >
-          <Grid item xs={6} sm={6}>
-            <TextField
-              label="Duration"
-              type="number"
-              fullWidth
-              className={classes.dataRefreshTextField}
-              value={selectedDataRefreshInterval.value}
-              onChange={handleDataRefreshValueChange}
-              variant="outlined"
-            />
+          <DialogTitle id="delete-responsive-dialog-title">
+            Data refresh
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Configure whether application`s data needs to be refreshed within
+              a certain time interval...
+            </DialogContentText>
+          </DialogContent>
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            justify="center"
+            alignItems="center"
+          >
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Duration"
+                type="number"
+                fullWidth
+                value={selectedDataRefreshInterval.value}
+                onChange={handleDataRefreshValueChange}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <TextField
+                id="outlined-select-currency"
+                select
+                label="Select"
+                fullWidth
+                value={selectedDataRefreshInterval.type}
+                onChange={handleDataRefreshTypeChange}
+                SelectProps={{
+                  MenuProps: {
+                    className: classes.menu
+                  }
+                }}
+                variant="outlined"
+              >
+                <MenuItem value="Hours">{`Hour${
+                  selectedDataRefreshInterval.value === '1' ? '' : 's'
+                }`}</MenuItem>
+                <MenuItem value="Days">{`Day${
+                  selectedDataRefreshInterval.value === '1' ? '' : 's'
+                }`}</MenuItem>
+                <MenuItem value="Weeks">{`Week${
+                  selectedDataRefreshInterval.value === '1' ? '' : 's'
+                }`}</MenuItem>
+              </TextField>
+            </Grid>
           </Grid>
-          <Grid item xs={3} sm={3}>
-            <TextField
-              id="outlined-select-currency"
-              select
-              label="Select"
-              fullWidth
-              className={classes.dataRefreshTextField}
-              value={selectedDataRefreshInterval.type}
-              onChange={handleDataRefreshTypeChange}
-              SelectProps={{
-                MenuProps: {
-                  className: classes.menu
-                }
-              }}
-              variant="outlined"
-            >
-              <MenuItem value="Hours">{`Hour${
-                selectedDataRefreshInterval.value === '1' ? '' : 's'
-              }`}</MenuItem>
-              <MenuItem value="Days">{`Day${
-                selectedDataRefreshInterval.value === '1' ? '' : 's'
-              }`}</MenuItem>
-              <MenuItem value="Weeks">{`Week${
-                selectedDataRefreshInterval.value === '1' ? '' : 's'
-              }`}</MenuItem>
-            </TextField>
-          </Grid>
-        </Grid>
-        <DialogContent />
+          <DialogContent />
 
-        <DialogActions>
-          <Button
-            onClick={handleDataRefreshDismissed}
-            color="primary"
-            autoFocus
-          >
-            Close
-          </Button>
-          <Button
-            onClick={handleDataRefreshToggleClicked}
-            color="primary"
-            autoFocus
-          >
-            {selectedPipelineExecution !== undefined &&
-            selectedPipelineExecution.scheduleOn
-              ? 'Disable'
-              : 'Enable'}
-          </Button>
-          <Button
-            onClick={handleDataRefreshConfirmed}
-            disabled={selectedDataRefreshInterval.value === ''}
-            color="primary"
-            autoFocus
-          >
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <DialogActions>
+            <Button
+              onClick={handleDataRefreshDismissed}
+              color="primary"
+              autoFocus
+            >
+              Close
+            </Button>
+            <Button
+              onClick={handleDataRefreshToggleClicked}
+              color="primary"
+              autoFocus
+            >
+              {selectedPipelineExecution !== undefined &&
+              selectedPipelineExecution.scheduleOn
+                ? 'Disable'
+                : 'Enable'}
+            </Button>
+            <Button
+              onClick={handleDataRefreshConfirmed}
+              disabled={selectedDataRefreshInterval.value === ''}
+              color="primary"
+              autoFocus
+            >
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
     );
   }
 }

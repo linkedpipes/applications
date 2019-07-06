@@ -31,7 +31,8 @@ const styles = theme => ({
     flex: 1
   },
   vizdiv: {
-    overflow: 'hidden'
+    overflow: 'hidden',
+    flexGrow: 1
   },
   containerView: {
     textAlign: 'center',
@@ -66,6 +67,8 @@ const getVisualizer = (
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
         />
       );
     }
@@ -76,6 +79,8 @@ const getVisualizer = (
           selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
           schemes={pathOr(
             [],
             'filterGroups.schemeFilter.options',
@@ -127,19 +132,21 @@ const VisualizerControllerContainer = (props: Props) => {
         md={7}
         xs={12}
       >
-        {getVisualizer(
-          props.visualizer.visualizerCode,
-          props.selectedResultGraphIri,
-          props.selectedPipelineExecution,
-          props.selectedApplication,
-          props.handleSetCurrentApplicationData,
-          props.selectedApplicationMetadata,
-          props.classes,
-          props.selectedNodes,
-          props.width,
-          props.height,
-          props.filtersState
-        )}
+        <Container maxWidth="xl">
+          {getVisualizer(
+            props.visualizer.visualizerCode,
+            props.selectedResultGraphIri,
+            props.selectedPipelineExecution,
+            props.selectedApplication,
+            props.handleSetCurrentApplicationData,
+            props.selectedApplicationMetadata,
+            props.classes,
+            props.selectedNodes,
+            props.width,
+            props.height,
+            props.filtersState
+          )}
+        </Container>
       </Grid>
     </Grid>
   );

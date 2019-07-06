@@ -6,10 +6,15 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
-  homepageTabIndex: 0,
+  dashboardTabIndex: 0,
+  applicationSetupTabIndex: 0,
+  discoverTabIndex: 0,
+  settingsTabIndex: 0,
+  applicationsBrowserTabIndex: 0,
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
-  shareApplicationDialogIsOpen: false
+  shareApplicationDialogIsOpen: false,
+  drawerState: false
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -43,10 +48,40 @@ const globalReducer = (state = INITIAL_STATE, action) => {
         colorThemeIsLight: action.value
       };
 
-    case types.SET_SELECTED_HOMEPAGE_TAB_INDEX:
+    case types.SET_SELECTED_DASHBOARD_TAB_INDEX:
       return {
         ...state,
-        homepageTabIndex: action.value
+        dashboardTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_DISCOVER_TAB_INDEX:
+      return {
+        ...state,
+        discoverTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATION_SETUP_TAB_INDEX:
+      return {
+        ...state,
+        applicationSetupTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATIONS_BROWSER_TAB_INDEX:
+      return {
+        ...state,
+        applicationsBrowserTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_SETTINGS_TAB_INDEX:
+      return {
+        ...state,
+        settingsTabIndex: action.value
+      };
+
+    case types.SET_MOBILE_DRAWER_STATE:
+      return {
+        ...state,
+        drawerState: action.value
       };
 
     default:
