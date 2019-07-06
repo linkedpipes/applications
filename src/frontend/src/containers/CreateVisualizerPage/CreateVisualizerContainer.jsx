@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import { filtersActions } from '@ducks/filtersDuck';
 import { CreateVisualizerComponent } from './CreateVisualizerComponent';
-import { Log, GoogleAnalyticsWrapper } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   selectedVisualizer: Object,

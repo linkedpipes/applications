@@ -2,9 +2,9 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
-import { Log } from '@utils';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { FilePond, registerPlugin } from 'react-filepond';
+import { Log } from '@utils';
 import './css/FilePondDarkStyle.css';
 
 // Register the filepond plugins

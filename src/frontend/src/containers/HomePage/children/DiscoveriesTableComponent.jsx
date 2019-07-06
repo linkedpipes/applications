@@ -13,7 +13,6 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 // eslint-disable-next-line no-unused-vars
-import { VisualizerIcon } from '@components/';
 import { CardHeader } from '@material-ui/core';
 import moment from 'moment';
 

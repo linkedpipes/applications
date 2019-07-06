@@ -3,8 +3,8 @@
  */
 
 import * as $rdf from 'rdflib';
-import { GlobalUtils } from '@utils/';
 import uuid from 'uuid';
+import { GlobalUtils } from '@utils/';
 
 const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');

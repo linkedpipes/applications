@@ -3,9 +3,9 @@ import React, { PureComponent } from 'react';
 import { AuthorizationComponent } from './AuthorizationComponent';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Log, GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
 import Particles from 'react-particles-js';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 const providers = {
   // Inrupt: 'https://inrupt.net/auth',

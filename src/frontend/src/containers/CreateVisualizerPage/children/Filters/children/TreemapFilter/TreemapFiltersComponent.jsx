@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
@@ -10,6 +9,7 @@ import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import FormGroup from '@material-ui/core/FormGroup';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import { VisualizersService } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
