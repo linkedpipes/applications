@@ -45,7 +45,10 @@ type Props = {
   setPipelineSelectorStep: Function,
   handleSetSelectedPipelineId: Function,
   rdfUrlDataSampleIri: string,
-  handleSetRdfUrlDataSampleIriFieldValue: Function
+  handleSetRdfUrlDataSampleIriFieldValue: Function,
+  handleSetDataSampleSessionId: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoveryId: string
 };
 
 type State = {
@@ -117,7 +120,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   handleProcessStartDiscovery = () => {
     const self = this;
-    const { handleSetDiscoveryId } = this.props;
+    const { handleSetDiscoveryId, handleSetDataSampleSessionId } = this.props;
 
     self.setState({
       discoveryIsLoading: true,
@@ -130,8 +133,13 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         if (response !== undefined) {
           const discoveryResponse = response.data;
           const discoveryId = discoveryResponse.discoveryId;
-          handleSetDiscoveryId(discoveryId);
-          self.startSocketListener(discoveryId);
+          if (discoveryId === null) {
+            const sessionId = discoveryResponse.sessionId;
+            handleSetDataSampleSessionId(sessionId);
+          } else {
+            handleSetDiscoveryId(discoveryId);
+          }
+          self.startSocketListener();
         }
       })
       .catch(error => {
@@ -151,7 +159,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       });
   };
 
-  startSocketListener = discoveryId => {
+  startSocketListener = () => {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
@@ -173,7 +181,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         );
       } else {
         const parsedData = JSON.parse(data);
-        if (parsedData.discoveryId !== discoveryId) {
+        if (parsedData.discoveryId !== self.props.discoveryId) {
           return;
         }
         if (parsedData.status.isFinished) {
@@ -182,7 +190,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             action: 'Processed discovery : step 1'
           });
 
-          self.loadPipelineGroups(discoveryId).then(response => {
+          self.loadPipelineGroups(self.props.discoveryId).then(response => {
             self.setState({
               discoveryIsLoading: false
             });
@@ -194,6 +202,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             }
           });
         }
+
+        socket.emit('leave', parsedData.discoveryId);
       }
     });
   };
@@ -383,6 +393,7 @@ const mapStateToProps = state => {
       state.discovery.datasources
     ),
     discoveryId: state.discovery.discoveryId,
+    dataSampleSessionId: state.discovery.dataSampleSessionId,
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
@@ -404,6 +415,11 @@ const mapDispatchToProps = dispatch => {
       discoveryActions.addDiscoveryIdAction({
         id: discoveryId
       })
+    );
+
+  const handleSetDataSampleSessionId = dataSampleSessionId =>
+    dispatch(
+      discoveryActions.addDataSampleSessionIdAction(dataSampleSessionId)
     );
 
   const setPipelineSelectorStep = () =>
@@ -458,6 +474,7 @@ const mapDispatchToProps = dispatch => {
 
   return {
     handleSetDiscoveryId,
+    handleSetDataSampleSessionId,
     handleSetRdfUrlDataSampleIriFieldValue,
     handleSetPipelineGroups,
     handleSetDataSampleIriFieldValue,
