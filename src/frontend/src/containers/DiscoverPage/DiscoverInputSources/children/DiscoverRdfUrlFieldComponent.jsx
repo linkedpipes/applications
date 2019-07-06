@@ -2,15 +2,14 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
-import { connect } from 'react-redux';
 
 type Props = {
   classes: { textField: {}, gridRoot: {} },
   discoveryIsLoading: boolean,
   handleRdfInputIriTextFieldChange: () => void,
   rdfInputIri: string,
-  handleDataSampleTextFieldChange: Function,
-  dataSampleIri: string
+  handleSetRdfUrlDataSampleIri: Function,
+  rdfUrlDataSampleIri: string
 };
 
 const styles = () => ({
@@ -26,8 +25,8 @@ const DiscoverSparqlSelectorFields = ({
   discoveryIsLoading,
   handleRdfInputIriTextFieldChange,
   rdfInputIri,
-  handleDataSampleTextFieldChange,
-  dataSampleIri
+  handleSetRdfUrlDataSampleIri,
+  rdfUrlDataSampleIri
 }: Props) => (
   <div>
     <TextField
@@ -50,11 +49,11 @@ const DiscoverSparqlSelectorFields = ({
 
     <TextField
       id="outlined-bare"
-      label="Data sample IRI"
+      label="Data sample IRI (Optional)"
       disabled={discoveryIsLoading}
       className={classes.textField}
       multiline
-      onChange={handleDataSampleTextFieldChange}
+      onChange={handleSetRdfUrlDataSampleIri}
       placeholder="Input your data sample IRI..."
       fullWidth
       margin="normal"
@@ -62,19 +61,9 @@ const DiscoverSparqlSelectorFields = ({
       InputLabelProps={{
         shrink: true
       }}
-      value={dataSampleIri}
+      value={rdfUrlDataSampleIri}
     />
   </div>
 );
 
-const mapStateToProps = state => {
-  return {
-    sparqlEndpointIri: state.discover.sparqlEndpointIri,
-    dataSampleIri: state.discover.dataSampleIri,
-    namedGraph: state.discover.namedGraph
-  };
-};
-
-export default connect(mapStateToProps)(
-  withStyles(styles)(DiscoverSparqlSelectorFields)
-);
+export default withStyles(styles)(DiscoverSparqlSelectorFields);
