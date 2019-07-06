@@ -1,6 +1,5 @@
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import logger from 'redux-logger';
-import { discoverReducer } from '@containers';
 import { discoveryReducer } from '@ducks/discoveryDuck';
 import { globalReducer } from '@ducks/globalDuck';
 import { etlReducer } from '@ducks/etlDuck';
@@ -9,6 +8,7 @@ import { visualizersReducer } from '@ducks/visualizersDuck';
 import { applicationReducer } from '@ducks/applicationDuck';
 import { filtersReducer } from '@ducks/filtersDuck';
 import thunk from 'redux-thunk';
+import { discoverReducer } from '@containers';
 
 const composeEnhancers =
   // eslint-disable-next-line no-underscore-dangle

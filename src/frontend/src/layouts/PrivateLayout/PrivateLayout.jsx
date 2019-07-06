@@ -1,12 +1,12 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { NavigationBar, HeaderControls } from '@components';
 import { withStyles } from '@material-ui/core/styles';
-import { withAuthorization } from '@utils';
 import Hidden from '@material-ui/core/Hidden';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
 import { CssBaseline } from '@material-ui/core';
+import { withAuthorization } from '@utils';
+import { NavigationBar, HeaderControls } from '@components';
 
 const drawerWidth = 256;
 

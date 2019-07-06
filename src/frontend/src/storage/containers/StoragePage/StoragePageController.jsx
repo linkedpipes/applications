@@ -3,8 +3,8 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import StorageSharedPage from './StorageSharedAppsBrowserContainer';
 import StoragePage from './StorageAppsBrowserContainer';
-import { GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 const styles = () => ({
   root: {

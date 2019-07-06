@@ -3,8 +3,8 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import SettingsPage from './Settings';
 import ProfilePage from './Profile';
-import { GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 const styles = () => ({
   root: {

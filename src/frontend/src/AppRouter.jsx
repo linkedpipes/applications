@@ -4,6 +4,15 @@ import { connect } from 'react-redux';
 import { Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
+import io from 'socket.io-client';
+import * as Sentry from '@sentry/browser';
+import { userActions } from '@ducks/userDuck';
+import ErrorBoundary from 'react-error-boundary';
+import { toast, ToastContainer } from 'react-toastify';
+import { Invitation } from '@storage/models';
+import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
+import { SocketContext, Log, UserService } from '@utils';
+import { PrivateLayout, PublicLayout } from '@layouts';
 import {
   DiscoverPage,
   HomePage,
@@ -14,23 +23,14 @@ import {
   ApplicationPage,
   SettingsPage
 } from '@containers';
-import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log, UserService } from '@utils';
-import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
-import io from 'socket.io-client';
-import * as Sentry from '@sentry/browser';
-import { userActions } from '@ducks/userDuck';
 import {
   DashboardHeader,
-  DiscoverHeader,
   ApplicationHeader,
-  ApplicationsBrowserHeader,
+  DiscoverHeader,
   SettingsHeader,
-  AboutHeader
+  AboutHeader,
+  ApplicationsBrowserHeader
 } from '@components';
-import ErrorBoundary from 'react-error-boundary';
-import { toast, ToastContainer } from 'react-toastify';
-import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case

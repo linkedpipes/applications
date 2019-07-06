@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import { VISUALIZER_TYPE } from '@constants';
 import MapIcon from '@material-ui/icons/MapTwoTone';
 import TimelineIcon from '@material-ui/icons/TimelineTwoTone';
 import DCTermsIcon from '@material-ui/icons/ShareTwoTone';
 import ChordIcon from '@material-ui/icons/BlurCircularTwoTone';
 import TreemapIcon from '@material-ui/icons/TableChartTwoTone';
 import UnkownIcon from '@material-ui/icons/WallpaperTwoTone';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   style: Object,
