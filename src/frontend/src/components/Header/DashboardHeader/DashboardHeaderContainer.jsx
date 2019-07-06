@@ -10,9 +10,9 @@ type Props = {
 };
 
 const tabTitle = [
-  { titleLabel: 'Quick Start' },
-  { titleLabel: 'Discoveries' },
-  { titleLabel: 'Pipeline Executions' }
+  { titleLabel: 'Quick Start', id: 'quickstart_tab' },
+  { titleLabel: 'Discoveries', id: 'discoveries_tab' },
+  { titleLabel: 'Pipeline Executions', id: 'pipeline_executions_tab' }
 ];
 
 const sectionLabel = 'Dashboard';
