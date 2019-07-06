@@ -105,8 +105,8 @@ public class DiscoveryController {
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
     public ResponseEntity<DiscoverySession> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
-                                                                @NotNull @RequestParam(value = "rdfInputIri") String rdfFileIri,
-                                                                @Nullable @RequestParam(DATA_SAMPLE_IRI_PARAM, required=false) String dataSampleIri) throws LpAppsException, IOException {
+                                                                @NotNull @RequestParam(value="rdfInputIri") String rdfFileIri,
+                                                                @Nullable @RequestParam(value=DATA_SAMPLE_IRI_PARAM, required=false) String dataSampleIri) throws LpAppsException, IOException {
         if (rdfFileIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF file IRI not provided");
         }
