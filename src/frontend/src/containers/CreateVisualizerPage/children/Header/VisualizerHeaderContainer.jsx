@@ -3,11 +3,11 @@ import React, { PureComponent } from 'react';
 import VisualizerControllerHeaderComponent from './VisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GoogleAnalyticsWrapper, UserService } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { GoogleAnalyticsWrapper, UserService } from '@utils';
+import { StorageToolbox } from '@storage';
 
 type Props = {
   selectedApplication: any,
