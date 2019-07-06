@@ -28,6 +28,7 @@ type Props = {
   namedTextFieldValue: string,
   onHandleProcessStartDiscovery: () => void,
   onHandleSetDataSampleIri: () => void,
+  onHandleSetRdfUrlDataSampleIri: () => void,
   onHandleSetNamedGraph: () => void,
   onHandleSetSparqlIri: () => void,
   onHandleClearInputsClicked(): Function,
@@ -39,7 +40,8 @@ type Props = {
   onHandleSetRdfFile: Function,
   onHandleSetRdfDataSampleFile: Function,
   onHandleTabIndexChange: Function,
-  tabIndex: Number
+  tabIndex: Number,
+  rdfUrlDataSampleIri: string
 };
 
 const styles = () => ({
@@ -67,10 +69,12 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
+      rdfUrlDataSampleIri,
       onHandleProcessStartDiscovery,
       onHandleClearInputsClicked,
       onHandleSetNamedGraph,
       onHandleSetDataSampleIri,
+      onHandleSetRdfUrlDataSampleIri,
       onHandleSetSparqlIri,
       namedGraph,
       sparqlTextFieldValue,
@@ -137,8 +141,10 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                       onHandleRdfInputIriTextFieldChange
                     }
                     rdfInputIri={rdfInputIri}
-                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                    dataSampleIri={dataSampleIri}
+                    handleSetRdfUrlDataSampleIri={
+                      onHandleSetRdfUrlDataSampleIri
+                    }
+                    rdfUrlDataSampleIri={rdfUrlDataSampleIri}
                   />
                   <DiscoverRdfFileDropIn
                     discoveryIsLoading={discoveryIsLoading}

@@ -43,7 +43,9 @@ type Props = {
   handleAddSelectedVisualizer: Function,
   setPipelineExecutorStep: Function,
   setPipelineSelectorStep: Function,
-  handleSetSelectedPipelineId: Function
+  handleSetSelectedPipelineId: Function,
+  rdfUrlDataSampleIri: string,
+  handleSetRdfUrlDataSampleIriFieldValue: Function
 };
 
 type State = {
@@ -127,7 +129,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       .then(response => {
         if (response !== undefined) {
           const discoveryResponse = response.data;
-          const discoveryId = discoveryResponse.id;
+          const discoveryId = discoveryResponse.discoveryId;
           handleSetDiscoveryId(discoveryId);
           self.startSocketListener(discoveryId);
         }
@@ -272,6 +274,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.handleSetDataSampleIriFieldValue(rawText);
   };
 
+  handleSetRdfUrlDataSampleIri = e => {
+    const rawText = e.target.value;
+    this.props.handleSetRdfUrlDataSampleIriFieldValue(rawText);
+  };
+
   handleSetNamedGraph = e => {
     const rawText = e.target.value;
     Log.info('Named graph field changed', 'DiscoverSelectorContainer');
@@ -323,7 +330,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph,
       rdfInputIri,
       inputType,
-      activeDiscoverTabIndex
+      activeDiscoverTabIndex,
+      rdfUrlDataSampleIri
     } = this.props;
 
     const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
@@ -343,6 +351,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         sparqlEndpointIri={sparqlEndpointIri}
         namedGraph={namedGraph}
         dataSampleIri={dataSampleIri}
+        rdfUrlDataSampleIri={rdfUrlDataSampleIri}
         onHandleClearInputsClicked={this.handleClearInputsClicked}
         onHandleProcessStartDiscovery={this.handleProcessStartDiscovery}
         onHandleSetNamedGraph={this.handleSetNamedGraph}
@@ -356,6 +365,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         rdfInputIri={rdfInputIri}
         tabIndex={activeDiscoverTabIndex}
         onHandleTabIndexChange={this.handleTabIndexChange}
+        onHandleSetRdfUrlDataSampleIri={this.handleSetRdfUrlDataSampleIri}
       />
     );
   }
@@ -376,6 +386,7 @@ const mapStateToProps = state => {
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
+    rdfUrlDataSampleIri: state.discover.rdfUrlDataSampleIri,
     namedGraph: state.discover.namedGraph,
     webId: state.user.webId,
     rdfInputIri: state.discover.rdfInputIri,
@@ -416,6 +427,9 @@ const mapDispatchToProps = dispatch => {
   const handleSetDataSampleIriFieldValue = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
 
+  const handleSetRdfUrlDataSampleIriFieldValue = rdfUrlDataSampleIri =>
+    dispatch(discoverActions.setRdfUrlDataSampleIri(rdfUrlDataSampleIri));
+
   const handleSetRdfInputIriUrlFieldValue = rdfInputIri =>
     dispatch(discoverActions.setRdfInputIri(rdfInputIri));
 
@@ -444,6 +458,7 @@ const mapDispatchToProps = dispatch => {
 
   return {
     handleSetDiscoveryId,
+    handleSetRdfUrlDataSampleIriFieldValue,
     handleSetPipelineGroups,
     handleSetDataSampleIriFieldValue,
     handleSetNamedGraphFieldValue,
