@@ -60,7 +60,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
     private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "https://applications.linkedpipes.com/graph/test-data-sample-graph";
-    private static final String SHARED_VOLUME_DIR = "/appdata/datasamples";
+    public static final String SHARED_VOLUME_DIR = "/appdata/datasamples";
     private final AtomicInteger counter = new AtomicInteger(0);
 
 
@@ -220,7 +220,9 @@ public class ExecutorServiceComponent implements ExecutorService {
         logger.debug("Will execute data sample pipeline");
         counter.compareAndSet(0, 1);
         try {
-            FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR)); //make sure we have empty dir as we upload *.ttl to virtuoso
+            File dir = new File(SHARED_VOLUME_DIR);
+            FileUtils.forceMkdir(dir);
+            FileUtils.cleanDirectory(dir); //make sure we have empty dir as we upload *.ttl to virtuoso
         } catch (IOException ex) {
             logger.warn("Failed to clean the shared folder before pipeline", ex);
         }

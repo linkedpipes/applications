@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
 
 import static com.linkedpipes.lpa.backend.util.UrlUtils.urlFrom;
 
@@ -77,6 +79,9 @@ public class EtlServiceComponent implements EtlService {
 
     @PostConstruct
     public void uploadDataSamplePipeline() throws IOException, InterruptedException {
+        File dir = new File(ExecutorServiceComponent.SHARED_VOLUME_DIR);
+        FileUtils.forceMkdir(dir);
+
         logger.info("Waiting for ETL to start");
         while (true) {
             try {
