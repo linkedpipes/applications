@@ -12,9 +12,9 @@ import {
   AcceptedInvitation,
   AccessControl
 } from './models';
-import { Log } from '@utils';
 import StorageFileClient from './StorageFileClient';
 import StorageSparqlClient from './StorageSparqlClient';
+import { Log } from '@utils';
 // eslint-disable-next-line import/newline-after-import
 const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
 // const N3 = require('n3');

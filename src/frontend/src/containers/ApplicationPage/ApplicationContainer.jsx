@@ -1,13 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VISUALIZER_TYPE } from '@constants';
-import {
-  MapsVisualizer,
-  TreemapVisualizer,
-  ChordVisualizer
-} from '@components';
 import { withRouter } from 'react-router-dom';
-import { Log, VisualizersService } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
@@ -19,6 +12,13 @@ import { ApplicationConfiguration } from '@storage/models';
 import { filtersActions } from '@ducks/filtersDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import StorageToolbox from '@storage/StorageToolbox';
+import { Log, VisualizersService } from '@utils';
+import {
+  MapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer
+} from '@components';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   location: Object,

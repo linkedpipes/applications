@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { etlActions } from '@ducks/etlDuck';
 import DiscoverPipelinesExecutorComponent from './DiscoverPipelinesExecutorComponent';
+import { discoverActions } from '../duck';
 import {
   ETLService,
   ETL_STATUS_MAP,
@@ -10,7 +11,6 @@ import {
   SocketContext,
   Log
 } from '@utils';
-import { discoverActions } from '../duck';
 
 type Props = {
   handleSetPipelineExecutionIri: Function,

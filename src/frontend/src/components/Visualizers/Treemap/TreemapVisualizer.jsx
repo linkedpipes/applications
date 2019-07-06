@@ -2,9 +2,9 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService, Log } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
+import { VisualizersService, Log } from '@utils';
 
 type Props = {
   classes: {
