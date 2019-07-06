@@ -79,13 +79,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   const newSelectedScheme = props.selectedScheme && props.selectedScheme.uri;
-  //   if (newSelectedScheme && newSelectedScheme !== state.selectedScheme.uri) {
-  //     this.handleSchemeChange(props.selectedScheme.uri);
-  //   }
-  // }
-
   async componentDidMount() {
     const {
       handleSetCurrentApplicationData,

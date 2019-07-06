@@ -5,8 +5,8 @@ import lpaAxios from './api.service';
 
 const VisualizersService = {
   // Map related
-  getMarkers: async (resultGraphIri, schemes = {}) => {
-    return lpaAxios.post('/map/markers', schemes, {
+  getMarkers: async (resultGraphIri, filters) => {
+    return lpaAxios.post('/map/markers', filters, {
       params: { resultGraphIri }
     });
   },

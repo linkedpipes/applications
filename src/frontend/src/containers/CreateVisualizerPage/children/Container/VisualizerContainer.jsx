@@ -70,6 +70,8 @@ const getVisualizer = (
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           height={height}
           width={width}
+          filters={pathOr([], 'filterGroups.mapFilters.filters', filtersState)}
+          visualizerCode={visualizerCode}
         />
       );
     }

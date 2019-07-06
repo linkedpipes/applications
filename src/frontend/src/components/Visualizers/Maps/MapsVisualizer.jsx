@@ -11,7 +11,7 @@ import {
   point as turfPoint
 } from '@turf/helpers';
 import geoViewport from '@mapbox/geo-viewport';
-import _ from 'lodash';
+import equal from 'fast-deep-equal';
 
 type Props = {
   classes: {
@@ -20,53 +20,20 @@ type Props = {
   selectedResultGraphIri: string,
   selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
-  width: number
+  width: number,
   height: number,
   isPublished: boolean,
+  visualizerCode: string,
+  filters: Array<{
+    filterUri: string,
+    options: Array<{ uri: string, selected: boolean }>
+  }>
 };
 
 type State = {
-  markers: Array<{ uri: string, coordinates: { lat: number, lng: number } }>,
   center: Array<number>,
   zoom: number,
-  schemes: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
-  }>
-};
-
-const areEqual = (
-  a: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
-  }>,
-  b: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
-  }>
-) => {
-  if (!a || !b) return false;
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) {
-    let eq = false;
-    for (let j = 0; j < b.length; j += 1) {
-      if (_.isEqual(a[i], b[j])) {
-        eq = true;
-        break;
-      }
-    }
-    if (!eq) return false;
-  }
-  return true;
+  markers: Array<{ uri: string, coordinates: { lat: number, lng: number } }>
 };
 
 class MapsVisualizer extends PureComponent<Props, State> {
@@ -89,15 +56,34 @@ class MapsVisualizer extends PureComponent<Props, State> {
     };
   }
 
+  static formatFiltersForRequest(
+    filters: Array<{
+      filterUri: string,
+      options: Array<{ uri: string, selected: boolean }>
+    }>
+  ) {
+    const filterRequestData = {};
+    filters.forEach(element => {
+      filterRequestData[element.filterUri] = [
+        ...(filterRequestData[element.filterUri] || []),
+        ...element.options.map(op => ({
+          uri: op.uri,
+          isActive: op.selected
+        }))
+      ];
+    });
+    return { filters: filterRequestData };
+  }
+
   static async fetchMarkers(
     selectedResultGraphIri: string,
     visualizerCode: string,
-    schemes: Array<{}>
+    filters: Array<{}>
   ) {
     if (visualizerCode === VISUALIZER_TYPE.ADVANCED_FILTERS_MAP) {
       const response = await VisualizersService.getMarkers(
         selectedResultGraphIri,
-        schemes
+        filters
       );
       const responseMarkers = response.data;
       return responseMarkers;
@@ -110,105 +96,83 @@ class MapsVisualizer extends PureComponent<Props, State> {
     return responseMarkers;
   }
 
+  isMounted: boolean = false;
+
   constructor(props: Props) {
     super(props);
+    this.isMounted = false;
     this.state = {
-      markers: this.props.markers || [],
-      schemes: this.props.schemes || [],
+      markers: [],
       center: [50.0755, 14.4378],
       zoom: 4
     };
   }
 
   async componentDidMount() {
+    this.isMounted = true;
     const {
-      selectedResultGraphIri,
       handleSetCurrentApplicationData,
       isPublished,
-      selectedPipelineExecution,
-      visualizerCode
+      selectedResultGraphIri,
+      selectedPipelineExecution
     } = this.props;
-    const schemes = this.props.schemes || [];
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
         endpoint: 'map',
-        etlExecutionIri: selectedPipelineExecution,
         graphIri: selectedResultGraphIri,
-        visualizerType: visualizerCode
+        etlExecutionIri: selectedPipelineExecution,
+        visualizerType: this.props.visualizerCode
       });
     }
 
-    const selectedSchemes = schemes.filter(scheme => scheme.selected);
-    const markers: Array<{
-      uri: string,
-      coordinates: { lat: number, lng: number }
-    }> = await MapsVisualizer.fetchMarkers(
-      selectedResultGraphIri,
-      visualizerCode,
-      selectedSchemes
+    // Fetch data
+    const processedFilters = await MapsVisualizer.formatFiltersForRequest(
+      this.props.filters
     );
-    this.updateMarkersState(markers);
+    const markers = await MapsVisualizer.fetchMarkers(
+      this.props.selectedResultGraphIri,
+      this.props.visualizerCode,
+      processedFilters
+    );
+    const { center, zoom } = MapsVisualizer.averageGeolocation(markers);
+
+    if (this.isMounted) {
+      this.setState({ center, zoom, markers });
+    }
   }
 
   async componentDidUpdate(prevProps: Props) {
-    // Typical usage (don't forget to compare props):
-    if (!areEqual(prevProps.schemes, this.props.schemes)) {
-      const schemes = this.props.schemes;
-      // If there are no selected nodes, then bring all the data
-      // (should never happen)
-
-      // Fetch data
-      const selectedSchemes = schemes
-        .filter(scheme => scheme.selected)
-        .map(scheme => ({
-          label: scheme.label,
-          uri: scheme.uri,
-          dataType: 'string',
-          isActive: scheme.selected
-        }));
-      const markers: Array<{
-        uri: string,
-        coordinates: { lat: number, lng: number }
-      }> = await MapsVisualizer.fetchMarkers(
+    if (!equal(this.props.filters, prevProps.filters)) {
+      const processedFilters = MapsVisualizer.formatFiltersForRequest(
+        this.props.filters
+      );
+      const markers = await MapsVisualizer.fetchMarkers(
         this.props.selectedResultGraphIri,
         this.props.visualizerCode,
-        { filters: { nodesFilter: selectedSchemes } }
+        processedFilters
       );
-      this.updateMarkersState(markers);
+      const { center, zoom } = MapsVisualizer.averageGeolocation(markers);
+      if (this.isMounted) {
+        /* eslint-disable react/no-did-update-set-state */
+        this.setState({ center, zoom, markers });
+      }
     }
   }
 
-  updateMarkersState = async (
-    markers: Array<{
-      uri: string,
-      coordinates: { lat: number, lng: number }
-    }> = []
-  ) => {
-    const {
-      handleSetCurrentApplicationData,
-      isPublished,
-      selectedPipelineExecution,
-      selectedResultGraphIri,
-      visualizerCode
-    } = this.props;
-    const { center, zoom } = MapsVisualizer.averageGeolocation(markers);
-    this.setState({ center, zoom, markers });
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
 
-    if (!isPublished) {
-      handleSetCurrentApplicationData({
-        endpoint: 'map',
-        etlExecutionIri: selectedPipelineExecution,
-        graphIri: selectedResultGraphIri,
-        visualizerType: visualizerCode
-      });
+  refreshMap = (center, zoom, markers) => {
+    if (this.isMounted) {
+      this.setState({ center, zoom, markers });
     }
   };
 
   render() {
-    const { markers, center, zoom } = this.state;
     const { height, width } = this.props;
-
+    const { markers, center, zoom } = this.state;
     const widthSize = Math.max(245, Math.min(width, height));
     const heightSize = Math.max(165, widthSize - 250);
 

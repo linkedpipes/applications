@@ -8,14 +8,14 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Switch from '@material-ui/core/Switch';
+// import Switch from '@material-ui/core/Switch';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+// import IconButton from '@material-ui/core/IconButton';
+// import Menu from '@material-ui/core/Menu';
+// import MenuItem from '@material-ui/core/MenuItem';
+// import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -57,8 +57,7 @@ type Props = {
   }>,
   onApplyFilter: Function,
   editingMode: boolean,
-  registerCallback: Function,
-  name: string
+  registerCallback: Function
 };
 
 type State = {
@@ -135,7 +134,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (true) {
+    if (this.props.editingMode) {
       let filters = [];
       const getNodesResponse = await VisualizersService.getProperties(
         this.props.selectedResultGraphIri
