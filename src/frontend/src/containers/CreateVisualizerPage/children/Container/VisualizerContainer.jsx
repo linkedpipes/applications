@@ -3,6 +3,7 @@ import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
 import FiltersComponent from '../Filters/FiltersComponent';
 import { pathOr } from 'rambda';
 import { VISUALIZER_TYPE } from '@constants';

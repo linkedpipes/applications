@@ -28,6 +28,8 @@ import { filtersActions } from '@ducks/filtersDuck';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import moment from 'moment';
 import { Typography } from '@material-ui/core';
+import { UserService, VisualizersService, GlobalUtils } from '@utils';
+import { VisualizerIcon } from '@components/';
 
 const styles = theme => ({
   card: {

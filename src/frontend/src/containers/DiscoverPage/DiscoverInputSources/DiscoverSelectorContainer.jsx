@@ -6,6 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
 import DiscoverSelectorComponent from './DiscoverSelectorComponent';
 import { discoverActions } from '../duck';
+import { globalActions } from '@ducks/globalDuck';
+import { etlActions } from '@ducks/etlDuck';
 import {
   DiscoveryService,
   GlobalUtils,

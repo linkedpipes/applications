@@ -10,8 +10,8 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
-import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 import { Container, Typography, Paper } from '@material-ui/core';
+import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 
 const styles = theme => ({
   stepperContainer: {

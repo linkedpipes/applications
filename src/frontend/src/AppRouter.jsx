@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { Invitation } from '@storage/models';
 import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import { SocketContext, Log, UserService } from '@utils';
@@ -23,6 +23,14 @@ import {
   ApplicationPage,
   SettingsPage
 } from '@containers';
+import {
+  DashboardHeader,
+  ApplicationHeader,
+  DiscoverHeader,
+  SettingsHeader,
+  AboutHeader,
+  ApplicationsBrowserHeader
+} from '@components';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case

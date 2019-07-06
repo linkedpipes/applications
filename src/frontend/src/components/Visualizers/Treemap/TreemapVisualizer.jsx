@@ -4,7 +4,7 @@ import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import { VisualizersService } from '@utils';
+import { VisualizersService, Log } from '@utils';
 
 type Props = {
   classes: {
