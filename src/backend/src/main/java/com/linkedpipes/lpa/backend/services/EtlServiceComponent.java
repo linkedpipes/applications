@@ -36,7 +36,7 @@ public class EtlServiceComponent implements EtlService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
-
+    private static final String SHARED_VOLUME_DIR = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_SHARED_VOLUME_DIR);
     private static String dataSamplePipelineIri = null; //loaded in uploadDataSamplePipeline()
 
     private final ApplicationContext context;
@@ -79,7 +79,7 @@ public class EtlServiceComponent implements EtlService {
 
     @PostConstruct
     public void uploadDataSamplePipeline() throws IOException, InterruptedException {
-        File dir = new File(ExecutorServiceComponent.SHARED_VOLUME_DIR);
+        File dir = new File(SHARED_VOLUME_DIR);
         FileUtils.forceMkdir(dir);
 
         logger.info("Waiting for ETL to start");

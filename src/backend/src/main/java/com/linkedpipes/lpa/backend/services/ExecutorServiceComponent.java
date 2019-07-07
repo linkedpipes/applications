@@ -59,17 +59,15 @@ public class ExecutorServiceComponent implements ExecutorService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
-    private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "https://applications.linkedpipes.com/graph/test-data-sample-graph";
-    public static final String SHARED_VOLUME_DIR = "/appdata/datasamples";
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_RESULT_GRAPH_IRI);
+    private static final String SHARED_VOLUME_DIR = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_SHARED_VOLUME_DIR);
 
 
     private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_TIMEOUT);
     private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_TIMEOUT);
     private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_FREQUENCY);
     private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_FREQUENCY);
-
-
+    @NotNull private final AtomicInteger counter = new AtomicInteger(0);
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;

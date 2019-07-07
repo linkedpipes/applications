@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.ExtractGraphQueryProvider;
@@ -42,7 +43,7 @@ public class SparqlUtils {
         ConstructSparqlQueryProvider provider = new ExtractGraphQueryProvider();
         Query query = provider.get(namedGraph);
 
-        try (QueryExecution queryExecution = QueryExecutionFactory.sparqlService(Application.getConfig().getString("lpa.virtuoso.queryEndpoint"), query)) {
+        try (QueryExecution queryExecution = QueryExecutionFactory.sparqlService(Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), query)) {
             Model model = queryExecution.execConstruct();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             RDFDataMgr.write(baos, model, RDFLanguages.TTL);
