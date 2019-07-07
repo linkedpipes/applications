@@ -100,12 +100,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
         DiscoveryDao d = this.userService.setUserDiscovery(userId);
         long sessionId  = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
-        DiscoverySession s = new DiscoverySession();
-        s.isFinished = false;
-        s.isFailed = false;
-        s.sessionId = sessionId;
-        s.discoveryId = discovery.id;
-        return s;
+        return DiscoverySession.create(sessionId, discovery.id);
     }
 
     /**
@@ -124,12 +119,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
         DiscoveryDao d = this.userService.setUserDiscovery(userId);
         long sessionId = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
-        DiscoverySession s = new DiscoverySession();
-        s.isFinished = false;
-        s.isFailed = false;
-        s.sessionId = sessionId;
-        s.discoveryId = discovery.id;
-        return s;
+        return DiscoverySession.create(sessionId, discovery.id);
     }
 
     /**
@@ -160,12 +150,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     private DiscoverySession executeDiscoveryFromEndpoint(@NotNull String userId, @NotNull long discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
         long sessionId = processStartedDiscovery(discovery.id, discoveryId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
-        DiscoverySession s = new DiscoverySession();
-        s.isFinished = false;
-        s.isFailed = false;
-        s.sessionId = sessionId;
-        s.discoveryId = discovery.id;
-        return s;
+        return DiscoverySession.create(sessionId, discovery.id);
     }
 
     /**
@@ -206,17 +191,17 @@ public class ExecutorServiceComponent implements ExecutorService {
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
         String endpoint = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT);
         DiscoveryDao d = userService.setUserDiscovery(userId);
-        long discoveryId = d.getId();
+        long sessionId = d.getId();
 
         if (dataSampleIri == null) {
             //generate data sample from named graph here
-            return runDataSamplePipeline(endpoint, Arrays.asList(namedGraph), userId, discoveryId);
+            return runDataSamplePipeline(endpoint, Arrays.asList(namedGraph), userId, sessionId);
         } else {
-            return executeDiscoveryFromEndpoint(userId, discoveryId, endpoint, dataSampleIri, Arrays.asList(namedGraph));
+            return executeDiscoveryFromEndpoint(userId, sessionId, endpoint, dataSampleIri, Arrays.asList(namedGraph));
         }
     }
 
-    private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long discoveryId) throws LpAppsException {
+    private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long sessionId) throws LpAppsException {
         logger.debug("Will execute data sample pipeline");
         counter.compareAndSet(0, 1);
         try {
@@ -227,16 +212,21 @@ public class ExecutorServiceComponent implements ExecutorService {
             logger.warn("Failed to clean the shared folder before pipeline", ex);
         }
         Execution dsPipe = etlService.executeDataSamplePipeline(sparqlEndpointIri, namedGraphs.get(0));
-        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, sparqlEndpointIri, namedGraphs, discoveryId));
+        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, sparqlEndpointIri, namedGraphs, sessionId));
 
-        DiscoverySession s = new DiscoverySession();
-        s.sessionId = discoveryId;
-        s.isFinished = false;
-        s.isFailed = false;
-        return s;
+        return DiscoverySession.create(sessionId, null);
     }
 
-    private IExecutionCallback getSampleCallback(final String userId, final String sparqlEndpointIri, final List<String> namedGraphs, final long discoveryId) {
+    private void reportError(long sessionId, final String userId) {
+        try {
+            DiscoverySession session = DiscoverySession.createError(sessionId);
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+        } catch (LpAppsException e) {
+            logger.error("Failed to report error", e);
+        }
+    }
+
+    private IExecutionCallback getSampleCallback(final String userId, final String sparqlEndpointIri, final List<String> namedGraphs, final long sessionId) {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
                 if (counter.get() != 1) {
@@ -256,39 +246,18 @@ public class ExecutorServiceComponent implements ExecutorService {
                     try {
                         String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
                         VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
-                        executeDiscoveryFromEndpoint(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+                        executeDiscoveryFromEndpoint(userId, sessionId, sparqlEndpointIri, dataSampleIri, namedGraphs);
                         //this will trigger socket notification of the started discovery & starts polling
                     } catch (LpAppsException|UserNotFoundException ex) {
                         logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);
-                        try {
-                            DiscoverySession session = new DiscoverySession();
-                            session.sessionId = discoveryId;
-                            session.isFailed = true;
-                            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
-                        } catch (LpAppsException e) {
-                            logger.error("Failed to report error", e);
-                        }
+                        reportError(sessionId, userId);
                     } catch (IOException e) {
                         logger.error("Failed to export generated data sample to github (" + gistName + "), sample was:\n" + ttl, e);
-                        try {
-                            DiscoverySession session = new DiscoverySession();
-                            session.sessionId = discoveryId;
-                            session.isFailed = true;
-                            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
-                        } catch (LpAppsException ex) {
-                            logger.error("Failed to report error", ex);
-                        }
+                        reportError(sessionId, userId);
                     }
                 } else {
                     logger.error("Data sample pipeline finished with errors");
-                    try {
-                        DiscoverySession session = new DiscoverySession();
-                        session.sessionId = discoveryId;
-                        session.isFailed = true;
-                        Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
-                    } catch (LpAppsException ex) {
-                        logger.error("Failed to report error", ex);
-                    }
+                    reportError(sessionId, userId);
                 }
 
                 if (counter.decrementAndGet() != 0) {

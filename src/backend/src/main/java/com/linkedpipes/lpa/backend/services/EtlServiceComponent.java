@@ -71,7 +71,7 @@ public class EtlServiceComponent implements EtlService {
 
     @Override
     public Execution executeDataSamplePipeline(String sparqlEndpointIri, String namedGraph) throws LpAppsException {
-         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph, sparqlEndpointIri);
+         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipelineInput(namedGraph, sparqlEndpointIri);
          logger.info("Data sample input:\n" + transformed);
          String response = httpActions.executeDataSamplePipeline(dataSamplePipelineIri, transformed);
          return OBJECT_MAPPER.readValue(response, Execution.class);
@@ -91,6 +91,7 @@ public class EtlServiceComponent implements EtlService {
                 Thread.sleep(1000);
             }
         }
+
         logger.info("Uploading data sample pipeline to ETL");
         try {
             try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
