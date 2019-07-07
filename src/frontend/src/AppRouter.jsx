@@ -4,6 +4,16 @@ import { connect } from 'react-redux';
 import { Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import withRoot from './withRoot';
+import io from 'socket.io-client';
+import * as Sentry from '@sentry/browser';
+import { userActions } from '@ducks/userDuck';
+import ErrorBoundary from 'react-error-boundary';
+import { toast, ToastContainer } from 'react-toastify';
+import { Invitation } from '@storage/models';
+import { discoveryActions } from '@ducks/discoveryDuck';
+import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
+import { SocketContext, Log, UserService } from '@utils';
+import { PrivateLayout, PublicLayout } from '@layouts';
 import {
   DiscoverPage,
   HomePage,
@@ -14,23 +24,14 @@ import {
   ApplicationPage,
   SettingsPage
 } from '@containers';
-import { PrivateLayout, PublicLayout } from '@layouts';
-import { SocketContext, Log, UserService } from '@utils';
-import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
-import io from 'socket.io-client';
-import * as Sentry from '@sentry/browser';
-import { userActions } from '@ducks/userDuck';
 import {
   DashboardHeader,
-  DiscoverHeader,
   ApplicationHeader,
-  ApplicationsBrowserHeader,
+  DiscoverHeader,
   SettingsHeader,
-  AboutHeader
+  AboutHeader,
+  ApplicationsBrowserHeader
 } from '@components';
-import ErrorBoundary from 'react-error-boundary';
-import { toast, ToastContainer } from 'react-toastify';
-import { Invitation } from '@storage/models';
 
 // Socket URL defaults to window.location
 // and default path is /socket.io in case
@@ -74,7 +75,13 @@ type Props = {
   // eslint-disable-next-line react/no-unused-prop-types
   discoverySessions: Array<Object>,
   // eslint-disable-next-line react/no-unused-prop-types
-  pipelineExecutions: Array<Object>
+  pipelineExecutions: Array<Object>,
+  // eslint-disable-next-line react/no-unused-prop-types
+  dataSampleSessionId: string,
+  handleSetDataSampleSessionId: Function,
+  handleSetDiscoveryId: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoveryId: string
 };
 
 type State = {
@@ -256,8 +263,12 @@ class AppRouter extends React.PureComponent<Props, State> {
       handleUpdateDiscoverySession,
       handleUpdateExecutionSession,
       handleDeleteDiscoverySession,
-      handleDeleteExecutionSession
+      handleDeleteExecutionSession,
+      handleSetDataSampleSessionId,
+      handleSetDiscoveryId
     } = this.props;
+
+    const self = this;
 
     if (socket) {
       // restart if there is an instance already
@@ -289,6 +300,11 @@ class AppRouter extends React.PureComponent<Props, State> {
         return;
       }
       const parsedData = JSON.parse(data);
+      const sessionId = parsedData.sessionId || undefined;
+      if (sessionId === self.props.dataSampleSessionId) {
+        handleSetDataSampleSessionId(undefined);
+        handleSetDiscoveryId(parsedData.discoveryId);
+      }
       socket.emit('join', parsedData.discoveryId);
       handleAddDiscoverySession(parsedData);
     });
@@ -307,8 +323,6 @@ class AppRouter extends React.PureComponent<Props, State> {
         handleDeleteDiscoverySession(discoveryId);
       }
     });
-
-    const self = this;
 
     socket.on('executionAdded', data => {
       if (data === undefined) {
@@ -355,7 +369,9 @@ class AppRouter extends React.PureComponent<Props, State> {
       }
       const parsedData = JSON.parse(data);
       if (parsedData.status.isFinished) {
-        socket.emit('leave', parsedData.discoveryId);
+        if (parsedData.discoveryId !== self.props.discoveryId) {
+          socket.emit('leave', parsedData.discoveryId);
+        }
         if (self.props.discoverySessions.length > 0) {
           const discoveryRecord = {};
 
@@ -483,7 +499,9 @@ const mapStateToProps = state => {
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
     discoverySessions: state.user.discoverySessions,
     pipelineExecutions: state.user.pipelineExecutions,
-    currentInboxInvitations: state.user.inboxInvitations
+    currentInboxInvitations: state.user.inboxInvitations,
+    dataSampleSessionId: state.discovery.dataSampleSessionId,
+    discoveryId: state.discovery.discoveryId
   };
 };
 
@@ -533,6 +551,18 @@ const mapDispatchToProps = dispatch => {
   const handleSetUserInboxInvitations = inboxInvitations =>
     dispatch(userActions.setUserInboxInvitations(inboxInvitations));
 
+  const handleSetDiscoveryId = discoveryId =>
+    dispatch(
+      discoveryActions.addDiscoveryIdAction({
+        id: discoveryId
+      })
+    );
+
+  const handleSetDataSampleSessionId = dataSampleSessionId =>
+    dispatch(
+      discoveryActions.addDataSampleSessionIdAction(dataSampleSessionId)
+    );
+
   return {
     handleSetSolidUserProfileAsync,
     handleSetUserWebId,
@@ -544,7 +574,9 @@ const mapDispatchToProps = dispatch => {
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
     handleUpdateUserDetails,
-    handleSetUserInboxInvitations
+    handleSetUserInboxInvitations,
+    handleSetDiscoveryId,
+    handleSetDataSampleSessionId
   };
 };
 

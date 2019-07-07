@@ -1,10 +1,10 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
 import { SettingsPageComponent } from './SettingsPageComponent';
-import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
-import { withAuthorization } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
+import { StoragePickFolderDialog } from '@storage';
+import { withAuthorization } from '@utils';
 
 type Props = {
   userProfile: Object,

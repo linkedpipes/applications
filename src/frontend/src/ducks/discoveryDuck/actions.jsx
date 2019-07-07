@@ -7,6 +7,11 @@ const addDiscoveryIdAction = ({ id } = {}) => ({
   }
 });
 
+const addDataSampleSessionIdAction = dataSampleSessionId => ({
+  type: types.SET_DATA_SAMPLE_SESSION_ID,
+  value: dataSampleSessionId
+});
+
 const setPipelineGroupsAction = pipelineGroups => {
   return {
     type: types.SET_PIPELINE_GROUPS,
@@ -23,6 +28,7 @@ const setSelectedPipelineGroupAction = ({ selectedPipelineGroup } = {}) => {
 
 export default {
   addDiscoveryIdAction,
+  addDataSampleSessionIdAction,
   setPipelineGroupsAction,
   setSelectedPipelineGroupAction
 };

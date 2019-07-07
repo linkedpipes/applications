@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VisualizersService } from '@utils';
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
 import Cluster from 'pigeon-cluster';
@@ -10,6 +9,7 @@ import {
   point as turfPoint
 } from '@turf/helpers';
 import geoViewport from '@mapbox/geo-viewport';
+import { VisualizersService } from '@utils';
 
 const averageGeolocation = (coords, width = 564, height = 300) => {
   const coord = coords.map(location =>

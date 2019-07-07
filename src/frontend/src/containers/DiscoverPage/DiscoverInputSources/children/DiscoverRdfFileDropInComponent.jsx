@@ -2,9 +2,9 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
-import { Log } from '@utils';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import { FilePond, registerPlugin } from 'react-filepond';
+import { Log } from '@utils';
 import './css/FilePondDarkStyle.css';
 
 // Register the filepond plugins
@@ -50,7 +50,7 @@ const DiscoverRdfFileDropInComponent = ({
   <div className={classes.gridRoot}>
     <FilePond
       // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
-      labelIdle="Drag & Drop your RDF file (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
+      labelIdle="Drag & Drop your RDF file or click me to choose (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
       allowMultiple={false}
       allowFileTypeValidation
       acceptedFileTypes={[
@@ -96,7 +96,7 @@ const DiscoverRdfFileDropInComponent = ({
     />
     <FilePond
       // eslint-disable-next-line no-return-assign, react/no-this-in-sfc
-      labelIdle="Drag & Drop your RDF data sample file (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
+      labelIdle="(Optional) Drag & Drop your RDF data sample file or click me to choose (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
       allowMultiple={false}
       allowFileTypeValidation
       acceptedFileTypes={[

@@ -1,6 +1,7 @@
 package com.linkedpipes.lpa.backend.util;
 
 import com.linkedpipes.lpa.backend.Application;
+import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import org.apache.jena.query.*;
 import org.apache.jena.update.*;
@@ -11,7 +12,7 @@ import java.util.function.Function;
 
 public final class JenaUtils {
 
-    private static final String ENDPOINT = Application.getConfig().getString("lpa.virtuoso.queryEndpoint");
+    private static final String ENDPOINT = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT);
 
     public static <R> R withQueryExecution(Query query, Function<QueryExecution, R> action) throws LpAppsException {
         List<String> graphNames = query.getGraphURIs();
