@@ -69,7 +69,7 @@ public class DiscoveryController {
      *
      * @param webId          the logged-in user's web ID
      * @param rdfFile        main RDF data file
-     * @param dataSampleFile data sample for main file
+     * @param dataSampleFile data sample for {@code rdfFile} (if not provided it's generated automatically)
      * @return an object representing the started Discovery
      * @throws LpAppsException if the Discovery start fails for any reason
      * @throws IOException if an I/O error occurs
@@ -93,11 +93,11 @@ public class DiscoveryController {
     }
 
     /**
-     * Start discovery of pipelines using data referenced by IRI
+     * Start discovery of pipelines using data referenced by IRI.
      *
      * @param webId         the logged-in user's web ID
      * @param rdfFileIri    IRI referencing a file with RDF data
-     * @param dataSampleIri IRI referencing a file containing a data sample for {@code rdfFileIri}
+     * @param dataSampleIri IRI referencing a file containing a data sample for {@code rdfFileIri} (if not provided it's generated automatically)
      * @return an object representing the started Discovery
      * @throws LpAppsException if the Discovery start fails for any reason
      * @throws IOException if an I/O error occurs
@@ -124,9 +124,10 @@ public class DiscoveryController {
     }
 
     /**
-     * Start discovery of pipelines using data in SPARQL endpoint
+     * Start discovery of pipelines using data in SPARQL endpoint.
+     *
      * @param sparqlEndpointIri IRI of the SPARQL endpoint containing the data
-     * @param dataSampleIri     IRI of the file containing a data sample of the data contained in {@code sparqlEndpointIri}
+     * @param dataSampleIri     IRI of the file containing a data sample of the data contained in {@code sparqlEndpointIri} (if not provided it's generated automatically using the first graph provided)
      * @param webId             the logged-in user's web ID
      * @param namedGraphs       a list of the named graphs in {@code sparqlEndpointIri} to query
      * @return an object representing the started Discovery

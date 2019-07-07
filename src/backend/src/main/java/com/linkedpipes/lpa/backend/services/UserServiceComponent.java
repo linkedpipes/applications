@@ -83,7 +83,7 @@ public class UserServiceComponent implements UserService {
      * Add discovery on user profile. Discovery started time is set to current
      * time.
      *
-     * @param username webId
+     * @param dbId identifier of the Discovery in database (session ID)
      * @param discoveryId discovery ID
      * @param sparqlEndpointIri SPARQL endpoint IRI as provided by user on frontend
      * @param dataSampleIri data sample IRI as provided by user on frontend
