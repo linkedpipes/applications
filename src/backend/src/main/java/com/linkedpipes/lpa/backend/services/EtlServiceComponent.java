@@ -80,29 +80,34 @@ public class EtlServiceComponent implements EtlService {
     @PostConstruct
     public void uploadDataSamplePipeline() throws IOException, InterruptedException {
         File dir = new File(SHARED_VOLUME_DIR);
-        FileUtils.forceMkdir(dir);
-
-        logger.info("Waiting for ETL to start");
-        while (true) {
-            try {
-                httpActions.getPipelines();
-                break;
-            } catch(LpAppsException e) {
-                Thread.sleep(1000);
-            }
-        }
-
-        logger.info("Uploading data sample pipeline to ETL");
         try {
-            try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
-                String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
-                String response = httpActions.createDataSamplePipeline(sample);
-                dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
-                logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+            FileUtils.forceMkdir(dir);
+
+            logger.info("Waiting for ETL to start");
+            while (true) {
+                try {
+                    httpActions.getPipelines();
+                    break;
+                } catch(LpAppsException e) {
+                    Thread.sleep(1000);
+                }
             }
-        } catch (LpAppsException e) {
-            logger.error("Failed to upload data sample pipeline to ETL", e);
+
+            logger.info("Uploading data sample pipeline to ETL");
+            try {
+                try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
+                    String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
+                    String response = httpActions.createDataSamplePipeline(sample);
+                    dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
+                    logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+                }
+            } catch (LpAppsException e) {
+                logger.error("Failed to upload data sample pipeline to ETL", e);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create shared directory (" + SHARED_VOLUME_DIR + ")", e);
         }
+
     }
 
     @PreDestroy
