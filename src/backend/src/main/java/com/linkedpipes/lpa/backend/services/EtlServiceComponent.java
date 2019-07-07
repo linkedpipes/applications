@@ -37,7 +37,7 @@ public class EtlServiceComponent implements EtlService {
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
 
-    private static String dataSamplePipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_PIPELINE_IRI);
+    private static String dataSamplePipelineIri = null; //loaded in uploadDataSamplePipeline()
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
