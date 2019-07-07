@@ -167,12 +167,6 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                         variant="outlined"
                         component="span"
                         color="primary"
-                        disabled={
-                          dataSourcesUris &&
-                          sparqlEndpointIri === '' &&
-                          dataSampleIri === '' &&
-                          namedGraph === ''
-                        }
                         onClick={onHandleClearInputsClicked}
                         size="small"
                       >

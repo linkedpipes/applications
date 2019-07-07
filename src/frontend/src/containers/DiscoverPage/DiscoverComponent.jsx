@@ -191,27 +191,30 @@ const Discover = ({
       </Container>
     </main>
     {/* Footer */}
-    {activeStep > 0 && (
-      <Paper className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Here are the LinkedData sources that you provided...
-        </Typography>
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          SPARQL IRI:
-        </Typography>{' '}
-        <Typography variant="body1">{sparqlEndpointIri || 'N/A'}</Typography>
-        <br />
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          Data sample IRI:
-        </Typography>{' '}
-        <Typography variant="body1">{dataSampleIri || 'N/A'}</Typography>
-        <br />
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          Named Graph IRIs:
-        </Typography>{' '}
-        <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
-      </Paper>
-    )}
+    {activeStep > 0 &&
+      (namedGraph !== '' ||
+        dataSampleIri !== '' ||
+        sparqlEndpointIri !== '') && (
+        <Paper className={classes.footer}>
+          <Typography variant="h6" align="center" gutterBottom>
+            Here are the LinkedData sources that you provided...
+          </Typography>
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            SPARQL IRI:
+          </Typography>{' '}
+          <Typography variant="body1">{sparqlEndpointIri || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Data sample IRI:
+          </Typography>{' '}
+          <Typography variant="body1">{dataSampleIri || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Named Graph IRIs:
+          </Typography>{' '}
+          <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
+        </Paper>
+      )}
     {/* End footer */}
   </React.Fragment>
 );

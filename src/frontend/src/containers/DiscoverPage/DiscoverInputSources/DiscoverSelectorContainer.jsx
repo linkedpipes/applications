@@ -48,7 +48,8 @@ type Props = {
   handleSetRdfUrlDataSampleIriFieldValue: Function,
   handleSetDataSampleSessionId: Function,
   // eslint-disable-next-line react/no-unused-prop-types
-  discoveryId: string
+  discoveryId: string,
+  rdfUrlDataSampleIri: string
 };
 
 type State = {
@@ -94,11 +95,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   postStartFromRdfInputIri = async () => {
-    const { rdfInputIri, webId, dataSampleIri } = this.props;
+    const { rdfInputIri, webId, rdfUrlDataSampleIri } = this.props;
     return DiscoveryService.postDiscoverFromInputIri({
       rdfInputIri,
       webId,
-      dataSampleIri
+      dataSampleIri: rdfUrlDataSampleIri
     }).then(response => {
       return response;
     });
@@ -340,6 +341,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph,
       rdfInputIri,
       inputType,
+      rdfFile,
       activeDiscoverTabIndex,
       rdfUrlDataSampleIri
     } = this.props;
@@ -350,7 +352,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         (sparqlEndpointIri === '' ||
           namedGraph === '' ||
           dataSampleIri === '')) ||
-      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '');
+      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '') ||
+      (inputType === 'RDF_INPUT_FILE' && rdfFile === undefined);
 
     return (
       <DiscoverSelectorComponent
