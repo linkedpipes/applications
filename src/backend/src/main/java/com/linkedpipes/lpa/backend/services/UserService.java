@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
     UserProfile addUserIfNotPresent(String user);
-    DiscoveryDao setUserDiscovery(long dbId, String discoveryId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws UserNotFoundException;
+    void setUserDiscovery(long dbId, String discoveryId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws UserNotFoundException;
     DiscoveryDao setUserDiscovery(String username) throws UserNotFoundException;
     void setUserExecution(String user, String execution, String etlPipelineIri, String visualizer) throws UserNotFoundException;
     UserProfile deleteExecution(String user, String executionIri) throws UserNotFoundException;

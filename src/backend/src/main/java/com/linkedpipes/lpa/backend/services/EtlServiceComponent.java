@@ -36,8 +36,8 @@ public class EtlServiceComponent implements EtlService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
-
-    private static String dataSamplePipelineIri = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_PIPELINE_IRI);
+    private static final String SHARED_VOLUME_DIR = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_SHARED_VOLUME_DIR);
+    private static String dataSamplePipelineIri = null; //loaded in uploadDataSamplePipeline()
 
     private final ApplicationContext context;
     private final HttpActions httpActions = new HttpActions();
@@ -71,7 +71,7 @@ public class EtlServiceComponent implements EtlService {
 
     @Override
     public Execution executeDataSamplePipeline(String sparqlEndpointIri, String namedGraph) throws LpAppsException {
-         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipeline(namedGraph, sparqlEndpointIri);
+         String transformed = DataSamplePipelineInputGenerator.getDataSamplePipelineInput(namedGraph, sparqlEndpointIri);
          logger.info("Data sample input:\n" + transformed);
          String response = httpActions.executeDataSamplePipeline(dataSamplePipelineIri, transformed);
          return OBJECT_MAPPER.readValue(response, Execution.class);
@@ -79,29 +79,35 @@ public class EtlServiceComponent implements EtlService {
 
     @PostConstruct
     public void uploadDataSamplePipeline() throws IOException, InterruptedException {
-        File dir = new File(ExecutorServiceComponent.SHARED_VOLUME_DIR);
-        FileUtils.forceMkdir(dir);
-
-        logger.info("Waiting for ETL to start");
-        while (true) {
-            try {
-                httpActions.getPipelines();
-                break;
-            } catch(LpAppsException e) {
-                Thread.sleep(1000);
-            }
-        }
-        logger.info("Uploading data sample pipeline to ETL");
+        File dir = new File(SHARED_VOLUME_DIR);
         try {
-            try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
-                String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
-                String response = httpActions.createDataSamplePipeline(sample);
-                dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
-                logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+            FileUtils.forceMkdir(dir);
+
+            logger.info("Waiting for ETL to start");
+            while (true) {
+                try {
+                    httpActions.getPipelines();
+                    break;
+                } catch(LpAppsException e) {
+                    Thread.sleep(1000);
+                }
             }
-        } catch (LpAppsException e) {
-            logger.error("Failed to upload data sample pipeline to ETL", e);
+
+            logger.info("Uploading data sample pipeline to ETL");
+            try {
+                try (java.io.InputStream is = EtlServiceComponent.class.getResourceAsStream("datasample.jsonld")) {
+                    String sample = IOUtils.toString(is, java.nio.charset.StandardCharsets.UTF_8);
+                    String response = httpActions.createDataSamplePipeline(sample);
+                    dataSamplePipelineIri = response.substring(response.indexOf("<") + 1, response.indexOf(">"));
+                    logger.info("New data sample pipeline IRI: " + dataSamplePipelineIri);
+                }
+            } catch (LpAppsException e) {
+                logger.error("Failed to upload data sample pipeline to ETL", e);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create shared directory (" + SHARED_VOLUME_DIR + ")", e);
         }
+
     }
 
     @PreDestroy

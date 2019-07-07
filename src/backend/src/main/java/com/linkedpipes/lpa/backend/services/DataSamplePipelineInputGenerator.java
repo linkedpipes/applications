@@ -6,7 +6,7 @@ import java.util.UUID;
 
 
 public class DataSamplePipelineInputGenerator {
-        public static String getDataSamplePipeline(String graphIri, String virtuosoEndpointIri) {
+        public static String getDataSamplePipelineInput(String graphIri, String virtuosoEndpointIri) {
             ModelBuilder modelBuilder = ModelBuilder.empty().namespace("etl", "http://linked.opendata.cz/ontology/adhoc/");
             ResourceBuilder resourceBuilder = modelBuilder.resource("https://applications.linkedpipes.com/ds-" + UUID.randomUUID().toString());
             resourceBuilder.property(ResourceFactory.createProperty("http://linked.opendata.cz/ontology/adhoc/ep"), virtuosoEndpointIri);
