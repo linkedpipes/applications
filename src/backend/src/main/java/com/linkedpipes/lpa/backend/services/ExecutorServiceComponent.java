@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.constants.SupportedRDFMimeTypes;
+import com.linkedpipes.lpa.backend.controllers.VirtuosoController;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
 import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
@@ -14,10 +15,14 @@ import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import com.linkedpipes.lpa.backend.util.GitHubUtils;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
+import com.linkedpipes.lpa.backend.util.IExecutionCallback;
+import com.linkedpipes.lpa.backend.util.SparqlUtils;
+
 import com.linkedpipes.lpa.backend.util.RdfUtils;
 import com.linkedpipes.lpa.backend.util.rdfbuilder.ModelBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +43,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -52,12 +59,15 @@ public class ExecutorServiceComponent implements ExecutorService {
     private static final LpAppsObjectMapper OBJECT_MAPPER = new LpAppsObjectMapper(
             new ObjectMapper()
                     .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+    private static final String DATA_SAMPLE_RESULT_GRAPH_IRI = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_RESULT_GRAPH_IRI);
+    private static final String SHARED_VOLUME_DIR = Application.getConfig().getString(ApplicationPropertyKeys.DATA_SAMPLE_SHARED_VOLUME_DIR);
+
 
     private final int DISCOVERY_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_TIMEOUT);
     private final int ETL_TIMEOUT_MINS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_TIMEOUT);
     private final int DISCOVERY_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.DISCOVERY_POLLING_FREQUENCY);
     private final int ETL_POLLING_FREQUENCY_SECS = Application.getConfig().getInt(ApplicationPropertyKeys.ETL_POLLING_FREQUENCY);
-
+    @NotNull private final AtomicInteger counter = new AtomicInteger(0);
     @NotNull private final DiscoveryService discoveryService;
     @NotNull private final EtlService etlService;
     @NotNull private final UserService userService;
@@ -84,10 +94,11 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
-        processStartedDiscovery(discovery.id, userId, null, null, null);
-        return discovery;
+        DiscoveryDao d = this.userService.setUserDiscovery(userId);
+        processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        return DiscoverySession.create(d.getId(), discovery.id);
     }
 
     /**
@@ -102,10 +113,11 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
-        processStartedDiscovery(discovery.id, userId, null, null, null);
-        return discovery;
+        DiscoveryDao d = this.userService.setUserDiscovery(userId);
+        processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        return DiscoverySession.create(d.getId(), discovery.id);
     }
 
     /**
@@ -122,10 +134,21 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+    public DiscoverySession startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        DiscoveryDao d = userService.setUserDiscovery(userId);
+        long sessionId = d.getId();
+
+        if (dataSampleIri == null) {
+            return runDataSamplePipeline(sparqlEndpointIri, namedGraphs, userId, sessionId);
+        } else {
+            return executeDiscoveryFromEndpoint(userId, sessionId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        }
+    }
+
+    private DiscoverySession executeDiscoveryFromEndpoint(@NotNull String userId, @NotNull long sessionId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
-        processStartedDiscovery(discovery.id, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
-        return discovery;
+        processStartedDiscovery(discovery.id, sessionId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        return DiscoverySession.create(sessionId, discovery.id);
     }
 
     /**
@@ -140,7 +163,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws IOException reading RDF data from URI failed
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
+    public DiscoverySession startDiscoveryFromInputIri(@NotNull String rdfFileIri, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, IOException {
         //read rdf data from iri and upload it to our virtuoso, create discovery config
         ModelBuilder mb = ModelBuilder.from(new URL(rdfFileIri));
         //get rdf data in TTL format
@@ -159,12 +182,87 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws LpAppsException call to discovery failed
      * @throws UserNotFoundException user was not found
      */
-    @NotNull @Override
-    public Discovery startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
+    @Nullable @Override
+    public DiscoverySession startDiscoveryFromInput(@NotNull final String rdfData, @NotNull Lang rdfLanguage, @NotNull String userId, @Nullable String dataSampleIri) throws LpAppsException, UserNotFoundException {
         //upload rdf in TTL format to our virtuoso, create discovery config and pass it to discovery
         String turtleRdfData = RdfUtils.RdfDataToTurtleFormat(rdfData, rdfLanguage);
         String namedGraph = VirtuosoService.putTtlToVirtuosoRandomGraph(turtleRdfData);
-        return startDiscoveryFromEndpoint(userId, Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), dataSampleIri, Arrays.asList(namedGraph));
+        String endpoint = Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT);
+        DiscoveryDao d = userService.setUserDiscovery(userId);
+        long sessionId = d.getId();
+
+        if (dataSampleIri == null) {
+            //generate data sample from named graph here
+            return runDataSamplePipeline(endpoint, Arrays.asList(namedGraph), userId, sessionId);
+        } else {
+            return executeDiscoveryFromEndpoint(userId, sessionId, endpoint, dataSampleIri, Arrays.asList(namedGraph));
+        }
+    }
+
+    private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long sessionId) throws LpAppsException {
+        logger.debug("Will execute data sample pipeline");
+        counter.compareAndSet(0, 1);
+        try {
+            File dir = new File(SHARED_VOLUME_DIR);
+            FileUtils.forceMkdir(dir);
+            FileUtils.cleanDirectory(dir); //make sure we have empty dir as we upload *.ttl to virtuoso
+        } catch (IOException ex) {
+            logger.warn("Failed to clean the shared folder before pipeline", ex);
+        }
+        Execution dsPipe = etlService.executeDataSamplePipeline(sparqlEndpointIri, namedGraphs.get(0));
+        startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, sparqlEndpointIri, namedGraphs, sessionId));
+
+        return DiscoverySession.create(sessionId, null);
+    }
+
+    private void reportError(long sessionId, final String userId) {
+        try {
+            DiscoverySession session = DiscoverySession.createError(sessionId);
+            Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
+        } catch (LpAppsException e) {
+            logger.error("Failed to report error", e);
+        }
+    }
+
+    private IExecutionCallback getSampleCallback(final String userId, final String sparqlEndpointIri, final List<String> namedGraphs, final long sessionId) {
+        return new IExecutionCallback() {
+            public void execute(EtlStatusReport report) {
+                if (counter.get() != 1) {
+                    logger.warn("Executing sample callback while counter is not 1!");
+                }
+                try {
+                    FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR));
+                } catch (IOException ex) {
+                    logger.warn("Failed to clean the shared folder after pipeline", ex);
+                }
+
+                if (report.status.status.equals(EtlStatus.FINISHED)) {
+                    logger.info("Pipeline finished, should extract sample now");
+                    //extract data sample from graph: https://applications.linkedpipes.com/graph/test-data-sample-graph
+                    String ttl = SparqlUtils.extractTTL(DATA_SAMPLE_RESULT_GRAPH_IRI);
+                    String gistName = namedGraphs.get(0).substring(VirtuosoController.GRAPH_NAME_PREFIX.length()) + ".ttl";
+                    try {
+                        String dataSampleIri = GitHubUtils.uploadGistFile(gistName, ttl);
+                        VirtuosoService.deleteNamedGraph(DATA_SAMPLE_RESULT_GRAPH_IRI);
+                        executeDiscoveryFromEndpoint(userId, sessionId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+                        //this will trigger socket notification of the started discovery & starts polling
+                    } catch (LpAppsException|UserNotFoundException ex) {
+                        logger.error("Failed to start discovery after generating data sample: " + report.executionIri, ex);
+                        reportError(sessionId, userId);
+                    } catch (IOException e) {
+                        logger.error("Failed to export generated data sample to github (" + gistName + "), sample was:\n" + ttl, e);
+                        reportError(sessionId, userId);
+                    }
+                } else {
+                    logger.error("Data sample pipeline finished with errors");
+                    reportError(sessionId, userId);
+                }
+
+                if (counter.decrementAndGet() != 0) {
+                    logger.warn("Leaving sample callback with counter not 0");
+                }
+            }
+        };
     }
 
     /**
@@ -179,17 +277,20 @@ public class ExecutorServiceComponent implements ExecutorService {
      * @throws UserNotFoundException user was not found
      */
     @NotNull @Override
-    public Discovery startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @NotNull MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
+    public DiscoverySession startDiscoveryFromInputFiles(@NotNull MultipartFile rdfFile, @Nullable MultipartFile dataSampleFile, @NotNull String userId) throws LpAppsException, IOException {
         Lang rdfFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(rdfFile.getContentType());
-        Lang dataSampleFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(dataSampleFile.getContentType());
-
-        if (rdfFileLanguage == null || dataSampleFileLanguage == null){
+        if (rdfFileLanguage == null) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "File content type not supported");
         }
 
-        String dataSampleIri = GitHubUtils.uploadGistFile(dataSampleFile.getName(), RdfUtils.RdfDataToTurtleFormat(new String(dataSampleFile.getBytes()), dataSampleFileLanguage));
+        String dataSampleIri = null;
+        if ( dataSampleFile != null ) {
+            Lang dataSampleFileLanguage = SupportedRDFMimeTypes.mimeTypeToRiotLangMap.get(dataSampleFile.getContentType());
+            dataSampleIri = GitHubUtils.uploadGistFile(dataSampleFile.getName(), RdfUtils.RdfDataToTurtleFormat(new String(dataSampleFile.getBytes()), dataSampleFileLanguage));
+        }
 
         return startDiscoveryFromInput(new String(rdfFile.getBytes()), rdfFileLanguage, userId, dataSampleIri);
+
     }
 
     /**
@@ -204,8 +305,8 @@ public class ExecutorServiceComponent implements ExecutorService {
     * @throws LpAppsException initial discovery status call failed
     * @throws UserNotFoundException user was not found
     */
-    private void processStartedDiscovery(String discoveryId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
-        this.userService.setUserDiscovery(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
+    private void processStartedDiscovery(String discoveryId, long dbId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        this.userService.setUserDiscovery(dbId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
     }
@@ -226,7 +327,9 @@ public class ExecutorServiceComponent implements ExecutorService {
         for (DiscoveryDao d : discoveryRepository.findByDiscoveryId(discoveryId)) {
             DiscoverySession session = new DiscoverySession();
             session.discoveryId = d.getDiscoveryId();
+            session.sessionId = d.getId();
             session.isFinished = discoveryStatus.isFinished;
+            session.isFailed = false;
             session.started = d.getStarted().getTime() / 1000L;
             if (d.getFinished() != null) {
                 session.finished = d.getFinished().getTime() / 1000L;
@@ -241,6 +344,20 @@ public class ExecutorServiceComponent implements ExecutorService {
             }
             Application.SOCKET_IO_SERVER.getRoomOperations(userId).sendEvent("discoveryAdded", OBJECT_MAPPER.writeValueAsString(session));
         }
+    }
+
+    private static IExecutionCallback getMainCallback() {
+        return new IExecutionCallback() {
+            public void execute(EtlStatusReport report) {
+                try {
+                    Application.SOCKET_IO_SERVER.getRoomOperations(report.executionIri)
+                        .sendEvent("executionStatus",
+                                   OBJECT_MAPPER.writeValueAsString(report));
+                } catch (LpAppsException ex) {
+                    logger.error("Failed to report execution status: " + report.executionIri, ex);
+                }
+            }
+        };
     }
 
     /**
@@ -259,7 +376,7 @@ public class ExecutorServiceComponent implements ExecutorService {
         Execution execution = this.etlService.executePipeline(etlPipelineIri);
         this.userService.setUserExecution(userId, execution.iri, etlPipelineIri, selectedVisualiser);  //this inserts execution in DB
         notifyExecutionStarted(execution.iri, userId);
-        startEtlStatusPolling(execution.iri);
+        startEtlStatusPolling(execution.iri, getMainCallback());
         return execution;
     }
 
@@ -297,7 +414,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param executionIri execution IRI to poll for
      */
-    private void startEtlStatusPolling(final String executionIri) {
+    private void startEtlStatusPolling(final String executionIri, final IExecutionCallback callback) {
         Runnable checker = () -> {
             PipelineInformationDao pipeline = null;
             try {
@@ -316,25 +433,14 @@ public class ExecutorServiceComponent implements ExecutorService {
 
                 if (!executionStatus.status.isPollable()) {
                     EtlStatusReport report = EtlStatusReport.createStandardReport(executionStatus, executionIri, pipeline);
-
-                    try {
-                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri)
-                            .sendEvent("executionStatus",
-                                       OBJECT_MAPPER.writeValueAsString(report));
-                    } catch (LpAppsException ex) {
-                        logger.error("Failed to report execution status: " + executionIri, ex);
-                    }
+                    callback.execute(report);
                     throw new PollingCompletedException(); //this cancels the scheduler
                 }
             } catch (LpAppsException e) {
                 logger.error("Got exception when polling for ETL status.", e);
 
                 EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, false, pipeline);
-                try {
-                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
-                } catch (LpAppsException ex) {
-                    logger.error("Failed to report execution status: " + executionIri, ex);
-                }
+                callback.execute(report);
                 throw new PollingCompletedException(e); //this cancels the scheduler
             }
         };
@@ -347,16 +453,11 @@ public class ExecutorServiceComponent implements ExecutorService {
                 if (e.getStatus() != EtlStatus.FINISHED) {
                     logger.info("Cancelling execution");
                     EtlStatusReport report = EtlStatusReport.createErrorReport(executionIri, true, null);
-
-                    try {
-                        Application.SOCKET_IO_SERVER.getRoomOperations(executionIri).sendEvent("executionStatus", OBJECT_MAPPER.writeValueAsString(report));
-                    } catch (LpAppsException ex) {
-                        logger.error("Failed to report execution status: " + executionIri, ex);
-                    }
-
+                    callback.execute(report);
                     cancelExecution(e, executionIri);
                 }
             }
+            counter.lazySet(0); //make sure we unlock the data sample pipeline
         };
 
         logger.info("Scheduling canceler to run in " + ETL_TIMEOUT_MINS + " minutes.");
