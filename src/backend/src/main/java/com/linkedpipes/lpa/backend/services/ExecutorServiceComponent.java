@@ -223,7 +223,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      */
     private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long sessionId) throws LpAppsException {
         logger.debug("Will execute data sample pipeline");
-        if ((namedGraphs == null) || (namedGraph.size() < 1)) {
+        if ((namedGraphs == null) || (namedGraphs.size() < 1)) {
             logger.error("Failed to execute data sample pipeline - named graphs null or empty");
             reportError(sessionId, userId);
             return;
