@@ -119,7 +119,7 @@ const Discover = ({
             used, if no multiple choises available it will pick one for your
             automatically. After that, it will transform the LinkedData into a
             format supported by that visualizer by executing a special data
-            transformatio pipeline. Finally it will take you to the application
+            transformation pipeline. Finally it will take you to the application
             setup page where you will name your application and publish it to
             share with anyone across the Web!
           </Typography>
