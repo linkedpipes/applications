@@ -34,7 +34,6 @@ public class HttpRequestSender {
 
     private static final String HTTP_PROPERTY_KEY_CONTENT_TYPE = "Content-Type";
     private static final String HTTP_PROPERTY_KEY_ACCEPT = "Accept";
-    private static final Logger logger = LoggerFactory.getLogger(HttpRequestSender.class);
 
     private final HttpURLConnectionFactory factory;
 
