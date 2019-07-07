@@ -227,7 +227,7 @@ public class ExecutorServiceComponent implements ExecutorService {
             logger.error("Failed to execute data sample pipeline - named graphs null or empty");
             reportError(sessionId, userId);
             return;
-        } else if (namedGraph.size() > 1) {
+        } else if (namedGraphs.size() > 1) {
             logger.warn("More than 1 named graphs submitted, only the first one will be used for data sample generation");
         }
 
