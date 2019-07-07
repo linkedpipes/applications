@@ -6,28 +6,26 @@ javadoc:
     - type: 'javadocClassLinks'
   pages:
     menu:
-    - type: 'javadocClasses'
     - type: 'javadocPackages'
 
 site:
   about:
     siteName: 'LPA Backend Documentation'
-    avatar: '/assets/media/logo.jpg'
 
 theme:
   social:
     github: 'linkedpipes/applications'
   menu:
-  - type: 'page'
+  - type: 'link'
     title: 'Home'
-    url: '/g'
-  - type: 'page'
-    url: 'https://www.example.com'
+    url: '/'
+  - type: 'link'
+    title: 'Javadoc'
+    url: '/com/linkedpipes/lpa/backend'
   #    - type: 'pages'
   #      atRoot: true
   extraCss:
-  - 'assets/css/extraCss.scss'
-  - 'assets/css/pygments.scss'
+  - 'assets/css/sideNav.css'
   extraJs:
   - 'assets/js/extraJs.js'
 
