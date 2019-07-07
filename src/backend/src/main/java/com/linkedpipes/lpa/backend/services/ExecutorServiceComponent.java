@@ -97,8 +97,8 @@ public class ExecutorServiceComponent implements ExecutorService {
     public DiscoverySession startDiscoveryFromConfig(@NotNull String discoveryConfig, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInput(discoveryConfig);
         DiscoveryDao d = this.userService.setUserDiscovery(userId);
-        long sessionId  = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
-        return DiscoverySession.create(sessionId, discovery.id);
+        processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        return DiscoverySession.create(d.getId(), discovery.id);
     }
 
     /**
@@ -116,8 +116,8 @@ public class ExecutorServiceComponent implements ExecutorService {
     public DiscoverySession startDiscoveryFromConfigIri(@NotNull String discoveryConfigIri, @NotNull String userId) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromInputIri(discoveryConfigIri);
         DiscoveryDao d = this.userService.setUserDiscovery(userId);
-        long sessionId = processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
-        return DiscoverySession.create(sessionId, discovery.id);
+        processStartedDiscovery(discovery.id, d.getId(), userId, null, null, null);
+        return DiscoverySession.create(d.getId(), discovery.id);
     }
 
     /**
@@ -136,18 +136,18 @@ public class ExecutorServiceComponent implements ExecutorService {
     @NotNull @Override
     public DiscoverySession startDiscoveryFromEndpoint(@NotNull String userId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         DiscoveryDao d = userService.setUserDiscovery(userId);
-        long discoveryId = d.getId();
+        long sessionId = d.getId();
 
         if (dataSampleIri == null) {
-            return runDataSamplePipeline(sparqlEndpointIri, namedGraphs, userId, discoveryId);
+            return runDataSamplePipeline(sparqlEndpointIri, namedGraphs, userId, sessionId);
         } else {
-            return executeDiscoveryFromEndpoint(userId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+            return executeDiscoveryFromEndpoint(userId, sessionId, sparqlEndpointIri, dataSampleIri, namedGraphs);
         }
     }
 
-    private DiscoverySession executeDiscoveryFromEndpoint(@NotNull String userId, @NotNull long discoveryId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+    private DiscoverySession executeDiscoveryFromEndpoint(@NotNull String userId, @NotNull long sessionId, @Nullable String sparqlEndpointIri, @Nullable String dataSampleIri, @Nullable List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
         Discovery discovery = this.discoveryService.startDiscoveryFromEndpoint(sparqlEndpointIri, dataSampleIri, namedGraphs);
-        long sessionId = processStartedDiscovery(discovery.id, discoveryId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
+        processStartedDiscovery(discovery.id, sessionId, userId, sparqlEndpointIri, dataSampleIri, namedGraphs);
         return DiscoverySession.create(sessionId, discovery.id);
     }
 
@@ -305,11 +305,10 @@ public class ExecutorServiceComponent implements ExecutorService {
     * @throws LpAppsException initial discovery status call failed
     * @throws UserNotFoundException user was not found
     */
-    private long processStartedDiscovery(String discoveryId, long dbId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
-        DiscoveryDao d = this.userService.setUserDiscovery(dbId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
+    private void processStartedDiscovery(String discoveryId, long dbId, String userId, String sparqlEndpointIri, String dataSampleIri, List<String> namedGraphs) throws LpAppsException, UserNotFoundException {
+        this.userService.setUserDiscovery(dbId, discoveryId, sparqlEndpointIri, dataSampleIri, namedGraphs);  //this inserts discovery in DB and sets flags
         notifyDiscoveryStarted(discoveryId, userId);
         startDiscoveryStatusPolling(discoveryId);
-        return d.getId();
     }
 
     /**

@@ -91,17 +91,14 @@ public class UserServiceComponent implements UserService {
      * @throws UserNotFoundException user was not found in database
      */
     @Nullable @Override
-    public DiscoveryDao setUserDiscovery(@NotNull final long dbId,
+    public void setUserDiscovery(@NotNull final long dbId,
                                  @NotNull final String discoveryId,
                                  @Nullable final String sparqlEndpointIri,
                                  @Nullable final String dataSampleIri,
                                  @Nullable final List<String> namedGraphs)
                                  throws UserNotFoundException {
         List<DiscoveryDao> discoveries = discoveryRepository.findById(dbId);
-        if (discoveries.size() == 0) {
-            return null;
-        } else {
-            DiscoveryDao d = discoveries.get(0);
+        for (DiscoveryDao d : discoveries) {
             d.setDiscoveryStarted(discoveryId, new Date());
             d.setSparqlEndpointIri(sparqlEndpointIri);
             d.setDataSampleIri(dataSampleIri);
@@ -114,7 +111,6 @@ public class UserServiceComponent implements UserService {
                 }
             }
             discoveryRepository.save(d);
-            return d;
         }
     }
 
