@@ -98,7 +98,7 @@ public class PipelineController {
     /**
      * Set the pipeline to be executed periodically.
      *
-     * @param frequencyHours interval (in hours) after which the pipeline will be eexecuted once again
+     * @param frequencyHours interval (in hours) after which the pipeline will be executed once again
      * @param webId user identifier
      * @param executionIri IRI of first pipeline execution
      * @param selectedVisualiser visualiser that was selected by user on frontend (will be returned later)
