@@ -34,6 +34,7 @@ public class HttpRequestSender {
 
     private static final String HTTP_PROPERTY_KEY_CONTENT_TYPE = "Content-Type";
     private static final String HTTP_PROPERTY_KEY_ACCEPT = "Accept";
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequestSender.class);
 
     private final HttpURLConnectionFactory factory;
 
@@ -146,8 +147,7 @@ public class HttpRequestSender {
             try (InputStream inputStream = connection.getInputStream()) {
                 return StreamUtils.copyToString(inputStream, Application.DEFAULT_CHARSET);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new LpAppsException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with external service", e);
         }
     }

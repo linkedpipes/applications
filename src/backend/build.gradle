@@ -90,10 +90,10 @@ task unpack(type: Copy) {
 
 dockerRun {
     name 'my-container'
-    image 'linkedpipes/discovery'
+    image 'linkedpipes/applications:discovery_hang_fix'
     ports '9000:9000'
     daemonize true
-    command "-Dplay.crypto.secret=yourRandomSecret"
+    command "-Dldcp.etl.hostname=http://localhost:8080 -Dplay.crypto.secret=yourRandomSecret  -Dpidfile.path=/dev/null"
 }
 
 // Jacoco setup
