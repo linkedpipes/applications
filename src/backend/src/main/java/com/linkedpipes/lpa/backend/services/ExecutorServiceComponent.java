@@ -108,7 +108,7 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param discoveryConfigIri configuration IRI passed to discovery service
      * @param userId web ID of the user who started the discovery
-     * @return discovery ID wrapped in JSON object
+     * @return discovery session JSON object
      * @throws LpAppsException call to discovery failed
      * @throws UserNotFoundException user was not found
      */
@@ -126,10 +126,12 @@ public class ExecutorServiceComponent implements ExecutorService {
      * sockets and start status polling.
      *
      * @param userId web ID of the user who started the discovery
-     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
-     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
+     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be
+     * recorded in the DB
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded
+     * in the DB (if not present, the sample will be generated)
      * @param namedGraphs list of provided named graphs to be recorded in the DB
-     * @return discovery ID wrapped in JSON object
+     * @return discovery session JSON object
      * @throws LpAppsException call to discovery failed
      * @throws UserNotFoundException user was not found
      */
@@ -157,8 +159,8 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param userId web ID of the user who started the discovery
      * @param rdfFileIri IRI to a file containing RDF data
-     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
-     * @return discovery ID wrapped in JSON object
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB (if not present it will be generated)
+     * @return discovery session JSON object
      * @throws LpAppsException call to discovery failed
      * @throws IOException reading RDF data from URI failed
      */
@@ -177,8 +179,9 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param userId web ID of the user who started the discovery
      * @param rdfData RDF data
-     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
-     * @return discovery ID wrapped in JSON object
+     * @param rdfLanguage RDF file format
+     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB (if not present it will be generated)
+     * @return discovery session JSON object
      * @throws LpAppsException call to discovery failed
      * @throws UserNotFoundException user was not found
      */
@@ -199,16 +202,51 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Run ETL pipeline for data sample preparation. After the pipeline finishes
+     * sample callback is executed.
+     *
+     * Execution is protected by a semaphore, ensuring at most one such pipeline
+     * is running at all times (because the underlying pipeline has a hardcoded
+     * graph name as well as because we clean a shared data folder using a
+     * wildcard delete.
+     *
+     * @param sparqlEndpointIri our virtuoso SPARQL endpoint IRI
+     * @param namedGraphs list of named graphs, if null or empty we return
+     * immediately, should contain exactly one graph, if there are more, only
+     * the first one is used
+     * @param userId WebID
+     * @param sessionId ID of discovery object in the database
+     * @return intermediate discovery session object indicating sessionId to
+     * identify future socket messages
+     * @throws LpAppsException failed to execute data sample pipeline
+     */
     private DiscoverySession runDataSamplePipeline(final String sparqlEndpointIri, final List<String> namedGraphs, final String userId, long sessionId) throws LpAppsException {
         logger.debug("Will execute data sample pipeline");
-        counter.compareAndSet(0, 1);
+        if ((namedGraphs == null) || (namedGraph.size() < 1) {
+            logger.error("Failed to execute data sample pipeline - named graphs null or empty");
+            reportError(sessionId, userId);
+            return;
+        } else if (namedGraph.size() > 1) {
+            logger.warn("More than 1 named graphs submitted, only the first one will be used for data sample generation");
+        }
+
+        counter.compareAndSet(0, 1); //SEMAPHORE
+
+        // === PROTECTED SECTION ===
+        File dir = new File(SHARED_VOLUME_DIR);
         try {
-            File dir = new File(SHARED_VOLUME_DIR);
             FileUtils.forceMkdir(dir);
+        } catch (IOException ex) {
+            logger.error("Failed to ensure existence of the shared folder before pipeline execution", ex);
+        }
+
+        try {
             FileUtils.cleanDirectory(dir); //make sure we have empty dir as we upload *.ttl to virtuoso
         } catch (IOException ex) {
-            logger.warn("Failed to clean the shared folder before pipeline", ex);
+            logger.warn("Failed to clean the shared folder before pipeline execution", ex);
         }
+
         Execution dsPipe = etlService.executeDataSamplePipeline(sparqlEndpointIri, namedGraphs.get(0));
         startEtlStatusPolling(dsPipe.iri, getSampleCallback(userId, sparqlEndpointIri, namedGraphs, sessionId));
 
@@ -224,12 +262,31 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Sample callback is called after the data sample preparation pipeline is
+     * finished.
+     *
+     * If the pipeline is finished successfully, the result graph is extracted
+     * into TTL and uploaded on github pages. The named graph is then removed
+     * and discovery started using the generated data sample.
+     *
+     * Shared directory is cleaned at all times and semaphore is decreased to
+     * allow future access.
+     *
+     * @param userId webID
+     * @param sessionId ID of discovery object in the database
+     * @param sparqlEndpointIri our virtuoso SPARQL endpoint IRI
+     * @param namedGraphs list of named graphs, it must have at least one item
+     * inside but we assume it was checked earlier
+     * @return callback to be executed after polling for the ETL pipeline finishes
+     */
     private IExecutionCallback getSampleCallback(final String userId, final String sparqlEndpointIri, final List<String> namedGraphs, final long sessionId) {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
                 if (counter.get() != 1) {
                     logger.warn("Executing sample callback while counter is not 1!");
                 }
+
                 try {
                     FileUtils.cleanDirectory(new File(SHARED_VOLUME_DIR));
                 } catch (IOException ex) {
@@ -271,8 +328,8 @@ public class ExecutorServiceComponent implements ExecutorService {
      *
      * @param userId web ID of the user who started the discovery
      * @param rdfFile RDF data in file
-     * @param dataSampleFile data sample in file
-     * @return discovery ID wrapped in JSON object
+     * @param dataSampleFile data sample in file (if not present it will be generated)
+     * @return discovery session JSON object
      * @throws LpAppsException call to discovery failed
      * @throws UserNotFoundException user was not found
      */
@@ -298,7 +355,7 @@ public class ExecutorServiceComponent implements ExecutorService {
     * start status polling.
     *
     * @param discoveryId ID of the discovery that was started
-    * @param userId webId of the user who started the discovery (used for socket notifications)
+    * @param dbId database ID of the discovery object (sessionId passed to frontend / in DiscoverySession)
     * @param sparqlEndpointIri SPARQL endpoint IRI provided in frontend to be recorded in the DB
     * @param dataSampleIri data sample IRI provided in frontend to be recorded in the DB
     * @param namedGraphs list of provided named graphs to be recorded in the DB
@@ -346,6 +403,12 @@ public class ExecutorServiceComponent implements ExecutorService {
         }
     }
 
+    /**
+     * Main callback is called after pipeline for user data preparation is finished.
+     * There's only a simple socket notification to the frontend.
+     *
+     * @return callback to be executed after polling for the ETL pipeline finishes
+     */
     private static IExecutionCallback getMainCallback() {
         return new IExecutionCallback() {
             public void execute(EtlStatusReport report) {
