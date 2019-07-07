@@ -14,7 +14,7 @@ public final class ApplicationPropertyKeys {
     public static final String GITHUB_USER = "lpa.github.user";
     public static final String GITHUB_PASSWORD = "lpa.github.password";
     public static final String DATA_SAMPLE_SHARED_VOLUME_DIR = "lpa.dataSample.sharedVolumeDir";
-    public static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "lpa.dataSample.sharedVolumeDir";
+    public static final String DATA_SAMPLE_RESULT_GRAPH_IRI = "lpa.dataSample.resultGraphIri";
 
     private ApplicationPropertyKeys() {
     }
