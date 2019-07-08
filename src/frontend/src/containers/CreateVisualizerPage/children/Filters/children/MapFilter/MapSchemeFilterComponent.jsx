@@ -218,7 +218,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, editingMode } = this.props;
 
     return (
       <React.Fragment>
@@ -228,37 +228,41 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
               <FormControl row className={classes.formControl}>
                 <FormLabel component="legend">{filter.filterLabel}</FormLabel>
                 <FormGroup row className={classes.formGroup}>
-                  {filter.options.map(option => (
-                    <span>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            onChange={this.handleChange({
-                              filterUri: filter.filterUri,
-                              optionUri: option.uri
-                            })}
-                            checked={option.selected}
-                            value={option}
-                          />
-                        }
-                        label={
-                          <span>
-                            <IconButton
-                              onClick={this.handleClick(
-                                filter.filterUri,
-                                option
+                  {filter.options.map(
+                    option =>
+                      (editingMode || option.visible) && (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              onChange={this.handleChange({
+                                filterUri: filter.filterUri,
+                                optionUri: option.uri
+                              })}
+                              checked={option.selected}
+                              value={option}
+                            />
+                          }
+                          label={
+                            <React.Fragment>
+                              {this.props.editingMode && (
+                                <IconButton
+                                  onClick={this.handleClick(
+                                    filter.filterUri,
+                                    option
+                                  )}
+                                >
+                                  <MoreVertIcon />
+                                </IconButton>
                               )}
-                            >
-                              <MoreVertIcon />
-                            </IconButton>
-                            {option.label}
-                          </span>
-                        }
-                        className={classes.option}
-                        key={option.uri}
-                      />
-                    </span>
-                  ))}
+                              {option.label}
+                            </React.Fragment>
+                          }
+                          className={classes.option}
+                          key={option.uri}
+                          disabled={!option.enabled}
+                        />
+                      )
+                  )}
                 </FormGroup>
               </FormControl>
               <Divider className={classes.divider} variant="middle" />
