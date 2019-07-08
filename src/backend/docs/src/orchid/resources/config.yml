@@ -22,14 +22,6 @@ theme:
   - type: 'link'
     title: 'Javadoc'
     url: '/com/linkedpipes/lpa/backend'
-  #    - type: 'pages'
-  #      atRoot: true
   extraCss:
   - 'assets/css/sideNav.css'
-  extraJs:
-  - 'assets/js/extraJs.js'
-
-services:
-  generators:
-    externalIndices:
-    - 'https://orchid.netlify.com/meta/all.index.json'
+  - 'assets/css/color.css'

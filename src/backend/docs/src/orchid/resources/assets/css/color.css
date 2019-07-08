@@ -1,0 +1,85 @@
+body {
+    background-color: #1D2330;
+    color: white;
+    font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+code {
+    color: #FDB241;
+}
+
+.bs-docs-nav {
+    background-color: #181B21;
+}
+
+.bs-docs-nav .navbar-brand, .bs-docs-nav .navbar-nav > li > a {
+    color: white;
+}
+
+.bs-docs-nav .navbar-brand:hover, .bs-docs-nav .navbar-nav > li > a:hover {
+    color: #FDB241;
+    background-color: initial;
+}
+
+.bs-docs-sidebar .nav > .active > a, .bs-docs-sidebar .nav > .active:hover > a {
+    color: #FDB241;
+    border-left-color: #FDB241;
+}
+
+.bs-docs-sidebar .nav > li > a:hover, .bs-docs-sidebar .nav > li > a:focus {
+    color: #FDB241;
+    border-left-color: #FDB241;
+}
+
+.breadcrumb {
+    background-color: #181B21;
+}
+
+.breadcrumb > .active {
+    color: white;
+}
+
+.panel-default {
+    border-color: #2D3747;
+}
+
+.panel-default > .panel-heading {
+    background-color: #181B21;
+    color: white;
+    border-color: #2D3747;
+}
+
+.panel-body, .panel-footer {
+    background-color: #1D2330;
+}
+
+.list-group-item {
+    background-color: #1D2330;
+    border-color: #2D3747;
+}
+
+a.list-group-item:hover, a.list-group-item:focus {
+    background-color: #181B21;
+}
+
+.badge {
+    background-color: #7D899C;
+}
+
+.back-to-top:hover {
+    color: #FDB241;
+}
+
+.fa {
+    color: white;
+}
+
+.fa:hover {
+    color: #FDB241;
+    text-decoration: none;
+}
+
+#jumbotron {
+    background-image: none !important;
+    background-color: #181B21;
+}
