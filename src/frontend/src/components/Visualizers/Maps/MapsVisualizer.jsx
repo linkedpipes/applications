@@ -171,7 +171,7 @@ class MapsVisualizer extends PureComponent<Props, State> {
     const heightSize = Math.max(165, widthSize - 250);
 
     return (
-      <Map center={center} zoom={zoom} width={widthSize} height={heightSize}>
+      <Map center={center} zoom={zoom} height={heightSize}>
         <Cluster>
           {markers.map(marker => (
             <Marker
