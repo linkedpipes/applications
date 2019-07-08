@@ -7,4 +7,5 @@ import java.util.List;
 @Repository
 public interface DiscoveryRepository extends CrudRepository<DiscoveryDao, Long> {
     List<DiscoveryDao> findByDiscoveryId(String discoveryId);
+    List<DiscoveryDao> findById(long id);
 }

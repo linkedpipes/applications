@@ -69,6 +69,13 @@ const setDataSampleIri = dataSampleIri => {
   };
 };
 
+const setRdfUrlDataSampleIri = rdfUrlDataSampleIri => {
+  return {
+    type: types.SET_RDF_URL_DATA_SAMPLE_IRI,
+    value: rdfUrlDataSampleIri
+  }
+}
+
 const setRdfInputIri = rdfInputIri => {
   return {
     type: types.SET_RDF_RESOURCE_URL,
@@ -115,6 +122,7 @@ export default {
   setNamedGraph,
   setSparqlEndpointIri,
   setDataSampleIri,
+  setRdfUrlDataSampleIri,
   setRdfInputIri,
   setRdfFile,
   setRdfDataSampleFile,

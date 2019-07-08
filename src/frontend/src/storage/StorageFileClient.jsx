@@ -1,5 +1,5 @@
-import { Log } from '@utils';
 import { Utils } from './utils';
+import { Log } from '@utils';
 
 class StorageFileClient {
   folderExists = async (path, folderName) => {

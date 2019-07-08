@@ -5,6 +5,7 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 from concurrent.futures import ThreadPoolExecutor
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 from selenium import webdriver
@@ -207,7 +208,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
@@ -270,7 +270,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
 
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 

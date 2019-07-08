@@ -14,8 +14,8 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { GlobalUtils } from '@utils';
 import { Container } from '@material-ui/core';
+import { GlobalUtils } from '@utils';
 
 type Props = {
   classes: {

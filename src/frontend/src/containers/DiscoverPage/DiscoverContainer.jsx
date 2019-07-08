@@ -3,8 +3,8 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { DiscoverComponent } from './DiscoverComponent';
 import { discoverActions } from './duck';
-import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions } from '@ducks/discoveryDuck';
+import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   activeStep: Number,

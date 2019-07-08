@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VisualizersService } from '@utils';
-import { VISUALIZER_TYPE } from '@constants';
+import equal from 'fast-deep-equal';
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
 import Cluster from 'pigeon-cluster';
@@ -11,7 +10,8 @@ import {
   point as turfPoint
 } from '@turf/helpers';
 import geoViewport from '@mapbox/geo-viewport';
-import equal from 'fast-deep-equal';
+import { VisualizersService } from '@utils';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   classes: {

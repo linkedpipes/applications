@@ -1,11 +1,11 @@
 // @flow
 import React from 'react';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
 import equal from 'fast-deep-equal';
+import { VisualizersService } from '@utils';
+import { withStyles, withTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 type Props = {
   classes: {},
