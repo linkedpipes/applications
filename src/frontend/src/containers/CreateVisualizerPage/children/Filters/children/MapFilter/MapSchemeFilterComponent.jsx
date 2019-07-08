@@ -8,14 +8,14 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-// import Switch from '@material-ui/core/Switch';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Divider from '@material-ui/core/Divider';
-// import IconButton from '@material-ui/core/IconButton';
-// import Menu from '@material-ui/core/Menu';
-// import MenuItem from '@material-ui/core/MenuItem';
-// import MoreVertIcon from '@material-ui/icons/MoreVert';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Switch from '@material-ui/core/Switch';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -61,6 +61,15 @@ type Props = {
 };
 
 type State = {
+  anchorEl: any,
+  selectedFilterUri: string,
+  selectedOption: {
+    uri: string,
+    label: string,
+    selected: boolean,
+    enabled: boolean,
+    visible: boolean
+  },
   filters: Array<{
     filterUri: string,
     filterLabel: string,
@@ -125,8 +134,13 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     (this: any).handleChange = this.handleChange.bind(this);
+    (this: any).handleClick = this.handleClick.bind(this);
+    (this: any).handleClose = this.handleClose.bind(this);
     // Initialize nodes with the ones passed from props
     this.state = {
+      anchorEl: null,
+      selectedOption: null,
+      selectedFilterUri: null,
       filters: this.props.filters || []
     };
   }
@@ -165,6 +179,22 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
     await this.props.onApplyFilter(this.state.filters);
   };
 
+  handleClick = (filterUri, option) => event => {
+    this.setState({
+      anchorEl: event.currentTarget,
+      selectedFilterUri: filterUri,
+      selectedOption: option
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      anchorEl: null
+    });
+  };
+
+  handleVisibleChange = () => {};
+
   handleChange = ({ filterUri, optionUri }) => event => {
     if (this.isMounted) {
       const checked = event.target.checked;
@@ -191,35 +221,124 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
     const { classes } = this.props;
 
     return (
-      <ExpansionPanelDetails className={classes.panelDetails}>
-        {this.state.filters.map(filter => (
-          <div key={filter.filterLabel}>
-            <FormControl row className={classes.formControl}>
-              <FormLabel component="legend">{filter.filterLabel}</FormLabel>
-              <FormGroup row className={classes.formGroup}>
-                {filter.options.map(option => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        onChange={this.handleChange({
-                          filterUri: filter.filterUri,
-                          optionUri: option.uri
-                        })}
-                        checked={option.selected}
-                        value={option}
+      <React.Fragment>
+        <ExpansionPanelDetails className={classes.panelDetails}>
+          {this.state.filters.map(filter => (
+            <div key={filter.filterLabel}>
+              <FormControl row className={classes.formControl}>
+                <FormLabel component="legend">{filter.filterLabel}</FormLabel>
+                <FormGroup row className={classes.formGroup}>
+                  {filter.options.map(option => (
+                    <span>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            onChange={this.handleChange({
+                              filterUri: filter.filterUri,
+                              optionUri: option.uri
+                            })}
+                            checked={option.selected}
+                            value={option}
+                          />
+                        }
+                        label={
+                          <span>
+                            <IconButton
+                              onClick={this.handleClick(
+                                filter.filterUri,
+                                option
+                              )}
+                            >
+                              <MoreVertIcon />
+                            </IconButton>
+                            {option.label}
+                          </span>
+                        }
+                        className={classes.option}
+                        key={option.uri}
                       />
-                    }
-                    label={option.label}
-                    className={classes.option}
-                    key={option.uri}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-            <Divider className={classes.divider} variant="middle" />
-          </div>
-        ))}
-      </ExpansionPanelDetails>
+                    </span>
+                  ))}
+                </FormGroup>
+              </FormControl>
+              <Divider className={classes.divider} variant="middle" />
+            </div>
+          ))}
+        </ExpansionPanelDetails>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          keepMounted
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose}
+        >
+          {this.state.selectedOption && (
+            <React.Fragment>
+              <MenuItem onClick={this.handleClose}>
+                Enabled
+                <Switch
+                  checked={this.state.selectedOption.enabled}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => {
+                      return {
+                        filters: prevState.filters.map(f => {
+                          if (f.filterUri === prevState.selectedFilterUri) {
+                            return {
+                              ...f,
+                              options: f.options.map(o => {
+                                if (o.uri === prevState.selectedOption.uri) {
+                                  return {
+                                    ...o,
+                                    enabled: checked
+                                  };
+                                }
+                                return o;
+                              })
+                            };
+                          }
+                          return f;
+                        })
+                      };
+                    });
+                  }}
+                  value={this.state.selectedOption.enabled}
+                />
+              </MenuItem>
+              <MenuItem onClick={this.handleClose}>
+                Visible
+                <Switch
+                  checked={this.state.selectedOption.visible}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => {
+                      return {
+                        filters: prevState.filters.map(f => {
+                          if (f.filterUri === prevState.selectedFilterUri) {
+                            return {
+                              ...f,
+                              options: f.options.map(o => {
+                                if (o.uri === prevState.selectedOption.uri) {
+                                  return {
+                                    ...o,
+                                    visible: checked
+                                  };
+                                }
+                                return o;
+                              })
+                            };
+                          }
+                          return f;
+                        })
+                      };
+                    });
+                  }}
+                  value={this.state.selectedOption.visible}
+                />
+              </MenuItem>
+            </React.Fragment>
+          )}
+        </Menu>
+      </React.Fragment>
     );
   }
 }

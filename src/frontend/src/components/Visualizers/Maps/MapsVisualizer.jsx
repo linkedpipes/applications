@@ -164,12 +164,6 @@ class MapsVisualizer extends PureComponent<Props, State> {
     this.isMounted = false;
   }
 
-  refreshMap = (center, zoom, markers) => {
-    if (this.isMounted) {
-      this.setState({ center, zoom, markers });
-    }
-  };
-
   render() {
     const { height, width } = this.props;
     const { markers, center, zoom } = this.state;
