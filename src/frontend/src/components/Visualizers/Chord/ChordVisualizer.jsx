@@ -1,11 +1,10 @@
 // @flow
 import React from 'react';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
-// import uuid from 'uuid';
-import _ from 'lodash';
+import equal from 'fast-deep-equal';
+import { withStyles, withTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { VisualizersService } from '@utils';
 
 type Props = {
@@ -33,6 +32,7 @@ type State = {
   groupLabels: Array<string>
 };
 
+// Styles
 const styles = theme => ({
   filterSideBar: {
     overflowY: 'auto'
@@ -41,37 +41,6 @@ const styles = theme => ({
   input: {},
   theme
 });
-
-const areEqual = (
-  a: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
-  }>,
-  b: Array<{
-    label: string,
-    uri: string,
-    visible: boolean,
-    enabled: boolean,
-    selected: boolean
-  }>
-) => {
-  if (!a || !b) return false;
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) {
-    let eq = false;
-    for (let j = 0; j < b.length; j += 1) {
-      if (_.isEqual(a[i], b[j])) {
-        eq = true;
-        break;
-      }
-    }
-    if (!eq) return false;
-  }
-  return true;
-};
 
 class ChordVisualizer extends React.PureComponent<Props, State> {
   elementVizDiv: any;
@@ -157,15 +126,9 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
     }
   }
 
-  async componentDidUpdate(prevProps) {
-    // this.elementVizDiv = document.getElementById('viz-div'); // is this necessary?
-    // const size = Math.min(
-    //   this.elementVizDiv.clientHeight,
-    //   this.elementVizDiv.clientWidth
-    // );
+  async componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
-    if (!areEqual(prevProps.nodes, this.props.nodes)) {
-      // TODO: Dispatch action to setup selectedNodes
+    if (!equal(prevProps.nodes, this.props.nodes)) {
       const nodes = this.props.nodes;
       // If there are no selected nodes, then bring all the data
       // (should never happen)
