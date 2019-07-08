@@ -77,6 +77,13 @@ public class EtlServiceComponent implements EtlService {
          return OBJECT_MAPPER.readValue(response, Execution.class);
     }
 
+    /**
+     * To ensure data sample generation functionality, the pipeline must be
+     * uploaded first. This method is run after backend is started. Here:
+     * - shared folder is created
+     * - we wait for ETL to start (busy wait until a call returns ok)
+     * - pipeline is uploaded to ETL and IRI is recorded
+     */
     @PostConstruct
     public void uploadDataSamplePipeline() throws IOException, InterruptedException {
         File dir = new File(SHARED_VOLUME_DIR);
@@ -110,6 +117,9 @@ public class EtlServiceComponent implements EtlService {
 
     }
 
+    /**
+     * On clean shutdown we attempt to delete the pipeline from ETL
+     */
     @PreDestroy
     public void removeDataSamplePipeline() {
         logger.info("Deleting data sample pipeline");

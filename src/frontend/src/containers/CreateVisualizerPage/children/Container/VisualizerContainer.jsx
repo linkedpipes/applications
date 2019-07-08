@@ -70,6 +70,8 @@ const getVisualizer = (
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           height={height}
           width={width}
+          filters={pathOr([], 'filterGroups.mapFilters.filters', filtersState)}
+          visualizerCode={visualizerCode}
         />
       );
     }
@@ -115,22 +117,31 @@ const getVisualizer = (
 };
 
 const VisualizerControllerContainer = (props: Props) => {
+  const renderFilters = props.visualizer.visualizerCode !== VISUALIZER_TYPE.MAP;
   return (
     <Grid container className={props.classes.root} direction="row" spacing={10}>
-      <Grid item lg={4} md={5} xs={12} className={props.classes.filterSideBar}>
-        <FiltersComponent
-          editingMode
-          filtersState={props.filtersState}
-          selectedResultGraphIri={props.selectedResultGraphIri}
-        />
-      </Grid>
+      {renderFilters && (
+        <Grid
+          item
+          lg={4}
+          md={5}
+          xs={12}
+          className={props.classes.filterSideBar}
+        >
+          <FiltersComponent
+            editingMode
+            filtersState={props.filtersState}
+            selectedResultGraphIri={props.selectedResultGraphIri}
+          />
+        </Grid>
+      )}
 
       <Grid
         id="viz-div"
         className={props.classes.vizdiv}
         item
-        lg={8}
-        md={7}
+        lg={renderFilters ? 8 : 12}
+        md={renderFilters ? 7 : 12}
         xs={12}
       >
         <Container maxWidth="xl">

@@ -43,7 +43,8 @@ type State = {
 
 const styles = theme => ({
   root: {
-    flex: 1
+    flex: 1,
+    height: '100vh'
   },
   vizdiv: {
     overflow: 'hidden'
@@ -199,10 +200,12 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const { getApplication } = this;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
+    const renderFilters =
+      visible && this.state.applicationType !== VISUALIZER_TYPE.MAP;
 
     return (
       <Grid container className={this.props.classes.root} direction="row">
-        {visible && this.state.applicationType !== 'Loading' && (
+        {renderFilters && this.state.applicationType !== 'Loading' && (
           <Grid
             item
             lg={4}

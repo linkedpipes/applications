@@ -1,6 +1,15 @@
 import types from './types';
 import StorageToolbox from '@storage/StorageToolbox';
 
+// Map
+
+const setSelectedMapOptions = filters => {
+  return {
+    type: types.SET_SELECTED_MAP_OPTIONS,
+    filters
+  };
+};
+
 const setSelectedScheme = (filterName, schemes) => {
   return {
     type: types.SET_SELECTED_SCHEME,
@@ -129,5 +138,6 @@ export default {
   toggleEnabledWithSolid,
   resetFilters,
   toggleVisibleWithSolid,
-  setSelectedNodesWithSolid
+  setSelectedNodesWithSolid,
+  setSelectedMapOptions
 };
