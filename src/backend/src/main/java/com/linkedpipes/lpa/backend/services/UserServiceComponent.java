@@ -396,7 +396,6 @@ public class UserServiceComponent implements UserService {
      * removed we remove the named graph as well.
      *
      * @param username webId
-     * @param executionIri execution IRI
      * @param solidIri IRI of the application in SOLID
      * @return user profile after modification
      * @throws UserNotFoundException user was not found
