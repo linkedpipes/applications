@@ -49,7 +49,9 @@ type Props = {
   handleSetHomepageTabIndex: Function,
   handleSetSparqlIri: Function,
   handleSetNamedGraph: Function,
-  handleSetDataSampleIri: Function
+  handleSetDataSampleIri: Function,
+  selectedNavigationItem: string,
+  handleSetSelectedNavigationItem: Function
 };
 type State = {
   applicationsMetadata: Array<ApplicationMetadata>,
@@ -81,6 +83,15 @@ class HomeController extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
+
+    const {
+      selectedNavigationItem,
+      handleSetSelectedNavigationItem
+    } = this.props;
+
+    if (selectedNavigationItem !== 'dashboard') {
+      handleSetSelectedNavigationItem('dashboard');
+    }
 
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
@@ -437,7 +448,8 @@ const mapStateToProps = state => {
     userProfile: state.user,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId,
-    dashboardTabIndex: state.globals.dashboardTabIndex
+    dashboardTabIndex: state.globals.dashboardTabIndex,
+    selectedNavigationItem: state.globals.selectedNavigationItem
   };
 };
 
@@ -486,6 +498,10 @@ const mapDispatchToProps = dispatch => {
   const handleSetDataSampleIri = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
 
+  const handleSetSelectedNavigationItem = item => {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  };
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -499,7 +515,8 @@ const mapDispatchToProps = dispatch => {
     handleSetFiltersState,
     handleSetSparqlIri,
     handleSetNamedGraph,
-    handleSetDataSampleIri
+    handleSetDataSampleIri,
+    handleSetSelectedNavigationItem
   };
 };
 
