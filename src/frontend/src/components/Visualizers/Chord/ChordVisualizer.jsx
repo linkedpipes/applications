@@ -32,6 +32,7 @@ type State = {
   groupLabels: Array<string>
 };
 
+// Styles
 const styles = theme => ({
   filterSideBar: {
     overflowY: 'auto'
