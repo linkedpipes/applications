@@ -21,7 +21,7 @@ public final class Visualizers {
             entry("https://discovery.linkedpipes.com/resource/application/dcterms/template", "DCTERMS"),
             entry("https://discovery.linkedpipes.com/resource/application/map/template", "MAP"),
             entry("https://discovery.linkedpipes.com/resource/application/map-labeled-points/template", "LABELED_POINTS_MAP"),
-            entry("https://discovery.linkedpipes.com/resource/application/map-advanced-filters/template", "MAP_WITH_ADVANCED_FILTERS"),
+            entry("https://discovery.linkedpipes.com/resource/application/map-advanced-filters/template", "MAP_WITH_MARKER_FILTERS"),
             entry("https://discovery.linkedpipes.com/resource/application/treemap/template", "TREEMAP"),
             entry("https://discovery.linkedpipes.com/resource/application/chord/template", "CHORD"),
     };
