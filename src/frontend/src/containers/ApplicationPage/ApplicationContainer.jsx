@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
-import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -12,6 +11,7 @@ import { ApplicationConfiguration } from '@storage/models';
 import { filtersActions } from '@ducks/filtersDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import StorageToolbox from '@storage/StorageToolbox';
+import { userActions } from '@ducks/userDuck';
 import { Log, VisualizersService } from '@utils';
 import {
   MapsVisualizer,
@@ -134,6 +134,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
+    const { height, width } = this.state;
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
@@ -143,6 +144,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <MapsVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
           />
         );
       }
@@ -152,6 +155,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <TreemapVisualizer
             selectedResultGraphIri={graphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
             schemes={pathOr(
               [],
               'filterGroups.schemeFilter.options',
@@ -164,7 +169,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
-            size={this.state.height + this.state.width}
+            height={height + 200}
+            width={width + 200}
             nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
             isPublished
           />
@@ -251,7 +257,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
+    dispatch(userActions.setLightColorTheme(isLight));
 
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));

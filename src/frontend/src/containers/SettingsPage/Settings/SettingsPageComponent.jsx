@@ -49,14 +49,16 @@ type Props = {
   classes: Object,
   userProfile: Object,
   onHandleChangeFolder: Function,
-  onHandleChangeColorTheme: Function
+  onHandleChangeColorTheme: Function,
+  colorThemeIsLight: boolean
 };
 
 const SettingsPage = ({
   classes,
   userProfile,
   onHandleChangeFolder,
-  onHandleChangeColorTheme
+  onHandleChangeColorTheme,
+  colorThemeIsLight
 }: Props) => {
   return (
     <main className={classes.main}>
@@ -85,6 +87,7 @@ const SettingsPage = ({
               <Checkbox
                 onChange={onHandleChangeColorTheme}
                 value="remember"
+                checked={colorThemeIsLight}
                 color="primary"
               />
             }

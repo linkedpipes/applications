@@ -80,7 +80,8 @@ type Props = {
   onBackClicked: Function,
   sparqlEndpointIri: string,
   dataSampleIri: string,
-  namedGraph: string
+  namedGraph: string,
+  selectedVisualizerTitle: string
 };
 
 const Discover = ({
@@ -90,7 +91,8 @@ const Discover = ({
   etlExecutionStatus,
   sparqlEndpointIri,
   dataSampleIri,
-  namedGraph
+  namedGraph,
+  selectedVisualizerTitle
 }: Props) => (
   <React.Fragment>
     <main>
@@ -180,7 +182,7 @@ const Discover = ({
                     });
                   }}
                   component={Link}
-                  to="/create-app"
+                  to="/config-application"
                 >
                   Create App
                 </Button>
@@ -213,6 +215,11 @@ const Discover = ({
             Named Graph IRIs:
           </Typography>{' '}
           <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Based on:
+          </Typography>{' '}
+          <Typography variant="body1">{selectedVisualizerTitle}</Typography>
         </Paper>
       )}
     {/* End footer */}

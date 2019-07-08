@@ -57,9 +57,7 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
         rdfInputIri: '',
         rdfUrlDataSampleIri: '',
         rdfFile: undefined,
-        rdfDataSampleFile: undefined,
-        inputType: 'SPARQL_ENDPOINT',
-        activeDiscoverTabIndex: 0
+        rdfDataSampleFile: undefined
       };
     }
 

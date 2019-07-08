@@ -164,7 +164,6 @@ class UntitledTestCase(unittest.TestCase):
     #
     #     self.custom_wait_clickable_and_click("storage_navbar_button")
     #
-    #     self.custom_wait_clickable_and_click("more_icon_0_test_selenium_gmaps_app")
     #
     #     self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
     #
@@ -208,7 +207,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
@@ -222,9 +220,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
-
-        self.custom_wait_clickable_and_click(
-            "more_icon_0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click(
             "delete_button_0_test_selenium_treemap_app")
@@ -270,7 +265,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
@@ -284,9 +278,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
-
-        self.custom_wait_clickable_and_click(
-            "more_icon_0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click(
             "delete_button_0_test_selenium_chord_app")

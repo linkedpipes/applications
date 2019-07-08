@@ -13,10 +13,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { withRouter } from 'react-router-dom';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -85,14 +81,12 @@ type Props = {
 };
 
 type State = {
-  open: boolean,
-  anchorEl: any
+  open: boolean
 };
 
 class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
-    open: false,
-    anchorEl: undefined
+    open: false
   };
 
   handleClickOpen = () => {
@@ -122,14 +116,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     }
 
     await setApplicationLoaderStatus(false);
-  };
-
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
   };
 
   handleShareApp = () => {
@@ -183,7 +169,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(
@@ -199,9 +185,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
   render() {
     const { classes, applicationMetadata, indexNumber, isShared } = this.props;
-    const { anchorEl } = this.state;
     const {
-      handleMenuClick,
       handleDeleteApp,
       handleShareApp,
       handleApplicationClicked,
@@ -214,18 +198,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
-            action={
-              <IconButton
-                aria-owns={anchorEl ? 'simple-menu' : undefined}
-                aria-haspopup="true"
-                id={`more_icon_${indexNumber.toString()}_${
-                  applicationConfiguration.title
-                }`}
-                onClick={handleMenuClick}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            }
             title={
               <Typography
                 style={{
@@ -283,7 +255,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
             >
               <VisualizerIcon
                 visualizerType={applicationConfiguration.endpoint}
-                style={{ color: 'white', fontSize: '85px' }}
+                style={{  fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
@@ -298,23 +270,18 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
             <Button size="small" onClick={handleShareApp} color="primary">
               Share
             </Button>
+            <Button
+              id={`delete_button_${indexNumber.toString()}_${
+                applicationConfiguration.title
+              }`}
+              size="small"
+              onClick={handleDeleteApp}
+              color="primary"
+            >
+              Delete
+            </Button>
           </CardActions>
         </Card>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleMenuClose}
-        >
-          <MenuItem
-            id={`delete_button_${indexNumber.toString()}_${
-              applicationConfiguration.title
-            }`}
-            onClick={handleDeleteApp}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
 
         <Dialog
           open={this.state.open}

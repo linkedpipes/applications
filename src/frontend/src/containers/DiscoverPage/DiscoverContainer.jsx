@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { DiscoverComponent } from './DiscoverComponent';
 import { discoverActions } from './duck';
 import { discoveryActions } from '@ducks/discoveryDuck';
+import globalUtils from '@utils/global.utils';
 import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
@@ -19,7 +20,8 @@ type Props = {
   onResetSelectedInput: Function,
   sparqlEndpointIri: String,
   dataSampleIri: String,
-  namedGraph: String
+  namedGraph: String,
+  selectedVisualizer: Object
 };
 class DiscoverContainer extends PureComponent<Props> {
   componentDidMount = () => {
@@ -68,8 +70,18 @@ class DiscoverContainer extends PureComponent<Props> {
       etlExecutionStatus,
       sparqlEndpointIri,
       dataSampleIri,
-      namedGraph
+      namedGraph,
+      selectedVisualizer
     } = this.props;
+
+    let selectedVisualizerTitle = globalUtils.getBeautifiedVisualizerTitle(
+      selectedVisualizer.visualizer.visualizerCode
+    );
+    selectedVisualizerTitle =
+      selectedVisualizerTitle === 'Undefined'
+        ? 'Not selected yet'
+        : `${selectedVisualizerTitle} visualizer`;
+
     return (
       <DiscoverComponent
         activeStep={activeStep}
@@ -78,6 +90,7 @@ class DiscoverContainer extends PureComponent<Props> {
         sparqlEndpointIri={sparqlEndpointIri}
         dataSampleIri={dataSampleIri}
         namedGraph={namedGraph}
+        selectedVisualizerTitle={selectedVisualizerTitle}
       />
     );
   }
@@ -115,7 +128,8 @@ const mapStateToProps = state => {
     etlExecutionStatus: state.discover.etlExecutionStatus,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
-    namedGraph: state.discover.namedGraph
+    namedGraph: state.discover.namedGraph,
+    selectedVisualizer: state.globals.selectedVisualizer
   };
 };
 
