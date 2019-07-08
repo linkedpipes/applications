@@ -10,8 +10,8 @@ import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
-import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 import { Container, Typography, Paper } from '@material-ui/core';
+import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
 
 const styles = theme => ({
   stepperContainer: {
@@ -80,7 +80,8 @@ type Props = {
   onBackClicked: Function,
   sparqlEndpointIri: string,
   dataSampleIri: string,
-  namedGraph: string
+  namedGraph: string,
+  selectedVisualizerTitle: string
 };
 
 const Discover = ({
@@ -90,7 +91,8 @@ const Discover = ({
   etlExecutionStatus,
   sparqlEndpointIri,
   dataSampleIri,
-  namedGraph
+  namedGraph,
+  selectedVisualizerTitle
 }: Props) => (
   <React.Fragment>
     <main>
@@ -119,7 +121,7 @@ const Discover = ({
             used, if no multiple choises available it will pick one for your
             automatically. After that, it will transform the LinkedData into a
             format supported by that visualizer by executing a special data
-            transformatio pipeline. Finally it will take you to the application
+            transformation pipeline. Finally it will take you to the application
             setup page where you will name your application and publish it to
             share with anyone across the Web!
           </Typography>
@@ -180,7 +182,7 @@ const Discover = ({
                     });
                   }}
                   component={Link}
-                  to="/create-app"
+                  to="/config-application"
                 >
                   Create App
                 </Button>
@@ -191,27 +193,35 @@ const Discover = ({
       </Container>
     </main>
     {/* Footer */}
-    {activeStep > 0 && (
-      <Paper className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Here are the LinkedData sources that you provided...
-        </Typography>
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          SPARQL IRI:
-        </Typography>{' '}
-        <Typography variant="body1">{sparqlEndpointIri || 'N/A'}</Typography>
-        <br />
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          Data sample IRI:
-        </Typography>{' '}
-        <Typography variant="body1">{dataSampleIri || 'N/A'}</Typography>
-        <br />
-        <Typography variant="subtitle1" style={{ display: 'inline' }}>
-          Named Graph IRIs:
-        </Typography>{' '}
-        <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
-      </Paper>
-    )}
+    {activeStep > 0 &&
+      (namedGraph !== '' ||
+        dataSampleIri !== '' ||
+        sparqlEndpointIri !== '') && (
+        <Paper className={classes.footer}>
+          <Typography variant="h6" align="center" gutterBottom>
+            Here are the LinkedData sources that you provided...
+          </Typography>
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            SPARQL IRI:
+          </Typography>{' '}
+          <Typography variant="body1">{sparqlEndpointIri || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Data sample IRI:
+          </Typography>{' '}
+          <Typography variant="body1">{dataSampleIri || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Named Graph IRIs:
+          </Typography>{' '}
+          <Typography variant="body1">{namedGraph || 'N/A'}</Typography>
+          <br />
+          <Typography variant="subtitle1" style={{ display: 'inline' }}>
+            Based on:
+          </Typography>{' '}
+          <Typography variant="body1">{selectedVisualizerTitle}</Typography>
+        </Paper>
+      )}
     {/* End footer */}
   </React.Fragment>
 );

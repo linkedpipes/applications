@@ -1,10 +1,12 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
 import { SettingsPageComponent } from './SettingsPageComponent';
-import { StoragePickFolderDialog } from '@storage';
 import { connect } from 'react-redux';
-import { withAuthorization } from '@utils';
 import { globalActions } from '@ducks/globalDuck';
+import { userActions } from '@ducks/userDuck';
+import UserService from '@utils/user.service';
+import { StoragePickFolderDialog } from '@storage';
+import { withAuthorization } from '@utils';
 
 type Props = {
   userProfile: Object,
@@ -25,19 +27,21 @@ class SettingsPage extends PureComponent<Props> {
     handleUpdateChooseFolderDialogState(true);
   }
 
-  handleChangeColor() {
-    const { setColorTheme, colorThemeIsLight } = this.props;
+  async handleChangeColor() {
+    const { setColorTheme, colorThemeIsLight, userProfile } = this.props;
+    await UserService.setColorTheme(userProfile.webId, !colorThemeIsLight);
     setColorTheme(!colorThemeIsLight);
   }
 
   render() {
-    const { userProfile } = this.props;
+    const { userProfile, colorThemeIsLight } = this.props;
     const { handleChangeFolder, handleChangeColor } = this;
     return (
       <Fragment>
         <SettingsPageComponent
           onHandleChangeFolder={handleChangeFolder}
           onHandleChangeColorTheme={handleChangeColor}
+          colorThemeIsLight={colorThemeIsLight}
           userProfile={userProfile}
         />
         <StoragePickFolderDialog />
@@ -49,7 +53,7 @@ class SettingsPage extends PureComponent<Props> {
 const mapStateToProps = state => {
   return {
     userProfile: state.user,
-    colorThemeIsLight: state.globals.colorThemeIsLight
+    colorThemeIsLight: state.user.colorThemeIsLight
   };
 };
 
@@ -58,7 +62,7 @@ const mapDispatchToProps = dispatch => {
     dispatch(globalActions.setChooseFolderDialogState({ state }));
 
   const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
+    dispatch(userActions.setLightColorTheme(isLight));
 
   return {
     handleUpdateChooseFolderDialogState,

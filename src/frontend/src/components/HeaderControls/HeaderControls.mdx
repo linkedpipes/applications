@@ -1,0 +1,31 @@
+---
+name: HeaderControls
+menu: Components
+---
+
+import { Playground, Props } from 'docz';
+import { HeaderControlsComponent } from './HeaderControlsComponent';
+
+# HeaderControls
+
+HeaderControls is a component used in the header of LinkedPipes Applications frontend. Contains MaterialUI Buttons with custom SVG icons, used in `HeaderControls` component. Allows control over main User related settings and inbox notifications.
+
+# Structure
+
+`HeaderControlsComponent` component exported from `HeaderControls` folder is represented by a stateless react component and a react `PureComponent` serving as a container.
+
+```.md
+├── HeaderControlsComponent.jsx # Stateless react component, responsible for ui
+├── HeaderControlsContainer.jsx # React PureComponent, responsible for states
+└── index.js
+```
+
+## Properties
+
+<Props of={HeaderControlsComponent} />
+
+## Example
+
+<Playground>
+  <HeaderControlsComponent />
+</Playground>

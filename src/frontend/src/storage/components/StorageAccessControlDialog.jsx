@@ -174,7 +174,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
 
     await StorageToolbox.updateAccessControl(
       webId,
-      selectedApplicationMetadata.url,
+      selectedApplicationMetadata.solidFileUrl,
       updatedMetadataStatus,
       this.state.collaborators
     );
@@ -194,7 +194,7 @@ class StorageAccessControlDialog extends PureComponent<Props, State> {
 
     await StorageToolbox.updateAccessControl(
       webId,
-      selectedApplicationMetadata.url,
+      selectedApplicationMetadata.solidFileUrl,
       this.state.metadataIsPublic,
       collaborators
     );

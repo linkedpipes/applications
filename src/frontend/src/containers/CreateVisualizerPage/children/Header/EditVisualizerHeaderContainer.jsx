@@ -3,13 +3,13 @@ import React, { PureComponent, Fragment } from 'react';
 import EditVisualizerHeaderComponent from './EditVisualizerHeaderComponent';
 import { applicationActions } from '@ducks/applicationDuck';
 import { connect } from 'react-redux';
-import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { globalActions } from '@ducks/globalDuck';
-import { GoogleAnalyticsWrapper, ETLService } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import UserService from '@utils/user.service';
+import { GoogleAnalyticsWrapper, ETLService } from '@utils';
+import { StorageToolbox, StorageAccessControlDialog } from '@storage';
 
 const intervalTypeToHours = (interval, type) => {
   const numberInterval = Number(interval);
@@ -158,7 +158,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
   };
 
   handleProceedToApplicationClicked = () => {
-    this.props.history.push('/storage');
+    this.props.history.push('/applications');
   };
 
   handleCopyLinkClicked = () => {

@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VisualizersService } from '@utils';
-import { VISUALIZER_TYPE } from '@constants';
+import equal from 'fast-deep-equal';
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
 import Cluster from 'pigeon-cluster';
@@ -11,7 +10,8 @@ import {
   point as turfPoint
 } from '@turf/helpers';
 import geoViewport from '@mapbox/geo-viewport';
-import equal from 'fast-deep-equal';
+import { VisualizersService } from '@utils';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   classes: {
@@ -164,12 +164,6 @@ class MapsVisualizer extends PureComponent<Props, State> {
     this.isMounted = false;
   }
 
-  refreshMap = (center, zoom, markers) => {
-    if (this.isMounted) {
-      this.setState({ center, zoom, markers });
-    }
-  };
-
   render() {
     const { height, width } = this.props;
     const { markers, center, zoom } = this.state;
@@ -177,7 +171,7 @@ class MapsVisualizer extends PureComponent<Props, State> {
     const heightSize = Math.max(165, widthSize - 250);
 
     return (
-      <Map center={center} zoom={zoom} width={widthSize} height={heightSize}>
+      <Map center={center} zoom={zoom} height={heightSize}>
         <Cluster>
           {markers.map(marker => (
             <Marker

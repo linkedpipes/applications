@@ -84,7 +84,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                 <Grid item>
                   <Link
                     style={{ textDecoration: 'none', color: 'transparent' }}
-                    to="/discover"
+                    to="/create-application"
                   >
                     <Button variant="contained" color="primary">
                       Create Application
@@ -114,7 +114,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                   >
                     <VisualizerIcon
                       visualizerType={sample.type}
-                      style={{ color: 'white', fontSize: '75px' }}
+                      style={{  fontSize: '75px' }}
                     />
                   </div>
                   <CardContent className={classes.cardContent}>

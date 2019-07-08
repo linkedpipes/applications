@@ -3,8 +3,9 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import StorageSharedPage from './StorageSharedAppsBrowserContainer';
 import StoragePage from './StorageAppsBrowserContainer';
-import { GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
+import { globalActions } from '@ducks/globalDuck';
+import { GoogleAnalyticsWrapper } from '@utils';
 
 const styles = () => ({
   root: {
@@ -14,12 +15,25 @@ const styles = () => ({
 
 type Props = {
   location: Object,
-  applicationsBrowserTabIndex: number
+  applicationsBrowserTabIndex: number,
+
+  handleSetSelectedNavigationItem: Function,
+  selectedNavigationItem: string
 };
 
 class StoragePageController extends React.Component<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
+
+    const {
+      selectedNavigationItem,
+      handleSetSelectedNavigationItem
+    } = this.props;
+
+    if (selectedNavigationItem !== 'applications') {
+      handleSetSelectedNavigationItem('applications');
+    }
+
     GoogleAnalyticsWrapper.trackPage(page);
   }
 
@@ -47,10 +61,20 @@ class StoragePageController extends React.Component<Props> {
 
 const mapStateToProps = state => {
   return {
-    applicationsBrowserTabIndex: state.globals.applicationsBrowserTabIndex
+    applicationsBrowserTabIndex: state.globals.applicationsBrowserTabIndex,
+    selectedNavigationItem: state.globals.selectedNavigationItem
   };
 };
 
-export default connect(mapStateToProps)(
-  withStyles(styles)(StoragePageController)
-);
+const mapDispatchToProps = dispatch => {
+  const handleSetSelectedNavigationItem = item => {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  };
+
+  return { handleSetSelectedNavigationItem };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(StoragePageController));

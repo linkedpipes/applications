@@ -6,8 +6,12 @@ import { etlActions } from '@ducks/etlDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import { globalActions } from '@ducks/globalDuck';
 import { filtersActions } from '@ducks/filtersDuck';
-import { StorageToolbox } from '@storage';
 import { toast } from 'react-toastify';
+import LoadingOverlay from 'react-loading-overlay';
+import { userActions } from '@ducks/userDuck';
+import { ApplicationMetadata } from '@storage/models';
+import { DiscoveriesCollection, PipelinesCollection } from './children';
+import QuickStartComponent from './QuickStart/QuickStartComponent';
 import {
   Log,
   SocketContext,
@@ -19,11 +23,7 @@ import {
   UserService,
   GoogleAnalyticsWrapper
 } from '@utils';
-import LoadingOverlay from 'react-loading-overlay';
-import { userActions } from '@ducks/userDuck';
-import { ApplicationMetadata } from '@storage/models';
-import { DiscoveriesCollection, PipelinesCollection } from './children';
-import QuickStartComponent from './QuickStart/QuickStartComponent';
+import { StorageToolbox } from '@storage';
 
 type Props = {
   history: { push: any },
@@ -49,7 +49,9 @@ type Props = {
   handleSetHomepageTabIndex: Function,
   handleSetSparqlIri: Function,
   handleSetNamedGraph: Function,
-  handleSetDataSampleIri: Function
+  handleSetDataSampleIri: Function,
+  selectedNavigationItem: string,
+  handleSetSelectedNavigationItem: Function
 };
 type State = {
   applicationsMetadata: Array<ApplicationMetadata>,
@@ -81,6 +83,15 @@ class HomeController extends PureComponent<Props, State> {
       setupEtlExecutionsListeners,
       loadApplicationsMetadata
     } = this;
+
+    const {
+      selectedNavigationItem,
+      handleSetSelectedNavigationItem
+    } = this.props;
+
+    if (selectedNavigationItem !== 'dashboard') {
+      handleSetSelectedNavigationItem('dashboard');
+    }
 
     const page = this.props.location.pathname;
     GoogleAnalyticsWrapper.trackPage(page);
@@ -186,7 +197,7 @@ class HomeController extends PureComponent<Props, State> {
     return () => {
       const { onInputExampleClicked, history } = this.props;
       onInputExampleClicked(sample);
-      history.push('/discover');
+      history.push('/create-application');
     };
   };
 
@@ -204,7 +215,7 @@ class HomeController extends PureComponent<Props, State> {
     await handleSetNamedGraph(discovery.namedGraphs.join(',\n'));
     await handleSetDataSampleIri(discovery.dataSampleIri);
     await history.push({
-      pathname: '/discover',
+      pathname: '/create-application',
       state: { discoveryId }
     });
   };
@@ -238,7 +249,7 @@ class HomeController extends PureComponent<Props, State> {
         handleSetSelectedVisualizer(selectedVisualiser);
 
         history.push({
-          pathname: '/create-app'
+          pathname: '/config-application'
         });
       })
       .catch(error => {
@@ -285,7 +296,7 @@ class HomeController extends PureComponent<Props, State> {
       await this.setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(
@@ -331,7 +342,7 @@ class HomeController extends PureComponent<Props, State> {
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.solidFileTitle}`,
+      `Removed application:\n${applicationConfigurationMetadata.configuration.title}`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000
@@ -437,7 +448,8 @@ const mapStateToProps = state => {
     userProfile: state.user,
     applicationsFolder: state.user.applicationsFolder,
     webId: state.user.webId,
-    dashboardTabIndex: state.globals.dashboardTabIndex
+    dashboardTabIndex: state.globals.dashboardTabIndex,
+    selectedNavigationItem: state.globals.selectedNavigationItem
   };
 };
 
@@ -486,6 +498,10 @@ const mapDispatchToProps = dispatch => {
   const handleSetDataSampleIri = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
 
+  const handleSetSelectedNavigationItem = item => {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  };
+
   return {
     onInputExampleClicked,
     handleSetResultPipelineIri,
@@ -499,7 +515,8 @@ const mapDispatchToProps = dispatch => {
     handleSetFiltersState,
     handleSetSparqlIri,
     handleSetNamedGraph,
-    handleSetDataSampleIri
+    handleSetDataSampleIri,
+    handleSetSelectedNavigationItem
   };
 };
 

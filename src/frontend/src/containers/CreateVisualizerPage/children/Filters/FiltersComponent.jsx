@@ -144,32 +144,6 @@ class FiltersComponent extends React.Component<Props, State> {
           <Typography variant="h4" className={classes.filterTitle}>
             Filters
             <span className={classes.filterSpan}>
-              {editingMode && (
-                <span>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleEnabled}
-                        checked={filtersState.enabled}
-                        value={filtersState.enabled}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleVisible}
-                        checked={filtersState.visible}
-                        value={filtersState.visible}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.visible ? 'Visible' : 'Hidden'}
-                  />
-                </span>
-              )}
               <Button
                 onClick={() => {
                   this.applyCallbacks.forEach(cb => {
@@ -183,6 +157,32 @@ class FiltersComponent extends React.Component<Props, State> {
                 Apply filters
               </Button>
             </span>
+            {editingMode && (
+              <div>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleEnabled}
+                      checked={filtersState.enabled}
+                      value={filtersState.enabled}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleVisible}
+                      checked={filtersState.visible}
+                      value={filtersState.visible}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.visible ? 'Visible' : 'Hidden'}
+                />
+              </div>
+            )}
           </Typography>
 
           {(Object.values(filtersState.filterGroups) || []).map(
@@ -201,30 +201,6 @@ class FiltersComponent extends React.Component<Props, State> {
                       <Typography className={classes.heading}>
                         {filterGroup.label}
                       </Typography>
-                      {editingMode && (
-                        <div>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={filterGroup.enabled}
-                                value={filterGroup.enabled}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={filterGroup.visible}
-                                value={filterGroup.visible}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.visible ? 'Visible' : 'Hidden'}
-                          />
-                        </div>
-                      )}
                     </ExpansionPanelSummary>
                     {this.getFilter(
                       filterGroup.filterType,

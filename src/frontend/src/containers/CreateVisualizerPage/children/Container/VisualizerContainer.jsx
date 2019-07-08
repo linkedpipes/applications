@@ -2,16 +2,16 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import FiltersComponent from '../Filters/FiltersComponent';
+import { pathOr } from 'rambda';
+import { VISUALIZER_TYPE } from '@constants';
 import {
   MapsVisualizer,
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
-import { VISUALIZER_TYPE } from '@constants';
-import Typography from '@material-ui/core/Typography';
-import FiltersComponent from '../Filters/FiltersComponent';
-import { pathOr } from 'rambda';
-import { Container } from '@material-ui/core';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
@@ -117,22 +117,31 @@ const getVisualizer = (
 };
 
 const VisualizerControllerContainer = (props: Props) => {
+  const renderFilters = props.visualizer.visualizerCode !== VISUALIZER_TYPE.MAP;
   return (
     <Grid container className={props.classes.root} direction="row" spacing={10}>
-      <Grid item lg={4} md={5} xs={12} className={props.classes.filterSideBar}>
-        <FiltersComponent
-          editingMode
-          filtersState={props.filtersState}
-          selectedResultGraphIri={props.selectedResultGraphIri}
-        />
-      </Grid>
+      {renderFilters && (
+        <Grid
+          item
+          lg={4}
+          md={5}
+          xs={12}
+          className={props.classes.filterSideBar}
+        >
+          <FiltersComponent
+            editingMode
+            filtersState={props.filtersState}
+            selectedResultGraphIri={props.selectedResultGraphIri}
+          />
+        </Grid>
+      )}
 
       <Grid
         id="viz-div"
         className={props.classes.vizdiv}
         item
-        lg={8}
-        md={7}
+        lg={renderFilters ? 8 : 12}
+        md={renderFilters ? 7 : 12}
         xs={12}
       >
         <Container maxWidth="xl">

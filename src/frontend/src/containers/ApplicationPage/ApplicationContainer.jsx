@@ -1,14 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VISUALIZER_TYPE } from '@constants';
-import {
-  MapsVisualizer,
-  TreemapVisualizer,
-  ChordVisualizer
-} from '@components';
 import { withRouter } from 'react-router-dom';
-import { Log, VisualizersService } from '@utils';
-import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -19,6 +11,14 @@ import { ApplicationConfiguration } from '@storage/models';
 import { filtersActions } from '@ducks/filtersDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import StorageToolbox from '@storage/StorageToolbox';
+import { userActions } from '@ducks/userDuck';
+import { Log, VisualizersService } from '@utils';
+import {
+  MapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer
+} from '@components';
+import { VISUALIZER_TYPE } from '@constants';
 
 type Props = {
   location: Object,
@@ -43,7 +43,8 @@ type State = {
 
 const styles = theme => ({
   root: {
-    flex: 1
+    flex: 1,
+    height: '100vh'
   },
   vizdiv: {
     overflow: 'hidden'
@@ -133,6 +134,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
+    const { height, width } = this.state;
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
@@ -142,6 +144,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <MapsVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
           />
         );
       }
@@ -151,6 +155,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <TreemapVisualizer
             selectedResultGraphIri={graphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
             schemes={pathOr(
               [],
               'filterGroups.schemeFilter.options',
@@ -163,7 +169,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
-            size={this.state.height + this.state.width}
+            height={height + 200}
+            width={width + 200}
             nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
             isPublished
           />
@@ -193,10 +200,12 @@ class ApplicationContainer extends PureComponent<Props, State> {
     const { getApplication } = this;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
+    const renderFilters =
+      visible && this.state.applicationType !== VISUALIZER_TYPE.MAP;
 
     return (
       <Grid container className={this.props.classes.root} direction="row">
-        {visible && this.state.applicationType !== 'Loading' && (
+        {renderFilters && this.state.applicationType !== 'Loading' && (
           <Grid
             item
             lg={4}
@@ -248,7 +257,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
+    dispatch(userActions.setLightColorTheme(isLight));
 
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));

@@ -7,13 +7,14 @@ import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import uuid from 'uuid';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 type Props = {
   classes: Object,
   sectionLabel: string,
-  tabTitles: [{ titleLabel: string }],
+  tabTitles: [{ titleLabel: string, id: string }],
   onHandleTabChange: Function,
   dashboardTabIndex: Number
 };
@@ -80,8 +81,8 @@ function DashboardHeader(props: Props) {
           textColor="inherit"
           onChange={onHandleTabChange}
         >
-          {tabTitles.map(({ titleLabel }) => (
-            <Tab textColor="inherit" label={titleLabel} />
+          {tabTitles.map(({ titleLabel, id }) => (
+            <Tab key={uuid()} textColor="inherit" id={id} label={titleLabel} />
           ))}
         </Tabs>
       </AppBar>

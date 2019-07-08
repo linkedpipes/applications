@@ -177,6 +177,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Add an application to the user profile.
+     *
+     * @param user  user identifier - currently webId is sent from frontend
+     * @param solidIri IRI of the published application in SOLID
+     * @param executionIri execution IRI used to generate the application
+     * @return user profile in JSON after new application is added
+     * @throws LpAppsException HTTP 401 when user is not found
+     */
     @PostMapping("/api/user/application")
     public ResponseEntity<UserProfile> addApplication(
             @NotNull @RequestParam(value = "webId") String user,
@@ -191,6 +200,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Delete an application from the user profile.
+     *
+     * @param user  user identifier - currently webId is sent from frontend
+     * @param solidIri IRI of the published application in SOLID
+     * @return user profile in JSON after the application is removed
+     * @throws LpAppsException HTTP 401 when user is not found
+     */
     @DeleteMapping("/api/user/application")
     public ResponseEntity<UserProfile> deleteApplication(
             @NotNull @RequestParam(value = "webId") String user,

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import { Route } from 'react-router-dom';
-import { NavigationBar, HeaderControls } from '@components';
 import { withStyles } from '@material-ui/core/styles';
-import { withAuthorization } from '@utils';
 import Hidden from '@material-ui/core/Hidden';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
 import { CssBaseline } from '@material-ui/core';
+import { withAuthorization } from '@utils';
+import { NavigationBar, HeaderControls } from '@components';
 
 const drawerWidth = 256;
 
@@ -36,59 +36,81 @@ type Props = {
   headerComponent: any,
   webId: any,
   drawerState: Boolean,
-  handleSetMobileDrawerState: Function
+  handleSetMobileDrawerState: Function,
+  selectedNavigationItem: string,
+  handleSetSelectedNavigationItem: Function
 };
 
-const PrivateLayout = ({
-  classes,
-  component: Component,
-  headerComponent: HeaderComponent,
-  webId,
-  drawerState,
-  handleSetMobileDrawerState,
-  ...rest
-}: Props) => {
-  return (
-    <Route
-      {...rest}
-      render={matchProps => (
-        <div className={classes.root}>
-          <CssBaseline />
-          <nav className={classes.drawer}>
-            <Hidden smUp implementation="js">
-              <NavigationBar
-                PaperProps={{ style: { width: drawerWidth } }}
-                variant="temporary"
-                open={drawerState}
-                onClose={() => {
+class PrivateLayout extends PureComponent<Props> {
+  handleSetNavigationItem = item => {
+    const { handleSetSelectedNavigationItem } = this.props;
+    handleSetSelectedNavigationItem(item);
+  };
+
+  render() {
+    const {
+      classes,
+      component: Component,
+      headerComponent: HeaderComponent,
+      webId,
+      drawerState,
+      handleSetMobileDrawerState,
+      selectedNavigationItem,
+      ...rest
+    } = this.props;
+
+    return (
+      <Route
+        {...rest}
+        render={matchProps => (
+          <div className={classes.root}>
+            <CssBaseline />
+            <nav className={classes.drawer}>
+              <Hidden smUp implementation="js">
+                <NavigationBar
+                  PaperProps={{ style: { width: drawerWidth } }}
+                  variant="temporary"
+                  open={drawerState}
+                  selectedNavigationItem={selectedNavigationItem}
+                  onHandleSetSelectedNavigationItem={
+                    this.handleSetNavigationItem
+                  }
+                  onClose={() => {
+                    handleSetMobileDrawerState(!drawerState);
+                  }}
+                />
+              </Hidden>
+              <Hidden xsDown implementation="css">
+                <NavigationBar
+                  onHandleSetSelectedNavigationItem={
+                    this.handleSetNavigationItem
+                  }
+                  selectedNavigationItem={selectedNavigationItem}
+                  PaperProps={{ style: { width: drawerWidth } }}
+                />
+              </Hidden>
+            </nav>
+            <div className={classes.appContent}>
+              <HeaderControls
+                onDrawerToggle={() => {
                   handleSetMobileDrawerState(!drawerState);
                 }}
               />
-            </Hidden>
-            <Hidden xsDown implementation="css">
-              <NavigationBar PaperProps={{ style: { width: drawerWidth } }} />
-            </Hidden>
-          </nav>
-          <div className={classes.appContent}>
-            <HeaderControls
-              onDrawerToggle={() => {
-                handleSetMobileDrawerState(!drawerState);
-              }}
-            />
-            {HeaderComponent !== undefined && <HeaderComponent />}
-            <main className={classes.mainContent}>
-              <Component {...matchProps} />
-            </main>
+              {HeaderComponent !== undefined && <HeaderComponent />}
+              <main className={classes.mainContent}>
+                <Component {...matchProps} />
+              </main>
+            </div>
           </div>
-        </div>
-      )}
-    />
-  );
-};
-
+        )}
+      />
+    );
+  }
+}
 const mapStateToProps = state => {
   return {
-    drawerState: state.globals.drawerState
+    drawerState: state.globals.drawerState,
+    selectedNavigationItem: state.globals.selectedNavigationItem
   };
 };
 
@@ -96,8 +118,13 @@ const mapDispatchToProps = dispatch => {
   const handleSetMobileDrawerState = drawerState =>
     dispatch(globalActions.setMobileDrawerState(drawerState));
 
+  function handleSetSelectedNavigationItem(item) {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  }
+
   return {
-    handleSetMobileDrawerState
+    handleSetMobileDrawerState,
+    handleSetSelectedNavigationItem
   };
 };
 

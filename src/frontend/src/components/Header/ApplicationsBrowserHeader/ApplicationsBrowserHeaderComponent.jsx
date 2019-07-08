@@ -7,6 +7,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import uuid from 'uuid';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -81,7 +82,7 @@ function ApplicationsBrowserHeader(props: Props) {
           onChange={onHandleTabChange}
         >
           {tabTitles.map(({ titleLabel }) => (
-            <Tab textColor="inherit" label={titleLabel} />
+            <Tab key={uuid()} textColor="inherit" label={titleLabel} />
           ))}
         </Tabs>
       </AppBar>

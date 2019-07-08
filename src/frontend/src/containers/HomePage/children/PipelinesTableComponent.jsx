@@ -5,18 +5,17 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 import RemoveIcon from '@material-ui/icons/RemoveCircle';
-import { ETL_STATUS_MAP } from '@utils';
 import uuid from 'uuid';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import { CardHeader } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import { VisualizerIcon } from '@components/';
-import globalUtils from '@utils/global.utils';
+import { ETL_STATUS_MAP, GlobalUtils } from '@utils';
+import { VisualizerIcon } from '@components';
 
 type Props = {
   pipelineExecutionsList: Array<{
@@ -164,7 +163,7 @@ const PipelinesTableComponent = ({
                 <div className={classes.cardMedia}>
                   <VisualizerIcon
                     visualizerType={pipelineExecutionItem.selectedVisualiser}
-                    style={{ color: 'white', fontSize: '75px' }}
+                    style={{ fontSize: '75px' }}
                   />
                 </div>
 
@@ -188,7 +187,7 @@ const PipelinesTableComponent = ({
                     variant="body2"
                     style={{ display: 'inline-block' }}
                   >
-                    {`${globalUtils.getBeautifiedVisualizerTitle(
+                    {`${GlobalUtils.getBeautifiedVisualizerTitle(
                       pipelineExecutionItem.selectedVisualiser
                     )} visualizer`}
                   </Typography>

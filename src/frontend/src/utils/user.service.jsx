@@ -27,6 +27,12 @@ const UserService = {
     return lpaAxios.delete('/user/application', {
       params: { webId, solidIri }
     });
+  },
+
+  setColorTheme(webId, colorSchemeIsLight) {
+    return lpaAxios.post('/user/color', null, {
+      params: { webId, color: colorSchemeIsLight ? 'WHITE' : 'BLACK' }
+    });
   }
 };
 
