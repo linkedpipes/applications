@@ -436,14 +436,14 @@ class AppRouter extends React.PureComponent<Props, State> {
               />
 
               <PrivateLayout
-                path="/create-app"
+                path="/config-application"
                 component={CreateVisualizerPage}
                 headerComponent={ApplicationHeader}
                 exact
               />
 
               <PrivateLayout
-                path="/discover"
+                path="/create-application"
                 component={DiscoverPage}
                 headerComponent={DiscoverHeader}
                 exact
@@ -464,7 +464,7 @@ class AppRouter extends React.PureComponent<Props, State> {
               />
 
               <PrivateLayout
-                path="/storage"
+                path="/applications"
                 component={StoragePage}
                 headerComponent={ApplicationsBrowserHeader}
                 exact

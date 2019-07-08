@@ -84,7 +84,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                 <Grid item>
                   <Link
                     style={{ textDecoration: 'none', color: 'transparent' }}
-                    to="/discover"
+                    to="/create-application"
                   >
                     <Button variant="contained" color="primary">
                       Create Application

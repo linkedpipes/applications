@@ -67,21 +67,21 @@ const styles = theme => ({
 type Props = {
   classes: Object,
   history: Object,
-  theme: Object
+  theme: Object,
+  selectedNavigationItem: string,
+  onHandleSetSelectedNavigationItem: Function
 };
 
-type State = {
-  selectedItem: string
-};
-
-class NavigationBarContainer extends PureComponent<Props, State> {
-  state = {
-    selectedItem: 'dashboard'
-  };
-
+class NavigationBarContainer extends PureComponent<Props> {
   render() {
-    const { classes, theme, history, ...other } = this.props;
-    const { selectedItem } = this.state;
+    const {
+      classes,
+      theme,
+      history,
+      selectedNavigationItem,
+      onHandleSetSelectedNavigationItem,
+      ...other
+    } = this.props;
 
     return (
       <Drawer variant="permanent" {...other}>
@@ -124,10 +124,10 @@ class NavigationBarContainer extends PureComponent<Props, State> {
             <ListItem
               id="dashboard_navbar_button"
               button
-              selected={selectedItem === 'dashboard'}
+              selected={selectedNavigationItem === 'dashboard'}
               onClick={() => {
                 history.push('/dashboard');
-                this.setState({ selectedItem: 'dashboard' });
+                onHandleSetSelectedNavigationItem('dashboard');
               }}
             >
               <ListItemIcon className={classes.itemIcon}>
@@ -144,10 +144,10 @@ class NavigationBarContainer extends PureComponent<Props, State> {
             <ListItem
               id="storage_navbar_button"
               button
-              selected={selectedItem === 'storage'}
+              selected={selectedNavigationItem === 'applications'}
               onClick={() => {
-                history.push('/storage');
-                this.setState({ selectedItem: 'storage' });
+                history.push('/applications');
+                onHandleSetSelectedNavigationItem('applications');
               }}
             >
               <ListItemIcon className={classes.itemIcon}>
@@ -163,10 +163,10 @@ class NavigationBarContainer extends PureComponent<Props, State> {
 
             <ListItem
               button
-              selected={selectedItem === 'about'}
+              selected={selectedNavigationItem === 'about'}
               onClick={() => {
                 history.push('/about');
-                this.setState({ selectedItem: 'about' });
+                onHandleSetSelectedNavigationItem('about');
               }}
             >
               <ListItemIcon className={classes.itemIcon}>

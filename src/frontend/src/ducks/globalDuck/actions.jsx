@@ -77,6 +77,13 @@ const setMobileDrawerState = drawerState => {
   };
 };
 
+const setSelectedNavigationItem = item => {
+  return {
+    type: types.SET_SELECTED_NAVIGATION_ITEM,
+    value: item
+  };
+};
+
 export default {
   addSelectedVisualizerAction,
   setAccessControlDialogState,
@@ -88,5 +95,6 @@ export default {
   setSelectedDiscverTabIndex,
   setSelectedApplicationSetupTabIndex,
   setSelectedApplicationsBrowserTabIndex,
-  setSelectedSettingsTabIndex
+  setSelectedSettingsTabIndex,
+  setSelectedNavigationItem
 };

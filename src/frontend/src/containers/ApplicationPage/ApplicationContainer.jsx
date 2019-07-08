@@ -133,6 +133,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
+    const { height, width } = this.state;
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
@@ -142,6 +143,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <MapsVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
           />
         );
       }
@@ -151,6 +154,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <TreemapVisualizer
             selectedResultGraphIri={graphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
             schemes={pathOr(
               [],
               'filterGroups.schemeFilter.options',
@@ -163,7 +168,8 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
-            size={this.state.height + this.state.width}
+            height={height + 200}
+            width={width + 200}
             nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
             isPublished
           />

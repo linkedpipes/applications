@@ -18,16 +18,24 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         applications: action.profile.applications,
-        discoverySessions: action.profile.discoverySessions,
-        pipelineExecutions: action.profile.pipelineExecutions
+        discoverySessions: action.profile.discoverySessions.sort((a, b) => {
+          return a.started > b.started;
+        }),
+        pipelineExecutions: action.profile.pipelineExecutions.sort((a, b) => {
+          return a.started > b.started;
+        })
       };
 
     case types.SET_SOLID_USER_PROFILE:
       return {
         ...state,
         applications: action.profile.applications,
-        discoverySessions: action.profile.discoverySessions,
-        pipelineExecutions: action.profile.pipelineExecutions,
+        discoverySessions: action.profile.discoverySessions.sort((a, b) => {
+          return a.started > b.started;
+        }),
+        pipelineExecutions: action.profile.pipelineExecutions.sort((a, b) => {
+          return a.started > b.started;
+        }),
         name: action.solidUsername,
         image: action.solidImage
       };
@@ -86,11 +94,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
         }
       });
 
-    case types.ADD_EXECUTION_SESSION:
+    case types.ADD_EXECUTION_SESSION: {
+      let newPipelineExecutions = state.pipelineExecutions.concat(
+        action.session
+      );
+      newPipelineExecutions = newPipelineExecutions.sort((a, b) => {
+        return a.started > b.started;
+      });
       return {
         ...state,
-        pipelineExecutions: state.pipelineExecutions.concat(action.session)
+        pipelineExecutions: newPipelineExecutions
       };
+    }
 
     case types.DELETE_EXECUTION_SESSION:
       return {

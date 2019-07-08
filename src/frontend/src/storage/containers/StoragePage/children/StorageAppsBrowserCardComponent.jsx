@@ -183,7 +183,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(

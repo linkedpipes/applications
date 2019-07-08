@@ -139,7 +139,7 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
     );
 
     setApplicationLoaderStatus(false);
-    this.handleAppPublished(publishedUrl);
+    this.handleAppEmbedded(publishedUrl);
 
     GoogleAnalyticsWrapper.trackEvent({
       category: 'CreateApp',
@@ -181,7 +181,7 @@ class VisualizerHeaderContainer extends PureComponent<Props, State> {
   };
 
   handleProceedToApplicationClicked = () => {
-    this.props.history.push('/storage');
+    this.props.history.push('/applications');
   };
 
   handleCopyLinkClicked = () => {

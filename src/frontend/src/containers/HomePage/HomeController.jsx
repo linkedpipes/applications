@@ -186,7 +186,7 @@ class HomeController extends PureComponent<Props, State> {
     return () => {
       const { onInputExampleClicked, history } = this.props;
       onInputExampleClicked(sample);
-      history.push('/discover');
+      history.push('/create-application');
     };
   };
 
@@ -204,7 +204,7 @@ class HomeController extends PureComponent<Props, State> {
     await handleSetNamedGraph(discovery.namedGraphs.join(',\n'));
     await handleSetDataSampleIri(discovery.dataSampleIri);
     await history.push({
-      pathname: '/discover',
+      pathname: '/create-application',
       state: { discoveryId }
     });
   };
@@ -238,7 +238,7 @@ class HomeController extends PureComponent<Props, State> {
         handleSetSelectedVisualizer(selectedVisualiser);
 
         history.push({
-          pathname: '/create-app'
+          pathname: '/config-application'
         });
       })
       .catch(error => {
@@ -285,7 +285,7 @@ class HomeController extends PureComponent<Props, State> {
       await this.setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(
@@ -331,7 +331,7 @@ class HomeController extends PureComponent<Props, State> {
     });
 
     toast.success(
-      `Removed application:\n${applicationConfigurationMetadata.solidFileTitle}`,
+      `Removed application:\n${applicationConfigurationMetadata.configuration.title}`,
       {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 4000

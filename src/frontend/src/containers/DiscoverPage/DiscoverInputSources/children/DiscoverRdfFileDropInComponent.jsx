@@ -13,7 +13,8 @@ registerPlugin(FilePondPluginFileValidateType);
 type Props = {
   classes: { textField: {}, gridRoot: {}, itemGrid: {} },
   onHandleSetRdfFile: Function,
-  onHandleSetRdfDataSampleFile: Function
+  onHandleSetRdfDataSampleFile: Function,
+  discoveryIsLoading: Boolean
 };
 
 const styles = () => ({
@@ -45,6 +46,7 @@ const extensionMap = {
 const DiscoverRdfFileDropInComponent = ({
   classes,
   onHandleSetRdfFile,
+  discoveryIsLoading,
   onHandleSetRdfDataSampleFile
 }: Props) => (
   <div className={classes.gridRoot}>
@@ -53,6 +55,8 @@ const DiscoverRdfFileDropInComponent = ({
       labelIdle="Drag & Drop your RDF file or click me to choose (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
       allowMultiple={false}
       allowFileTypeValidation
+      disabled={discoveryIsLoading}
+      labelButtonRemoveItem=""
       acceptedFileTypes={[
         'text/turtle',
         'application/n-triples',
@@ -99,6 +103,8 @@ const DiscoverRdfFileDropInComponent = ({
       labelIdle="(Optional) Drag & Drop your RDF data sample file or click me to choose (.ttl, .nt, .ng, .trig, .rdf or .jsonld)"
       allowMultiple={false}
       allowFileTypeValidation
+      labelButtonRemoveItem=""
+      disabled={discoveryIsLoading}
       acceptedFileTypes={[
         'text/turtle',
         'application/n-triples',
