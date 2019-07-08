@@ -24,7 +24,7 @@ class HttpRequestSenderTests {
 
     private final ApplicationContext context;
     private final FakeHttpURLConnectionFactory fakeFactory;
-    
+
     private HttpRequestSender sender;
 
     HttpRequestSenderTests(ApplicationContext context) {
@@ -295,4 +295,3 @@ class HttpRequestSenderTests {
     }
 
 }
-

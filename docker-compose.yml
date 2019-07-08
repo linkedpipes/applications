@@ -23,6 +23,8 @@ services:
       - "9005:9005"
       - "9092:9092"
     restart: on-failure
+    volumes:
+      - ./appdata:/appdata
     depends_on:
       - etl
       - discovery
@@ -54,7 +56,7 @@ services:
       VIRT_Parameters_ThreadCleanupInterval: 1
       VIRT_Parameters_ResourcesCleanupInterval: 1
       VIRT_Parameters_MaxCheckpointRemap: 3750
-      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata, /appdata/upload
+      VIRT_Parameters_DirsAllowed: ., /usr/local/virtuoso-opensource/share/virtuoso/vad, /appdata, /appdata/upload, /appdata/datasamples
     ports:
       - "8890:8890"
     restart: on-failure

@@ -80,39 +80,62 @@ public class UserServiceComponent implements UserService {
     }
 
     /**
-     * Add discovery on user profile. Discovery started time is set to current
-     * time.
+     * Populate discovery on user profile. Discovery started time is set to
+     * current time.
      *
-     * @param username webId
+     * @param dbId identifier of the Discovery in database (session ID)
      * @param discoveryId discovery ID
      * @param sparqlEndpointIri SPARQL endpoint IRI as provided by user on frontend
      * @param dataSampleIri data sample IRI as provided by user on frontend
      * @param namedGraphs list of IRIs as provided on frontend
-     * @throws UserNotFoundException user was not found in database
+     * @throws UserNotFoundException user was not found in the database
      */
-    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull final String username,
+    @Nullable @Override
+    public void setUserDiscovery(@NotNull final long dbId,
                                  @NotNull final String discoveryId,
                                  @Nullable final String sparqlEndpointIri,
                                  @Nullable final String dataSampleIri,
                                  @Nullable final List<String> namedGraphs)
                                  throws UserNotFoundException {
-        UserDao user = getUser(username);
-        DiscoveryDao d = new DiscoveryDao();
-        d.setDiscoveryStarted(discoveryId, new Date());
-        d.setSparqlEndpointIri(sparqlEndpointIri);
-        d.setDataSampleIri(dataSampleIri);
-        if (namedGraphs != null) {
-            for (String namedGraph : namedGraphs) {
-                DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
-                ng.setNamedGraph(namedGraph);
-                d.addNamedGraph(ng);
-                ngRepository.save(ng);
+        List<DiscoveryDao> discoveries = discoveryRepository.findById(dbId);
+        for (DiscoveryDao d : discoveries) {
+            d.setDiscoveryStarted(discoveryId, new Date());
+            d.setSparqlEndpointIri(sparqlEndpointIri);
+            d.setDataSampleIri(dataSampleIri);
+            if (namedGraphs != null) {
+                for (String namedGraph : namedGraphs) {
+                    DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+                    ng.setNamedGraph(namedGraph);
+                    d.addNamedGraph(ng);
+                    ngRepository.save(ng);
+                }
             }
+            discoveryRepository.save(d);
         }
-        user.addDiscovery(d);
-        discoveryRepository.save(d);
-        repository.save(user);
+    }
+
+
+    /**
+     * Create a discovery on user profile. Created discovery is a dummy object
+     * that will be populated later in
+     * {@code setUserDiscovery(long, String, String, String, List<String>)}
+     *
+     * @param username webId
+     * @throws UserNotFoundException user was not found in the database
+     */
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public DiscoveryDao setUserDiscovery(@NotNull final String username)
+                                 throws UserNotFoundException {
+         UserDao user = getUser(username);
+         DiscoveryDao d = new DiscoveryDao();
+
+         d.setDiscoveryStarted("", new Date());
+         d.setExecuting(false);
+
+         user.addDiscovery(d);
+         discoveryRepository.save(d);
+         repository.save(user);
+         return d;
     }
 
     private UserDao getUser(final String username) throws UserNotFoundException {
@@ -133,7 +156,7 @@ public class UserServiceComponent implements UserService {
     }
 
     /**
-     * Add execution on user profile.
+     * Add an execution on user profile.
      *
      * If there are more pipeline information records, first one is used.
      * Execution started time is set to current time.
@@ -336,6 +359,16 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
+    /**
+     * Add an application on user profile. The application is linked onto
+     * the execution it was created from.
+     *
+     * @param username webId
+     * @param executionIri execution IRI
+     * @param solidIri IRI of the application in SOLID
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
     @Override @Transactional(rollbackFor=UserNotFoundException.class)
     public UserProfile addApplication(String username, String executionIri, String solidIri) throws UserNotFoundException {
         UserDao user = getUser(username);
@@ -357,6 +390,17 @@ public class UserServiceComponent implements UserService {
         return transformUserProfile(user);
     }
 
+    /**
+     * If application exists on user profile it will be removed.
+     * If all executions populating the application's graph in Virtuoso are
+     * removed we remove the named graph as well.
+     *
+     * @param username webId
+     * @param executionIri execution IRI
+     * @param solidIri IRI of the application in SOLID
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
     @Override @Transactional(rollbackFor=UserNotFoundException.class)
     public UserProfile deleteApplication(String username, String solidIri) throws UserNotFoundException {
         UserDao user = getUser(username);
@@ -410,7 +454,13 @@ public class UserServiceComponent implements UserService {
     }
 
 
-
+    /**
+     * Pull execution information from the database.
+     *
+     * @param executionIri execution IRI to identify the pipeline
+     * @return pipeline information
+     * @throws LpAppsException HTTP 404 if execution was not found
+     */
     @Override
     public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
         List<ExecutionDao> lst = executionRepository.findByExecutionIri(executionIri);

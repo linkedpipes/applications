@@ -21,13 +21,13 @@ type Props = {
   classes: any,
   dataSampleIri: string,
   dataSampleTextFieldValue: string,
-  dataSourcesUris: string,
   discoveryIsLoading: boolean,
   discoveryLoadingLabel: string,
   namedGraph: string,
   namedTextFieldValue: string,
   onHandleProcessStartDiscovery: () => void,
   onHandleSetDataSampleIri: () => void,
+  onHandleSetRdfUrlDataSampleIri: () => void,
   onHandleSetNamedGraph: () => void,
   onHandleSetSparqlIri: () => void,
   onHandleClearInputsClicked(): Function,
@@ -39,7 +39,8 @@ type Props = {
   onHandleSetRdfFile: Function,
   onHandleSetRdfDataSampleFile: Function,
   onHandleTabIndexChange: Function,
-  tabIndex: Number
+  tabIndex: Number,
+  rdfUrlDataSampleIri: string
 };
 
 const styles = () => ({
@@ -64,13 +65,14 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       classes,
       discoveryIsLoading,
       discoveryLoadingLabel,
-      dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
+      rdfUrlDataSampleIri,
       onHandleProcessStartDiscovery,
       onHandleClearInputsClicked,
       onHandleSetNamedGraph,
       onHandleSetDataSampleIri,
+      onHandleSetRdfUrlDataSampleIri,
       onHandleSetSparqlIri,
       namedGraph,
       sparqlTextFieldValue,
@@ -137,8 +139,10 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                       onHandleRdfInputIriTextFieldChange
                     }
                     rdfInputIri={rdfInputIri}
-                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                    dataSampleIri={dataSampleIri}
+                    handleSetRdfUrlDataSampleIri={
+                      onHandleSetRdfUrlDataSampleIri
+                    }
+                    rdfUrlDataSampleIri={rdfUrlDataSampleIri}
                   />
                   <DiscoverRdfFileDropIn
                     discoveryIsLoading={discoveryIsLoading}
@@ -161,12 +165,6 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                         variant="outlined"
                         component="span"
                         color="primary"
-                        disabled={
-                          dataSourcesUris &&
-                          sparqlEndpointIri === '' &&
-                          dataSampleIri === '' &&
-                          namedGraph === ''
-                        }
                         onClick={onHandleClearInputsClicked}
                         size="small"
                       >

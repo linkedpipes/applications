@@ -43,7 +43,13 @@ type Props = {
   handleAddSelectedVisualizer: Function,
   setPipelineExecutorStep: Function,
   setPipelineSelectorStep: Function,
-  handleSetSelectedPipelineId: Function
+  handleSetSelectedPipelineId: Function,
+  rdfUrlDataSampleIri: string,
+  handleSetRdfUrlDataSampleIriFieldValue: Function,
+  handleSetDataSampleSessionId: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoveryId: string,
+  rdfUrlDataSampleIri: string
 };
 
 type State = {
@@ -89,11 +95,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   postStartFromRdfInputIri = async () => {
-    const { rdfInputIri, webId, dataSampleIri } = this.props;
+    const { rdfInputIri, webId, rdfUrlDataSampleIri } = this.props;
     return DiscoveryService.postDiscoverFromInputIri({
       rdfInputIri,
       webId,
-      dataSampleIri
+      dataSampleIri: rdfUrlDataSampleIri
     }).then(response => {
       return response;
     });
@@ -115,7 +121,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   handleProcessStartDiscovery = () => {
     const self = this;
-    const { handleSetDiscoveryId } = this.props;
+    const { handleSetDiscoveryId, handleSetDataSampleSessionId } = this.props;
 
     self.setState({
       discoveryIsLoading: true,
@@ -127,9 +133,14 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       .then(response => {
         if (response !== undefined) {
           const discoveryResponse = response.data;
-          const discoveryId = discoveryResponse.id;
-          handleSetDiscoveryId(discoveryId);
-          self.startSocketListener(discoveryId);
+          const discoveryId = discoveryResponse.discoveryId;
+          if (discoveryId === null) {
+            const sessionId = discoveryResponse.sessionId;
+            handleSetDataSampleSessionId(sessionId);
+          } else {
+            handleSetDiscoveryId(discoveryId);
+          }
+          self.startSocketListener();
         }
       })
       .catch(error => {
@@ -149,7 +160,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       });
   };
 
-  startSocketListener = discoveryId => {
+  startSocketListener = () => {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
@@ -171,7 +182,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         );
       } else {
         const parsedData = JSON.parse(data);
-        if (parsedData.discoveryId !== discoveryId) {
+        if (parsedData.discoveryId !== self.props.discoveryId) {
           return;
         }
         if (parsedData.status.isFinished) {
@@ -180,7 +191,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             action: 'Processed discovery : step 1'
           });
 
-          self.loadPipelineGroups(discoveryId).then(response => {
+          self.loadPipelineGroups(self.props.discoveryId).then(response => {
             self.setState({
               discoveryIsLoading: false
             });
@@ -192,6 +203,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             }
           });
         }
+
+        socket.emit('leave', parsedData.discoveryId);
       }
     });
   };
@@ -272,6 +285,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
     this.props.handleSetDataSampleIriFieldValue(rawText);
   };
 
+  handleSetRdfUrlDataSampleIri = e => {
+    const rawText = e.target.value;
+    this.props.handleSetRdfUrlDataSampleIriFieldValue(rawText);
+  };
+
   handleSetNamedGraph = e => {
     const rawText = e.target.value;
     Log.info('Named graph field changed', 'DiscoverSelectorContainer');
@@ -323,7 +341,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph,
       rdfInputIri,
       inputType,
-      activeDiscoverTabIndex
+      rdfFile,
+      activeDiscoverTabIndex,
+      rdfUrlDataSampleIri
     } = this.props;
 
     const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
@@ -332,7 +352,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         (sparqlEndpointIri === '' ||
           namedGraph === '' ||
           dataSampleIri === '')) ||
-      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '');
+      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '') ||
+      (inputType === 'RDF_INPUT_FILE' && rdfFile === undefined);
 
     return (
       <DiscoverSelectorComponent
@@ -343,6 +364,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         sparqlEndpointIri={sparqlEndpointIri}
         namedGraph={namedGraph}
         dataSampleIri={dataSampleIri}
+        rdfUrlDataSampleIri={rdfUrlDataSampleIri}
         onHandleClearInputsClicked={this.handleClearInputsClicked}
         onHandleProcessStartDiscovery={this.handleProcessStartDiscovery}
         onHandleSetNamedGraph={this.handleSetNamedGraph}
@@ -356,6 +378,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         rdfInputIri={rdfInputIri}
         tabIndex={activeDiscoverTabIndex}
         onHandleTabIndexChange={this.handleTabIndexChange}
+        onHandleSetRdfUrlDataSampleIri={this.handleSetRdfUrlDataSampleIri}
       />
     );
   }
@@ -373,9 +396,11 @@ const mapStateToProps = state => {
       state.discovery.datasources
     ),
     discoveryId: state.discovery.discoveryId,
+    dataSampleSessionId: state.discovery.dataSampleSessionId,
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
+    rdfUrlDataSampleIri: state.discover.rdfUrlDataSampleIri,
     namedGraph: state.discover.namedGraph,
     webId: state.user.webId,
     rdfInputIri: state.discover.rdfInputIri,
@@ -393,6 +418,11 @@ const mapDispatchToProps = dispatch => {
       discoveryActions.addDiscoveryIdAction({
         id: discoveryId
       })
+    );
+
+  const handleSetDataSampleSessionId = dataSampleSessionId =>
+    dispatch(
+      discoveryActions.addDataSampleSessionIdAction(dataSampleSessionId)
     );
 
   const setPipelineSelectorStep = () =>
@@ -415,6 +445,9 @@ const mapDispatchToProps = dispatch => {
 
   const handleSetDataSampleIriFieldValue = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
+
+  const handleSetRdfUrlDataSampleIriFieldValue = rdfUrlDataSampleIri =>
+    dispatch(discoverActions.setRdfUrlDataSampleIri(rdfUrlDataSampleIri));
 
   const handleSetRdfInputIriUrlFieldValue = rdfInputIri =>
     dispatch(discoverActions.setRdfInputIri(rdfInputIri));
@@ -444,6 +477,8 @@ const mapDispatchToProps = dispatch => {
 
   return {
     handleSetDiscoveryId,
+    handleSetDataSampleSessionId,
+    handleSetRdfUrlDataSampleIriFieldValue,
     handleSetPipelineGroups,
     handleSetDataSampleIriFieldValue,
     handleSetNamedGraphFieldValue,
