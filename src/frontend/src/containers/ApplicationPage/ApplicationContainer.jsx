@@ -1,7 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
-import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -12,6 +11,7 @@ import { ApplicationConfiguration } from '@storage/models';
 import { filtersActions } from '@ducks/filtersDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import StorageToolbox from '@storage/StorageToolbox';
+import { userActions } from '@ducks/userDuck';
 import { Log, VisualizersService } from '@utils';
 import {
   MapsVisualizer,
@@ -254,7 +254,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
+    dispatch(userActions.setLightColorTheme(isLight));
 
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));

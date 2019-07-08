@@ -495,7 +495,7 @@ const mapStateToProps = state => {
   return {
     webId: state.user.webId,
     userProfile: state.user,
-    colorThemeIsLight: state.globals.colorThemeIsLight,
+    colorThemeIsLight: state.user.colorThemeIsLight,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
     discoverySessions: state.user.discoverySessions,
     pipelineExecutions: state.user.pipelineExecutions,

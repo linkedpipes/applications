@@ -9,7 +9,8 @@ const INITIAL_STATE = {
   pipelineExecutions: [],
   name: '',
   image: undefined,
-  inboxInvitations: []
+  inboxInvitations: [],
+  colorThemeIsLight: false
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -23,7 +24,8 @@ const userReducer = (state = INITIAL_STATE, action) => {
         }),
         pipelineExecutions: action.profile.pipelineExecutions.sort((a, b) => {
           return a.started > b.started;
-        })
+        }),
+        colorThemeIsLight: action.profile.color !== 'BLACK'
       };
 
     case types.SET_SOLID_USER_PROFILE:
@@ -37,7 +39,8 @@ const userReducer = (state = INITIAL_STATE, action) => {
           return a.started > b.started;
         }),
         name: action.solidUsername,
-        image: action.solidImage
+        image: action.solidImage,
+        colorThemeIsLight: action.profile.color !== 'BLACK'
       };
 
     case types.SET_USER_WEBID:
@@ -147,6 +150,12 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         inboxInvitations: action.value
+      };
+
+    case types.SET_LIGHT_COLOR_THEME:
+      return {
+        ...state,
+        colorThemeIsLight: action.value
       };
 
     default:

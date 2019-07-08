@@ -51,7 +51,7 @@ const DiscoverVisualizerCardComponent = ({
       >
         <VisualizerIcon
           visualizerType={visualizerData.visualizer.visualizerCode}
-          style={{ color: 'white', fontSize: '75px' }}
+          style={{ fontSize: '75px' }}
         />
         <CardContent className={classes.CardContent}>
           <Typography gutterBottom variant="h5" component="h2">

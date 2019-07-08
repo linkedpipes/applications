@@ -28,13 +28,6 @@ const setInboxDialogState = state => {
   };
 };
 
-const setLightColorTheme = isLight => {
-  return {
-    type: types.SET_LIGHT_COLOR_THEME,
-    value: isLight
-  };
-};
-
 const setSelectedDashboardTabIndex = tabIndex => {
   return {
     type: types.SET_SELECTED_DASHBOARD_TAB_INDEX,
@@ -87,7 +80,6 @@ const setSelectedNavigationItem = item => {
 export default {
   addSelectedVisualizerAction,
   setAccessControlDialogState,
-  setLightColorTheme,
   setChooseFolderDialogState,
   setSelectedDashboardTabIndex,
   setInboxDialogState,

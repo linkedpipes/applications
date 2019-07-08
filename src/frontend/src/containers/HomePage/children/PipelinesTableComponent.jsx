@@ -163,7 +163,7 @@ const PipelinesTableComponent = ({
                 <div className={classes.cardMedia}>
                   <VisualizerIcon
                     visualizerType={pipelineExecutionItem.selectedVisualiser}
-                    style={{ color: 'white', fontSize: '75px' }}
+                    style={{ fontSize: '75px' }}
                   />
                 </div>
 

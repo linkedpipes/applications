@@ -44,19 +44,21 @@ const styles = theme => ({
     color: '#4fc3f7'
   },
   itemPrimary: {
-    fontSize: 'inherit'
+    fontSize: 'inherit',
+    color: theme.palette.common.white
   },
   itemDevBuild: {
-    fontSize: 14
+    fontSize: 14,
+    color: theme.palette.common.white
   },
   itemIcon: {
     minWidth: 'auto',
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
+    color: theme.palette.common.white
   },
   divider: {
     marginTop: theme.spacing(2)
   },
-
   logo: {
     margin: theme.spacing(2),
     width: 240,

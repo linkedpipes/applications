@@ -43,12 +43,6 @@ const globalReducer = (state = INITIAL_STATE, action) => {
         inboxDialogIsOpen: action.isOpen
       };
 
-    case types.SET_LIGHT_COLOR_THEME:
-      return {
-        ...state,
-        colorThemeIsLight: action.value
-      };
-
     case types.SET_SELECTED_DASHBOARD_TAB_INDEX:
       return {
         ...state,
