@@ -18,8 +18,11 @@ import {
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
+// eslint-disable-next-line import/order
 import { VISUALIZER_TYPE } from '@constants';
 
+// eslint-disable-next-line import/newline-after-import
+const queryString = require('query-string');
 type Props = {
   location: Object,
   setColorTheme: Function,
@@ -85,10 +88,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
   }
 
   loadApplicationMetadata = async () => {
-    const queryString = await import(
-      /* webpackChunkName: "query-string" */ 'query-string'
-    );
-
     const self = this;
 
     const parsed = queryString.parse(this.props.location.search);
