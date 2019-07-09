@@ -8,6 +8,12 @@ code {
   color: #fdb241;
 }
 
+a,
+a:hover,
+a:focus {
+  color: #006a5c;
+}
+
 .bs-docs-nav {
   background-color: #181b21;
 }
