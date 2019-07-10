@@ -14,8 +14,6 @@ const tabTitle = [
   { titleLabel: 'Application Storage' }
 ];
 
-const sectionLabel = 'Settings';
-
 class SettingsHeaderContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
     this.props.handleSetSettingsTabIndex(tabIndex);
@@ -28,7 +26,6 @@ class SettingsHeaderContainer extends PureComponent<Props> {
     return (
       <SettingsHeaderComponent
         settingsTabIndex={settingsTabIndex}
-        sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
       />

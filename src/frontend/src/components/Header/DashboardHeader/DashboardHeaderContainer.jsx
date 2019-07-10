@@ -15,8 +15,6 @@ const tabTitle = [
   { titleLabel: 'Pipeline Executions', id: 'pipeline_executions_tab' }
 ];
 
-const sectionLabel = 'Dashboard';
-
 class DashboardHeaderContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
     this.props.handleSetDashboardTabIndex(tabIndex);
@@ -29,7 +27,6 @@ class DashboardHeaderContainer extends PureComponent<Props> {
     return (
       <DashboardHeaderComponent
         dashboardTabIndex={dashboardTabIndex}
-        sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
       />

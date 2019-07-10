@@ -3,23 +3,18 @@ import React, { PureComponent, Fragment } from 'react';
 import { SettingsPageComponent } from './SettingsPageComponent';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
-import { userActions } from '@ducks/userDuck';
-import UserService from '@utils/user.service';
 import { StoragePickFolderDialog } from '@storage';
 import { withAuthorization } from '@utils';
 
 type Props = {
   userProfile: Object,
-  handleUpdateChooseFolderDialogState: Function,
-  setColorTheme: Function,
-  colorThemeIsLight: Boolean
+  handleUpdateChooseFolderDialogState: Function
 };
 
 class SettingsPage extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
-    (this: any).handleChangeColor = this.handleChangeColor.bind(this);
   }
 
   handleChangeFolder() {
@@ -27,21 +22,13 @@ class SettingsPage extends PureComponent<Props> {
     handleUpdateChooseFolderDialogState(true);
   }
 
-  async handleChangeColor() {
-    const { setColorTheme, colorThemeIsLight, userProfile } = this.props;
-    await UserService.setColorTheme(userProfile.webId, !colorThemeIsLight);
-    setColorTheme(!colorThemeIsLight);
-  }
-
   render() {
-    const { userProfile, colorThemeIsLight } = this.props;
-    const { handleChangeFolder, handleChangeColor } = this;
+    const { userProfile } = this.props;
+    const { handleChangeFolder } = this;
     return (
       <Fragment>
         <SettingsPageComponent
           onHandleChangeFolder={handleChangeFolder}
-          onHandleChangeColorTheme={handleChangeColor}
-          colorThemeIsLight={colorThemeIsLight}
           userProfile={userProfile}
         />
         <StoragePickFolderDialog />
@@ -52,8 +39,7 @@ class SettingsPage extends PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user,
-    colorThemeIsLight: state.user.colorThemeIsLight
+    userProfile: state.user
   };
 };
 
@@ -61,12 +47,8 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateChooseFolderDialogState = state =>
     dispatch(globalActions.setChooseFolderDialogState({ state }));
 
-  const setColorTheme = isLight =>
-    dispatch(userActions.setLightColorTheme(isLight));
-
   return {
-    handleUpdateChooseFolderDialogState,
-    setColorTheme
+    handleUpdateChooseFolderDialogState
   };
 };
 

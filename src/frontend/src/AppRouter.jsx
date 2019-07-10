@@ -29,7 +29,6 @@ import {
   ApplicationHeader,
   DiscoverHeader,
   SettingsHeader,
-  AboutHeader,
   ApplicationsBrowserHeader
 } from '@components';
 
@@ -432,6 +431,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/dashboard"
                 component={HomePage}
                 headerComponent={DashboardHeader}
+                headerTitle={'Dashboard'}
                 exact
               />
 
@@ -439,13 +439,14 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/config-application"
                 component={CreateVisualizerPage}
                 headerComponent={ApplicationHeader}
+                headerTitle={'Application Control & Setup'}
                 exact
               />
 
               <PrivateLayout
                 path="/create-application"
                 component={DiscoverPage}
-                headerComponent={DiscoverHeader}
+                headerTitle={'Create Application'}
                 exact
               />
 
@@ -453,13 +454,14 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/settings"
                 component={SettingsPage}
                 headerComponent={SettingsHeader}
+                headerTitle={'Settings'}
                 exact
               />
 
               <PrivateLayout
                 path="/about"
                 component={AboutPage}
-                headerComponent={AboutHeader}
+                headerTitle={'FAQ'}
                 exact
               />
 
@@ -467,6 +469,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/applications"
                 component={StoragePage}
                 headerComponent={ApplicationsBrowserHeader}
+                headerTitle={'Applications Browser'}
                 exact
               />
 

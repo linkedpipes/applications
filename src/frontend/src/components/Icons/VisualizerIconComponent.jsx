@@ -6,6 +6,7 @@ import DCTermsIcon from '@material-ui/icons/ShareTwoTone';
 import ChordIcon from '@material-ui/icons/BlurCircularTwoTone';
 import TreemapIcon from '@material-ui/icons/TableChartTwoTone';
 import { withStyles } from '@material-ui/core/styles';
+import ErrorIcon from '@material-ui/icons/ErrorTwoTone';
 import UnkownIcon from '@material-ui/icons/WallpaperTwoTone';
 import { connect } from 'react-redux';
 import { VISUALIZER_TYPE } from '@constants';
@@ -47,6 +48,9 @@ const Icon = ({ visualizerType, style, classes, colorThemeIsLight }: Props) => {
 
     case VISUALIZER_TYPE.CHORD:
       return <ChordIcon className={iconClass} style={style} />;
+
+    case 'ERROR':
+      return <ErrorIcon className={iconClass} style={style} />;
 
     default:
       return <UnkownIcon className={iconClass} style={style} />;
