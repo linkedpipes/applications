@@ -27,7 +27,6 @@ import {
 import {
   DashboardHeader,
   ApplicationHeader,
-  DiscoverHeader,
   SettingsHeader,
   ApplicationsBrowserHeader
 } from '@components';
