@@ -190,10 +190,7 @@ class FiltersComponent extends React.Component<Props, State> {
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
                 <div className={classes.filterWrapper} key={filterGroup.label}>
-                  <ExpansionPanel
-                    key={filterGroup.label}
-                    disabled={!filterGroup.enabled && !editingMode}
-                  >
+                  <ExpansionPanel key={filterGroup.label}>
                     <ExpansionPanelSummary
                       id={filterGroup.label}
                       expandIcon={<ExpandMoreIcon />}

@@ -20,6 +20,8 @@ import { VisualizersService } from '@utils';
 type Props = {
   selectedResultGraphIri: string,
   classes: {
+    menu: { marginTop: string, marginLeft: string },
+    icon: { display: string },
     progress: number,
     formControl: string,
     selectEmpty: string,
@@ -62,8 +64,8 @@ type Props = {
 
 type State = {
   anchorEl: any,
-  selectedFilterUri: string,
-  selectedOption: {
+  selectedFilterUri: ?string,
+  selectedOption: ?{
     uri: string,
     label: string,
     selected: boolean,
@@ -99,31 +101,40 @@ const styles = theme => ({
     display: 'block'
   },
   option: {
-    display: 'block'
+    display: 'inline'
   },
+  icon: { display: 'inline' },
   divider: {
     marginBottom: '1rem'
-  }
+  },
+  menu: { marginTop: '2rem', marginLeft: '1rem' }
 });
 
 const processProperties = propertiesResponse => {
   const filters = propertiesResponse;
-  return Object.entries(filters)
-    .map(entry => {
-      const topUri = entry[0];
-      return Object.entries(entry[1]).map(entry2 => ({
-        filterUri: topUri,
-        filterLabel: entry2[1].schemeLabel.languageMap.cs,
-        options: Object.entries(entry2[1].concepts).map(entry3 => ({
-          uri: entry3[0],
-          label: entry3[1].languageMap.cs,
-          selected: true,
-          visible: true,
-          enabled: true
-        }))
-      }));
-    })
-    .flat();
+  return (
+    Object.entries(filters)
+      .map(entry => {
+        const topUri: string = entry[0];
+        // $FlowFixMe
+        return Object.entries(entry[1]).map(entry2 => ({
+          filterUri: topUri,
+          // $FlowFixMe
+          filterLabel: entry2[1].schemeLabel.languageMap.cs,
+          // $FlowFixMe
+          options: Object.entries(entry2[1].concepts).map(entry3 => ({
+            uri: entry3[0],
+            // $FlowFixMe
+            label: entry3[1].languageMap.cs,
+            selected: true,
+            visible: true,
+            enabled: true
+          }))
+        }));
+      })
+      // $FlowFixMe
+      .flat()
+  );
 };
 
 class MapSchemeFilterComponent extends React.Component<Props, State> {
@@ -223,29 +234,20 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <ExpansionPanelDetails className={classes.panelDetails}>
-          {this.state.filters.map(filter => (
-            <div key={filter.filterLabel}>
-              <FormControl row className={classes.formControl}>
-                <FormLabel component="legend">{filter.filterLabel}</FormLabel>
-                <FormGroup row className={classes.formGroup}>
-                  {filter.options.map(
-                    option =>
-                      (editingMode || option.visible) && (
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              onChange={this.handleChange({
-                                filterUri: filter.filterUri,
-                                optionUri: option.uri
-                              })}
-                              checked={option.selected}
-                              value={option}
-                            />
-                          }
-                          label={
-                            <React.Fragment>
+          {this.state.filters &&
+            this.state.filters.map(filter => (
+              <div key={filter.filterLabel}>
+                <FormControl row className={classes.formControl}>
+                  <FormLabel component="legend">{filter.filterLabel}</FormLabel>
+                  <FormGroup row className={classes.formGroup}>
+                    {filter &&
+                      filter.options.map(
+                        option =>
+                          (editingMode || option.visible) && (
+                            <div>
                               {this.props.editingMode && (
                                 <IconButton
+                                  className={classes.icon}
                                   onClick={this.handleClick(
                                     filter.filterUri,
                                     option
@@ -254,32 +256,43 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                                   <MoreVertIcon />
                                 </IconButton>
                               )}
-                              {option.label}
-                            </React.Fragment>
-                          }
-                          className={classes.option}
-                          key={option.uri}
-                          disabled={!option.enabled}
-                        />
-                      )
-                  )}
-                </FormGroup>
-              </FormControl>
-              <Divider className={classes.divider} variant="middle" />
-            </div>
-          ))}
+                              <FormControlLabel
+                                control={
+                                  <React.Fragment>
+                                    <Checkbox
+                                      onChange={this.handleChange({
+                                        filterUri: filter.filterUri,
+                                        optionUri: option.uri
+                                      })}
+                                      checked={option.selected}
+                                      value={option}
+                                    />
+                                  </React.Fragment>
+                                }
+                                label={option.label}
+                                className={classes.option}
+                                key={option.uri}
+                                disabled={!option.enabled}
+                              />
+                            </div>
+                          )
+                      )}
+                  </FormGroup>
+                </FormControl>
+                <Divider className={classes.divider} variant="middle" />
+              </div>
+            ))}
         </ExpansionPanelDetails>
         <Menu
           anchorEl={this.state.anchorEl}
-          keepMounted
           open={Boolean(this.state.anchorEl)}
           onClose={this.handleClose}
+          className={classes.menu}
         >
           {this.state.selectedOption && (
             <React.Fragment>
               <MenuItem onClick={this.handleClose}>
-                Enabled
-                <Switch
+                <Checkbox
                   checked={this.state.selectedOption.enabled}
                   onChange={event => {
                     const checked = event.target.checked;
@@ -290,7 +303,11 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                             return {
                               ...f,
                               options: f.options.map(o => {
-                                if (o.uri === prevState.selectedOption.uri) {
+                                if (
+                                  o.uri ===
+                                  (prevState.selectedOption &&
+                                    prevState.selectedOption.uri)
+                                ) {
                                   return {
                                     ...o,
                                     enabled: checked
@@ -307,10 +324,10 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                   }}
                   value={this.state.selectedOption.enabled}
                 />
+                Enabled for interaction
               </MenuItem>
               <MenuItem onClick={this.handleClose}>
-                Visible
-                <Switch
+                <Checkbox
                   checked={this.state.selectedOption.visible}
                   onChange={event => {
                     const checked = event.target.checked;
@@ -321,7 +338,11 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                             return {
                               ...f,
                               options: f.options.map(o => {
-                                if (o.uri === prevState.selectedOption.uri) {
+                                if (
+                                  o.uri ===
+                                  (prevState.selectedOption &&
+                                    prevState.selectedOption.uri)
+                                ) {
                                   return {
                                     ...o,
                                     visible: checked
@@ -338,6 +359,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                   }}
                   value={this.state.selectedOption.visible}
                 />
+                Visible to the end user
               </MenuItem>
             </React.Fragment>
           )}
