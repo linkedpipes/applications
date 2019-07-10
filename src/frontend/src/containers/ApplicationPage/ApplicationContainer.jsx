@@ -202,7 +202,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { getApplication } = this;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
     const renderFilters =
@@ -243,7 +242,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
               textAlign: visible ? 'left' : 'center'
             }}
           >
-            {getApplication(
+            {this.getApplication(
               this.state.applicationType,
               this.props.selectedApplication
             )}

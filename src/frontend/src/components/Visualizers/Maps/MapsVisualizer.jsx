@@ -78,7 +78,7 @@ class MapsVisualizer extends PureComponent<Props, State> {
   static async fetchMarkers(
     selectedResultGraphIri: string,
     visualizerCode: string,
-    filters: Array<{}>
+    filters: {}
   ) {
     if (visualizerCode === VISUALIZER_TYPE.ADVANCED_FILTERS_MAP) {
       const response = await VisualizersService.getMarkers(
@@ -127,9 +127,10 @@ class MapsVisualizer extends PureComponent<Props, State> {
     }
 
     // Fetch data
-    const processedFilters = await MapsVisualizer.formatFiltersForRequest(
-      this.props.filters
-    );
+    const processedFilters: {
+      filters: {}
+    } = await MapsVisualizer.formatFiltersForRequest(this.props.filters);
+
     const markers = await MapsVisualizer.fetchMarkers(
       this.props.selectedResultGraphIri,
       this.props.visualizerCode,
