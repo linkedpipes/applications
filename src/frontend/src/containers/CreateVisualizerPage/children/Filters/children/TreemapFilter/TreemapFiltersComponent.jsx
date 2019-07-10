@@ -26,6 +26,7 @@ type Props = {
     enabled: boolean,
     selected: boolean
   }>,
+  enabled: boolean,
   editingMode: boolean,
   registerCallback: Function,
   onApplyFilter: Function,
@@ -119,7 +120,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, enabled } = this.props;
     const selectedScheme =
       this.state.schemes && this.state.schemes.find(s => s.selected);
     if (!selectedScheme) {
@@ -130,7 +131,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
       !!selectedScheme && (
         <ExpansionPanelDetails>
           <FormGroup className={classes.formGroup}>
-            <FormControl className={classes.formControl}>
+            <FormControl disabled={!enabled} className={classes.formControl}>
               <Select
                 value={selectedScheme}
                 onChange={this.handleSchemeChange}

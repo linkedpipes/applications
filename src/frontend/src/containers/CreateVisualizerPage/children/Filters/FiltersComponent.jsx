@@ -78,16 +78,18 @@ class FiltersComponent extends React.Component<Props, State> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = (filterType, filterLabel, options) => {
+  getFilter = (filterGroup, enabled) => {
+    const { filterType, filterLabel } = filterGroup;
     switch (filterType) {
       case 'NODES_FILTER':
         return (
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            nodes={options}
+            nodes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       case 'MAP_SCHEMES_FILTER':
@@ -95,9 +97,10 @@ class FiltersComponent extends React.Component<Props, State> {
           <MapSchemeFilterComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            nodes={options}
+            filters={filterGroup.filters || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       case 'SCHEME_FILTER':
@@ -105,9 +108,10 @@ class FiltersComponent extends React.Component<Props, State> {
           <TreemapFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            schemes={options}
+            schemes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       default:
@@ -190,10 +194,7 @@ class FiltersComponent extends React.Component<Props, State> {
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
                 <div className={classes.filterWrapper} key={filterGroup.label}>
-                  <ExpansionPanel
-                    key={filterGroup.label}
-                    disabled={!filterGroup.enabled && !editingMode}
-                  >
+                  <ExpansionPanel key={filterGroup.label}>
                     <ExpansionPanelSummary
                       id={filterGroup.label}
                       expandIcon={<ExpandMoreIcon />}
@@ -202,11 +203,7 @@ class FiltersComponent extends React.Component<Props, State> {
                         {filterGroup.label}
                       </Typography>
                     </ExpansionPanelSummary>
-                    {this.getFilter(
-                      filterGroup.filterType,
-                      filterGroup.label,
-                      filterGroup.options
-                    )}
+                    {this.getFilter(filterGroup, filtersState.enabled)}
                   </ExpansionPanel>
                 </div>
               )
