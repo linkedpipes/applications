@@ -78,7 +78,7 @@ class FiltersComponent extends React.Component<Props, State> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = filterGroup => {
+  getFilter = (filterGroup, enabled) => {
     const { filterType, filterLabel } = filterGroup;
     switch (filterType) {
       case 'NODES_FILTER':
@@ -89,6 +89,7 @@ class FiltersComponent extends React.Component<Props, State> {
             nodes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       case 'MAP_SCHEMES_FILTER':
@@ -99,6 +100,7 @@ class FiltersComponent extends React.Component<Props, State> {
             filters={filterGroup.filters || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       case 'SCHEME_FILTER':
@@ -109,6 +111,7 @@ class FiltersComponent extends React.Component<Props, State> {
             schemes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
           />
         );
       default:
@@ -200,7 +203,7 @@ class FiltersComponent extends React.Component<Props, State> {
                         {filterGroup.label}
                       </Typography>
                     </ExpansionPanelSummary>
-                    {this.getFilter(filterGroup)}
+                    {this.getFilter(filterGroup, filtersState.enabled)}
                   </ExpansionPanel>
                 </div>
               )

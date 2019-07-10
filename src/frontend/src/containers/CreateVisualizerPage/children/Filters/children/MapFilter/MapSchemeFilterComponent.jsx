@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -57,6 +56,7 @@ type Props = {
       visible: boolean
     }>
   }>,
+  enabled: boolean,
   onApplyFilter: Function,
   editingMode: boolean,
   registerCallback: Function
@@ -229,7 +229,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
   };
 
   render() {
-    const { classes, editingMode } = this.props;
+    const { classes, editingMode, enabled } = this.props;
 
     return (
       <React.Fragment>
@@ -237,7 +237,11 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
           {this.state.filters &&
             this.state.filters.map(filter => (
               <div key={filter.filterLabel}>
-                <FormControl row className={classes.formControl}>
+                <FormControl
+                  disabled={!enabled && !editingMode}
+                  row
+                  className={classes.formControl}
+                >
                   <FormLabel component="legend">{filter.filterLabel}</FormLabel>
                   <FormGroup row className={classes.formGroup}>
                     {filter &&
@@ -272,7 +276,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
                                 label={option.label}
                                 className={classes.option}
                                 key={option.uri}
-                                disabled={!option.enabled}
+                                disabled={!option.enabled || !enabled}
                               />
                             </div>
                           )

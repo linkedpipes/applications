@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Switch from '@material-ui/core/Switch';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -35,7 +35,8 @@ type Props = {
   onApplyFilter: Function,
   editingMode: boolean,
   registerCallback: Function,
-  name: string
+  name: string,
+  enabled: boolean
 };
 
 type State = {
@@ -174,40 +175,42 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   };
 
   render() {
-    const { classes, editingMode } = this.props;
+    const { classes, editingMode, enabled } = this.props;
     return (
       <React.Fragment>
         <ExpansionPanelDetails>
-          <FormGroup disabled row className={classes.formGroup}>
-            {this.state.nodes.map(
-              node =>
-                (editingMode || node.visible) && (
-                  <div>
-                    {editingMode && (
-                      <IconButton
-                        className={classes.icon}
-                        onClick={this.handleClick(node)}
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
-                    )}
-                    <FormControlLabel
-                      key={node.uri}
-                      className={classes.option}
-                      control={
-                        <Checkbox
-                          value={node.uri}
-                          checked={node.selected}
-                          onChange={this.handleChange(node.uri)}
-                        />
-                      }
-                      label={node.label}
-                      disabled={!node.enabled}
-                    />
-                  </div>
-                )
-            )}
-          </FormGroup>
+          <FormControl>
+            <FormGroup row className={classes.formGroup}>
+              {this.state.nodes.map(
+                node =>
+                  (editingMode || node.visible) && (
+                    <div>
+                      {editingMode && (
+                        <IconButton
+                          className={classes.icon}
+                          onClick={this.handleClick(node)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      )}
+                      <FormControlLabel
+                        key={node.uri}
+                        className={classes.option}
+                        control={
+                          <Checkbox
+                            value={node.uri}
+                            checked={node.selected}
+                            onChange={this.handleChange(node.uri)}
+                          />
+                        }
+                        label={node.label}
+                        disabled={!enabled || !node.enabled}
+                      />
+                    </div>
+                  )
+              )}
+            </FormGroup>
+          </FormControl>
         </ExpansionPanelDetails>
         <Menu
           anchorEl={this.state.anchorEl}
