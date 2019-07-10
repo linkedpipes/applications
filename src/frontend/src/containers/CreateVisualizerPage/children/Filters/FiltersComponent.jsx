@@ -78,14 +78,15 @@ class FiltersComponent extends React.Component<Props, State> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = (filterType, filterLabel, options) => {
+  getFilter = filterGroup => {
+    const { filterType, filterLabel } = filterGroup;
     switch (filterType) {
       case 'NODES_FILTER':
         return (
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            nodes={options}
+            nodes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -95,7 +96,7 @@ class FiltersComponent extends React.Component<Props, State> {
           <MapSchemeFilterComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            nodes={options}
+            filters={filterGroup.filters || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -105,7 +106,7 @@ class FiltersComponent extends React.Component<Props, State> {
           <TreemapFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            schemes={options}
+            schemes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
           />
@@ -199,11 +200,7 @@ class FiltersComponent extends React.Component<Props, State> {
                         {filterGroup.label}
                       </Typography>
                     </ExpansionPanelSummary>
-                    {this.getFilter(
-                      filterGroup.filterType,
-                      filterGroup.label,
-                      filterGroup.options
-                    )}
+                    {this.getFilter(filterGroup)}
                   </ExpansionPanel>
                 </div>
               )

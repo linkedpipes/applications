@@ -145,6 +145,12 @@ class ApplicationContainer extends PureComponent<Props, State> {
             isPublished
             height={height + 250}
             width={width + 250}
+            filters={pathOr(
+              [],
+              'filterGroups.mapFilters.filters',
+              filtersState
+            )}
+            visualizerCode={applicationType}
           />
         );
       }
@@ -219,6 +225,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
             />
           </Grid>
         )}
+
         <Grid
           id="viz-div"
           className={this.props.classes.vizdiv}
