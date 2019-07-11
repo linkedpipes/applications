@@ -165,6 +165,13 @@ const PipelinesTableComponent = ({
                   onClick={() => {
                     onHandleSelectPipelineExecutionClick(pipelineExecutionItem);
                   }}
+                  disabled={
+                      !(
+                        pipelineExecutionItem.status &&
+                        ETL_STATUS_MAP[pipelineExecutionItem.status['@id']] ===
+                          'Finished'
+                      )
+                    }
                 >
                   <div className={classes.cardMedia}>
                     <VisualizerIcon

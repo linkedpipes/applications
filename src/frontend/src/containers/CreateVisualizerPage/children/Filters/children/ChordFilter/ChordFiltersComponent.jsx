@@ -96,7 +96,11 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (this.props.editingMode && !this.state.nodes.length) {
+    if (
+      this.props.editingMode &&
+      this.state.nodes.length !== 0 &&
+      this.props.nodes.length === 0
+    ) {
       let nodes = [];
       const getNodesResponse = await VisualizersService.getChordNodes(
         this.props.selectedResultGraphIri
@@ -133,6 +137,24 @@ class ChordFiltersComponent extends React.Component<Props, State> {
 
     // Register callback
     this.props.registerCallback(this.handleApplyFilter);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.isMounted && !this.props.editingMode) {
+      const nodes = nextProps.nodes;
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
+        }
+      );
+    }
   }
 
   componentWillUnmount = () => {

@@ -450,26 +450,51 @@ class SolidBackend {
   ): Promise<boolean> {
     const promises = [];
 
-    for (const node of nodes) {
-      const sparqlQuery = `
-            @prefix lpa: <https://w3id.org/def/lpapps#> .
+    let sparqlQuery = '@prefix lpa: <https://w3id.org/def/lpapps#> .';
+    const deleteStatements = [];
+    const insertStatements = [];
+    const whereStatements = [];
 
-            DELETE
-            { ?optionToUpdate lpa:uri "${node.uri}" .
-              ?optionToUpdate lpa:selected ?optionSelected . }
-            INSERT
-            { ?optionToUpdate lpa:uri "${node.uri}" .
-              ?optionToUpdate lpa:selected "${node.selected}" . }
-            WHERE
-            { ?optionToUpdate lpa:uri "${node.uri}" .
-              ?optionToUpdate lpa:selected ?optionSelected . }
-    `;
-      promises.push(
-        StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery)
-      );
+    let cnt = 0;
+
+    for (const node of nodes) {
+      deleteStatements.push(`?selectedOption${cnt} lpa:uri "${node.uri}" .
+      ?selectedOption${cnt} lpa:selected ?selected${cnt} .
+      ?selectedOption${cnt} lpa:visible ?visible${cnt} .
+      ?selectedOption${cnt} lpa:enabled ?enabled${cnt} .`);
+
+      insertStatements.push(`?selectedOption${cnt} lpa:uri "${node.uri}" .
+      ?selectedOption${cnt} lpa:selected "${node.selected}" .
+      ?selectedOption${cnt} lpa:visible "${node.visible}" .
+      ?selectedOption${cnt} lpa:enabled "${node.enabled}" .`);
+
+      whereStatements.push(`?selectedOption${cnt} lpa:uri "${node.uri}" .
+      ?selectedOption${cnt} lpa:selected ?selected${cnt} .
+      ?selectedOption${cnt} lpa:visible ?visible${cnt} .
+      ?selectedOption${cnt} lpa:enabled ?enabled${cnt} . `);
+
+      cnt += 1;
     }
 
-    await Promise.all(promises);
+    sparqlQuery += `
+
+      DELETE {
+        ${deleteStatements.join('\n')}
+      }
+
+      INSERT {
+        ${insertStatements.join('\n')}
+      }
+
+      WHERE {
+        ${whereStatements.join('\n')}
+      }
+
+    `;
+
+    Log.info(sparqlQuery);
+
+    await StorageSparqlClient.patchFileWithQuery(metadataUrl, sparqlQuery);
 
     try {
       await this.load($rdf.sym(metadataUrl).doc());
@@ -1263,7 +1288,7 @@ class SolidBackend {
       Accept: 'application/ld+json'
     });
 
-    const response = JSON.parse(fetchResponse)
+    const response = JSON.parse(fetchResponse);
 
     return new AccessControl(response, aclUrl);
   }
