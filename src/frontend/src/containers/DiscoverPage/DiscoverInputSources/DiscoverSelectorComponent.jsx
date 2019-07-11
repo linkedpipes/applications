@@ -15,6 +15,7 @@ import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { Container } from '@material-ui/core';
 import { LinearLoader } from '@components';
 
 type Props = {
@@ -90,7 +91,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
     return (
       <Card className={classes.card}>
         <CardContent>
-          <div className={classes.gridRoot}>
+          <Container className={classes.gridRoot} maxWidth="xl">
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12}>
                 <AppBar
@@ -190,7 +191,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                 )}
               </Grid>
             </Grid>
-          </div>
+          </Container>
         </CardContent>
       </Card>
     );
