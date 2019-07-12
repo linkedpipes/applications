@@ -81,12 +81,41 @@ type Props = {
 };
 
 type State = {
-  open: boolean
+  open: boolean,
+  graphExists: boolean
 };
 
 class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
-    open: false
+    open: false,
+    graphExists: true
+  };
+
+  isMounted: boolean = false;
+
+  componentDidMount() {
+    this.isMounted = true;
+    this.fetchGraphStatus();
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
+  fetchGraphStatus = async () => {
+    const { applicationMetadata } = this.props;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
+    const resultGraphIri = applicationConfiguration.graphIri;
+
+    const self = this;
+
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      if (self.isMounted) {
+        self.setState({ graphExists: false });
+      }
+    });
   };
 
   handleClickOpen = () => {
@@ -191,6 +220,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleApplicationClicked,
       handleCopyLinkClicked
     } = this;
+    const { graphExists } = this.state;
 
     const applicationConfiguration = applicationMetadata.configuration;
 
@@ -242,10 +272,30 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                     </Typography>
                   </React.Fragment>
                 )}
+                {!graphExists && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Error:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      The data associated with this application is either
+                      removed or corrupted. If you are using your own instance
+                      of LPApps, make sure that you are running all components
+                      of the platform and try refreshing this page.
+                    </Typography>
+                  </React.Fragment>
+                )}
               </React.Fragment>
             }
           />
-          <CardActionArea onClick={handleApplicationClicked}>
+          <CardActionArea
+            disabled={!graphExists}
+            onClick={handleApplicationClicked}
+          >
             <div
               className={classes.media}
               id={`${indexNumber.toString()}_${applicationConfiguration.title}`}
@@ -254,22 +304,28 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               }}
             >
               <VisualizerIcon
-                visualizerType={applicationConfiguration.endpoint}
-                style={{  fontSize: '85px' }}
+                visualizerType={
+                  graphExists ? applicationConfiguration.endpoint : 'Error'
+                }
+                style={{ fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
           <CardActions className={classes.spacing}>
-            <Button
-              size="small"
-              onClick={handleApplicationClicked}
-              color="primary"
-            >
-              Edit
-            </Button>
-            <Button size="small" onClick={handleShareApp} color="primary">
-              Share
-            </Button>
+            {graphExists && (
+              <React.Fragment>
+                <Button
+                  size="small"
+                  onClick={handleApplicationClicked}
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button size="small" onClick={handleShareApp} color="primary">
+                  Share
+                </Button>
+              </React.Fragment>
+            )}
             <Button
               id={`delete_button_${indexNumber.toString()}_${
                 applicationConfiguration.title

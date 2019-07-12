@@ -2,15 +2,24 @@
 import React, { PureComponent } from 'react';
 import { UserProfilePage } from './UserProfilePageComponent';
 import { connect } from 'react-redux';
+import UserService from '@utils/user.service';
+import { userActions } from '@ducks/userDuck';
 import { withAuthorization, GlobalUtils, Log } from '@utils';
 
 type Props = {
   userProfile: Object,
   history: Object,
-  resetReduxStore: Function
+  resetReduxStore: Function,
+  setColorTheme: Function,
+  colorThemeIsLight: Boolean
 };
 
 class UserProfilePageContainer extends PureComponent<Props> {
+  constructor(props) {
+    super(props);
+    (this: any).handleChangeColor = this.handleChangeColor.bind(this);
+  }
+
   performLogout = async () => {
     await this.props.resetReduxStore();
 
@@ -46,14 +55,23 @@ class UserProfilePageContainer extends PureComponent<Props> {
     this.performLogout();
   };
 
+  async handleChangeColor() {
+    const { setColorTheme, colorThemeIsLight, userProfile } = this.props;
+    await UserService.setColorTheme(userProfile.webId, !colorThemeIsLight);
+    setColorTheme(!colorThemeIsLight);
+  }
+
   render() {
-    const { userProfile } = this.props;
-    const { performLogout, performPasswordReset } = this;
+    const { userProfile, colorThemeIsLight } = this.props;
+    const { performLogout, performPasswordReset, handleChangeColor } = this;
+
     return (
       <UserProfilePage
         userProfile={userProfile}
         onHandleLogoutClicked={performLogout}
         onHandlePasswordReset={performPasswordReset}
+        colorThemeIsLight={colorThemeIsLight}
+        onHandleChangeColorTheme={handleChangeColor}
       />
     );
   }
@@ -61,15 +79,20 @@ class UserProfilePageContainer extends PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user
+    userProfile: state.user,
+    colorThemeIsLight: state.user.colorThemeIsLight
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const resetReduxStore = () => dispatch({ type: 'USER_LOGOUT' });
 
+  const setColorTheme = isLight =>
+    dispatch(userActions.setLightColorTheme(isLight));
+
   return {
-    resetReduxStore
+    resetReduxStore,
+    setColorTheme
   };
 };
 

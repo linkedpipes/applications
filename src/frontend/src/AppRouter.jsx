@@ -27,9 +27,7 @@ import {
 import {
   DashboardHeader,
   ApplicationHeader,
-  DiscoverHeader,
   SettingsHeader,
-  AboutHeader,
   ApplicationsBrowserHeader
 } from '@components';
 
@@ -51,8 +49,11 @@ const startSocketClient = () => {
 };
 
 const stopSocketClient = () => {
+  socket.removeAllListeners();
   socket.disconnect();
 };
+
+let socketHasDisconnectedBefore = false;
 
 const styles = () => ({
   root: {}
@@ -265,7 +266,8 @@ class AppRouter extends React.PureComponent<Props, State> {
       handleDeleteDiscoverySession,
       handleDeleteExecutionSession,
       handleSetDataSampleSessionId,
-      handleSetDiscoveryId
+      handleSetDiscoveryId,
+      webId
     } = this.props;
 
     const self = this;
@@ -280,18 +282,32 @@ class AppRouter extends React.PureComponent<Props, State> {
       if (socket.connected) {
         Log.info('Client connected', 'AppRouter');
         Log.info(socket.id, 'AppRouter');
+        if (socket && socketHasDisconnectedBefore) {
+          // restart if there is an instance already
+          Log.info('Socket has disconnected before');
+          socketHasDisconnectedBefore = false;
+          self.startSocketListeners();
+          socket.emit('join', webId);
+        }
       }
     });
 
     socket.on('disconnect', () => {
       Log.info('Client disconnected', 'AppRouter');
       Log.info(socket.id, 'AppRouter');
+      socketHasDisconnectedBefore = true;
     });
 
     socket.on('reconnect', () => {
       if (socket.connected) {
         Log.info('Client reconnected', 'AppRouter');
         Log.info(socket.id, 'AppRouter');
+        if (socket && socketHasDisconnectedBefore) {
+          Log.info('Socket has disconnected before');
+          socketHasDisconnectedBefore = false;
+          self.startSocketListeners();
+          socket.emit('join', webId);
+        }
       }
     });
 
@@ -432,6 +448,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/dashboard"
                 component={HomePage}
                 headerComponent={DashboardHeader}
+                headerTitle={'Dashboard'}
                 exact
               />
 
@@ -439,13 +456,14 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/config-application"
                 component={CreateVisualizerPage}
                 headerComponent={ApplicationHeader}
+                headerTitle={'Application Control & Setup'}
                 exact
               />
 
               <PrivateLayout
                 path="/create-application"
                 component={DiscoverPage}
-                headerComponent={DiscoverHeader}
+                headerTitle={'Create Application'}
                 exact
               />
 
@@ -453,13 +471,14 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/settings"
                 component={SettingsPage}
                 headerComponent={SettingsHeader}
+                headerTitle={'Settings'}
                 exact
               />
 
               <PrivateLayout
                 path="/about"
                 component={AboutPage}
-                headerComponent={AboutHeader}
+                headerTitle={'FAQ'}
                 exact
               />
 
@@ -467,6 +486,7 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/applications"
                 component={StoragePage}
                 headerComponent={ApplicationsBrowserHeader}
+                headerTitle={'Applications Browser'}
                 exact
               />
 

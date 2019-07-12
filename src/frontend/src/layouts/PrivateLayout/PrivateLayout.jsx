@@ -38,7 +38,9 @@ type Props = {
   drawerState: Boolean,
   handleSetMobileDrawerState: Function,
   selectedNavigationItem: string,
-  handleSetSelectedNavigationItem: Function
+  handleSetSelectedNavigationItem: Function,
+  headerComponent: string,
+  headerTitle: string
 };
 
 class PrivateLayout extends PureComponent<Props> {
@@ -56,6 +58,8 @@ class PrivateLayout extends PureComponent<Props> {
       drawerState,
       handleSetMobileDrawerState,
       selectedNavigationItem,
+      headerComponent,
+      headerTitle,
       ...rest
     } = this.props;
 
@@ -95,6 +99,7 @@ class PrivateLayout extends PureComponent<Props> {
                 onDrawerToggle={() => {
                   handleSetMobileDrawerState(!drawerState);
                 }}
+                headerTitle={headerTitle}
               />
               {HeaderComponent !== undefined && <HeaderComponent />}
               <main className={classes.mainContent}>

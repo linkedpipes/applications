@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
@@ -94,35 +93,15 @@ class NavigationBarContainer extends PureComponent<Props> {
               classes.item,
               classes.itemCategory
             )}
+            onClick={() => {
+              history.push('/dashboard');
+              onHandleSetSelectedNavigationItem('dashboard');
+            }}
           >
             <img className={classes.logo} src={LpaHeaderLogo} alt="" />
           </ListItem>
-          <ListItem className={clsx(classes.item, classes.itemCategory)}>
-            <ListItemIcon className={classes.itemIcon}>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText
-              classes={{
-                primary: classes.itemPrimary
-              }}
-            >
-              Project Overview
-            </ListItemText>
-          </ListItem>
 
           <React.Fragment key={'general-list-item-section'}>
-            <ListItem className={classes.categoryHeader}>
-              <ListItemText
-                classes={{
-                  primary: classes.categoryHeaderPrimary
-                }}
-              >
-                General
-              </ListItemText>
-            </ListItem>
-
-            <Divider className={classes.divider} />
-
             <ListItem
               id="dashboard_navbar_button"
               button

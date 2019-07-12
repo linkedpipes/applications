@@ -11,7 +11,8 @@ type Props = {
   resetReduxStore: Function,
   handleSetInboxDialogState: Function,
   currentInboxInvitations: Array<Object>,
-  onDrawerToggle: Function
+  onDrawerToggle: Function,
+  headerTitle: string
 };
 
 type State = {
@@ -72,7 +73,7 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
       handleOpenSettings,
       handleSetInboxDialogOpen
     } = this;
-    const { currentInboxInvitations, onDrawerToggle } = this.props;
+    const { currentInboxInvitations, onDrawerToggle, headerTitle } = this.props;
     const profileMenuIsOpen = Boolean(anchorElement);
 
     return (
@@ -86,6 +87,7 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
         onHandleSetInboxDialogOpen={handleSetInboxDialogOpen}
         currentInboxInvitations={currentInboxInvitations}
         onDrawerToggle={onDrawerToggle}
+        headerTitle={headerTitle}
       />
     );
   }

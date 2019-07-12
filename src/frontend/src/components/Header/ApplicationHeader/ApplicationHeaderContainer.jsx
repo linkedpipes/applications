@@ -11,8 +11,6 @@ type Props = {
 
 const tabTitle = [];
 
-const sectionLabel = 'Application Control & Setup';
-
 class ApplicationHeaderContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
     this.props.handleSetApplicationSetupTabIndex(tabIndex);
@@ -25,7 +23,6 @@ class ApplicationHeaderContainer extends PureComponent<Props> {
     return (
       <ApplicationHeaderComponent
         applicationSetupTabIndex={applicationSetupTabIndex}
-        sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
       />

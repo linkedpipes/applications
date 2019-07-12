@@ -14,6 +14,7 @@ import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import uuid from 'uuid';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
+import { CardActionArea } from '@material-ui/core';
 import { ETL_STATUS_MAP, GlobalUtils } from '@utils';
 import { VisualizerIcon } from '@components';
 
@@ -160,12 +161,25 @@ const PipelinesTableComponent = ({
                   }
                 />
 
-                <div className={classes.cardMedia}>
-                  <VisualizerIcon
-                    visualizerType={pipelineExecutionItem.selectedVisualiser}
-                    style={{ fontSize: '75px' }}
-                  />
-                </div>
+                <CardActionArea
+                  onClick={() => {
+                    onHandleSelectPipelineExecutionClick(pipelineExecutionItem);
+                  }}
+                  disabled={
+                      !(
+                        pipelineExecutionItem.status &&
+                        ETL_STATUS_MAP[pipelineExecutionItem.status['@id']] ===
+                          'Finished'
+                      )
+                    }
+                >
+                  <div className={classes.cardMedia}>
+                    <VisualizerIcon
+                      visualizerType={pipelineExecutionItem.selectedVisualiser}
+                      style={{ fontSize: '75px' }}
+                    />
+                  </div>
+                </CardActionArea>
 
                 <CardContent className={classes.cardContent}>
                   <Typography variant="subtitle2" style={{ display: 'inline' }}>

@@ -18,8 +18,11 @@ import {
   TreemapVisualizer,
   ChordVisualizer
 } from '@components';
+// eslint-disable-next-line import/order
 import { VISUALIZER_TYPE } from '@constants';
 
+// eslint-disable-next-line import/newline-after-import
+const queryString = require('query-string');
 type Props = {
   location: Object,
   setColorTheme: Function,
@@ -85,10 +88,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
   }
 
   loadApplicationMetadata = async () => {
-    const queryString = await import(
-      /* webpackChunkName: "query-string" */ 'query-string'
-    );
-
     const self = this;
 
     const parsed = queryString.parse(this.props.location.search);
@@ -146,6 +145,12 @@ class ApplicationContainer extends PureComponent<Props, State> {
             isPublished
             height={height + 250}
             width={width + 250}
+            filters={pathOr(
+              [],
+              'filterGroups.mapFilters.filters',
+              filtersState
+            )}
+            visualizerCode={applicationType}
           />
         );
       }
@@ -197,7 +202,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { getApplication } = this;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
     const renderFilters =
@@ -220,6 +224,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
             />
           </Grid>
         )}
+
         <Grid
           id="viz-div"
           className={this.props.classes.vizdiv}
@@ -237,7 +242,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
               textAlign: visible ? 'left' : 'center'
             }}
           >
-            {getApplication(
+            {this.getApplication(
               this.state.applicationType,
               this.props.selectedApplication
             )}
