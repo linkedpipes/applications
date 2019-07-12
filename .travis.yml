@@ -70,8 +70,8 @@ jobs:
         - yarn install --frozen-lockfile --check-files --network-concurrency 1
         - yarn run eslint
         - yarn run build
-#         - yarn run docz:build
-#         - netlify deploy -s $NETLIFY_FRONTEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs
+        - yarn run docz:build
+        - netlify deploy -s $NETLIFY_FRONTEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs
 
     - name: "Backend"
       language: java
