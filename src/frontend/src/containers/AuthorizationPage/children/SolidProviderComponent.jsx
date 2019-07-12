@@ -46,6 +46,9 @@ const SolidProviderComponent = ({
         </MenuItem>
         {/* <MenuItem value={'Inrupt'}>Inrupt</MenuItem> */}
         <MenuItem value={'LinkedPipes PODs'}>LinkedPipes PODs</MenuItem>
+        <MenuItem disable={true} value={''}>
+          Stay tuned for more supported providers...
+        </MenuItem>
       </Select>
     </FormControl>
   );
