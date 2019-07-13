@@ -5,7 +5,7 @@ import palette from 'google-palette';
 import equal from 'fast-deep-equal';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { VisualizersService } from '@utils';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   classes: {},
@@ -138,7 +138,9 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
         );
         const nodesResponse = await nodesRequest.data;
         const nodeUris = nodesResponse.map(node => node.uri);
-        const labels = nodesResponse.map(node => node.label.languageMap.nolang);
+        const labels = nodesResponse.map(node =>
+          GlobalUtils.getLanguageLabel(node.label.languageMap, node.uri)
+        );
 
         const matrixRequest = await VisualizersService.getChordData(
           this.props.selectedResultGraphIri,

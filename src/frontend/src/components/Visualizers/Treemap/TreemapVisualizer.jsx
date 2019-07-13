@@ -4,7 +4,7 @@ import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import { VisualizersService, Log } from '@utils';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   classes: {
@@ -58,7 +58,10 @@ const styles = theme => ({
 const transformData = data => {
   return data.map(row => {
     return [
-      { v: row.id, f: row.label.languageMap.en },
+      {
+        v: row.id,
+        f: GlobalUtils.getLanguageLabel(row.label.languageMap, row.uri)
+      },
       row.parentId,
       row.size,
       Math.floor(Math.random() * Math.floor(100))
@@ -207,8 +210,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     const { classes, schemes, width, height } = this.props;
 
     const heightSize = `${Math.max(250, Math.min(width, height) - 250)}px`;
-
-    Log.info(heightSize);
 
     const selectedScheme = schemes.find(s => s.selected);
     return (
