@@ -1,0 +1,156 @@
+body {
+  background-color: #1d2330;
+  color: white;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+code {
+  color: #fdb241;
+}
+
+a,
+a:hover,
+a:focus {
+  color: #fdb241;
+}
+
+.bs-docs-nav {
+  background-color: #1d2330;
+  -webkit-box-shadow: 0px 3px 12px 0px #000;
+  -moz-box-shadow: 0px 3px 12px 0px #888;
+  box-shadow: 0px 3px 12px 0px #001002;
+}
+
+.github-fork-ribbon {
+  width: 0em;
+  height: 0em;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #fff;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #1c1d25;
+  border: 1px solid #353846;
+  border-radius: 4px;
+}
+
+.dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.dropdown-menu.scrollable-menu {
+  height: auto;
+  max-height: 480px;
+  overflow-x: scroll;
+  background: #353846;
+}
+
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+  background-color: #3d4151;
+  border-color: #337ab7;
+}
+
+.bs-docs-nav .navbar-brand,
+.bs-docs-nav .navbar-nav > li > a {
+  color: white;
+}
+
+.bs-docs-nav .navbar-brand:hover,
+.bs-docs-nav .navbar-nav > li > a:hover {
+  color: #fdb241;
+  background-color: initial;
+}
+
+.bs-docs-sidebar .nav > .active > a,
+.bs-docs-sidebar .nav > .active:hover > a {
+  color: #fdb241;
+  border-left-color: #fdb241;
+}
+
+.bs-docs-sidebar .nav > li > a:hover,
+.bs-docs-sidebar .nav > li > a:focus {
+  color: #fdb241;
+  border-left-color: #fdb241;
+}
+
+.breadcrumb {
+  background-color: #181b21;
+}
+
+.breadcrumb > .active {
+  color: white;
+}
+
+.panel-default {
+  border-color: #2d3747;
+}
+
+.panel-default > .panel-heading {
+  background-color: #181b21;
+  color: white;
+  border-color: #2d3747;
+}
+
+.panel-body,
+.panel-footer {
+  background-color: #1d2330;
+}
+
+.list-group-item {
+  background-color: #1d2330;
+  border-color: #2d3747;
+}
+
+a.list-group-item:hover,
+a.list-group-item:focus {
+  background-color: #181b21;
+}
+
+.badge {
+  background-color: #7d899c;
+}
+
+.back-to-top:hover {
+  color: #fdb241;
+}
+
+.fa {
+  color: white;
+}
+
+.fa:hover {
+  color: #fdb241;
+  text-decoration: none;
+}
+
+#jumbotron {
+  background-image: none !important;
+  background-color: #181b21;
+}
+
+#jumbotron:after {
+  background: transparent;
+}
+
+#search #search-results ul li:nth-child(odd) {
+  background: #1d2330;
+}
+
+.input-group .form-control {
+  background: #1d2330;
+  color: #fff;
+}

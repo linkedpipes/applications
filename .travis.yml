@@ -89,8 +89,8 @@ jobs:
         - git config --global user.name "travis-ci"
         - npm install netlify-cli -g
       script:
-        - ./gradlew assemble javadoc
-        - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./build/docs/javadoc
+        - ./gradlew orchidBuild
+        - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs/build/docs/orchid
 
     - stage: tests
       name: "Backend unit tests"

@@ -82,7 +82,7 @@ public class PipelineController {
      */
     @NotNull
     @PostMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
+    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value = "webId") String webId,
                                                      @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
         try {
@@ -122,9 +122,8 @@ public class PipelineController {
      * @param repeat is the periodic execution on or off
      * @param executionIri IRI of first pipeline execution
      */
-    @NotNull
     @PutMapping("/api/pipeline/repeat")
-    public void executePipeline(@NotNull @RequestParam(value="repeat") boolean repeat,
+    public void executePipeline(@RequestParam(value = "repeat") boolean repeat,
                                 @NotNull @RequestParam(value = "executionIri") String executionIri) {
         scheduledExecutionService.stopScheduledExecution(repeat, executionIri);
     }
