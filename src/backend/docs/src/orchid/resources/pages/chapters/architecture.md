@@ -1,8 +1,5 @@
 ---
-menu:
-  - type: "pageContent"
-    title: "Architecture"
-    order: 3
+title: "Architecture"
 ---
 
 ## Backend high-level architecture

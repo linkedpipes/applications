@@ -150,6 +150,10 @@ a.list-group-item:focus {
   background: #1d2330;
 }
 
+#search #search-results ul li:nth-child(even) {
+  background: #181b21;
+}
+
 .input-group .form-control {
   background: #1d2330;
   color: #fff;
