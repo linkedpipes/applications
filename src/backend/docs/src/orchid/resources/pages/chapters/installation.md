@@ -1,8 +1,5 @@
 ---
-menu:
-  - type: "pageContent"
-    title: "Installation"
-    order: 1
+title: "Installation"
 ---
 
 ## Installation guide
