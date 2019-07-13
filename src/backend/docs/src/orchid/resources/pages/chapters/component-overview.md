@@ -1,8 +1,5 @@
 ---
-menu:
-  - type: "pageContent"
-    title: "Component overview"
-    order: 2
+title: "Component overview"
 ---
 
 ## Backend component overview

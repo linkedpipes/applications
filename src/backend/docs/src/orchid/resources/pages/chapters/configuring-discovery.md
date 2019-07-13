@@ -1,8 +1,5 @@
 ---
-menu:
-  - type: "pageContent"
-    title: "Configuring Discovery"
-    order: 4
+title: "Configuring Discovery"
 ---
 
 ## Discovery configuration and <code>base.ttl</code>
