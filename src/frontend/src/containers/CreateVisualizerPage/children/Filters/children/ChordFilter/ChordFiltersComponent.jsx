@@ -12,7 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { VisualizersService } from '@utils';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -96,18 +96,14 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (
-      this.props.editingMode &&
-      this.state.nodes.length !== 0 &&
-      this.props.nodes.length === 0
-    ) {
+    if (this.props.editingMode && this.props.nodes.length === 0) {
       let nodes = [];
       const getNodesResponse = await VisualizersService.getChordNodes(
         this.props.selectedResultGraphIri
       );
       nodes = (getNodesResponse.data || []).map(node => ({
         ...node,
-        label: node.label.languageMap.nolang,
+        label: GlobalUtils.getLanguageLabel(node.label.languageMap, node.uri),
         visible: true,
         enabled: true,
         selected: true
@@ -226,7 +222,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
                           />
                         }
                         label={node.label}
-                        disabled={!enabled || !node.enabled}
+                        disabled={!editingMode && (!enabled || !node.enabled)}
                       />
                     </div>
                   )
