@@ -22,7 +22,7 @@ services:
       - "9092:9092"
     restart: on-failure
     volumes:
-      - ./appdata:/appdata
+      - ../appdata:/appdata
     depends_on:
       - etl
       - discovery
@@ -56,8 +56,8 @@ services:
       - "8890:8890"
     restart: on-failure
     volumes:
-      - ./data/virtuoso:/data
-      - ./appdata:/appdata
+      - ../data/virtuoso:/data
+      - ../appdata:/appdata
 
 
   discovery:
@@ -83,7 +83,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./appdata:/appdata
+      - ../appdata:/appdata
 
   postgres:
     image: postgres:9.6
@@ -93,7 +93,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ../data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -101,6 +101,6 @@ services:
     image: boxfuse/flyway
     command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
     volumes:
-      - ./src/backend/src/main/resources/db/migration:/flyway/sql
+      - ../src/backend/src/main/resources/db/migration:/flyway/sql
     depends_on:
       - postgres

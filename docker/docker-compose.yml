@@ -24,7 +24,7 @@ services:
       - "9092:9092"
     restart: on-failure
     volumes:
-      - ./appdata:/appdata
+      - ../appdata:/appdata
     depends_on:
       - etl
       - discovery
@@ -61,7 +61,7 @@ services:
       - "8890:8890"
     restart: on-failure
     volumes:
-      - ./appdata:/appdata
+      - ../appdata:/appdata
 
   discovery:
     image: linkedpipes/applications:discovery_hang_fix
@@ -86,7 +86,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./appdata:/appdata
+      - ../appdata:/appdata
 
   postgres:
     image: postgres:9.6
@@ -103,6 +103,6 @@ services:
     command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
     restart: on-failure
     volumes:
-      - ./src/backend/src/main/resources/db/migration:/flyway/sql
+      - ../src/backend/src/main/resources/db/migration:/flyway/sql
     depends_on:
       - postgres

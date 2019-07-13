@@ -141,5 +141,6 @@ export default {
   extractUrlGroups,
   urlDomain,
   getBeautifiedVisualizerTitle,
-  useScroll
+  useScroll,
+  clearCookies
 };
