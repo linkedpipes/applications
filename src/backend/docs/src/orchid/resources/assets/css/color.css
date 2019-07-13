@@ -11,11 +11,57 @@ code {
 a,
 a:hover,
 a:focus {
-  color: #006a5c;
+  color: #fdb241;
 }
 
 .bs-docs-nav {
-  background-color: #181b21;
+  background-color: #1d2330;
+  -webkit-box-shadow: 0px 3px 12px 0px #000;
+  -moz-box-shadow: 0px 3px 12px 0px #888;
+  box-shadow: 0px 3px 12px 0px #001002;
+}
+
+.github-fork-ribbon {
+  width: 0em;
+  height: 0em;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #fff;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #1c1d25;
+  border: 1px solid #353846;
+  border-radius: 4px;
+}
+
+.dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.dropdown-menu.scrollable-menu {
+  height: auto;
+  max-height: 480px;
+  overflow-x: scroll;
+  background: #353846;
+}
+
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+  background-color: #3d4151;
+  border-color: #337ab7;
 }
 
 .bs-docs-nav .navbar-brand,
@@ -98,4 +144,13 @@ a.list-group-item:focus {
 
 #jumbotron:after {
   background: transparent;
+}
+
+#search #search-results ul li:nth-child(odd) {
+  background: #1d2330;
+}
+
+.input-group .form-control {
+  background: #1d2330;
+  color: #fff;
 }
