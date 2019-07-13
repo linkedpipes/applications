@@ -14,9 +14,10 @@ import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import uuid from 'uuid';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
-import { CardActionArea } from '@material-ui/core';
+import { CardActionArea, Link } from '@material-ui/core';
 import { ETL_STATUS_MAP, GlobalUtils } from '@utils';
 import { VisualizerIcon } from '@components';
+import { GlobalConstants } from '@constants/';
 
 type Props = {
   pipelineExecutionsList: Array<{
@@ -166,12 +167,12 @@ const PipelinesTableComponent = ({
                     onHandleSelectPipelineExecutionClick(pipelineExecutionItem);
                   }}
                   disabled={
-                      !(
-                        pipelineExecutionItem.status &&
-                        ETL_STATUS_MAP[pipelineExecutionItem.status['@id']] ===
-                          'Finished'
-                      )
-                    }
+                    !(
+                      pipelineExecutionItem.status &&
+                      ETL_STATUS_MAP[pipelineExecutionItem.status['@id']] ===
+                        'Finished'
+                    )
+                  }
                 >
                   <div className={classes.cardMedia}>
                     <VisualizerIcon
@@ -268,7 +269,10 @@ const PipelinesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to ETL section in Docs.
+        Refer to ETL section in&nbsp;
+        <Link target="_blank" href={GlobalConstants.DOCUMENTATION_URL}>
+          Docs.
+        </Link>
       </Typography>
     </Paper>
     {/* End footer */}
