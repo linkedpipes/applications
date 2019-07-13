@@ -63,7 +63,8 @@ type Props = {
         options: Array<{ selected: boolean }>,
         filterType: string,
         visible: boolean
-      }
+      },
+      schemeFilter: any
     }
   },
   handleToggleEnabled: Function,

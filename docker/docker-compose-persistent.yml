@@ -1,6 +1,6 @@
 version: "3.3"
 services:
-  # nginx:
+  nginx:
     image: nginx:stable
     container_name: lpa-reverse-proxy
     volumes:

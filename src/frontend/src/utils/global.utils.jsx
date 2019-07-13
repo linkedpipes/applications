@@ -160,6 +160,6 @@ export default {
   urlDomain,
   getBeautifiedVisualizerTitle,
   useScroll,
-  getLanguageLabel
+  getLanguageLabel,
   clearCookies
 };
