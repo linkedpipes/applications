@@ -4,9 +4,9 @@ services:
     image: nginx:stable
     container_name: lpa-reverse-proxy
     volumes:
-      - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "9001:80" # port configured in lpapps server
+      - "9001:80"
     restart: on-failure
     depends_on:
       - backend
@@ -16,7 +16,9 @@ services:
     image: linkedpipes/applications:backend
     container_name: lpa-backend
     environment:
-      SENTRY_ENVIRONMENT: "production"
+      SENTRY_ENVIRONMENT: "development"
+    build:
+      context: ../src/backend/
     ports:
       - "9005:9005"
       - "9092:9092"
@@ -29,8 +31,11 @@ services:
       - flyway
 
   frontend:
-    image: linkedpipes/applications:frontend-prod
+    image: linkedpipes/applications:frontend
     container_name: lpa-frontend
+    build:
+      context: ../src/frontend/
+      dockerfile: Dockerfile
     restart: on-failure
     depends_on:
       - backend
@@ -56,9 +61,7 @@ services:
       - "8890:8890"
     restart: on-failure
     volumes:
-      - ./data/virtuoso:/data
       - ./appdata:/appdata
-
 
   discovery:
     image: linkedpipes/applications:discovery_hang_fix
@@ -92,14 +95,13 @@ services:
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: lpa
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
   flyway:
     image: boxfuse/flyway
     command: -url=jdbc:postgresql://lpa-postgres:5432/lpa -user=lpa -password=example -connectRetries=60 migrate
+    restart: on-failure
     volumes:
       - ./src/backend/src/main/resources/db/migration:/flyway/sql
     depends_on:
