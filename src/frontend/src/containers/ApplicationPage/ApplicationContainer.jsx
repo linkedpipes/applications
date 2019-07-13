@@ -162,6 +162,11 @@ class ApplicationContainer extends PureComponent<Props, State> {
             isPublished
             height={height + 250}
             width={width + 250}
+            selectedTopLevelConcepts={pathOr(
+              [],
+              'filterGroups.nodesFilter.options',
+              filtersState
+            )}
             schemes={pathOr(
               [],
               'filterGroups.schemeFilter.options',

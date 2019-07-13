@@ -84,6 +84,11 @@ const getVisualizer = (
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
           height={height}
           width={width}
+          selectedTopLevelConcepts={pathOr(
+            [],
+            'filterGroups.nodesFilter.options',
+            filtersState
+          )}
           schemes={pathOr(
             [],
             'filterGroups.schemeFilter.options',

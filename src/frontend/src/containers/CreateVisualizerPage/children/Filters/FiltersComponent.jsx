@@ -9,7 +9,10 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
-import TreemapFiltersComponent from './children/TreemapFilter';
+import {
+  TreemapFiltersComponent,
+  TreemapNodesFilterComponent
+} from './children/TreemapFilter';
 import MapSchemeFilterComponent from './children/MapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
@@ -53,15 +56,15 @@ type Props = {
   filtersState: {
     enabled: boolean,
     visible: boolean,
-    filterGroups: [
-      {
+    filterGroups: {
+      [key: string]: {
         label: string,
         enabled: boolean,
-        options: {},
+        options: Array<{ selected: boolean }>,
         filterType: string,
         visible: boolean
       }
-    ]
+    }
   },
   handleToggleEnabled: Function,
   handleToggleVisible: Function
@@ -109,6 +112,22 @@ class FiltersComponent extends React.Component<Props, State> {
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
             schemes={filterGroup.options || []}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+            enabled={enabled}
+          />
+        );
+      case 'TREEMAP_NODES_FILTER':
+        return (
+          <TreemapNodesFilterComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            concepts={filterGroup.options || []}
+            selectedScheme={
+              (
+                this.props.filtersState.filterGroups.schemeFilter.options || []
+              ).find(e => e.selected) || null
+            }
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
             enabled={enabled}

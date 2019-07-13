@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import FormGroup from '@material-ui/core/FormGroup';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import { VisualizersService } from '@utils';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -26,7 +26,6 @@ type Props = {
     enabled: boolean,
     selected: boolean
   }>,
-  enabled: boolean,
   editingMode: boolean,
   registerCallback: Function,
   onApplyFilter: Function,
@@ -74,17 +73,17 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   async componentDidMount() {
     // Get the schemes
     this.isMounted = true;
-    if (
-      this.props.editingMode &&
-      this.state.schemes.length !== 0 &&
-      this.props.schemes.length === 0
-    ) {
+    //      this.state.schemes.length !== 0 &&
+    if (this.props.editingMode && this.props.schemes.length === 0) {
       const schemesResponse = await VisualizersService.getSkosSchemes(
         this.props.selectedResultGraphIri
       );
       const schemes = schemesResponse.data.map(scheme => ({
         uri: scheme.uri,
-        label: scheme.label.languageMap.en,
+        label: GlobalUtils.getLanguageLabel(
+          scheme.label.languageMap,
+          scheme.uri
+        ),
         visible: true,
         enabled: true,
         selected: false
@@ -101,6 +100,10 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
             this.props.editingMode
           )
       );
+    } else {
+      this.setState({
+        schemes: this.props.schemes
+      });
     }
 
     // Register callback
@@ -148,7 +151,7 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const { classes, enabled } = this.props;
+    const { classes, editingMode } = this.props;
     const selectedScheme =
       this.state.schemes && this.state.schemes.find(s => s.selected);
     if (!selectedScheme) {
@@ -159,7 +162,10 @@ class TreemapFiltersComponent extends React.PureComponent<Props, State> {
       !!selectedScheme && (
         <ExpansionPanelDetails>
           <FormGroup className={classes.formGroup}>
-            <FormControl disabled={!enabled} className={classes.formControl}>
+            <FormControl
+              disabled={!editingMode}
+              className={classes.formControl}
+            >
               <Select
                 value={selectedScheme}
                 onChange={this.handleSchemeChange}
