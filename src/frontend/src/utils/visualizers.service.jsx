@@ -44,13 +44,18 @@ const VisualizersService = {
     });
   },
 
-  // why is this a post request?
-  getMarkers: async ({ resultGraphIri, filters = {} }) => {
+  // Map related
+  getMarkers: async (resultGraphIri, filters) => {
     return lpaAxios.post('/map/markers', filters, {
       params: { resultGraphIri }
     });
   },
 
+  getProperties: async resultGraphIri => {
+    return lpaAxios.get('/map/properties', { params: { resultGraphIri } });
+  },
+
+  // Chord related
   getChordNodes: async (resultGraphIri, limit, offset) => {
     return lpaAxios.get('/chord/nodes', {
       params: { resultGraphIri, limit, offset }
@@ -73,6 +78,7 @@ const VisualizersService = {
     });
   },
 
+  // Treemap related
   getSkosSchemes: async resultGraphIri => {
     return lpaAxios.get('/skos/schemes', { params: { resultGraphIri } });
   },

@@ -1,82 +1,82 @@
 // @flow
 import React from 'react';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import ChordDiagram from 'react-chord-diagram';
 import palette from 'google-palette';
-import uuid from 'uuid';
+import equal from 'fast-deep-equal';
+import { withStyles, withTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { VisualizersService } from '@utils';
 
 type Props = {
-  classes: {
-    progress: number
-  },
+  classes: {},
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: string,
   isPublished: boolean,
-  size: number,
-  selectedNodes: Set<string>,
-  theme: Object
+  theme: Object,
+  nodes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  height: number,
+  width: number
 };
 
 type State = {
   dataLoadingStatus: string,
   matrix: Array<Array<any>>,
   groupColors: Array<string>,
-  groupLabels: Array<string>,
-  size: number
+  groupLabels: Array<string>
 };
 
+// Styles
 const styles = theme => ({
   filterSideBar: {
     overflowY: 'auto'
   },
   card: {},
   input: {},
-  progress: {
-    margin: theme.spacing(2),
-    alignItems: 'center'
-  },
   theme
 });
 
-const eqSet = (as, bs) => {
-  if (!as || !bs) return false;
-  if (as.size !== bs.size) return false;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const a of as) if (!bs.has(a)) return false;
-  return true;
-};
-
 class ChordVisualizer extends React.PureComponent<Props, State> {
+  elementVizDiv: any;
+
   constructor(props: Props) {
     super(props);
+    this.elementVizDiv = null;
     this.state = {
       dataLoadingStatus: 'loading',
       matrix: [],
       groupColors: [],
-      groupLabels: [],
-      size: 500
+      groupLabels: []
     };
   }
 
   async componentDidMount() {
-    const { handleSetCurrentApplicationData, isPublished } = this.props;
-    const elementVizDiv = document.getElementById('viz-div');
-    if (elementVizDiv) {
+    const {
+      handleSetCurrentApplicationData,
+      isPublished,
+      selectedResultGraphIri
+    } = this.props;
+    this.elementVizDiv = document.getElementById('viz-div');
+    const nodes = this.props.nodes || [];
+
+    if (this.elementVizDiv) {
       if (!isPublished) {
         handleSetCurrentApplicationData({
-          id: uuid.v4(),
-          applicationEndpoint: 'chord',
-          selectedResultGraphIri: this.props.selectedResultGraphIri,
-          visualizerCode: 'CHORD',
-          selectedNodes: this.props.selectedNodes && [
-            ...this.props.selectedNodes
-          ]
+          endpoint: 'chord',
+          graphIri: this.props.selectedResultGraphIri,
+          etlExecutionIri: this.props.selectedPipelineExecution,
+          visualizerType: 'CHORD'
         });
       }
 
-      if (!this.props.selectedNodes || !this.props.selectedNodes.size) {
+      // Should never happen
+      if (nodes.length === 0) {
         const nodesRequest = await VisualizersService.getChordNodes(
           this.props.selectedResultGraphIri
         );
@@ -98,22 +98,16 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           dataLoadingStatus: 'ready',
           matrix: matrixData,
           groupColors: colors,
-          groupLabels: labels,
-          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+          groupLabels: labels
         });
       } else {
         // Fetch data
-        const nodesRequest = await VisualizersService.getChordNodes(
-          this.props.selectedResultGraphIri
-        );
-        const nodesResponse = await nodesRequest.data;
-        const labels = nodesResponse
-          .filter(node => this.props.selectedNodes.has(node.uri))
-          .map(node => node.label.languageMap.nolang);
+        const selectedNodes = nodes.filter(node => node.selected);
+        const labels = selectedNodes.map(node => node.label);
 
         const matrixRequest = await VisualizersService.getChordData(
-          this.props.selectedResultGraphIri,
-          [...this.props.selectedNodes]
+          selectedResultGraphIri,
+          selectedNodes.map(node => node.uri)
         );
         const matrixData = await matrixRequest.data;
 
@@ -126,65 +120,72 @@ class ChordVisualizer extends React.PureComponent<Props, State> {
           dataLoadingStatus: 'ready',
           matrix: matrixData,
           groupColors: colors,
-          groupLabels: labels,
-          size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
+          groupLabels: labels
         });
       }
     }
   }
 
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
-    if (
-      this.props.selectedNodes &&
-      !eqSet(prevProps.selectedNodes, this.props.selectedNodes)
-    ) {
-      // Fetch data
-      const nodesRequest = await VisualizersService.getChordNodes(
-        this.props.selectedResultGraphIri
-      );
-      const nodesResponse = await nodesRequest.data;
-      const labels = nodesResponse
-        .filter(node => this.props.selectedNodes.has(node.uri))
-        .map(node => node.label.languageMap.nolang);
+    if (!equal(prevProps.nodes, this.props.nodes)) {
+      const nodes = this.props.nodes;
+      // If there are no selected nodes, then bring all the data
+      // (should never happen)
+      if (this.props.nodes.length === 0) {
+        const nodesRequest = await VisualizersService.getChordNodes(
+          this.props.selectedResultGraphIri
+        );
+        const nodesResponse = await nodesRequest.data;
+        const nodeUris = nodesResponse.map(node => node.uri);
+        const labels = nodesResponse.map(node => node.label.languageMap.nolang);
 
-      const matrixRequest = await VisualizersService.getChordData(
-        this.props.selectedResultGraphIri,
-        [...this.props.selectedNodes]
-      );
-      const matrixData = await matrixRequest.data;
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          nodeUris
+        );
+        const matrixData = await matrixRequest.data;
 
-      const colors = palette('sol-accent', labels.length).map(
-        color => `#${color}`
-      );
+        const colors = palette('sol-accent', nodeUris.length).map(
+          color => `#${color}`
+        );
 
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        dataLoadingStatus: 'ready',
-        matrix: matrixData,
-        groupColors: colors,
-        groupLabels: labels
-      });
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels
+        });
+      } else {
+        // Fetch data
+        const selectedNodes = nodes.filter(node => node.selected);
+        const labels = selectedNodes.map(node => node.label);
 
-      if (!this.props.isPublished) {
-        this.props.handleSetCurrentApplicationData({
-          selectedNodes: [...this.props.selectedNodes]
+        const matrixRequest = await VisualizersService.getChordData(
+          this.props.selectedResultGraphIri,
+          selectedNodes.map(node => node.uri)
+        );
+        const matrixData = await matrixRequest.data;
+
+        const colors = palette('sol-accent', labels.length).map(
+          color => `#${color}`
+        );
+
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          dataLoadingStatus: 'ready',
+          matrix: matrixData,
+          groupColors: colors,
+          groupLabels: labels
         });
       }
-    }
-
-    const elementVizDiv = document.getElementById('viz-div');
-    if (elementVizDiv && prevProps.size !== this.props.size) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        size: Math.min(elementVizDiv.clientHeight, elementVizDiv.clientWidth)
-      });
     }
   }
 
   render() {
-    const { theme } = this.props;
-    const size = Math.max(this.state.size, 150);
+    const { theme, height, width } = this.props;
+    const size = Math.max(150, Math.min(width, height) - 200);
     return this.state.dataLoadingStatus !== 'ready' ? (
       <CircularProgress />
     ) : (

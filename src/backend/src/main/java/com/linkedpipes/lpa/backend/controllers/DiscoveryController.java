@@ -2,10 +2,14 @@ package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.DataSource;
 import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
 import com.linkedpipes.lpa.backend.entities.PipelineGroups;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
-import com.linkedpipes.lpa.backend.services.*;
+import com.linkedpipes.lpa.backend.services.DiscoveryService;
+import com.linkedpipes.lpa.backend.services.ExecutorService;
+import com.linkedpipes.lpa.backend.services.TtlGenerator;
+import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.util.UrlUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -40,7 +44,7 @@ public class DiscoveryController {
 
     @NotNull
     @PostMapping("/api/pipelines/discoverFromDataSources")
-    public ResponseEntity<Discovery> startDiscoveryFromDataSources(@NotNull @RequestParam("webId") String webId,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromDataSources(@NotNull @RequestParam("webId") String webId,
                                                     @Nullable @RequestBody List<DataSource> dataSourceList) throws LpAppsException {
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "No data sources were provided");
@@ -53,37 +57,57 @@ public class DiscoveryController {
         try {
             userService.addUserIfNotPresent(webId);
             String discoveryConfig = TtlGenerator.getDiscoveryConfig(dataSourceList);
-            Discovery newDiscovery = executorService.startDiscoveryFromConfig(discoveryConfig, webId);
+            DiscoverySession newDiscovery = executorService.startDiscoveryFromConfig(discoveryConfig, webId);
             return ResponseEntity.ok(newDiscovery);
         } catch(UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
+    /**
+     * Start discovery of pipelines from received RDF data.
+     *
+     * @param webId          the logged-in user's web ID
+     * @param rdfFile        main RDF data file
+     * @param dataSampleFile data sample for {@code rdfFile} (if not provided it's generated automatically)
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
+     * @throws IOException if an I/O error occurs
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInput")
-    public ResponseEntity<Discovery> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
-                                                             @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
-                                                             @Nullable @RequestBody String rdfInput) throws LpAppsException {
-        if (rdfInput == null || rdfInput.isEmpty()) {
+    public ResponseEntity<DiscoverySession> startDiscoveryFromInput(@NotNull @RequestParam("webId") String webId,
+                                                             @RequestParam("rdfFile") MultipartFile rdfFile,
+                                                             @Nullable @RequestParam(value="dataSampleFile", required=false) MultipartFile dataSampleFile) throws LpAppsException, IOException {
+        if (rdfFile == null || rdfFile.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF input not provided");
         }
 
         try {
             userService.addUserIfNotPresent(webId);
-            return ResponseEntity.ok(executorService.startDiscoveryFromInput(rdfInput, webId, dataSampleIri));
+            return ResponseEntity.ok(executorService.startDiscoveryFromInputFiles(rdfFile, dataSampleFile, webId));
 
         } catch (UserNotFoundException e) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "User not found", e);
         }
     }
 
+    /**
+     * Start discovery of pipelines using data referenced by IRI.
+     *
+     * @param webId         the logged-in user's web ID
+     * @param rdfFileIri    IRI referencing a file with RDF data
+     * @param dataSampleIri IRI referencing a file containing a data sample for {@code rdfFileIri} (if not provided it's generated automatically)
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
+     * @throws IOException if an I/O error occurs
+     */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromInputIri")
-    public ResponseEntity<Discovery> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
-                                                                @NotNull @RequestParam(value = "rdfInputIri") String rdfFileIri,
-                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri) throws LpAppsException, IOException {
-        if (rdfFileIri == null || rdfFileIri.isEmpty()) {
+    public ResponseEntity<DiscoverySession> startDiscoveryFromInputIri(@NotNull @RequestParam("webId") String webId,
+                                                                @NotNull @RequestParam(value="rdfInputIri") String rdfFileIri,
+                                                                @Nullable @RequestParam(value=DATA_SAMPLE_IRI_PARAM, required=false) String dataSampleIri) throws LpAppsException, IOException {
+        if (rdfFileIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "RDF file IRI not provided");
         }
 
@@ -100,28 +124,27 @@ public class DiscoveryController {
     }
 
     /**
-     * Start discovery of pipelines using data in SPARQL endpoint
-     * @param sparqlEndpointIri
-     * @param dataSampleIri
-     * @param namedGraphs
-     * @param webId
-     * @return
-     * @throws LpAppsException
+     * Start discovery of pipelines using data in SPARQL endpoint.
+     *
+     * @param sparqlEndpointIri IRI of the SPARQL endpoint containing the data
+     * @param dataSampleIri     IRI of the file containing a data sample of the data contained in {@code sparqlEndpointIri} (if not provided it's generated automatically using the first graph provided)
+     * @param webId             the logged-in user's web ID
+     * @param namedGraphs       a list of the named graphs in {@code sparqlEndpointIri} to query
+     * @return an object representing the started Discovery
+     * @throws LpAppsException if the Discovery start fails for any reason
      */
     @NotNull
     @PostMapping("/api/pipelines/discoverFromEndpoint")
-    public ResponseEntity<Discovery> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
-                                                                @NotNull @RequestParam(DATA_SAMPLE_IRI_PARAM) String dataSampleIri,
+    public ResponseEntity<DiscoverySession> startDiscoveryFromEndpoint(@NotNull @RequestParam(SPARQL_ENDPOINT_IRI_PARAM) String sparqlEndpointIri,
+                                                                @Nullable @RequestParam(value=DATA_SAMPLE_IRI_PARAM, required=false) String dataSampleIri,
                                                                 @NotNull @RequestParam("webId") String webId,
                                                                 @Nullable @RequestParam List<String> namedGraphs) throws LpAppsException {
-        if(namedGraphs == null)
+        if (namedGraphs == null) {
             namedGraphs = new ArrayList<>();
+        }
 
         if (sparqlEndpointIri.isEmpty()) {
             throw new LpAppsException(HttpStatus.BAD_REQUEST, "SPARQL Endpoint IRI not provided");
-        }
-        if (dataSampleIri.isEmpty()) {
-            throw new LpAppsException(HttpStatus.BAD_REQUEST, "Data Sample IRI not provided");
         }
 
         try {
@@ -134,10 +157,11 @@ public class DiscoveryController {
     }
 
     /**
-     * Get pipelines found for discovery, grouped by visualizer
-     * @param discoveryId
-     * @return
-     * @throws LpAppsException
+     * Get pipelines found for discovery, grouped by visualizer.
+     *
+     * @param discoveryId id of the Discovery to get pipeline groups from
+     * @return pipelines grouped by visualizer
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     @GetMapping("/api/discovery/{id}/pipelineGroups")
     public ResponseEntity<PipelineGroups> getPipelineGroups(@NotNull @PathVariable("id") String discoveryId) throws LpAppsException {

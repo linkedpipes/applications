@@ -1,3 +1,3 @@
-import SettingsPage from './SettingsPageContainer';
+import SettingsPage from './SettingsController';
 
 export default SettingsPage;

@@ -1,26 +1,28 @@
 package com.linkedpipes.lpa.backend.rdf;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@JsonSerialize(using = LocalizedValue.Serializer.class)
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
+
+@JsonAutoDetect(fieldVisibility = ANY)
 public class LocalizedValue {
 
     private final Map<String, String> languageMap = new HashMap<>();
 
     public static String noLanguageLabel = "nolang";
+
+    public LocalizedValue() {
+    }
 
     public LocalizedValue(Map<String, String> variants){
         variants.forEach(this::put);
@@ -38,7 +40,7 @@ public class LocalizedValue {
         put(literal.getLanguage(), literal.getString());
     }
 
-    public LocalizedValue(Resource resource, Property property){
+    public LocalizedValue(Resource resource, Property property) {
         Lists.reverse(resource.listProperties(property).toList()).forEach(l -> put(l.getLanguage(), l.getString()));
     }
 
@@ -58,19 +60,9 @@ public class LocalizedValue {
         return languageMap.size();
     }
 
-    public static class Serializer extends StdSerializer<LocalizedValue> {
-
-        public Serializer() {
-            super((Class<LocalizedValue>) null);
-        }
-
-        @Override
-        public void serialize(LocalizedValue value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-            gen.writeStartObject();
-            gen.writeObjectField("languageMap", value.languageMap);
-            gen.writeEndObject();
-        }
-
+    public LocalizedValue withDefault(@NotNull LocalizedValue defaultValues) {
+        defaultValues.languageMap.forEach(this.languageMap::putIfAbsent);
+        return this;
     }
 
 }

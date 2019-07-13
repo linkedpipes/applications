@@ -70,12 +70,24 @@ const setUserProfileAsync = profile => {
     });
 };
 
+const setUserInboxInvitations = inboxInvitations => ({
+  type: types.SET_USER_INBOX_INVITATIONS,
+  value: inboxInvitations
+});
+
 const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
   return dispatch =>
     new Promise(resolve => {
       dispatch(setSolidUserProfile(profile, solidUsername, solidImage));
       resolve();
     });
+};
+
+const setLightColorTheme = isLight => {
+  return {
+    type: types.SET_LIGHT_COLOR_THEME,
+    value: isLight
+  };
 };
 
 export default {
@@ -90,6 +102,8 @@ export default {
   deleteExecutionSession,
   updateExecutionSession,
   setUserProfileAsync,
+  updateApplicationsFolder,
+  setUserInboxInvitations,
   setSolidUserProfileAsync,
-  updateApplicationsFolder
+  setLightColorTheme
 };

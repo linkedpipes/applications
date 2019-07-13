@@ -25,8 +25,8 @@ apply plugin: "jacoco"
 
 group = 'com.linkedpipes.lpa'
 version = '0.0.1'
-sourceCompatibility = 10
-targetCompatibility = 10
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
@@ -60,6 +60,12 @@ dependencies {
     compile 'io.sentry:sentry-spring:1.7.16'
 
     compile 'com.corundumstudio.socketio:netty-socketio:1.7.17'
+
+    compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.9'
+    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.9'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.3.2'

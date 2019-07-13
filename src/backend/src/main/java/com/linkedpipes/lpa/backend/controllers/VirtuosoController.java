@@ -5,10 +5,14 @@ import com.linkedpipes.lpa.backend.services.TtlGenerator;
 import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Endpoints directly interacting with our Virtuoso instance.
+ */
 @RestController
 public class VirtuosoController {
 
@@ -29,14 +33,28 @@ public class VirtuosoController {
      * Check if a named graph exists in our Virtuoso db
      * @param graphName - full URI identifying the named graph
      * @return 200 OK if graph exists or 404 otherwise
-     * @throws LpAppsException
+     * @throws LpAppsException if the request fails for any reason
      */
-    @GetMapping("api/virtuoso/graphExists")
+    @GetMapping("/api/virtuoso/graphExists")
     public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphName") String graphName) throws LpAppsException {
         boolean exists = VirtuosoService.checkNamedGraphExists(graphName);
-        if (exists)
+        if (exists) {
             return ResponseEntity.ok("");
+        }
 
         throw new LpAppsException(HttpStatus.NOT_FOUND, "Named graph does not exist.");
+    }
+
+    /**
+     * Drop a named graph from our Virtuoso db
+     *
+     * @param graphName - full URI identifying the named graph
+     * @return an empty response
+     */
+    @DeleteMapping("api/virtuoso/dropGraph")
+    public ResponseEntity dropNamedGraph(@RequestParam(value = "graphName") String graphName) {
+        VirtuosoService.deleteNamedGraph(graphName);
+
+        return ResponseEntity.ok("");
     }
 }

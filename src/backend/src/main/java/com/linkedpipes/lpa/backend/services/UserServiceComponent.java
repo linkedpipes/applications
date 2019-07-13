@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.entities.*;
 import com.linkedpipes.lpa.backend.entities.profile.*;
 import com.linkedpipes.lpa.backend.entities.database.*;
+import com.linkedpipes.lpa.backend.services.virtuoso.VirtuosoService;
+import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.exceptions.UserNotFoundException;
 import com.linkedpipes.lpa.backend.util.LpAppsObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
@@ -45,6 +48,9 @@ public class UserServiceComponent implements UserService {
     @Autowired
     private DiscoveryNamedGraphRepository ngRepository;
 
+    @Autowired
+    private ApplicationRepository appRepository;
+
     /**
     * Returns the user's profile. If user doesn't exist yet we add them.
     *
@@ -74,39 +80,62 @@ public class UserServiceComponent implements UserService {
     }
 
     /**
-     * Add discovery on user profile. Discovery started time is set to current
-     * time.
+     * Populate discovery on user profile. Discovery started time is set to
+     * current time.
      *
-     * @param username webId
+     * @param dbId identifier of the Discovery in database (session ID)
      * @param discoveryId discovery ID
      * @param sparqlEndpointIri SPARQL endpoint IRI as provided by user on frontend
      * @param dataSampleIri data sample IRI as provided by user on frontend
      * @param namedGraphs list of IRIs as provided on frontend
-     * @throws UserNotFoundException user was not found in database
+     * @throws UserNotFoundException user was not found in the database
      */
-    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
-    public void setUserDiscovery(@NotNull final String username,
+    @Nullable @Override
+    public void setUserDiscovery(@NotNull final long dbId,
                                  @NotNull final String discoveryId,
                                  @Nullable final String sparqlEndpointIri,
                                  @Nullable final String dataSampleIri,
                                  @Nullable final List<String> namedGraphs)
                                  throws UserNotFoundException {
-        UserDao user = getUser(username);
-        DiscoveryDao d = new DiscoveryDao();
-        d.setDiscoveryStarted(discoveryId, new Date());
-        d.setSparqlEndpointIri(sparqlEndpointIri);
-        d.setDataSampleIri(dataSampleIri);
-        if (namedGraphs != null) {
-            for (String namedGraph : namedGraphs) {
-                DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
-                ng.setNamedGraph(namedGraph);
-                d.addNamedGraph(ng);
-                ngRepository.save(ng);
+        List<DiscoveryDao> discoveries = discoveryRepository.findById(dbId);
+        for (DiscoveryDao d : discoveries) {
+            d.setDiscoveryStarted(discoveryId, new Date());
+            d.setSparqlEndpointIri(sparqlEndpointIri);
+            d.setDataSampleIri(dataSampleIri);
+            if (namedGraphs != null) {
+                for (String namedGraph : namedGraphs) {
+                    DiscoveryNamedGraphDao ng = new DiscoveryNamedGraphDao();
+                    ng.setNamedGraph(namedGraph);
+                    d.addNamedGraph(ng);
+                    ngRepository.save(ng);
+                }
             }
+            discoveryRepository.save(d);
         }
-        user.addDiscovery(d);
-        discoveryRepository.save(d);
-        repository.save(user);
+    }
+
+
+    /**
+     * Create a discovery on user profile. Created discovery is a dummy object
+     * that will be populated later in
+     * {@code setUserDiscovery(long, String, String, String, List<String>)}
+     *
+     * @param username webId
+     * @throws UserNotFoundException user was not found in the database
+     */
+    @NotNull @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public DiscoveryDao setUserDiscovery(@NotNull final String username)
+                                 throws UserNotFoundException {
+         UserDao user = getUser(username);
+         DiscoveryDao d = new DiscoveryDao();
+
+         d.setDiscoveryStarted("", new Date());
+         d.setExecuting(false);
+
+         user.addDiscovery(d);
+         discoveryRepository.save(d);
+         repository.save(user);
+         return d;
     }
 
     private UserDao getUser(final String username) throws UserNotFoundException {
@@ -127,7 +156,7 @@ public class UserServiceComponent implements UserService {
     }
 
     /**
-     * Add execution on user profile.
+     * Add an execution on user profile.
      *
      * If there are more pipeline information records, first one is used.
      * Execution started time is set to current time.
@@ -197,18 +226,17 @@ public class UserServiceComponent implements UserService {
         profile.pipelineExecutions = new ArrayList<>();
         if (user.getExecutions() != null) {
             for (ExecutionDao e : user.getExecutions()) {
-                PipelineExecution exec = new PipelineExecution();
-                exec.status = e.getStatus();
-                exec.executionIri = e.getExecutionIri();
-                exec.etlPipelineIri = e.getPipeline().getEtlPipelineIri();
-                exec.selectedVisualiser = e.getSelectedVisualiser();
-                exec.started = e.getStarted().getTime() / 1000L;
-                if (e.getFinished() != null) {
-                    exec.finished = e.getFinished().getTime() / 1000L;
-                } else {
-                    exec.finished = -1;
-                }
-                profile.pipelineExecutions.add(exec);
+                profile.pipelineExecutions.add(PipelineExecution.getPipelineExecutionFromDao(e));
+            }
+        }
+
+        profile.applications = new ArrayList<>();
+        if (user.getApplications() != null) {
+            for (ApplicationDao application : user.getApplications()) {
+                Application app = new Application();
+                app.solidIri = application.getSolidIri();
+                app.executionAvailable = (application.getExecution() != null) && (!application.getExecution().isRemoved());
+                profile.applications.add(app);
             }
         }
 
@@ -232,7 +260,6 @@ public class UserServiceComponent implements UserService {
                                        throws UserNotFoundException {
         UserDao user = getUser(username);
         ExecutionDao toDelete = null;
-        PipelineInformationDao pipelineInformationToDelete = null;
 
         for (ExecutionDao execution : user.getExecutions()) {
             if (execution.getExecutionIri().equals(executionIri)) {
@@ -241,6 +268,14 @@ public class UserServiceComponent implements UserService {
             }
         }
 
+        removeExecutionFromUser(user, toDelete);
+
+        return transformUserProfile(user);
+    }
+
+    private void removeExecutionFromUser(UserDao user, ExecutionDao toDelete) {
+        PipelineInformationDao pipelineInformationToDelete = null;
+
         if (toDelete != null) {
             user.removeExecution(toDelete);
 
@@ -248,16 +283,30 @@ public class UserServiceComponent implements UserService {
                 pipelineInformationToDelete = toDelete.getPipeline();
             }
 
-            executionRepository.delete(toDelete);
+            List<ExecutionDao> executions = new ArrayList<>();
+            for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(toDelete.getPipeline().getResultGraphIri())) {
+                executions.addAll(x.getExecutions());
+            }
 
-            if (pipelineInformationToDelete != null) {
-                pipelineRepository.delete(pipelineInformationToDelete);
+            if (toDelete.getApplications().isEmpty()) { //this is for repeated executions using the same NG
+                //no applications - delete from virtuoso
+                String graphName = toDelete.getPipeline().getResultGraphIri();
+                VirtuosoService.deleteNamedGraph(graphName);
+
+                for (ExecutionDao e : executions) {
+                    executionRepository.delete(e);
+                }
+
+                if (pipelineInformationToDelete != null) {
+                    pipelineRepository.delete(pipelineInformationToDelete);
+                }
+            } else {
+                toDelete.setRemoved(true);
+                executionRepository.save(toDelete);
             }
 
             repository.save(user);
         }
-
-        return transformUserProfile(user);
     }
 
     /**
@@ -308,6 +357,114 @@ public class UserServiceComponent implements UserService {
         user.setColor(color);
         repository.save(user);
         return transformUserProfile(user);
+    }
+
+    /**
+     * Add an application on user profile. The application is linked onto
+     * the execution it was created from.
+     *
+     * @param username webId
+     * @param executionIri execution IRI
+     * @param solidIri IRI of the application in SOLID
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
+    @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile addApplication(String username, String executionIri, String solidIri) throws UserNotFoundException {
+        UserDao user = getUser(username);
+
+        for (ExecutionDao e : user.getExecutions()) {
+            if (e.getExecutionIri().equals(executionIri)) {
+                ApplicationDao app = new ApplicationDao();
+                app.setSolidIri(solidIri);
+                e.addApplication(app);
+                user.addApplication(app);
+
+                repository.save(user);
+                executionRepository.save(e);
+                appRepository.save(app);
+                break;
+            }
+        }
+
+        return transformUserProfile(user);
+    }
+
+    /**
+     * If application exists on user profile it will be removed.
+     * If all executions populating the application's graph in Virtuoso are
+     * removed we remove the named graph as well.
+     *
+     * @param username webId
+     * @param solidIri IRI of the application in SOLID
+     * @return user profile after modification
+     * @throws UserNotFoundException user was not found
+     */
+    @Override @Transactional(rollbackFor=UserNotFoundException.class)
+    public UserProfile deleteApplication(String username, String solidIri) throws UserNotFoundException {
+        UserDao user = getUser(username);
+
+        for (ApplicationDao app : user.getApplications()) {
+            if (app.getSolidIri().equals(solidIri)) {
+                ExecutionDao execution = app.getExecution();
+                if (null != execution) {
+                    if (execution.isScheduled()) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.getExecutionIri().equals(execution.getExecutionIri())) {
+                                    executionRepository.delete(y);
+                                }
+                            }
+                        }
+                    }
+
+                    boolean allRemoved = execution.isRemoved();
+                    if (allRemoved) {
+                        for (PipelineInformationDao x : pipelineRepository.findByResultGraphIri(execution.getPipeline().getResultGraphIri())) {
+                            for (ExecutionDao y : x.getExecutions()) {
+                                if (!y.isRemoved()) {
+                                    allRemoved = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (allRemoved) {
+                        //all executions were already removed
+                        String graphName = app.getExecution().getPipeline().getResultGraphIri();
+                        VirtuosoService.deleteNamedGraph(graphName);
+
+                        executionRepository.delete(execution);
+                    } else {
+                        execution.removeApplication(app);
+                        executionRepository.save(execution);
+                    }
+                }
+
+                user.removeApplication(app);
+                appRepository.delete(app);
+                repository.save(user);
+                break;
+            }
+        }
+
+        return transformUserProfile(user);
+    }
+
+
+    /**
+     * Pull execution information from the database.
+     *
+     * @param executionIri execution IRI to identify the pipeline
+     * @return pipeline information
+     * @throws LpAppsException HTTP 404 if execution was not found
+     */
+    @Override
+    public PipelineExecution getExecution(@NotNull final String executionIri) throws LpAppsException {
+        List<ExecutionDao> lst = executionRepository.findByExecutionIri(executionIri);
+        if (!lst.isEmpty()) return PipelineExecution.getPipelineExecutionFromDao(lst.get(0));
+        throw new LpAppsException(HttpStatus.NOT_FOUND, "No such execution");
     }
 
 }

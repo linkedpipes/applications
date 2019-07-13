@@ -4,9 +4,10 @@
 <p align="center">
     <a href="https://travis-ci.org/linkedpipes/applications"><img src="https://travis-ci.org/linkedpipes/applications.svg?branch=develop" alt="Travis status" /></a>
     <a href="https://app.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Grade_Settings"><img src="https://api.codacy.com/project/badge/Grade/87ac72b5a8d347b5a10a519323d71b6f" alt="Codacy" /></a>
-    <a href="https://renovatebot.com/"><img src="https://img.shields.io/badge/renovate-enabled-brightgreen.svg" alt="Renovate Bot" /></a>
-    <a href="https://linkedpipes.docs.apiary.io"><img src="https://img.shields.io/badge/Documentation-Apiary-Blue.svg" alt="Apiary" /></a>
-    <a href="https://linkedpipes.com/applications/javadoc"><img src="https://img.shields.io/badge/Documentation-Javadoc-blue.svg" alt="Javadoc" /></a>
+    <a href="https://renovatebot.com/"><img src="https://img.shields.io/badge/renovate-enabled-brightgreen.svg" alt="Renovate Bot" /></a> </br>
+    <a href="https://linkedpipes.docs.apiary.io"><img src="https://img.shields.io/badge/Documentation-API-Blue.svg" alt="Apiary" /></a>
+    <a href="https://docs.frontend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Frontend-blue.svg" alt="Javadoc" /></a>
+    <a href="https://docs.backend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Backend-blue.svg" alt="Javadoc" /></a>
 </p>
 
 ## About

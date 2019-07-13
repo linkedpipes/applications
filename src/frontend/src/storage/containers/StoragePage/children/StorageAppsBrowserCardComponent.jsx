@@ -12,14 +12,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService } from '@utils';
-import { AppConfiguration } from '../../../models';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -27,18 +20,22 @@ import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
-import ShareIcon from '@material-ui/icons/Share';
-import axios from 'axios';
+import { filtersActions } from '@ducks/filtersDuck';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import moment from 'moment';
+import { Typography } from '@material-ui/core';
+import { UserService, VisualizersService, GlobalUtils } from '@utils';
+import { VisualizerIcon } from '@components/';
 
-const styles = {
+const styles = theme => ({
   card: {
-    height: '280',
-    width: '190',
-    flexDirection: 'column',
-    marginRight: 5
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column'
   },
 
   media: {
+    padding: theme.spacing(2),
     textAlign: 'center'
   },
 
@@ -50,8 +47,12 @@ const styles = {
     flexGrow: 1,
     width: '100%',
     marginTop: '1rem'
+  },
+
+  cardHeader: {
+    height: '100px'
   }
-};
+});
 
 type Props = {
   classes: {
@@ -60,9 +61,10 @@ type Props = {
     cardContent: {},
     media: {},
     spacing: {},
-    textField: {}
+    textField: {},
+    cardHeader: {}
   },
-  applicationMetadata: AppConfiguration,
+  applicationMetadata: ApplicationMetadata,
   handleSetResultPipelineIri: Function,
   handleSetSelectedVisualizer: Function,
   onHandleApplicationDeleted: Function,
@@ -70,20 +72,50 @@ type Props = {
   handleSetSelectedApplicationData: Function,
   handleSetSelectedApplicationMetadata: Function,
   setApplicationLoaderStatus: Function,
+  handleSetFiltersState: Function,
   history: Object,
   applicationsFolder: string,
-  indexNumber: Number
+  indexNumber: Number,
+  webId: string,
+  isShared: Boolean
 };
 
 type State = {
   open: boolean,
-  anchorEl: any
+  graphExists: boolean
 };
 
 class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
     open: false,
-    anchorEl: undefined
+    graphExists: true
+  };
+
+  isMounted: boolean = false;
+
+  componentDidMount() {
+    this.isMounted = true;
+    this.fetchGraphStatus();
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
+  fetchGraphStatus = async () => {
+    const { applicationMetadata } = this.props;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
+    const resultGraphIri = applicationConfiguration.graphIri;
+
+    const self = this;
+
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      if (self.isMounted) {
+        self.setState({ graphExists: false });
+      }
+    });
   };
 
   handleClickOpen = () => {
@@ -104,18 +136,15 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       this.props.applicationMetadata
     );
     if (result) {
+      await UserService.deleteApplication(
+        this.props.webId,
+        this.props.applicationMetadata.solidFileUrl
+      );
+
       this.props.onHandleApplicationDeleted(this.props.applicationMetadata);
     }
 
     await setApplicationLoaderStatus(false);
-  };
-
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
   };
 
   handleShareApp = () => {
@@ -138,25 +167,16 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetSelectedApplicationTitle,
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
+      handleSetFiltersState,
       history
     } = this.props;
 
     await setApplicationLoaderStatus(true);
 
-    const appConfigurationResponse = await axios.get(
-      applicationMetadata.object
-    );
+    const applicationConfiguration = applicationMetadata.configuration;
 
-    if (appConfigurationResponse.status !== 200) {
-      toast.error('Error, unable to load!', {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000
-      });
-      await setApplicationLoaderStatus(false);
-    }
-    const applicationData = appConfigurationResponse.data.applicationData;
+    const resultGraphIri = applicationConfiguration.graphIri;
 
-    const resultGraphIri = applicationData.selectedResultGraphIri;
     let graphExists = true;
 
     await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
@@ -165,19 +185,20 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
     if (graphExists) {
       const selectedVisualiser = {
-        visualizer: { visualizerCode: applicationData.visualizerCode }
+        visualizer: { visualizerCode: applicationConfiguration.visualizerType }
       };
 
       await handleSetResultPipelineIri(resultGraphIri);
-      await handleSetSelectedApplicationTitle(applicationMetadata.title);
-      await handleSetSelectedApplicationData(applicationData);
+      await handleSetSelectedApplicationTitle(applicationConfiguration.title);
+      await handleSetSelectedApplicationData(applicationConfiguration);
       await handleSetSelectedApplicationMetadata(applicationMetadata);
       await handleSetSelectedVisualizer(selectedVisualiser);
+      await handleSetFiltersState(applicationConfiguration.filterConfiguration);
 
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(
@@ -192,69 +213,131 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   };
 
   render() {
-    const { classes, applicationMetadata, indexNumber } = this.props;
-    const { anchorEl } = this.state;
+    const { classes, applicationMetadata, indexNumber, isShared } = this.props;
     const {
-      handleMenuClick,
       handleDeleteApp,
       handleShareApp,
       handleApplicationClicked,
       handleCopyLinkClicked
     } = this;
+    const { graphExists } = this.state;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
     return (
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
-            action={
-              <IconButton
-                aria-owns={anchorEl ? 'simple-menu' : undefined}
-                aria-haspopup="true"
-                id={`more_icon_${indexNumber.toString()}_${
-                  applicationMetadata.title
-                }`}
-                onClick={handleMenuClick}
+            title={
+              <Typography
+                style={{
+                  whiteSpace: 'nowrap',
+                  width: '15rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                variant="subtitle1"
               >
-                <MoreVertIcon />
-              </IconButton>
+                {applicationConfiguration.title}
+              </Typography>
             }
-            title={applicationMetadata.title}
-            subheader={GlobalUtils.getBeautifiedVisualizerTitle(
-              applicationMetadata.endpoint
-            )}
+            subheader={
+              <React.Fragment>
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Based on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {`${GlobalUtils.getBeautifiedVisualizerTitle(
+                    applicationConfiguration.endpoint
+                  )} visualizer`}
+                </Typography>
+                <br />
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Published on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {moment(applicationConfiguration.published).format('lll')}
+                </Typography>
+                {isShared && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Author:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      {applicationConfiguration.author}
+                    </Typography>
+                  </React.Fragment>
+                )}
+                {!graphExists && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Error:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      The data associated with this application is either
+                      removed or corrupted. If you are using your own instance
+                      of LPApps, make sure that you are running all components
+                      of the platform and try refreshing this page.
+                    </Typography>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            }
           />
-          <CardActionArea onClick={handleApplicationClicked}>
+          <CardActionArea
+            disabled={!graphExists}
+            onClick={handleApplicationClicked}
+          >
             <div
               className={classes.media}
-              id={`${indexNumber.toString()}_${applicationMetadata.title}`}
-              style={{ backgroundColor: applicationMetadata.cardColor }}
+              id={`${indexNumber.toString()}_${applicationConfiguration.title}`}
+              style={{
+                backgroundColor: applicationConfiguration.backgroundColor
+              }}
             >
               <VisualizerIcon
-                visualizerType={applicationMetadata.endpoint}
-                style={{ color: 'white', fontSize: '85px' }}
+                visualizerType={
+                  graphExists ? applicationConfiguration.endpoint : 'Error'
+                }
+                style={{ fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
-          <CardActions className={classes.spacing} disableSpacing>
-            <IconButton aria-label="Share" onClick={handleShareApp}>
-              <ShareIcon />
-            </IconButton>
+          <CardActions className={classes.spacing}>
+            {graphExists && (
+              <React.Fragment>
+                <Button
+                  size="small"
+                  onClick={handleApplicationClicked}
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button size="small" onClick={handleShareApp} color="primary">
+                  Share
+                </Button>
+              </React.Fragment>
+            )}
+            <Button
+              id={`delete_button_${indexNumber.toString()}_${
+                applicationConfiguration.title
+              }`}
+              size="small"
+              onClick={handleDeleteApp}
+              color="primary"
+            >
+              Delete
+            </Button>
           </CardActions>
         </Card>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleMenuClose}
-        >
-          <MenuItem
-            id={`delete_button_${indexNumber.toString()}_${
-              applicationMetadata.title
-            }`}
-            onClick={handleDeleteApp}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
 
         <Dialog
           open={this.state.open}
@@ -275,8 +358,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
           <DialogContent>
             <CopyToClipboard
               text={StorageToolbox.appIriToPublishUrl(
-                applicationMetadata.object,
-                applicationMetadata.endpoint
+                applicationMetadata.solidFileUrl,
+                applicationConfiguration.endpoint
               )}
               onCopy={handleCopyLinkClicked}
             >
@@ -287,8 +370,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 className={classes.textField}
                 fullWidth
                 value={StorageToolbox.appIriToPublishUrl(
-                  applicationMetadata.object,
-                  applicationMetadata.endpoint
+                  applicationMetadata.solidFileUrl,
+                  applicationConfiguration.endpoint
                 )}
                 autoFocus
               />
@@ -307,17 +390,14 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    applicationsFolder: state.user.applicationsFolder
+    applicationsFolder: state.user.applicationsFolder,
+    webId: state.user.webId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   const handleSetResultPipelineIri = resultGraphIri =>
-    dispatch(
-      etlActions.addSelectedResultGraphIriAction({
-        data: resultGraphIri
-      })
-    );
+    dispatch(etlActions.addSelectedResultGraphIriAction(resultGraphIri));
 
   const handleSetSelectedVisualizer = visualizerData =>
     dispatch(
@@ -335,12 +415,16 @@ const mapDispatchToProps = dispatch => {
   const handleSetSelectedApplicationMetadata = applicationMetadata =>
     dispatch(applicationActions.setApplicationMetadata(applicationMetadata));
 
+  const handleSetFiltersState = filters =>
+    dispatch(filtersActions.setFiltersState(filters));
+
   return {
     handleSetResultPipelineIri,
     handleSetSelectedVisualizer,
     handleSetSelectedApplicationTitle,
     handleSetSelectedApplicationData,
-    handleSetSelectedApplicationMetadata
+    handleSetSelectedApplicationMetadata,
+    handleSetFiltersState
   };
 };
 

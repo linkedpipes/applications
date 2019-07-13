@@ -11,7 +11,8 @@ module.exports = () => {
   const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
     template: path.join(__dirname, './src/index.html'),
     filename: 'index.html',
-    inject: 'body'
+    inject: 'body',
+    title: 'Caching'
   });
 
   const plugins = [
@@ -44,11 +45,17 @@ module.exports = () => {
     entry: [path.join(__dirname, '/src/index.jsx')],
     output: {
       path: path.join(__dirname, '/public'),
-      filename: '[name].bundle.js',
-      chunkFilename: '[name].bundle.js'
+      filename:
+        process.env.NODE_ENV !== 'production'
+          ? '[name].[hash].js'
+          : '[name].[contenthash].js',
+      chunkFilename:
+        process.env.NODE_ENV !== 'production'
+          ? '[name].[hash].js'
+          : '[name].[chunkhash].js'
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.jsx'],
+      extensions: ['.mjs', '.js', '.jsx', '.mdx'],
       alias: {
         '@components': path.resolve(__dirname, './src/components'),
         '@containers': path.resolve(__dirname, './src/containers'),
@@ -85,12 +92,23 @@ module.exports = () => {
               options: {}
             }
           ]
+        },
+        {
+          test: /\.mdx?$/,
+          use: ['babel-loader', '@mdx-js/loader']
         }
       ]
     },
     optimization: {
+      runtimeChunk: 'single',
       splitChunks: {
-        chunks: 'all'
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all'
+          }
+        }
       }
     },
     devtool: dev ? 'inline-source-map' : 'source-map',

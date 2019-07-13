@@ -163,7 +163,7 @@ public class DiscoveryServiceComponent implements DiscoveryService {
 
     private class HttpActions {
 
-        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.DiscoveryServiceUrl);
+        private final String URL_BASE = Application.getConfig().getString(ApplicationPropertyKeys.DISCOVERY_SERVICE_URL);
         private final String URL_START_FROM_INPUT = urlFrom(URL_BASE, "discovery", "startFromInput");
         private final String URL_START_FROM_INPUT_IRI = urlFrom(URL_BASE, "discovery", "startFromInputIri");
         private final String URL_GET_STATUS = urlFrom(URL_BASE, "discovery", "%s");

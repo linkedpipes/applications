@@ -6,8 +6,16 @@ const INITIAL_STATE = {
   },
   selectedVisualizer: { visualizer: { visualizerCode: 'UNDEFINED' } },
   chooseFolderDialogIsOpen: false,
+  dashboardTabIndex: 0,
+  applicationSetupTabIndex: 0,
+  discoverTabIndex: 0,
+  settingsTabIndex: 0,
+  applicationsBrowserTabIndex: 0,
   colorThemeIsLight: false,
-  homepageTabIndex: 0
+  inboxDialogIsOpen: false,
+  shareApplicationDialogIsOpen: false,
+  drawerState: false,
+  selectedNavigationItem: 'dashboard'
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -23,16 +31,58 @@ const globalReducer = (state = INITIAL_STATE, action) => {
         chooseFolderDialogIsOpen: action.isOpen
       };
 
-    case types.SET_LIGHT_COLOR_THEME:
+    case types.SET_ACCESS_CONTROL_DIALOG_STATE:
       return {
         ...state,
-        colorThemeIsLight: action.value
+        shareApplicationDialogIsOpen: action.isOpen
       };
 
-    case types.SET_SELECTED_HOMEPAGE_TAB_INDEX:
+    case types.SET_INBOX_DIALOG_STATE:
       return {
         ...state,
-        homepageTabIndex: action.value
+        inboxDialogIsOpen: action.isOpen
+      };
+
+    case types.SET_SELECTED_DASHBOARD_TAB_INDEX:
+      return {
+        ...state,
+        dashboardTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_DISCOVER_TAB_INDEX:
+      return {
+        ...state,
+        discoverTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATION_SETUP_TAB_INDEX:
+      return {
+        ...state,
+        applicationSetupTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_APPLICATIONS_BROWSER_TAB_INDEX:
+      return {
+        ...state,
+        applicationsBrowserTabIndex: action.value
+      };
+
+    case types.SET_SELECTED_SETTINGS_TAB_INDEX:
+      return {
+        ...state,
+        settingsTabIndex: action.value
+      };
+
+    case types.SET_MOBILE_DRAWER_STATE:
+      return {
+        ...state,
+        drawerState: action.value
+      };
+
+    case types.SET_SELECTED_NAVIGATION_ITEM:
+      return {
+        ...state,
+        selectedNavigationItem: action.value
       };
 
     default:

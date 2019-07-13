@@ -2,11 +2,9 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import uuid from 'uuid';
-import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import { VisualizersService, Log } from '@utils';
 
 type Props = {
   classes: {
@@ -17,8 +15,17 @@ type Props = {
   },
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
+  selectedPipelineExecution: Function,
   isPublished: boolean,
-  selectedScheme: string
+  schemes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  width: number,
+  height: number
 };
 
 type State = {
@@ -37,7 +44,7 @@ const styles = theme => ({
     alignItems: 'center'
   },
   formControl: {
-    margin: theme.spacing(),
+    margin: theme.spacing(1),
     minWidth: 120
   },
   selectEmpty: {
@@ -76,21 +83,22 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     const {
       handleSetCurrentApplicationData,
       isPublished,
-      selectedScheme,
+      schemes,
       selectedResultGraphIri
     } = this.props;
 
     if (!isPublished) {
       handleSetCurrentApplicationData({
-        id: uuid.v4(),
-        applicationEndpoint: 'treemap',
-        conceptIri: this.props.selectedScheme, // TODO: change Confusing Naming
-        selectedResultGraphIri: this.props.selectedResultGraphIri,
-        visualizerCode: 'TREEMAP'
+        endpoint: 'treemap',
+        graphIri: this.props.selectedResultGraphIri,
+        etlExecutionIri: this.props.selectedPipelineExecution,
+        visualizerType: 'TREEMAP'
       });
     }
 
     this.conceptsFetched = new Set();
+    const selectedScheme: Object = schemes.find(s => s.selected);
+    const self = this;
 
     this.chartEvents = [
       {
@@ -107,22 +115,31 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
           // The first row in the data is the headers row. Ignore if got chosen
           const index = chartWrapper.getChart().getSelection()[0].row;
           if (!index) return;
-          const selectedItem = this.state.chartData[index + 1];
+          const selectedItem: {
+            label: string,
+            uri: string,
+            visible: boolean,
+            enabled: boolean,
+            selected: boolean
+          } = self.state.chartData[index + 1];
           const iri = selectedItem[0].v;
+          const currentScheme: Object = self.props.schemes.find(
+            s => s.selected
+          );
 
           // If data for this conceptIri has been fetched, then return
-          if (this.conceptsFetched.has(iri)) return;
+          if (self.conceptsFetched.has(iri)) return;
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            this.props.selectedScheme,
-            this.props.selectedResultGraphIri,
+            currentScheme.uri,
+            self.props.selectedResultGraphIri,
             iri
           );
           const jsonData = await response.data;
 
           // Update state
-          this.setState(
+          self.setState(
             prevState => {
               return {
                 ...prevState,
@@ -133,20 +150,30 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
               // Set selection to where user was. Assuming concat keeps order
               chartWrapper.getChart().setSelection([{ row: index, col: null }]);
               // Add the id the set of fetched items
-              this.conceptsFetched.add(iri);
+              self.conceptsFetched.add(iri);
             }
           );
         }
       }
     ];
-    if (selectedResultGraphIri && selectedScheme) {
-      this.handleSchemeChange(selectedScheme);
+
+    if (selectedResultGraphIri && selectedScheme && selectedScheme.uri) {
+      this.handleSchemeChange(selectedScheme.uri);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedScheme !== this.props.selectedScheme) {
-      this.handleSchemeChange(nextProps.selectedScheme);
+    const currentSchemes = this.props.schemes;
+    const currentSelectedScheme = currentSchemes.find(s => s.selected);
+    const newSchemes = nextProps.schemes;
+    const newSelectedScheme = newSchemes.find(s => s.selected);
+    if (
+      newSelectedScheme &&
+      newSelectedScheme.uri !==
+        (currentSelectedScheme && currentSelectedScheme.uri)
+    ) {
+      // this aint been callfinded. ty vole
+      this.handleSchemeChange(newSelectedScheme.uri);
     }
     return null;
   }
@@ -172,19 +199,22 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
-
-    this.props.handleSetCurrentApplicationData({
-      conceptIri: this.props.selectedScheme
-    });
   };
 
   handleGoUpClick = () => {};
 
   render() {
-    const { classes } = this.props;
+    const { classes, schemes, width, height } = this.props;
+
+    const heightSize = `${Math.max(250, Math.min(width, height) - 250)}px`;
+
+    Log.info(heightSize);
+
+    const selectedScheme = schemes.find(s => s.selected);
     return (
       <div className={classes.wrapper}>
-        {this.props.selectedScheme &&
+        {selectedScheme &&
+          selectedScheme.uri &&
           (this.state.dataLoadingStatus === 'ready' ? (
             <div className={classes.wrapper}>
               <Button
@@ -196,7 +226,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
                 Go up one level
               </Button>
               <Chart
-                height="99%"
+                height={heightSize}
                 chartType="TreeMap"
                 loader={<div>Loading Chart</div>}
                 data={this.state.chartData}
@@ -224,10 +254,4 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    selectedScheme: state.filters.selectedScheme || ownProps.selectedScheme
-  };
-};
-
-export default connect(mapStateToProps)(withStyles(styles)(TreemapVisualizer));
+export default withStyles(styles)(TreemapVisualizer);

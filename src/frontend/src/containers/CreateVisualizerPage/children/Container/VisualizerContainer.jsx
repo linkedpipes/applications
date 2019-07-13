@@ -2,27 +2,30 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import FiltersComponent from '../Filters/FiltersComponent';
+import { pathOr } from 'rambda';
+import { VISUALIZER_TYPE } from '@constants';
 import {
   MapsVisualizer,
   TreemapVisualizer,
   ChordVisualizer,
   TimelineVisualizer
 } from '@components';
-import { VISUALIZER_TYPE } from '@constants';
-import Typography from '@material-ui/core/Typography';
-import TreemapFiltersComponent from '../Filters/children/TreemapFilter';
-import ChordFiltersComponent from '../Filters/children/ChordFilter';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
   visualizer: { visualizerCode: string },
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   handleSetCurrentApplicationData: Function,
   selectedApplication: Object,
   selectedApplicationMetadata: Object,
   height: number,
   width: number,
-  selectedNodes?: Set<string>
+  selectedNodes?: Set<string>,
+  filtersState: {}
 };
 
 const styles = theme => ({
@@ -30,7 +33,8 @@ const styles = theme => ({
     flex: 1
   },
   vizdiv: {
-    overflow: 'hidden'
+    overflow: 'hidden',
+    flexGrow: 1
   },
   containerView: {
     textAlign: 'center',
@@ -43,53 +47,32 @@ const styles = theme => ({
   input: {}
 });
 
-const getFilters = (visualizerCode, selectedResultGraphIri) => {
-  switch (visualizerCode) {
-    case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
-      return <div>Filters for Google Maps not yet implemented.</div>;
-    }
-    case VISUALIZER_TYPE.TREEMAP:
-      return (
-        <TreemapFiltersComponent
-          selectedResultGraphIri={selectedResultGraphIri}
-        />
-      );
-    case VISUALIZER_TYPE.CHORD:
-      return (
-        <ChordFiltersComponent
-          selectedResultGraphIri={selectedResultGraphIri}
-        />
-      );
-    default:
-      return <div>No filters available for selected visualizer.</div>;
-  }
-};
-
 const getVisualizer = (
   visualizerCode,
   selectedResultGraphIri,
+  selectedPipelineExecution,
   selectedApplication,
   handleSetCurrentApplicationData,
   selectedApplicationMetadata,
   classes,
   selectedNodes,
   width,
-  height
+  height,
+  filtersState
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
     case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
-      const markers =
-        selectedApplication && selectedApplication.markers
-          ? selectedApplication.markers
-          : [];
       return (
         <MapsVisualizer
-          propMarkers={markers}
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
+          filters={pathOr([], 'filterGroups.mapFilters.filters', filtersState)}
+          visualizerCode={visualizerCode}
         />
       );
     }
@@ -105,18 +88,28 @@ const getVisualizer = (
       return (
         <TreemapVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
+          schemes={pathOr(
+            [],
+            'filterGroups.schemeFilter.options',
+            filtersState
+          )}
         />
       );
     case VISUALIZER_TYPE.CHORD:
       return (
         <ChordVisualizer
           selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
-          size={height + width}
-          selectedNodes={selectedNodes}
+          height={height}
+          width={width}
+          nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
         />
       );
     case VISUALIZER_TYPE.UNDEFINED:
@@ -133,33 +126,48 @@ const getVisualizer = (
 };
 
 const VisualizerControllerContainer = (props: Props) => {
+  const renderFilters = props.visualizer.visualizerCode !== VISUALIZER_TYPE.MAP;
   return (
     <Grid container className={props.classes.root} direction="row" spacing={10}>
-      <Grid item lg={3} md={4} xs={12} className={props.classes.filterSideBar}>
-        {getFilters(
-          props.visualizer.visualizerCode,
-          props.selectedResultGraphIri
-        )}
-      </Grid>
+      {renderFilters && (
+        <Grid
+          item
+          lg={4}
+          md={5}
+          xs={12}
+          className={props.classes.filterSideBar}
+        >
+          <FiltersComponent
+            editingMode
+            filtersState={props.filtersState}
+            selectedResultGraphIri={props.selectedResultGraphIri}
+          />
+        </Grid>
+      )}
+
       <Grid
         id="viz-div"
         className={props.classes.vizdiv}
         item
-        lg={9}
-        md={8}
+        lg={renderFilters ? 8 : 12}
+        md={renderFilters ? 7 : 12}
         xs={12}
       >
-        {getVisualizer(
-          props.visualizer.visualizerCode,
-          props.selectedResultGraphIri,
-          props.selectedApplication,
-          props.handleSetCurrentApplicationData,
-          props.selectedApplicationMetadata,
-          props.classes,
-          props.selectedNodes,
-          props.width,
-          props.height
-        )}
+        <Container maxWidth="xl">
+          {getVisualizer(
+            props.visualizer.visualizerCode,
+            props.selectedResultGraphIri,
+            props.selectedPipelineExecution,
+            props.selectedApplication,
+            props.handleSetCurrentApplicationData,
+            props.selectedApplicationMetadata,
+            props.classes,
+            props.selectedNodes,
+            props.width,
+            props.height,
+            props.filtersState
+          )}
+        </Container>
       </Grid>
     </Grid>
   );

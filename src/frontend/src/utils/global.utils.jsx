@@ -1,3 +1,5 @@
+import React from 'react';
+
 /* eslint-disable */
 function urlDomain(url) {
   let hostname;
@@ -120,6 +122,16 @@ const getBeautifiedVisualizerTitle = visualizerId => {
   return '';
 };
 
+const useScroll = () => {
+  const ref = React.useRef(null);
+  const executeScroll = () => {
+    window.scrollTo(0, ref.current.offsetTop);
+  };
+  const htmlElementAttributes = { ref };
+
+  return [executeScroll, htmlElementAttributes];
+};
+
 export default {
   randDarkColor,
   unixTimeConverter,
@@ -128,5 +140,6 @@ export default {
   getLocation,
   extractUrlGroups,
   urlDomain,
-  getBeautifiedVisualizerTitle
+  getBeautifiedVisualizerTitle,
+  useScroll
 };

@@ -15,6 +15,24 @@ const UserService = {
     return lpaAxios.delete('/user/execution', {
       params: { webId, executionIri, socketId }
     });
+  },
+
+  postApplication(webId, solidIri, executionIri) {
+    return lpaAxios.post('/user/application', null, {
+      params: { webId, solidIri, executionIri }
+    });
+  },
+
+  deleteApplication(webId, solidIri) {
+    return lpaAxios.delete('/user/application', {
+      params: { webId, solidIri }
+    });
+  },
+
+  setColorTheme(webId, colorSchemeIsLight) {
+    return lpaAxios.post('/user/color', null, {
+      params: { webId, color: colorSchemeIsLight ? 'WHITE' : 'BLACK' }
+    });
   }
 };
 

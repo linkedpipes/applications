@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.entities.DataSource;
-import com.linkedpipes.lpa.backend.entities.Discovery;
+import com.linkedpipes.lpa.backend.entities.profile.DiscoverySession;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.services.UserService;
 import com.linkedpipes.lpa.backend.testutil.TestError;
@@ -61,18 +61,13 @@ class DiscoveryControllerTests {
         assertFalse(response.getStatusCode().isError());
 
         Object responseBody = response.getBody();
-        assertTrue(responseBody instanceof Discovery);
-        assertNotNull(((Discovery) responseBody).id);
+        assertTrue(responseBody instanceof DiscoverySession);
+        assertNotNull(((DiscoverySession) responseBody).discoveryId);
     }
 
     @Test
     void testStartDiscoveryFromInputNull() {
         assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, null, null));
-    }
-
-    @Test
-    void testStartDiscoveryFromInputEmpty() {
-        assertThrows(LpAppsException.class, () -> discoveryController.startDiscoveryFromInput(USER_ID, "", ""));
     }
 
     @Test

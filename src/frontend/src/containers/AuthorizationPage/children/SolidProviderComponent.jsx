@@ -16,7 +16,7 @@ const styles = theme => ({
   },
   formControl: {
     width: '100%',
-    marginTop: theme.spacing()
+    marginTop: theme.spacing(1)
   }
 });
 
@@ -45,7 +45,10 @@ const SolidProviderComponent = ({
           <em>None</em>
         </MenuItem>
         {/* <MenuItem value={'Inrupt'}>Inrupt</MenuItem> */}
-        <MenuItem value={'Solid Community'}>Solid Community</MenuItem>
+        <MenuItem value={'LinkedPipes PODs'}>LinkedPipes PODs</MenuItem>
+        <MenuItem disabled value={''}>
+          Stay tuned for more supported providers...
+        </MenuItem>
       </Select>
     </FormControl>
   );

@@ -5,6 +5,7 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 from concurrent.futures import ThreadPoolExecutor
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 from selenium import webdriver
@@ -163,7 +164,6 @@ class UntitledTestCase(unittest.TestCase):
     #
     #     self.custom_wait_clickable_and_click("storage_navbar_button")
     #
-    #     self.custom_wait_clickable_and_click("more_icon_0_test_selenium_gmaps_app")
     #
     #     self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
     #
@@ -190,7 +190,7 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlinked2.solid.community/profile/card#me")
+            "https://seleniumlinked2.lpsolid.eu:8443/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
@@ -207,8 +207,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
@@ -222,9 +220,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
-
-        self.custom_wait_clickable_and_click(
-            "more_icon_0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click(
             "delete_button_0_test_selenium_treemap_app")
@@ -253,7 +248,7 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlinked1.solid.community/profile/card#me")
+            "https://seleniumlinked1.lpsolid.eu:8443/profile/card#me")
         driver.find_element_by_id(
             "sign-in-button").click()
         driver.find_element_by_id("username").click()
@@ -270,8 +265,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
-
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
@@ -285,9 +278,6 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click("storage_navbar_button")
-
-        self.custom_wait_clickable_and_click(
-            "more_icon_0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click(
             "delete_button_0_test_selenium_chord_app")

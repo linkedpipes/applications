@@ -1,141 +1,308 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
-import FormControl from '@material-ui/core/FormControl';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
-import Button from '@material-ui/core/Button';
-import FormLabel from '@material-ui/core/FormLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { VisualizersService } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
   classes: {
+    menu: { marginTop: string, marginLeft: string },
+    icon: { display: string },
     progress: number,
-    formControl: string,
-    selectEmpty: string
+    formControl: {},
+    selectEmpty: string,
+    option: {},
+    formGroup: {}
   },
-  onApplyFilter: Function
+  nodes: Array<{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  onApplyFilter: Function,
+  editingMode: boolean,
+  registerCallback: Function,
+  name: string,
+  enabled: boolean
 };
+
 type State = {
   nodes: Array<{
-    label: { languageMap: { nolang: string } },
+    label: string,
     uri: string,
-    checked: boolean
-  }>
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  }>,
+  selectedNode: ?{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  },
+  anchorEl: any
 };
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing(),
+    margin: theme.spacing(1),
     minWidth: 100
   },
   selectEmpty: {
     marginTop: theme.spacing(2)
-  }
+  },
+  formGroup: {
+    display: 'block'
+  },
+  option: {
+    display: 'inline'
+  },
+  icon: { display: 'inline' },
+  menu: { marginTop: '2rem', marginLeft: '1rem' }
 });
 
 class ChordFiltersComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
 
+  isMounted = false;
+
   constructor(props: Props) {
     super(props);
+    (this: any).handleChange = this.handleChange.bind(this);
+    (this: any).handleClick = this.handleClick.bind(this);
+    (this: any).handleClose = this.handleClose.bind(this);
+    // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: [] // Initialize with the props
+      nodes: this.props.nodes || [],
+      selectedNode: null,
+      anchorEl: null
     };
   }
 
   async componentDidMount() {
-    // Get nodes
-    const getNodesResponse = await VisualizersService.getChordNodes(
-      this.props.selectedResultGraphIri
-    );
-    const nodes = getNodesResponse.data;
-    if (nodes.length) {
-      this.setState({
-        nodes: nodes.map(node => {
-          return { ...node, checked: true };
-        })
-      });
+    this.isMounted = true;
+    // Get all the nodes
+    if (
+      this.props.editingMode &&
+      this.state.nodes.length !== 0 &&
+      this.props.nodes.length === 0
+    ) {
+      let nodes = [];
+      const getNodesResponse = await VisualizersService.getChordNodes(
+        this.props.selectedResultGraphIri
+      );
+      nodes = (getNodesResponse.data || []).map(node => ({
+        ...node,
+        label: node.label.languageMap.nolang,
+        visible: true,
+        enabled: true,
+        selected: true
+      }));
+
+      // Dispatch setNodes
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
+        }
+      );
+    } else {
+      // Dispatch setNodes
+      this.props.onApplyFilter(
+        this.props.name,
+        this.state.nodes,
+        this.props.editingMode
+      );
+    }
+
+    // Register callback
+    this.props.registerCallback(this.handleApplyFilter);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.isMounted && !this.props.editingMode) {
+      const nodes = nextProps.nodes;
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
+        }
+      );
     }
   }
 
+  componentWillUnmount = () => {
+    this.isMounted = false;
+  };
+
   handleApplyFilter = async () => {
-    // dispatch set selected scheme
-    await this.props.onApplyFilter(this.state.nodes);
+    await this.props.onApplyFilter(
+      this.props.name,
+      this.state.nodes,
+      this.props.editingMode
+    );
   };
 
   handleChange = uri => event => {
-    const checked = event.target.checked;
-    this.setState(prevState => ({
-      nodes: prevState.nodes.map(node => {
-        if (node.uri === uri) {
-          return { ...node, checked };
-        }
-        return node;
-      })
-    }));
+    if (this.isMounted) {
+      const checked = event.target.checked;
+      this.setState(prevState => ({
+        nodes: prevState.nodes.map(node => {
+          if (node.uri === uri) {
+            return { ...node, selected: checked };
+          }
+          return node;
+        })
+      }));
+    }
   };
 
-  // todo: add switch to define whether it is editable by users
+  handleClick = node => event => {
+    this.setState({
+      anchorEl: event.currentTarget,
+      selectedNode: node
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      anchorEl: null
+    });
+  };
+
   render() {
-    const { classes } = this.props;
+    const { classes, editingMode, enabled } = this.props;
     return (
-      <FormControl component="fieldset" className={classes.formControl}>
-        <FormLabel component="legend">
-          Nodes{' '}
-          <Button
-            onClick={this.handleApplyFilter}
-            disabled={!this.state.nodes.length}
-            variant="contained"
-            size="small"
-            color="primary"
-          >
-            Apply
-          </Button>
-        </FormLabel>
-        <FormGroup>
-          {(this.state.nodes || []).map(node => (
-            <FormControlLabel
-              key={node.uri}
-              control={
+      <React.Fragment>
+        <ExpansionPanelDetails>
+          <FormControl>
+            <FormGroup row className={classes.formGroup}>
+              {this.state.nodes.map(
+                node =>
+                  (editingMode || node.visible) && (
+                    <div>
+                      {editingMode && (
+                        <IconButton
+                          className={classes.icon}
+                          onClick={this.handleClick(node)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      )}
+                      <FormControlLabel
+                        key={node.uri}
+                        className={classes.option}
+                        control={
+                          <Checkbox
+                            value={node.uri}
+                            checked={node.selected}
+                            onChange={this.handleChange(node.uri)}
+                          />
+                        }
+                        label={node.label}
+                        disabled={!enabled || !node.enabled}
+                      />
+                    </div>
+                  )
+              )}
+            </FormGroup>
+          </FormControl>
+        </ExpansionPanelDetails>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose}
+          className={classes.menu}
+        >
+          {this.state.selectedNode && (
+            <React.Fragment>
+              <MenuItem onClick={this.handleClose}>
                 <Checkbox
-                  checked={node.checked}
-                  onChange={this.handleChange(node.uri)}
-                  value={node.uri}
+                  checked={this.state.selectedNode.enabled}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => ({
+                      nodes: prevState.nodes.map(node => {
+                        if (
+                          node.uri ===
+                          (prevState.selectedNode && prevState.selectedNode.uri)
+                        ) {
+                          return { ...node, enabled: checked };
+                        }
+                        return node;
+                      })
+                    }));
+                  }}
+                  value={this.state.selectedNode.enabled}
                 />
-              }
-              label={node.label.languageMap.nolang}
-            />
-          ))}
-        </FormGroup>
-      </FormControl>
+                Enabled for interaction
+              </MenuItem>
+              <MenuItem onClick={this.handleClose}>
+                <Checkbox
+                  checked={this.state.selectedNode.visible}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => ({
+                      nodes: prevState.nodes.map(node => {
+                        if (
+                          node.uri ===
+                          (prevState.selectedNode && prevState.selectedNode.uri)
+                        ) {
+                          return { ...node, visible: checked };
+                        }
+                        return node;
+                      })
+                    }));
+                  }}
+                  value={this.state.selectedNode.visible}
+                />
+                Visible to the end user
+              </MenuItem>
+            </React.Fragment>
+          )}
+        </Menu>
+      </React.Fragment>
     );
   }
 }
 
 const mapDispatchToProps = dispatch => {
-  const onApplyFilter = nodes =>
+  const onApplyFilter = (filterName, nodes, isEditing) =>
     dispatch(
-      filtersActions.setSelectedNodes(
-        new Set(nodes.filter(node => node.checked).map(node => node.uri))
-      )
+      filtersActions.setSelectedNodesWithSolid(filterName, nodes, isEditing)
     );
   return {
     onApplyFilter
   };
 };
 
-const mapStateToProps = state => {
-  return {
-    nodes: state.filters.nodes
-  };
-};
-
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(withStyles(styles)(ChordFiltersComponent));

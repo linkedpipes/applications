@@ -35,4 +35,4 @@ const LinearLoaderComponent = ({
   </div>
 );
 
-export default withStyles(styles)(LinearLoaderComponent);
+export const LinearLoader = withStyles(styles)(LinearLoaderComponent);

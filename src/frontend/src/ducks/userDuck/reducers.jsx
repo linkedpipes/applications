@@ -8,7 +8,9 @@ const INITIAL_STATE = {
   discoverySessions: [],
   pipelineExecutions: [],
   name: '',
-  image: undefined
+  image: undefined,
+  inboxInvitations: [],
+  colorThemeIsLight: false
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -17,18 +19,28 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         applications: action.profile.applications,
-        discoverySessions: action.profile.discoverySessions,
-        pipelineExecutions: action.profile.pipelineExecutions
+        discoverySessions: action.profile.discoverySessions.sort((a, b) => {
+          return a.started > b.started;
+        }),
+        pipelineExecutions: action.profile.pipelineExecutions.sort((a, b) => {
+          return a.started > b.started;
+        }),
+        colorThemeIsLight: action.profile.color !== 'BLACK'
       };
 
     case types.SET_SOLID_USER_PROFILE:
       return {
         ...state,
         applications: action.profile.applications,
-        discoverySessions: action.profile.discoverySessions,
-        pipelineExecutions: action.profile.pipelineExecutions,
+        discoverySessions: action.profile.discoverySessions.sort((a, b) => {
+          return a.started > b.started;
+        }),
+        pipelineExecutions: action.profile.pipelineExecutions.sort((a, b) => {
+          return a.started > b.started;
+        }),
         name: action.solidUsername,
-        image: action.solidImage
+        image: action.solidImage,
+        colorThemeIsLight: action.profile.color !== 'BLACK'
       };
 
     case types.SET_USER_WEBID:
@@ -85,11 +97,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
         }
       });
 
-    case types.ADD_EXECUTION_SESSION:
+    case types.ADD_EXECUTION_SESSION: {
+      let newPipelineExecutions = state.pipelineExecutions.concat(
+        action.session
+      );
+      newPipelineExecutions = newPipelineExecutions.sort((a, b) => {
+        return a.started > b.started;
+      });
       return {
         ...state,
-        pipelineExecutions: state.pipelineExecutions.concat(action.session)
+        pipelineExecutions: newPipelineExecutions
       };
+    }
 
     case types.DELETE_EXECUTION_SESSION:
       return {
@@ -125,6 +144,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         applicationsFolder: action.value
+      };
+
+    case types.SET_USER_INBOX_INVITATIONS:
+      return {
+        ...state,
+        inboxInvitations: action.value
+      };
+
+    case types.SET_LIGHT_COLOR_THEME:
+      return {
+        ...state,
+        colorThemeIsLight: action.value
       };
 
     default:

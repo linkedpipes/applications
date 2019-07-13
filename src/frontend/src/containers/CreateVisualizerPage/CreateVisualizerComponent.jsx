@@ -7,43 +7,52 @@ import {
   VisualizerContainer
 } from './children';
 import LoadingOverlay from 'react-loading-overlay';
-import AppConfiguration from '@storage/models/AppConfiguration';
+import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { Container } from '@material-ui/core';
 
 type Props = {
   selectedVisualizer: any,
   selectedApplication: any,
-  selectedApplicationMetadata: AppConfiguration,
+  selectedApplicationMetadata: ApplicationMetadata,
   headerParams?: any,
   filters: any,
   selectedResultGraphIri: string,
+  selectedPipelineExecution: string,
   classes: {
-    root: {}
+    root: {},
+    cardGrid: {}
   },
   handleSetCurrentApplicationData: Function,
   setApplicationLoaderStatus: Function,
   loadingIsActive: boolean,
   width: number,
   height: number,
-  selectedNodes?: Set<string>
+  selectedNodes?: Set<string>,
+  filtersState: {}
 };
 
-const styles = {
+const styles = theme => ({
   root: {
     flex: 1,
     display: 'flex',
     flexFlow: 'column',
     height: '100%'
   },
+  cardGrid: {
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8)
+  },
   card: {},
   input: {}
-};
+});
 
-const CreateVisualizerComponent = ({
+const CreateVisualizer = ({
   classes,
   selectedVisualizer,
   headerParams,
   filters,
   selectedResultGraphIri,
+  selectedPipelineExecution,
   selectedApplication,
   selectedApplicationMetadata,
   handleSetCurrentApplicationData,
@@ -51,35 +60,43 @@ const CreateVisualizerComponent = ({
   loadingIsActive,
   selectedNodes,
   width,
-  height
+  height,
+  filtersState
 }: Props) => (
-  <LoadingOverlay className={classes.root} active={loadingIsActive} spinner>
-    {selectedApplicationMetadata ? (
-      <EditVisualizerHeader
-        headerParams={headerParams}
-        onRefreshSwitchChange={() => {}}
-        setApplicationLoaderStatus={setApplicationLoaderStatus}
-        selectedApplicationMetadata={selectedApplicationMetadata}
-      />
-    ) : (
-      <VisualizerControllerHeader
-        headerParams={headerParams}
-        onRefreshSwitchChange={() => {}}
-        setApplicationLoaderStatus={setApplicationLoaderStatus}
-      />
-    )}
-    <VisualizerContainer
-      filters={filters}
-      visualizer={selectedVisualizer.visualizer}
-      selectedResultGraphIri={selectedResultGraphIri}
-      handleSetCurrentApplicationData={handleSetCurrentApplicationData}
-      selectedApplication={selectedApplication}
-      selectedApplicationMetadata={selectedApplicationMetadata}
-      width={width}
-      height={height}
-      selectedNodes={selectedNodes}
-    />
+  <LoadingOverlay active={loadingIsActive} spinner>
+    <main>
+      {selectedApplicationMetadata ? (
+        <EditVisualizerHeader
+          headerParams={headerParams}
+          onRefreshSwitchChange={() => {}}
+          setApplicationLoaderStatus={setApplicationLoaderStatus}
+          selectedApplicationMetadata={selectedApplicationMetadata}
+        />
+      ) : (
+        <VisualizerControllerHeader
+          headerParams={headerParams}
+          onRefreshSwitchChange={() => {}}
+          setApplicationLoaderStatus={setApplicationLoaderStatus}
+        />
+      )}
+
+      <Container className={classes.cardGrid} maxWidth="xl">
+        <VisualizerContainer
+          filters={filters}
+          visualizer={selectedVisualizer.visualizer}
+          selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          selectedApplication={selectedApplication}
+          selectedApplicationMetadata={selectedApplicationMetadata}
+          width={width}
+          height={height}
+          selectedNodes={selectedNodes}
+          filtersState={filtersState}
+        />
+      </Container>
+    </main>
   </LoadingOverlay>
 );
 
-export default withStyles(styles)(CreateVisualizerComponent);
+export const CreateVisualizerComponent = withStyles(styles)(CreateVisualizer);

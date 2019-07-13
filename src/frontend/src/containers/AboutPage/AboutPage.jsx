@@ -1,6 +1,9 @@
+// @flow
 import React, { PureComponent } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { globalActions } from '@ducks/globalDuck';
+import { connect } from 'react-redux';
 import { GoogleAnalyticsWrapper } from '@utils/';
 
 const styles = theme => ({
@@ -9,7 +12,7 @@ const styles = theme => ({
     paddingTop: theme.spacing(20)
   },
   button: {
-    margin: theme.spacing()
+    margin: theme.spacing(1)
   },
   input: {
     display: 'none'
@@ -18,12 +21,24 @@ const styles = theme => ({
 
 type Props = {
   classes: Object,
-  location: Object
+  location: Object,
+  selectedNavigationItem: string,
+  handleSetSelectedNavigationItem: Function
 };
 
-class AboutPage extends PureComponent<Props> {
+class AboutPageContainer extends PureComponent<Props> {
   componentDidMount() {
     const page = this.props.location.pathname;
+
+    const {
+      selectedNavigationItem,
+      handleSetSelectedNavigationItem
+    } = this.props;
+
+    if (selectedNavigationItem !== 'about') {
+      handleSetSelectedNavigationItem('about');
+    }
+
     GoogleAnalyticsWrapper.trackPage(page);
   }
 
@@ -43,4 +58,25 @@ class AboutPage extends PureComponent<Props> {
   }
 }
 
-export default withStyles(styles)(AboutPage);
+const mapStateToProps = state => {
+  return {
+    selectedNavigationItem: state.globals.selectedNavigationItem
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const handleSetSelectedNavigationItem = item => {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  };
+
+  return {
+    handleSetSelectedNavigationItem
+  };
+};
+
+export const AboutPage = withStyles(styles)(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AboutPageContainer)
+);
