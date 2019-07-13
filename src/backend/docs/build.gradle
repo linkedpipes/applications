@@ -28,5 +28,5 @@ orchid {
     version = "${project.version}"
     theme = "BsDoc"
     environment = 'debug'
-    baseUrl = 'http://localhost:8080'
+    baseUrl = 'https://docs.backend.applications.linkedpipes.com'
 }
