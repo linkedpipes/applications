@@ -12,7 +12,7 @@
 
 </p>
 
-## About
+## 📃 About
 
 LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!
 
@@ -20,7 +20,7 @@ LinkedPipes Applications is a visualization web platform that allows the users t
 • Developer oriented frontend documentation and `React` component demos are available [here](docs.frontend.applications.linkedpipes.com) <br/>
 • Developer oriented backend documentation and architecture overview are available [here](docs.backend.applications.linkedpipes.com)
 
-## Quick start
+## 🚀 Quick start
 
 The faster way to start your own LinkedPipes Applications platform instance is to execute the production docker-compose setup.
 
@@ -45,7 +45,7 @@ You should be able to access: <br/>
 • Local **ETL** at `localhost:8080` <br/>
 • Local **Virtuoso** at `localhost:8890`
 
-## Advanced usage
+## 🧠 Advanced usage
 
 ---
 
@@ -62,7 +62,7 @@ usage: ./lpa-cli.sh [-dc]|[--detailed-command]
 -h   | --help                         Print help documentation
 ```
 
-## Testing
+## 🧪 Testing
 
 LinkedPipes Applications uses [BrowserStack](https://www.browserstack.com) for automated integration testing.
 
