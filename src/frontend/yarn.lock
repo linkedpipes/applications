@@ -13140,10 +13140,10 @@ react-ga@^2.5.7:
   resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.6.0.tgz#c3fe830ead2ad25117e1d33280d9698de9b28496"
   integrity sha512-GWHBWZDFjDGMkIk1LzroIn0mNTygKw3adXuqvGvheFZvlbpqMPbHsQsTdQBIxRRdXGQM/Zq+dQLRPKbwIHMTaw==
 
-react-google-charts@3.0.13:
-  version "3.0.13"
-  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-3.0.13.tgz#7e22b36312054cf4a370e121206dd2af5bcea0cf"
-  integrity sha512-YGWVblSKycszcSWKARbQMrjC244dbamCSanW52uzWR+hvr4+5OVT3c3OQdwHcV0zmIeMywjWk7XHbUUAiZm+Yg==
+react-google-charts@3.0.14:
+  version "3.0.14"
+  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-3.0.14.tgz#204e27d845ebb38688f85b4cfb1fb948df39b3d5"
+  integrity sha512-ZUHPlHbpLt4MxXi6kWp0KbPN1FAxDcF8wEoGFMJ/eJs4lElIaigmfKFMEaqjoC15nwmq8gAc/Rpbos0zaU4BMg==
   dependencies:
     react-load-script "^0.0.6"
 
