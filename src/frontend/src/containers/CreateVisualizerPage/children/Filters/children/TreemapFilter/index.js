@@ -1,3 +1,4 @@
 import TreemapFiltersComponent from './TreemapFiltersComponent';
+import TreemapNodesFilterComponent from './TreemapNodesFilterComponent';
 
-export default TreemapFiltersComponent;
+export { TreemapFiltersComponent, TreemapNodesFilterComponent };

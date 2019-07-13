@@ -25,13 +25,14 @@ type Props = {
     option: {},
     formGroup: {}
   },
-  nodes: Array<{
+  concepts: Array<{
     label: string,
     uri: string,
     visible: boolean,
     enabled: boolean,
     selected: boolean
   }>,
+  selectedScheme: { uri: string },
   onApplyFilter: Function,
   editingMode: boolean,
   registerCallback: Function,
@@ -40,14 +41,14 @@ type Props = {
 };
 
 type State = {
-  nodes: Array<{
+  concepts: Array<{
     label: string,
     uri: string,
     visible: boolean,
     enabled: boolean,
     selected: boolean
   }>,
-  selectedNode: ?{
+  selectedConcept: ?{
     label: string,
     uri: string,
     visible: boolean,
@@ -75,20 +76,21 @@ const styles = theme => ({
   menu: { marginTop: '2rem', marginLeft: '1rem' }
 });
 
-class ChordFiltersComponent extends React.Component<Props, State> {
+class TreemapNodesFilterComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
 
   isMounted = false;
 
   constructor(props: Props) {
     super(props);
-    (this: any).handleChange = this.handleChange.bind(this);
-    (this: any).handleClick = this.handleClick.bind(this);
-    (this: any).handleClose = this.handleClose.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleApplyFilter = this.handleApplyFilter.bind(this);
     // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: this.props.nodes || [],
-      selectedNode: null,
+      concepts: this.props.concepts || [],
+      selectedConcept: null,
       anchorEl: null
     };
   }
@@ -96,28 +98,41 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (this.props.editingMode && this.props.nodes.length === 0) {
-      let nodes = [];
-      const getNodesResponse = await VisualizersService.getChordNodes(
+    if (
+      this.props.editingMode &&
+      this.props.concepts.length === 0 &&
+      this.props.selectedScheme
+    ) {
+      let concepts = [];
+
+      // Fetch nodes
+      const getConceptsResponse = await VisualizersService.getSkosScheme(
+        this.props.selectedScheme,
         this.props.selectedResultGraphIri
       );
-      nodes = (getNodesResponse.data || []).map(node => ({
-        ...node,
-        label: GlobalUtils.getLanguageLabel(node.label.languageMap, node.uri),
-        visible: true,
-        enabled: true,
-        selected: true
-      }));
+
+      concepts = (getConceptsResponse.data || [])
+        // .filter(concept => !!concept.parentId)
+        .map(concept => ({
+          uri: concept.id,
+          label: GlobalUtils.getLanguageLabel(
+            concept.label.languageMap,
+            concept.id
+          ),
+          visible: true,
+          enabled: true,
+          selected: true
+        }));
 
       // Dispatch setNodes
       this.setState(
         {
-          nodes
+          concepts
         },
         () => {
           this.props.onApplyFilter(
             this.props.name,
-            this.state.nodes,
+            this.state.concepts,
             this.props.editingMode
           );
         }
@@ -126,7 +141,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
       // Dispatch setNodes
       this.props.onApplyFilter(
         this.props.name,
-        this.state.nodes,
+        this.state.concepts,
         this.props.editingMode
       );
     }
@@ -135,17 +150,42 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     this.props.registerCallback(this.handleApplyFilter);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.isMounted && !this.props.editingMode) {
-      const nodes = nextProps.nodes;
+  async componentWillReceiveProps(nextProps) {
+    const nextScheme = nextProps.selectedScheme;
+    if (
+      (nextScheme && nextScheme.uri) !==
+      (this.props.selectedScheme && this.props.selectedScheme.uri)
+    ) {
+      let concepts = [];
+
+      // Fetch nodes
+      const getConceptsResponse = await VisualizersService.getSkosScheme(
+        nextScheme.uri,
+        this.props.selectedResultGraphIri
+      );
+
+      concepts = (getConceptsResponse.data || [])
+        .filter(concept => !!concept.parentId)
+        .map(concept => ({
+          uri: concept.id,
+          label: GlobalUtils.getLanguageLabel(
+            concept.label.languageMap,
+            concept.uri
+          ),
+          visible: true,
+          enabled: true,
+          selected: true
+        }));
+
+      // Dispatch setNodes
       this.setState(
         {
-          nodes
+          concepts
         },
         () => {
           this.props.onApplyFilter(
             this.props.name,
-            this.state.nodes,
+            this.state.concepts,
             this.props.editingMode
           );
         }
@@ -157,10 +197,10 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     this.isMounted = false;
   };
 
-  handleApplyFilter = async () => {
-    await this.props.onApplyFilter(
+  handleApplyFilter = () => {
+    this.props.onApplyFilter(
       this.props.name,
-      this.state.nodes,
+      this.state.concepts,
       this.props.editingMode
     );
   };
@@ -169,11 +209,11 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     if (this.isMounted) {
       const checked = event.target.checked;
       this.setState(prevState => ({
-        nodes: prevState.nodes.map(node => {
-          if (node.uri === uri) {
-            return { ...node, selected: checked };
+        concepts: prevState.concepts.map(concept => {
+          if (concept.uri === uri) {
+            return { ...concept, selected: checked };
           }
-          return node;
+          return concept;
         })
       }));
     }
@@ -182,7 +222,7 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   handleClick = node => event => {
     this.setState({
       anchorEl: event.currentTarget,
-      selectedNode: node
+      selectedConcept: node
     });
   };
 
@@ -199,34 +239,36 @@ class ChordFiltersComponent extends React.Component<Props, State> {
         <ExpansionPanelDetails>
           <FormControl>
             <FormGroup row className={classes.formGroup}>
-              {this.state.nodes.map(
-                node =>
-                  (editingMode || node.visible) && (
-                    <div>
-                      {editingMode && (
-                        <IconButton
-                          className={classes.icon}
-                          onClick={this.handleClick(node)}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                      )}
-                      <FormControlLabel
-                        key={node.uri}
-                        className={classes.option}
-                        control={
-                          <Checkbox
-                            value={node.uri}
-                            checked={node.selected}
-                            onChange={this.handleChange(node.uri)}
+              {this.state.concepts.length
+                ? this.state.concepts.map(
+                    concept =>
+                      (editingMode || concept.visible) && (
+                        <div>
+                          {editingMode && (
+                            <IconButton
+                              className={classes.icon}
+                              onClick={this.handleClick(concept)}
+                            >
+                              <MoreVertIcon />
+                            </IconButton>
+                          )}
+                          <FormControlLabel
+                            key={concept.uri}
+                            className={classes.option}
+                            control={
+                              <Checkbox
+                                value={concept.uri}
+                                checked={concept.selected}
+                                onChange={this.handleChange(concept.uri)}
+                              />
+                            }
+                            label={concept.label}
+                            disabled={!enabled || !concept.enabled}
                           />
-                        }
-                        label={node.label}
-                        disabled={!editingMode && (!enabled || !node.enabled)}
-                      />
-                    </div>
+                        </div>
+                      )
                   )
-              )}
+                : 'No options available'}
             </FormGroup>
           </FormControl>
         </ExpansionPanelDetails>
@@ -236,47 +278,49 @@ class ChordFiltersComponent extends React.Component<Props, State> {
           onClose={this.handleClose}
           className={classes.menu}
         >
-          {this.state.selectedNode && (
+          {this.state.selectedConcept && (
             <React.Fragment>
               <MenuItem onClick={this.handleClose}>
                 <Checkbox
-                  checked={this.state.selectedNode.enabled}
+                  checked={this.state.selectedConcept.enabled}
                   onChange={event => {
                     const checked = event.target.checked;
                     this.setState(prevState => ({
-                      nodes: prevState.nodes.map(node => {
+                      concepts: prevState.concepts.map(concept => {
                         if (
-                          node.uri ===
-                          (prevState.selectedNode && prevState.selectedNode.uri)
+                          concept.uri ===
+                          (prevState.selectedConcept &&
+                            prevState.selectedConcept.uri)
                         ) {
-                          return { ...node, enabled: checked };
+                          return { ...concept, enabled: checked };
                         }
-                        return node;
+                        return concept;
                       })
                     }));
                   }}
-                  value={this.state.selectedNode.enabled}
+                  value={this.state.selectedConcept.enabled}
                 />
                 Enabled for interaction
               </MenuItem>
               <MenuItem onClick={this.handleClose}>
                 <Checkbox
-                  checked={this.state.selectedNode.visible}
+                  checked={this.state.selectedConcept.visible}
                   onChange={event => {
                     const checked = event.target.checked;
                     this.setState(prevState => ({
-                      nodes: prevState.nodes.map(node => {
+                      concepts: prevState.concepts.map(concept => {
                         if (
-                          node.uri ===
-                          (prevState.selectedNode && prevState.selectedNode.uri)
+                          concept.uri ===
+                          (prevState.selectedConcept &&
+                            prevState.selectedConcept.uri)
                         ) {
-                          return { ...node, visible: checked };
+                          return { ...concept, visible: checked };
                         }
-                        return node;
+                        return concept;
                       })
                     }));
                   }}
-                  value={this.state.selectedNode.visible}
+                  value={this.state.selectedConcept.visible}
                 />
                 Visible to the end user
               </MenuItem>
@@ -301,4 +345,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   null,
   mapDispatchToProps
-)(withStyles(styles)(ChordFiltersComponent));
+)(withStyles(styles)(TreemapNodesFilterComponent));

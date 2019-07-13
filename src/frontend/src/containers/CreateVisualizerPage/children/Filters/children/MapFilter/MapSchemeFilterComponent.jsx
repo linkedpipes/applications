@@ -14,7 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { VisualizersService } from '@utils';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
@@ -120,13 +120,19 @@ const processProperties = propertiesResponse => {
         // $FlowFixMe
         return Object.entries(entry[1]).map(entry2 => ({
           filterUri: topUri,
-          // $FlowFixMe
-          filterLabel: entry2[1].schemeLabel.languageMap.cs,
+          filterLabel: GlobalUtils.getLanguageLabel(
+            // $FlowFixMe
+            entry2[1].schemeLabel.languageMap,
+            entry2[0]
+          ),
           // $FlowFixMe
           options: Object.entries(entry2[1].concepts).map(entry3 => ({
             uri: entry3[0],
-            // $FlowFixMe
-            label: entry3[1].languageMap.cs,
+            label: GlobalUtils.getLanguageLabel(
+              // $FlowFixMe
+              entry3[1].languageMap,
+              entry3[0]
+            ),
             selected: true,
             visible: true,
             enabled: true
@@ -149,6 +155,7 @@ class MapSchemeFilterComponent extends React.Component<Props, State> {
     (this: any).handleClick = this.handleClick.bind(this);
     (this: any).handleClose = this.handleClose.bind(this);
     (this: any).handleApplyFilter = this.handleApplyFilter.bind(this);
+
     // Initialize nodes with the ones passed from props
     this.state = {
       anchorEl: null,

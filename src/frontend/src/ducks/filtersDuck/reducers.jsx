@@ -101,6 +101,13 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   visible: true,
                   filterType: 'SCHEME_FILTER',
                   options: []
+                },
+                nodesFilter: {
+                  label: 'Nodes',
+                  enabled: true,
+                  visible: true,
+                  filterType: 'TREEMAP_NODES_FILTER',
+                  options: []
                 }
               }
             }
