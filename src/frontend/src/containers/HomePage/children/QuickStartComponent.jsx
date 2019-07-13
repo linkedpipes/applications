@@ -52,7 +52,7 @@ type Props = {
   onHandleSampleClick: Function
 };
 
-export default function QuickStartComponent({ onHandleSampleClick }: Props) {
+function QuickStartComponent({ onHandleSampleClick }: Props) {
   const classes = useStyles();
   const [executeScroll, scrollHtmlAttributes] = GlobalUtils.useScroll();
 
@@ -166,3 +166,5 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
     </React.Fragment>
   );
 }
+
+export const QuickStart = QuickStartComponent

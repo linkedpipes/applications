@@ -10,8 +10,11 @@ import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
 import { userActions } from '@ducks/userDuck';
 import { ApplicationMetadata } from '@storage/models';
-import { DiscoveriesCollection, PipelinesCollection } from './children';
-import QuickStartComponent from './QuickStart/QuickStartComponent';
+import {
+  DiscoveriesCollection,
+  PipelinesCollection,
+  QuickStart
+} from './children';
 import {
   Log,
   SocketContext,
@@ -397,7 +400,7 @@ class HomeController extends PureComponent<Props, State> {
 
     switch (tabIndex) {
       case 0:
-        return <QuickStartComponent onHandleSampleClick={handleSampleClick} />;
+        return <QuickStart onHandleSampleClick={handleSampleClick} />;
       case 1:
         return (
           <DiscoveriesCollection
@@ -419,7 +422,7 @@ class HomeController extends PureComponent<Props, State> {
           />
         );
       default:
-        return <QuickStartComponent onHandleSampleClick={handleSampleClick} />;
+        return <QuickStart onHandleSampleClick={handleSampleClick} />;
     }
   };
 
