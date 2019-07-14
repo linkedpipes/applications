@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on </title>
-    <link>/tags/</link>
-    <description>Recent content in Tags on </description>
+    <title>Tags on LinkedPipes Applications Docs</title>
+    <link>https://docs.applications.linkedpipes.com/tags/</link>
+    <description>Recent content in Tags on LinkedPipes Applications Docs</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://docs.applications.linkedpipes.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>

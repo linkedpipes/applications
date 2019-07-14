@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Glossary  on LinkedPipes Applications Docs</title>
+    <link>https://docs.applications.linkedpipes.com/glossary/</link>
+    <description>Recent content in Glossary  on LinkedPipes Applications Docs</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	<atom:link href="https://docs.applications.linkedpipes.com/glossary/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

@@ -1,7 +1,7 @@
 :root {
   --MAIN-TEXT-color: #fff; /* Color of text by default */
   --MAIN-TITLES-TEXT-color: #fff; /* Color of titles h2-h3-h4-h5 */
-  --MAIN-LINK-color: #0b5fff; /* Color of links */
+  --MAIN-LINK-color: #fba333; /* Color of links */
   --MAIN-LINK-HOVER-color: #167ad0; /* Color of hovered links */
   --MAIN-ANCHOR-color: #1c90f3; /* color of anchors on titles */
 
@@ -116,4 +116,30 @@ a:hover {
 
 #sidebar hr {
   border-color: var(--MENU-SECTION-HR-color);
+}
+
+th {
+  background: #303030;
+  padding: 0.5rem;
+}
+
+code {
+  color: #9aedfe;
+  background: #282a36;
+  border: 1px solid #333333;
+}
+
+.copy-to-clipboard {
+  background-image: url(../images/clippy.svg);
+  background-position: 50% 50%;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  width: 27px;
+  height: 1.45rem;
+  top: -1px;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  color: #ccc;
+  background-color: #949bab;
 }

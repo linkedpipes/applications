@@ -9,7 +9,7 @@
 
     <link rel="icon" href="/images/favicon.png" type="image/png">
 
-    <title>Tags :: LinkedPipes Applications Docs</title>
+    <title>2. Installation :: LinkedPipes Applications Docs</title>
 
     
     <link href="/css/nucleus.css?1563109807" rel="stylesheet">
@@ -35,7 +35,7 @@
     </style>
     
   </head>
-  <body class="" data-url="/tags/">
+  <body class="" data-url="/get-started/2.installation/">
     <nav id="sidebar" class="">
 
 
@@ -83,7 +83,7 @@
   
     
     <li data-nav-id="/get-started/" title="Get Started" class="dd-item 
-        
+        parent
         
         
         ">
@@ -126,7 +126,7 @@
  
   
     
-      <li data-nav-id="/get-started/2.installation/" title="2. Installation" class="dd-item ">
+      <li data-nav-id="/get-started/2.installation/" title="2. Installation" class="dd-item active">
         <a href="/get-started/2.installation/">
         2. Installation
         
@@ -378,14 +378,29 @@
                   <span class="links">
                  
                  
-                   Tags 
+                   2. Installation 
                  
                   </span>
                 </div>
                 
                     <div class="progress">
     <div class="wrapper">
-
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#prerequisites">⚙️ Prerequisites</a></li>
+<li><a href="#quick-start">🚀 Quick start</a>
+<ul>
+<li><a href="#running-locally">Running locally</a></li>
+<li><a href="#cloning-the-repository">Cloning the repository</a>
+<ul>
+<li><a href="#default-ports">Default ports</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
     </div>
 </div>
 
@@ -401,7 +416,7 @@
           
             <h1>
               
-              Tags
+              2. Installation
             </h1>
           
 
@@ -411,15 +426,76 @@
 
 
 
+<h2 id="prerequisites">⚙️ Prerequisites</h2>
+
+<p>Make sure to have the following installed in your OS:</p>
 
 <ul>
-	
+<li><a href="https://git-scm.com">Git</a> </br></li>
+<li><a href="https://www.docker.com">Docker</a> </br></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker-compose</a> </br></li>
 </ul>
+
+<h2 id="quick-start">🚀 Quick start</h2>
+
+<p>If you do not consider yourself a developer who is working, contributing or tweaking
+your own instance of the platform, the fastest way to access the platform would be to simply
+navigate to the latest instance available at <a href="https://applications.linkedpipes.com">applications.linkedpipes.com</a>.</p>
+
+<p>If you do, the consequite sections will guide you through all possible installation scenarious.</p>
+
+<h3 id="running-locally">Running locally</h3>
+
+<p>The most basic and simply option to start the platform locally is to run these commands:</p>
+
+<pre><code class="language-bash">$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/lpa-cli.sh -o lpa-cli.sh &amp;&amp; ./lpa-cli.sh --production-no-cloning
+</code></pre>
+
+<p>After starting all containers, simply navigate to <a href="http://localhost:9001">localhost:9001</a> in your preferred browser.</p>
+
+<p>Please note, this doesn&rsquo;t require cloning the project&rsquo;s repository.
+However, make sure to have latest versions of <strong>docker</strong> and <strong>docker-compose</strong> available on your system.</p>
+
+<h3 id="cloning-the-repository">Cloning the repository</h3>
+
+<p>If you want to have access to more advanced <strong>docker-compose</strong> startup configurations, make sure to clone the repository project first.</p>
+
+<pre><code class="language-bash">$ git clone https://github.com/linkedpipes/applications
+$ cd ./applications
+</code></pre>
+
+<p>Once you navigate into the root folder of cloned repository, refer to the <strong>lpa-cli.sh</strong> commands description to get access to all possible
+<strong>docker-compose</strong> configurations to start the platform locally:</p>
+
+<pre><code class="language-bash">usage: ./lpa-cli.sh [-dc]|[--detailed-command]
+-d   | --development                  Start non persistent development setup (assumes repository is already cloned)
+-dp  | --development-persistent       Start non persistend development setup (assumes repository is already cloned)
+-p   | --production                   Start persistend production setup (assumes repository is already cloned)
+-pnc | --production-no-cloning        Start persistend production setup [NO CLONING REQUIRED ;-)]
+-cs  | --clean-storage                Remove 'appdata' and 'data' folders with database data and etc
+-sc  | --stop-compose                 Setup whatever configuration setup is currently running
+-h   | --help                         Print help documentation
+</code></pre>
+
+<p>You can also investigate the commands inside the <strong>lpa-cli.sh</strong> script for more details. The script itself is essentially a very simple wrapper around various
+<strong>docker-compose</strong> related commands.</p>
+
+<h4 id="default-ports">Default ports</h4>
+
+<p>Regardless of whether you cloned repository or used the <strong>no-cloning</strong> option, once you have started the instance of the platform in
+<strong>docker-compose</strong>, individual components will be accessible on the following ports by default:</p>
+
+<p>• <strong>Frontend</strong> of LPA at localhost:9001 <br />
+• <strong>Backend</strong> of LPA at localhost:9005 <br />
+• <strong>Discovery</strong> at localhost:9000 <br />
+• <strong>ETL</strong> at localhost:8080 <br />
+• <strong>Virtuoso</strong> at localhost:8890</p>
 
 
 <footer class=" footline" >
 	
 </footer>
+
 
         
         </div> 
@@ -452,8 +528,6 @@
             
                 
                     
-                        
-                        
                     
                 
                 
@@ -467,6 +541,9 @@
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -484,6 +561,7 @@
             
                 
                     
+                    
                 
                 
 
@@ -499,6 +577,9 @@
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -678,3 +759,4 @@
 
   </body>
 </html>
+

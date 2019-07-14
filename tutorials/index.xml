@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Home on LinkedPipes Applications Docs</title>
-    <link>https://docs.applications.linkedpipes.com/</link>
-    <description>Recent content in Home on LinkedPipes Applications Docs</description>
+    <title>Tutorials  on LinkedPipes Applications Docs</title>
+    <link>https://docs.applications.linkedpipes.com/tutorials/</link>
+    <description>Recent content in Tutorials  on LinkedPipes Applications Docs</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	<atom:link href="https://docs.applications.linkedpipes.com/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://docs.applications.linkedpipes.com/tutorials/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>1. About</title>
-      <link>https://docs.applications.linkedpipes.com/get-started/1.what_is/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.applications.linkedpipes.com/get-started/1.what_is/</guid>
-      <description>LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!
-The main features of the platform can be described as follows:
- The user owns and manages his private data space. He can upload graph data therefrom his computer or provide an URL from which the data should be imported.</description>
-    </item>
     
     <item>
       <title>1. Authentication and Dashboard</title>
@@ -31,17 +20,6 @@ Dashboard walkthrough guide when checking a car always remember to get a backgro
     </item>
     
     <item>
-      <title>2. Installation</title>
-      <link>https://docs.applications.linkedpipes.com/get-started/2.installation/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.applications.linkedpipes.com/get-started/2.installation/</guid>
-      <description>⚙️ Prerequisites Make sure to have the following installed in your OS:
- Git  Docker  Docker-compose   🚀 Quick start If you do not consider yourself a developer who is working, contributing or tweaking your own instance of the platform, the fastest way to access the platform would be to simply navigate to the latest instance available at applications.linkedpipes.com.
-If you do, the consequite sections will guide you through all possible installation scenarious.</description>
-    </item>
-    
-    <item>
       <title>2. Providing LinkedData sources</title>
       <link>https://docs.applications.linkedpipes.com/tutorials/2.providing_sources/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -49,16 +27,6 @@ If you do, the consequite sections will guide you through all possible installat
       <guid>https://docs.applications.linkedpipes.com/tutorials/2.providing_sources/</guid>
       <description>There are three main options to point your LinkedData sources to the platform:
  By providing Data Sample IRI (example RDF a chunk of data from a whole dataset), Named Grap IRIs By providing a link containing the RDF file you would like to visualize. By uploading your local RDF file that you would like to visualize.  How to provide LinkedData sources from IRIs? recycling your iPhoneyCo2 herefunction execute_YTvideo(){return youtube.</description>
-    </item>
-    
-    <item>
-      <title>3. Core concepts</title>
-      <link>https://docs.applications.linkedpipes.com/get-started/3.core-concepts/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.applications.linkedpipes.com/get-started/3.core-concepts/</guid>
-      <description>The following section will introduce the main concepts and terms used within platform.
-LinkedPipes Applications consist of multiple services encorporated into docker containers, interacting within docker-compose environment. As a part of [LinkedPipes] suite, we are relying on two extra software services that are responsible for discovering, retreiving and transforming your LinkedData sources to be visualized. It is recommended to get yourself familiar with conceptual description of those services, since it provides a better understanding on what exactly is happening during Data Preparation workflow process.</description>
     </item>
     
     <item>

@@ -3,33 +3,64 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/basics/first-content/</loc>
-    <lastmod>2019-06-29T00:46:48+02:00</lastmod>
+    <loc>https://docs.applications.linkedpipes.com/get-started/</loc>
   </url>
   
   <url>
-    <loc>/basics/second-content/</loc>
-    <lastmod>2019-06-29T00:46:48+02:00</lastmod>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/</loc>
   </url>
   
   <url>
-    <loc>/basics/</loc>
-    <lastmod>2019-06-29T00:40:22+02:00</lastmod>
+    <loc>https://docs.applications.linkedpipes.com/glossary/</loc>
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2019-06-29T00:46:48+02:00</lastmod>
+    <loc>https://docs.applications.linkedpipes.com/get-started/1.what_is/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/1.authentication/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/get-started/2.installation/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/2.providing_sources/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/get-started/3.core-concepts/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/3.creating_applications/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/4.configuring_published_applications/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/5.adding_solid_contacts_sharing/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/tutorials/6.misc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://docs.applications.linkedpipes.com/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/</loc>
-    <priority>0</priority>
+    <loc>https://docs.applications.linkedpipes.com/</loc>
   </url>
   
   <url>
-    <loc>/tags/</loc>
+    <loc>https://docs.applications.linkedpipes.com/tags/</loc>
     <priority>0</priority>
   </url>
   

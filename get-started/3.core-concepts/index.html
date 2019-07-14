@@ -9,7 +9,7 @@
 
     <link rel="icon" href="/images/favicon.png" type="image/png">
 
-    <title>Tags :: LinkedPipes Applications Docs</title>
+    <title>3. Core concepts :: LinkedPipes Applications Docs</title>
 
     
     <link href="/css/nucleus.css?1563109807" rel="stylesheet">
@@ -35,7 +35,7 @@
     </style>
     
   </head>
-  <body class="" data-url="/tags/">
+  <body class="" data-url="/get-started/3.core-concepts/">
     <nav id="sidebar" class="">
 
 
@@ -83,7 +83,7 @@
   
     
     <li data-nav-id="/get-started/" title="Get Started" class="dd-item 
-        
+        parent
         
         
         ">
@@ -145,7 +145,7 @@
  
   
     
-      <li data-nav-id="/get-started/3.core-concepts/" title="3. Core concepts" class="dd-item ">
+      <li data-nav-id="/get-started/3.core-concepts/" title="3. Core concepts" class="dd-item active">
         <a href="/get-started/3.core-concepts/">
         3. Core concepts
         
@@ -378,14 +378,23 @@
                   <span class="links">
                  
                  
-                   Tags 
+                   3. Core concepts 
                  
                   </span>
                 </div>
                 
                     <div class="progress">
     <div class="wrapper">
-
+<nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#discovery">Discovery</a></li>
+<li><a href="#etl">ETL</a></li>
+<li><a href="#what-s-next">What&rsquo;s next?</a></li>
+</ul></li>
+</ul>
+</nav>
     </div>
 </div>
 
@@ -401,7 +410,7 @@
           
             <h1>
               
-              Tags
+              3. Core concepts
             </h1>
           
 
@@ -411,15 +420,38 @@
 
 
 
+<p>The following section will introduce the main concepts and terms used within platform.</p>
 
-<ul>
-	
-</ul>
+<p>LinkedPipes Applications consist of multiple services encorporated into <strong>docker</strong> containers, interacting within <strong>docker-compose</strong> environment.
+As a part of [LinkedPipes] suite, we are relying on two extra software services that are responsible for discovering, retreiving and transforming your LinkedData sources to be visualized.
+It is recommended to get yourself familiar with conceptual description of those services, since it provides a better understanding on what exactly is happening during <strong>Data Preparation workflow</strong> process.</p>
+
+<h2 id="discovery">Discovery</h2>
+
+<p><a href="https://github.com/linkedpipes/discovery"><strong>LinkedPipes Discovery</strong></a> is a service used by LinkedPipes Applications to discover whether provided LinkedData sources can be processed and visualized by the platform.
+After a successfull request sent to <strong>Discovery</strong> service it executes a session that we refer to as <strong>Discovery session</strong>. Upon successfull completion of a <strong>Discovery session</strong>, service generates specific files in <strong>json-ld</strong> format, we refer to those files as <strong>Pipelines</strong>. A <strong>Pipeline</strong> describes how <strong>ETL</strong> needs to extract the whole LinkedData set and store the data into a Graph database called <a href="https://virtuoso.openlinksw.com">Virtuoso</a>, which is yet another component used by LinkedPipes Applications platform.</p>
+
+<p><a href="https://imgur.com/xobUzIu"><img width="40%" src="https://i.imgur.com/xobUzIu.png" title="source: imgur.com" /></a></p>
+
+<p>The diagram above, recaps the core functionality of Discovery. If you would like to learn more about the <strong>LinkedPipes Discovery</strong> project refer to their official <a href="https://github.com/linkedpipes/discovery">GitHub repository</a></p>
+
+<h2 id="etl">ETL</h2>
+
+<p><a href="https://etl.linkedpipes.com"><strong>LinkedPipes ETL</strong></a> is an <a href="https://en.wikipedia.org/wiki/Extract,_transform,_load">Extract Transform Load</a> for Linked Data. It runs so called <strong>Pipelines</strong> which are defined data transformation processes. We call any <em>execution</em> of such <strong>Pipelines</strong> as <strong>Pipeline executions</strong>.</p>
+
+<p><a href="https://imgur.com/PLCH75W"><img width="40%"  src="https://i.imgur.com/PLCH75W.png" title="source: imgur.com" /></a></p>
+
+<p>The diagram above, recaps the core functionality of ETL. If you would like to learn more about the <strong>LinkedPipes ETL</strong> project refer to their official <a href="https://etl.linkedpipes.com">project documentation</a></p>
+
+<h2 id="what-s-next">What&rsquo;s next?</h2>
+
+<p>As you might understand at this point, both services are trying to achieve relatively simple and straighforward goals. <strong>Discovery</strong> needs to check if it can visualize user&rsquo;s LinkedData sources, while <strong>ETL</strong> needs to do the heavy work with the <em>discovered</em> data, extract, transform and load parsed data in <strong>RDF</strong> format into the database. However, the underlying implementation of both services represent very complex codebases but since the intention of this chapter is to simply get you familiar with their core concepts, that is about everything you need to know aboit them. Please, note that upcoming chapters are going to assume that you have read this section and understand responsibilities of these components.</p>
 
 
 <footer class=" footline" >
 	
 </footer>
+
 
         
         </div> 
@@ -452,8 +484,6 @@
             
                 
                     
-                        
-                        
                     
                 
                 
@@ -467,6 +497,9 @@
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -500,6 +533,7 @@
             
                 
                     
+                    
                 
                 
 
@@ -518,6 +552,9 @@
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -678,3 +715,4 @@
 
   </body>
 </html>
+

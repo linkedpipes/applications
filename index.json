@@ -1,41 +1,104 @@
 [
 {
-	"uri": "/basics/first-content/",
-	"title": "First Content",
+	"uri": "https://docs.applications.linkedpipes.com/get-started/",
+	"title": "Get Started",
 	"tags": [],
 	"description": "",
-	"content": "Lorem Ipsum.\n"
+	"content": " LinkedPipes Applications docs Basics Discover the platform and core concepts behind it.\n"
 },
 {
-	"uri": "/basics/second-content/",
-	"title": "Second Content",
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/",
+	"title": "Tutorials ",
 	"tags": [],
 	"description": "",
-	"content": "Lorem Ipsum.\n"
+	"content": " LinkedPipes Applications docs Platform usage tutorials Whether you are an experience LinkedData domain expert, or have zero experience with concepts of Semantic Web, get started with this chapter to master LinkedPipes Applications platform, easily create, publish and share your own LinkedData based visualizer applications with anyone!\nThe chapter consist of multiple pages containing video tutorials guiding you through functionality of the whole platform.\n"
 },
 {
-	"uri": "/basics/",
-	"title": "Basics",
+	"uri": "https://docs.applications.linkedpipes.com/glossary/",
+	"title": "Glossary ",
 	"tags": [],
 	"description": "",
-	"content": " Chapter X Some Chapter title Lorem Ipsum.\n"
+	"content": " LinkedPipes Applications docs Glossary of terms Learn more about a variety of Semantic Web and LinkedData terms used within LinkedPipes Applications platform.\nTerms    Word Definition     API Stands for Application Programming Interface. Consists of a set of endpoints.   Endpoint An endpoint is one end of a communication channel. It may refer to a SPARQL endpoint, a standardized interface for public access to databases of LinkedData on the web.   Assistant Refers to the Linked Pipes Visualization Assistant, a predecessor of Linked Pipes Applications, which allows users to create, configure and publish visualisations based on input data sets.   Data descriptor A SPARQL ASK query associated with a visualizer that determines if an input data graph can be visualized in the corresponding visualizer.   Data source Refers to any source of data, such as an RDF file, SPARQL endpoint, csv, database, etc.   ETL Extract, transform, load.   IRI Stands for Internationalized Resource Identifier. It is an internet protocol standard which extends ASCII characters subset of the Uniform Resource Identifier (URI) protocol.   LDVM Stands for Linked Data Visualization Model.   LDVMi Stands for LDVM implementation.   Linked Data a method of publishing structured data so that it can be interlinked.   LPA Stands for Linked Pipes Application.   Linked Open Data Cloud (LOD Cloud) The largest cloud of linked data that is freely available to everyone.   LinkedPipes ETL The service in charge of the ETL process.   Pipeline In the current context, refers to a process in which the application takes any data source and applies a series of transformations to its data based on the desired visualisation.   Pipeline Execution A run of the pipeline on the actual data and handover of the transformed output to a visualizer component, which then produces a visual representation of the data.   Pipeline Discovery A process taking input descriptors for all visualizers and attempting to combine the respective registered transformations to achieve a specific data format.   RDF Resource Description Framework.   Semantic web An extension of the World Wide Web through standards by the World Wide Web Consortium.   Single Page Application (SPA) A web application or web site that interacts with the user by dynamically rewriting the current page rather than loading entire new pages from a server.   SPARQL Stands for SPARQL Protocol and RDF Query Language. It is a query language able to retrieve and manipulate data stored in RDF format.   URI A Uniform Resource Identifier (URI) is a string of characters designed for unambiguous identification of resources and extensibility via the URI scheme. They provide a standard way for resources to be accessed by other computers across a network or over the World Wide Web.   URL A URL is a specific type of URI and stands for Uniform Resource Locator.    "
 },
 {
-	"uri": "/",
-	"title": "",
+	"uri": "https://docs.applications.linkedpipes.com/get-started/1.what_is/",
+	"title": "1. About",
 	"tags": [],
 	"description": "",
-	"content": ""
+	"content": "LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!\nThe main features of the platform can be described as follows:\n The user owns and manages his private data space. He can upload graph data therefrom his computer or provide an URL from which the data should be imported. The user can share his data with other users. The user can create and share data sources (entitiesthat provide access to the graph data, for example a SPARQL endpoint). The user can create, edit and share an analyses (tree-like structures where the data flow from the leavesto the root and are processed when passing through a node). The user can browse throughthe data sources and the analysis results using a generic visualization tool. He can alsoalter the visualization using ontologies  "
 },
 {
-	"uri": "/categories/",
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/1.authentication/",
+	"title": "1. Authentication and Dashboard",
+	"tags": [],
+	"description": "",
+	"content": " How to authenticate into platform using SOLID providers and WebID? this page cant load Google Maps correctly fixcheapest data report in the UKfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video More about SOLID To learn more about solid project by Tim Berners Lee, refer to their official website.\nDashboard walkthrough guide when checking a car always remember to get a background checkherefunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/get-started/2.installation/",
+	"title": "2. Installation",
+	"tags": [],
+	"description": "",
+	"content": " ⚙️ Prerequisites Make sure to have the following installed in your OS:\n Git  Docker  Docker-compose   🚀 Quick start If you do not consider yourself a developer who is working, contributing or tweaking your own instance of the platform, the fastest way to access the platform would be to simply navigate to the latest instance available at applications.linkedpipes.com.\nIf you do, the consequite sections will guide you through all possible installation scenarious.\nRunning locally The most basic and simply option to start the platform locally is to run these commands:\n$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/lpa-cli.sh -o lpa-cli.sh \u0026amp;\u0026amp; ./lpa-cli.sh --production-no-cloning  After starting all containers, simply navigate to localhost:9001 in your preferred browser.\nPlease note, this doesn\u0026rsquo;t require cloning the project\u0026rsquo;s repository. However, make sure to have latest versions of docker and docker-compose available on your system.\nCloning the repository If you want to have access to more advanced docker-compose startup configurations, make sure to clone the repository project first.\n$ git clone https://github.com/linkedpipes/applications $ cd ./applications  Once you navigate into the root folder of cloned repository, refer to the lpa-cli.sh commands description to get access to all possible docker-compose configurations to start the platform locally:\nusage: ./lpa-cli.sh [-dc]|[--detailed-command] -d | --development Start non persistent development setup (assumes repository is already cloned) -dp | --development-persistent Start non persistend development setup (assumes repository is already cloned) -p | --production Start persistend production setup (assumes repository is already cloned) -pnc | --production-no-cloning Start persistend production setup [NO CLONING REQUIRED ;-)] -cs | --clean-storage Remove 'appdata' and 'data' folders with database data and etc -sc | --stop-compose Setup whatever configuration setup is currently running -h | --help Print help documentation  You can also investigate the commands inside the lpa-cli.sh script for more details. The script itself is essentially a very simple wrapper around various docker-compose related commands.\nDefault ports Regardless of whether you cloned repository or used the no-cloning option, once you have started the instance of the platform in docker-compose, individual components will be accessible on the following ports by default:\n• Frontend of LPA at localhost:9001 • Backend of LPA at localhost:9005 • Discovery at localhost:9000 • ETL at localhost:8080 • Virtuoso at localhost:8890\n"
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/2.providing_sources/",
+	"title": "2. Providing LinkedData sources",
+	"tags": [],
+	"description": "",
+	"content": " There are three main options to point your LinkedData sources to the platform:\n By providing Data Sample IRI (example RDF a chunk of data from a whole dataset), Named Grap IRIs By providing a link containing the RDF file you would like to visualize. By uploading your local RDF file that you would like to visualize.  How to provide LinkedData sources from IRIs? recycling your iPhoneyCo2 herefunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video How to LinkedData sources from RDF files? Uploading from URL links Buying a car then try a car history checkherefunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video Uploading local RDF files The process for uploading the local RDF files into data preparation workflow is identical to what is presenting the the URL link guide, simple drag \u0026amp; drop your file into corresponding field in From File with RDF tab.\n"
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/get-started/3.core-concepts/",
+	"title": "3. Core concepts",
+	"tags": [],
+	"description": "",
+	"content": " The following section will introduce the main concepts and terms used within platform.\nLinkedPipes Applications consist of multiple services encorporated into docker containers, interacting within docker-compose environment. As a part of [LinkedPipes] suite, we are relying on two extra software services that are responsible for discovering, retreiving and transforming your LinkedData sources to be visualized. It is recommended to get yourself familiar with conceptual description of those services, since it provides a better understanding on what exactly is happening during Data Preparation workflow process.\nDiscovery LinkedPipes Discovery is a service used by LinkedPipes Applications to discover whether provided LinkedData sources can be processed and visualized by the platform. After a successfull request sent to Discovery service it executes a session that we refer to as Discovery session. Upon successfull completion of a Discovery session, service generates specific files in json-ld format, we refer to those files as Pipelines. A Pipeline describes how ETL needs to extract the whole LinkedData set and store the data into a Graph database called Virtuoso, which is yet another component used by LinkedPipes Applications platform.\n\nThe diagram above, recaps the core functionality of Discovery. If you would like to learn more about the LinkedPipes Discovery project refer to their official GitHub repository\nETL LinkedPipes ETL is an Extract Transform Load for Linked Data. It runs so called Pipelines which are defined data transformation processes. We call any execution of such Pipelines as Pipeline executions.\n\nThe diagram above, recaps the core functionality of ETL. If you would like to learn more about the LinkedPipes ETL project refer to their official project documentation\nWhat\u0026rsquo;s next? As you might understand at this point, both services are trying to achieve relatively simple and straighforward goals. Discovery needs to check if it can visualize user\u0026rsquo;s LinkedData sources, while ETL needs to do the heavy work with the discovered data, extract, transform and load parsed data in RDF format into the database. However, the underlying implementation of both services represent very complex codebases but since the intention of this chapter is to simply get you familiar with their core concepts, that is about everything you need to know aboit them. Please, note that upcoming chapters are going to assume that you have read this section and understand responsibilities of these components.\n"
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/3.creating_applications/",
+	"title": "3. Creating applications",
+	"tags": [],
+	"description": "",
+	"content": " This set of tutorials will guide you through the basics of creating your applications after data preparation workflow is finished processing.\nHow to create, publish and embedd your application? car troublesuseful tip according to the DVLA from FreeCarCheckfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/4.configuring_published_applications/",
+	"title": "4. Configuring applications",
+	"tags": [],
+	"description": "",
+	"content": " This set of tutorials will guide you through the basics of configuring your application before publishing and sharing it with the world.\nHow to configure filters on your published application? This video tutorial demonstrates filter configurations on three different visualizer types. This tutorial assumes that you have successfully published an application and want to learn more about how to configure filters and setup their appearance for end-users accessing the application via the \u0026lsquo;share\u0026rsquo; url.\nhttps://www.codeguesser.co.uk/halfords.comat the forestfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video How to setup automatic background data refreshing for your published application? Another feature of the platform is the abiltiy to automatically refresh the created published applications with a specific hourly/daily/weekly time interval. This means that your application will always be up to date with the latest changes in the LinkedData sources that you provided initially.\nRefer to the video tutorial to learn more.\nhttps://www.codeguesser.co.uk/halfords.comat the forestfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/5.adding_solid_contacts_sharing/",
+	"title": "5. Adding SOLID contacts, collaborative editing.",
+	"tags": [],
+	"description": "",
+	"content": " This set of tutorials will guide you through the basics of configuring your application before publishing and sharing it with the world.\nHow to add SOLID contants to your WebID? Voucher code websitewormeriesfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video How to accept the collaboration invitation and access shared app? Voucher code websitewormeriesfunction execute_YTvideo(){return youtube.query({ids:\"channel==MINE\",startDate:\"2019-01-01\",endDate:\"2019-12-31\",metrics:\"views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained\",dimensions:\"day\",sort:\"day\"}).then(function(e){},function(e){console.error(\"Execute error\",e)})}Powered by Embed YouTube Video "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tutorials/6.misc/",
+	"title": "6. Generic platform tutorials",
+	"tags": [],
+	"description": "",
+	"content": " Managing platform and user settings "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/categories/",
 	"title": "Categories",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "/tags/",
+	"uri": "https://docs.applications.linkedpipes.com/",
+	"title": "Home",
+	"tags": [],
+	"description": "",
+	"content": " \nPlatform Documentation About LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!\n To start with the installation guide and core concepts of the platform refer to the Get Started chapter. To start with a detailed tutorial videos guiding you through the functionality of the whole platform, refer to Tutorials chapter. To learn more about main definitions and abbreviations mentioned throughout the platform, refer to Glossary chapter.  "
+},
+{
+	"uri": "https://docs.applications.linkedpipes.com/tags/",
 	"title": "Tags",
 	"tags": [],
 	"description": "",
