@@ -9,10 +9,11 @@ import { Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { Paper } from '@material-ui/core';
+import { Paper, CardActionArea } from '@material-ui/core';
 import { samples as quickStartSamples } from '../../DiscoverPage/DiscoverInputSources/DiscoverExamplesContainer';
 import uuid from 'uuid';
 import { VisualizerIcon } from '@components/';
+import { GlobalUtils } from '@utils/';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -51,8 +52,9 @@ type Props = {
   onHandleSampleClick: Function
 };
 
-export default function QuickStartComponent({ onHandleSampleClick }: Props) {
+function QuickStartComponent({ onHandleSampleClick }: Props) {
   const classes = useStyles();
+  const [executeScroll, scrollHtmlAttributes] = GlobalUtils.useScroll();
 
   return (
     <React.Fragment>
@@ -84,7 +86,7 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                 <Grid item>
                   <Link
                     style={{ textDecoration: 'none', color: 'transparent' }}
-                    to="/discover"
+                    to="/create-application"
                   >
                     <Button variant="contained" color="primary">
                       Create Application
@@ -92,7 +94,11 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Button variant="outlined" color="primary">
+                  <Button
+                    onClick={executeScroll}
+                    variant="outlined"
+                    color="primary"
+                  >
                     Browse templates
                   </Button>
                 </Grid>
@@ -102,21 +108,23 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
         </Paper>
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
-          <Grid container spacing={4}>
+          <Grid {...scrollHtmlAttributes} container spacing={4}>
             {quickStartSamples.map(sample => (
               <Grid item key={uuid()} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
-                  <div
-                    className={classes.cardMedia}
-                    style={{
-                      backgroundColor: sample.backgroundColor
-                    }}
-                  >
-                    <VisualizerIcon
-                      visualizerType={sample.type}
-                      style={{ color: 'white', fontSize: '75px' }}
-                    />
-                  </div>
+                  <CardActionArea onClick={onHandleSampleClick(sample)}>
+                    <div
+                      className={classes.cardMedia}
+                      style={{
+                        backgroundColor: sample.backgroundColor
+                      }}
+                    >
+                      <VisualizerIcon
+                        visualizerType={sample.type}
+                        style={{ fontSize: '75px' }}
+                      />
+                    </div>
+                  </CardActionArea>
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {sample.label}
@@ -158,3 +166,5 @@ export default function QuickStartComponent({ onHandleSampleClick }: Props) {
     </React.Fragment>
   );
 }
+
+export const QuickStart = QuickStartComponent

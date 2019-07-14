@@ -13,10 +13,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { withRouter } from 'react-router-dom';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -86,13 +82,40 @@ type Props = {
 
 type State = {
   open: boolean,
-  anchorEl: any
+  graphExists: boolean
 };
 
 class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
     open: false,
-    anchorEl: undefined
+    graphExists: true
+  };
+
+  isMounted: boolean = false;
+
+  componentDidMount() {
+    this.isMounted = true;
+    this.fetchGraphStatus();
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
+  fetchGraphStatus = async () => {
+    const { applicationMetadata } = this.props;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
+    const resultGraphIri = applicationConfiguration.graphIri;
+
+    const self = this;
+
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      if (self.isMounted) {
+        self.setState({ graphExists: false });
+      }
+    });
   };
 
   handleClickOpen = () => {
@@ -122,14 +145,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     }
 
     await setApplicationLoaderStatus(false);
-  };
-
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
   };
 
   handleShareApp = () => {
@@ -183,7 +198,7 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application'
       });
     } else {
       toast.success(
@@ -199,14 +214,13 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
 
   render() {
     const { classes, applicationMetadata, indexNumber, isShared } = this.props;
-    const { anchorEl } = this.state;
     const {
-      handleMenuClick,
       handleDeleteApp,
       handleShareApp,
       handleApplicationClicked,
       handleCopyLinkClicked
     } = this;
+    const { graphExists } = this.state;
 
     const applicationConfiguration = applicationMetadata.configuration;
 
@@ -214,18 +228,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
-            action={
-              <IconButton
-                aria-owns={anchorEl ? 'simple-menu' : undefined}
-                aria-haspopup="true"
-                id={`more_icon_${indexNumber.toString()}_${
-                  applicationConfiguration.title
-                }`}
-                onClick={handleMenuClick}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            }
             title={
               <Typography
                 style={{
@@ -270,10 +272,30 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                     </Typography>
                   </React.Fragment>
                 )}
+                {!graphExists && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Error:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      The data associated with this application is either
+                      removed or corrupted. If you are using your own instance
+                      of LPApps, make sure that you are running all components
+                      of the platform and try refreshing this page.
+                    </Typography>
+                  </React.Fragment>
+                )}
               </React.Fragment>
             }
           />
-          <CardActionArea onClick={handleApplicationClicked}>
+          <CardActionArea
+            disabled={!graphExists}
+            onClick={handleApplicationClicked}
+          >
             <div
               className={classes.media}
               id={`${indexNumber.toString()}_${applicationConfiguration.title}`}
@@ -282,39 +304,40 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               }}
             >
               <VisualizerIcon
-                visualizerType={applicationConfiguration.endpoint}
-                style={{ color: 'white', fontSize: '85px' }}
+                visualizerType={
+                  graphExists ? applicationConfiguration.endpoint : 'Error'
+                }
+                style={{ fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
           <CardActions className={classes.spacing}>
+            {graphExists && (
+              <React.Fragment>
+                <Button
+                  size="small"
+                  onClick={handleApplicationClicked}
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button size="small" onClick={handleShareApp} color="primary">
+                  Share
+                </Button>
+              </React.Fragment>
+            )}
             <Button
+              id={`delete_button_${indexNumber.toString()}_${
+                applicationConfiguration.title
+              }`}
               size="small"
-              onClick={handleApplicationClicked}
+              onClick={handleDeleteApp}
               color="primary"
             >
-              Edit
-            </Button>
-            <Button size="small" onClick={handleShareApp} color="primary">
-              Share
+              Delete
             </Button>
           </CardActions>
         </Card>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleMenuClose}
-        >
-          <MenuItem
-            id={`delete_button_${indexNumber.toString()}_${
-              applicationConfiguration.title
-            }`}
-            onClick={handleDeleteApp}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
 
         <Dialog
           open={this.state.open}

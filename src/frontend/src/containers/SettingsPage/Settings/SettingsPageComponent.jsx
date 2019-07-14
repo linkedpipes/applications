@@ -4,8 +4,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import SettingsIcon from '@material-ui/icons/SettingsOutlined';
@@ -48,15 +46,13 @@ const styles = theme => ({
 type Props = {
   classes: Object,
   userProfile: Object,
-  onHandleChangeFolder: Function,
-  onHandleChangeColorTheme: Function
+  onHandleChangeFolder: Function
 };
 
 const SettingsPage = ({
   classes,
   userProfile,
-  onHandleChangeFolder,
-  onHandleChangeColorTheme
+  onHandleChangeFolder
 }: Props) => {
   return (
     <main className={classes.main}>
@@ -80,16 +76,6 @@ const SettingsPage = ({
               value={userProfile.applicationsFolder}
             />
           </FormControl>
-          <FormControlLabel
-            control={
-              <Checkbox
-                onChange={onHandleChangeColorTheme}
-                value="remember"
-                color="primary"
-              />
-            }
-            label="Light theme"
-          />
           <Button
             fullWidth
             variant="contained"

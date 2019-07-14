@@ -5,19 +5,25 @@ import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Switch from '@material-ui/core/Switch';
-// import _ from 'lodash';
-import uuid from 'uuid';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { VisualizersService } from '@utils';
 
 type Props = {
   selectedResultGraphIri: string,
   classes: {
+    menu: { marginTop: string, marginLeft: string },
+    icon: { display: string },
     progress: number,
-    formControl: string,
-    selectEmpty: string
+    formControl: {},
+    selectEmpty: string,
+    option: {},
+    formGroup: {}
   },
   nodes: Array<{
     label: string,
@@ -29,7 +35,8 @@ type Props = {
   onApplyFilter: Function,
   editingMode: boolean,
   registerCallback: Function,
-  name: string
+  name: string,
+  enabled: boolean
 };
 
 type State = {
@@ -39,7 +46,15 @@ type State = {
     visible: boolean,
     enabled: boolean,
     selected: boolean
-  }>
+  }>,
+  selectedNode: ?{
+    label: string,
+    uri: string,
+    visible: boolean,
+    enabled: boolean,
+    selected: boolean
+  },
+  anchorEl: any
 };
 
 const styles = theme => ({
@@ -49,14 +64,16 @@ const styles = theme => ({
   },
   selectEmpty: {
     marginTop: theme.spacing(2)
-  }
+  },
+  formGroup: {
+    display: 'block'
+  },
+  option: {
+    display: 'inline'
+  },
+  icon: { display: 'inline' },
+  menu: { marginTop: '2rem', marginLeft: '1rem' }
 });
-
-// const isArrayEqual = (x, y) => {
-//   return _(x)
-//     .differenceWith(y, _.isEqual)
-//     .isEmpty();
-// };
 
 class ChordFiltersComponent extends React.Component<Props, State> {
   conceptsFetched: Set<string>;
@@ -66,24 +83,24 @@ class ChordFiltersComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     (this: any).handleChange = this.handleChange.bind(this);
+    (this: any).handleClick = this.handleClick.bind(this);
+    (this: any).handleClose = this.handleClose.bind(this);
     // Initialize nodes with the ones passed from props
     this.state = {
-      nodes: this.props.nodes || []
+      nodes: this.props.nodes || [],
+      selectedNode: null,
+      anchorEl: null
     };
   }
-
-  // Currently messing with state
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   if (nextProps.nodes.length && !areEqual(nextProps.nodes, prevState.nodes)) {
-  //     return { nodes: nextProps.nodes };
-  //   }
-  //   return null;
-  // }
 
   async componentDidMount() {
     this.isMounted = true;
     // Get all the nodes
-    if (this.props.editingMode && !this.state.nodes.length) {
+    if (
+      this.props.editingMode &&
+      this.state.nodes.length !== 0 &&
+      this.props.nodes.length === 0
+    ) {
       let nodes = [];
       const getNodesResponse = await VisualizersService.getChordNodes(
         this.props.selectedResultGraphIri
@@ -122,6 +139,24 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     this.props.registerCallback(this.handleApplyFilter);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.isMounted && !this.props.editingMode) {
+      const nodes = nextProps.nodes;
+      this.setState(
+        {
+          nodes
+        },
+        () => {
+          this.props.onApplyFilter(
+            this.props.name,
+            this.state.nodes,
+            this.props.editingMode
+          );
+        }
+      );
+    }
+  }
+
   componentWillUnmount = () => {
     this.isMounted = false;
   };
@@ -148,44 +183,111 @@ class ChordFiltersComponent extends React.Component<Props, State> {
     }
   };
 
+  handleClick = node => event => {
+    this.setState({
+      anchorEl: event.currentTarget,
+      selectedNode: node
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      anchorEl: null
+    });
+  };
+
   render() {
+    const { classes, editingMode, enabled } = this.props;
     return (
-      <ExpansionPanelDetails>
-        <FormGroup row>
-          {this.state.nodes.map(node => (
-            <span key={node.uri}>
-              <FormControlLabel
-                key={uuid.v4()}
-                control={
-                  <Checkbox
-                    value={node.uri}
-                    checked={node.selected}
-                    onChange={this.handleChange(node.uri)}
-                  />
-                }
-                label={node.label}
-                disabled={!node.enabled}
-              />
-              {this.props.editingMode && (
-                <span>
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Enabled"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch checked value="checkedA" color="primary" />
-                    }
-                    label="Visible"
-                  />
-                </span>
+      <React.Fragment>
+        <ExpansionPanelDetails>
+          <FormControl>
+            <FormGroup row className={classes.formGroup}>
+              {this.state.nodes.map(
+                node =>
+                  (editingMode || node.visible) && (
+                    <div>
+                      {editingMode && (
+                        <IconButton
+                          className={classes.icon}
+                          onClick={this.handleClick(node)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      )}
+                      <FormControlLabel
+                        key={node.uri}
+                        className={classes.option}
+                        control={
+                          <Checkbox
+                            value={node.uri}
+                            checked={node.selected}
+                            onChange={this.handleChange(node.uri)}
+                          />
+                        }
+                        label={node.label}
+                        disabled={!enabled || !node.enabled}
+                      />
+                    </div>
+                  )
               )}
-            </span>
-          ))}
-        </FormGroup>
-      </ExpansionPanelDetails>
+            </FormGroup>
+          </FormControl>
+        </ExpansionPanelDetails>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose}
+          className={classes.menu}
+        >
+          {this.state.selectedNode && (
+            <React.Fragment>
+              <MenuItem onClick={this.handleClose}>
+                <Checkbox
+                  checked={this.state.selectedNode.enabled}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => ({
+                      nodes: prevState.nodes.map(node => {
+                        if (
+                          node.uri ===
+                          (prevState.selectedNode && prevState.selectedNode.uri)
+                        ) {
+                          return { ...node, enabled: checked };
+                        }
+                        return node;
+                      })
+                    }));
+                  }}
+                  value={this.state.selectedNode.enabled}
+                />
+                Enabled for interaction
+              </MenuItem>
+              <MenuItem onClick={this.handleClose}>
+                <Checkbox
+                  checked={this.state.selectedNode.visible}
+                  onChange={event => {
+                    const checked = event.target.checked;
+                    this.setState(prevState => ({
+                      nodes: prevState.nodes.map(node => {
+                        if (
+                          node.uri ===
+                          (prevState.selectedNode && prevState.selectedNode.uri)
+                        ) {
+                          return { ...node, visible: checked };
+                        }
+                        return node;
+                      })
+                    }));
+                  }}
+                  value={this.state.selectedNode.visible}
+                />
+                Visible to the end user
+              </MenuItem>
+            </React.Fragment>
+          )}
+        </Menu>
+      </React.Fragment>
     );
   }
 }

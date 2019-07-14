@@ -14,7 +14,8 @@ const INITIAL_STATE = {
   colorThemeIsLight: false,
   inboxDialogIsOpen: false,
   shareApplicationDialogIsOpen: false,
-  drawerState: false
+  drawerState: false,
+  selectedNavigationItem: 'dashboard'
 };
 
 const globalReducer = (state = INITIAL_STATE, action) => {
@@ -40,12 +41,6 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         inboxDialogIsOpen: action.isOpen
-      };
-
-    case types.SET_LIGHT_COLOR_THEME:
-      return {
-        ...state,
-        colorThemeIsLight: action.value
       };
 
     case types.SET_SELECTED_DASHBOARD_TAB_INDEX:
@@ -82,6 +77,12 @@ const globalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         drawerState: action.value
+      };
+
+    case types.SET_SELECTED_NAVIGATION_ITEM:
+      return {
+        ...state,
+        selectedNavigationItem: action.value
       };
 
     default:

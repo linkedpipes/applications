@@ -100,7 +100,11 @@ class Authorization extends PureComponent<Props, State> {
 
   handleWebIdFieldChange = e => {
     const value = e.target.value;
-    this.setState({ webIdFieldValue: value });
+    this.setState({ webIdFieldValue: value, withWebIdStatus: true });
+
+    if (this.state.providerTitle !== '') {
+      this.setState({ providerTitle: '' });
+    }
   };
 
   onSetWithWebId = event => {
@@ -111,7 +115,10 @@ class Authorization extends PureComponent<Props, State> {
   };
 
   handleProviderChange = event => {
-    this.setState({ providerTitle: event.target.value });
+    this.setState({ providerTitle: event.target.value, withWebIdStatus: false });
+    if (this.state.webIdFieldValue !== '') {
+      this.setState({ webIdFieldValue: '' });
+    }
   };
 
   render() {
@@ -121,7 +128,7 @@ class Authorization extends PureComponent<Props, State> {
       onSetWithWebId,
       handleProviderChange
     } = this;
-    const { withWebIdStatus, providerTitle } = this.state;
+    const { providerTitle, webIdFieldValue } = this.state;
     return (
       <div
         className="container"
@@ -152,8 +159,8 @@ class Authorization extends PureComponent<Props, State> {
           onWebIdFieldChange={handleWebIdFieldChange}
           onSignInClick={handleSignIn}
           onSetWithWebId={onSetWithWebId}
-          withWebIdStatus={withWebIdStatus}
           providerTitle={providerTitle}
+          webIdFieldValue={webIdFieldValue}
           handleProviderChange={handleProviderChange}
         />
       </div>

@@ -158,7 +158,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
   };
 
   handleProceedToApplicationClicked = () => {
-    this.props.history.push('/storage');
+    this.props.history.push('/applications');
   };
 
   handleCopyLinkClicked = () => {

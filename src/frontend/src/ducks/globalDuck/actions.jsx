@@ -28,13 +28,6 @@ const setInboxDialogState = state => {
   };
 };
 
-const setLightColorTheme = isLight => {
-  return {
-    type: types.SET_LIGHT_COLOR_THEME,
-    value: isLight
-  };
-};
-
 const setSelectedDashboardTabIndex = tabIndex => {
   return {
     type: types.SET_SELECTED_DASHBOARD_TAB_INDEX,
@@ -77,10 +70,16 @@ const setMobileDrawerState = drawerState => {
   };
 };
 
+const setSelectedNavigationItem = item => {
+  return {
+    type: types.SET_SELECTED_NAVIGATION_ITEM,
+    value: item
+  };
+};
+
 export default {
   addSelectedVisualizerAction,
   setAccessControlDialogState,
-  setLightColorTheme,
   setChooseFolderDialogState,
   setSelectedDashboardTabIndex,
   setInboxDialogState,
@@ -88,5 +87,6 @@ export default {
   setSelectedDiscverTabIndex,
   setSelectedApplicationSetupTabIndex,
   setSelectedApplicationsBrowserTabIndex,
-  setSelectedSettingsTabIndex
+  setSelectedSettingsTabIndex,
+  setSelectedNavigationItem
 };

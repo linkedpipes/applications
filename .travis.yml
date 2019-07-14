@@ -24,7 +24,7 @@ jobs:
       name: "Frontend"
       before_script:
         - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.17.0
         - export PATH="$HOME/.yarn/bin:$PATH"
       cache:
         yarn: true
@@ -58,7 +58,7 @@ jobs:
       name: "Frontend"
       before_script:
         - cd src/frontend
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.17.0
         - export PATH="$HOME/.yarn/bin:$PATH"
         - npm install netlify-cli -g
       cache:
@@ -70,8 +70,8 @@ jobs:
         - yarn install --frozen-lockfile --check-files --network-concurrency 1
         - yarn run eslint
         - yarn run build
-#         - yarn run docz:build
-#         - netlify deploy -s $NETLIFY_FRONTEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs
+        - yarn run docz:build
+        - netlify deploy -s $NETLIFY_FRONTEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs
 
     - name: "Backend"
       language: java
@@ -89,8 +89,8 @@ jobs:
         - git config --global user.name "travis-ci"
         - npm install netlify-cli -g
       script:
-        - ./gradlew assemble javadoc
-        - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./build/docs/javadoc
+        - ./gradlew orchidBuild
+        - netlify deploy -s $NETLIFY_BACKEND_ID --auth $NETLIFY_ACCESS_TOKEN -p --dir ./docs/build/docs/orchid
 
     - stage: tests
       name: "Backend unit tests"

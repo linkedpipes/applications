@@ -8,16 +8,13 @@ import { withAuthorization } from '@utils';
 
 type Props = {
   userProfile: Object,
-  handleUpdateChooseFolderDialogState: Function,
-  setColorTheme: Function,
-  colorThemeIsLight: Boolean
+  handleUpdateChooseFolderDialogState: Function
 };
 
 class SettingsPage extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any).handleChangeFolder = this.handleChangeFolder.bind(this);
-    (this: any).handleChangeColor = this.handleChangeColor.bind(this);
   }
 
   handleChangeFolder() {
@@ -25,19 +22,13 @@ class SettingsPage extends PureComponent<Props> {
     handleUpdateChooseFolderDialogState(true);
   }
 
-  handleChangeColor() {
-    const { setColorTheme, colorThemeIsLight } = this.props;
-    setColorTheme(!colorThemeIsLight);
-  }
-
   render() {
     const { userProfile } = this.props;
-    const { handleChangeFolder, handleChangeColor } = this;
+    const { handleChangeFolder } = this;
     return (
       <Fragment>
         <SettingsPageComponent
           onHandleChangeFolder={handleChangeFolder}
-          onHandleChangeColorTheme={handleChangeColor}
           userProfile={userProfile}
         />
         <StoragePickFolderDialog />
@@ -48,8 +39,7 @@ class SettingsPage extends PureComponent<Props> {
 
 const mapStateToProps = state => {
   return {
-    userProfile: state.user,
-    colorThemeIsLight: state.globals.colorThemeIsLight
+    userProfile: state.user
   };
 };
 
@@ -57,12 +47,8 @@ const mapDispatchToProps = dispatch => {
   const handleUpdateChooseFolderDialogState = state =>
     dispatch(globalActions.setChooseFolderDialogState({ state }));
 
-  const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
-
   return {
-    handleUpdateChooseFolderDialogState,
-    setColorTheme
+    handleUpdateChooseFolderDialogState
   };
 };
 

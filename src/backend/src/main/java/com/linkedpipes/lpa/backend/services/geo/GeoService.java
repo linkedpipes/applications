@@ -1,9 +1,9 @@
 package com.linkedpipes.lpa.backend.services.geo;
 
+import com.linkedpipes.lpa.backend.entities.MarkerFilterSetup;
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import com.linkedpipes.lpa.backend.entities.geo.Polygon;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.GeoPropertiesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.geo.MarkerExtractor;
@@ -12,10 +12,11 @@ import com.linkedpipes.lpa.backend.sparql.queries.SelectSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.GeoPropertiesQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.MarkerQueryProvider;
 import com.linkedpipes.lpa.backend.util.JenaUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +24,15 @@ import java.util.Map;
 @Service
 public class GeoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(GeoService.class);
+
     public static List<Marker> getMarkers(String graphIri, Map<String, List<ValueFilter>> filters) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new MarkerQueryProvider(filters);
-        System.out.println(provider.get(graphIri));
+        logger.info(provider.get(graphIri).toString());
         return JenaUtils.withQueryExecution(provider.get(graphIri), new MarkerExtractor()::extract);
     }
 
-    public static List<Property> getProperties(String graphIri) throws LpAppsException {
+    public static MarkerFilterSetup getProperties(String graphIri) throws LpAppsException {
         SelectSparqlQueryProvider provider = new GeoPropertiesQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), new GeoPropertiesExtractor()::extract);
     }

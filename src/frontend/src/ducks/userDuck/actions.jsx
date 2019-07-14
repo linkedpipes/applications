@@ -83,6 +83,13 @@ const setSolidUserProfileAsync = (profile, solidUsername, solidImage) => {
     });
 };
 
+const setLightColorTheme = isLight => {
+  return {
+    type: types.SET_LIGHT_COLOR_THEME,
+    value: isLight
+  };
+};
+
 export default {
   setUserProfile,
   setUserWebId,
@@ -97,5 +104,6 @@ export default {
   setUserProfileAsync,
   updateApplicationsFolder,
   setUserInboxInvitations,
-  setSolidUserProfileAsync
+  setSolidUserProfileAsync,
+  setLightColorTheme
 };
