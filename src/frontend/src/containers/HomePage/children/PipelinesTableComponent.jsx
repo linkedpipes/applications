@@ -102,8 +102,8 @@ const PipelinesTableComponent = ({
           {(pipelineExecutionsList === undefined ||
             pipelineExecutionsList.length === 0) && (
             <Typography component={'span'} variant="h6" gutterBottom>
-              No discovery sessions available, start with creating new app to
-              see sessions here...
+              No pipeline sessions available, start with creating new app to see
+              sessions here...
             </Typography>
           )}
           {pipelineExecutionsList.map((pipelineExecutionItem, index) => (
@@ -269,8 +269,11 @@ const PipelinesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to ETL section in&nbsp;
-        <Link target="_blank" href={GlobalConstants.DOCUMENTATION_URL}>
+        Refer to Core Concepts section in&nbsp;
+        <Link
+          target="_blank"
+          href={GlobalConstants.CORE_CONCEPTS_DOCUMENTATION_URL}
+        >
           Docs.
         </Link>
       </Typography>

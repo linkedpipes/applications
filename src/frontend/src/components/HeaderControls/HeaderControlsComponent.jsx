@@ -79,7 +79,7 @@ const HeaderControls = ({
           </Hidden>
           <Grid item xs />
           <Grid item>
-            <Tooltip title="Documentation • Go to documentation">
+            <Tooltip title="Documentation • Go to platform documentation">
               <IconButton
                 color="inherit"
                 href={GlobalConstants.DOCUMENTATION_URL}

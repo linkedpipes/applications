@@ -155,8 +155,15 @@ function StorageAppsBrowserComponent(props: Props) {
           <Link target="_blank" href={GlobalConstants.SOLID_INFO_URL}>
             here
           </Link>
-          &nbsp;to learn more about SOLID project. Refer here to learn more
-          about usage of SOLID within LinkedPipes Applications.
+          &nbsp;to learn more about SOLID project. Refer&nbsp;
+          <Link
+            target="_blank"
+            href={GlobalConstants.CONFIGURING_APPLICATIONS_DOCUMENTATION_URL}
+          >
+            here
+          </Link>
+          &nbsp;to learn more about usage of SOLID within LinkedPipes
+          Applications.
         </Typography>
       </Paper>
       {/* End footer */}

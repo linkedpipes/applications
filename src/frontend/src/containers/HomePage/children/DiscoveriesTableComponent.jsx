@@ -249,8 +249,11 @@ const DiscoveriesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to Discovery section in&nbsp;
-        <Link target="_blank" href={GlobalConstants.DOCUMENTATION_URL}>
+        Refer to Core Concepts section in&nbsp;
+        <Link
+          target="_blank"
+          href={GlobalConstants.PROVIDING_SOURCES_DOCUMENTATION_URL}
+        >
           Docs.
         </Link>
       </Typography>

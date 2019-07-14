@@ -167,4 +167,4 @@ function QuickStartComponent({ onHandleSampleClick }: Props) {
   );
 }
 
-export const QuickStart = QuickStartComponent
+export const QuickStart = QuickStartComponent;

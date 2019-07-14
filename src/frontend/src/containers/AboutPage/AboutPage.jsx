@@ -1,13 +1,51 @@
+/* eslint-disable max-len */
 // @flow
 import React, { PureComponent } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
-import { Container, Paper, Grid, Link, Button } from '@material-ui/core';
+import {
+  Container,
+  Paper,
+  Grid,
+  Button,
+  Card,
+  CardContent,
+  CardActions
+} from '@material-ui/core';
+import uuid from 'uuid';
+import PlatformIcon from '@material-ui/icons/SchoolTwoTone';
+import FrontedIcon from '@material-ui/icons/DesktopMacTwoTone';
+import BackendIcon from '@material-ui/icons/SettingsApplicationsTwoTone';
 import { GoogleAnalyticsWrapper } from '@utils/';
+import { GlobalConstants } from '@constants/';
 
-const useStyles = makeStyles(theme => ({
+export const documentationCards = [
+  {
+    label: 'Platform Tutorials',
+    description:
+      'If you are just starting with the platform, this is the best place to learn more about main concepts and functionality. The website also provides a detailed set of video lessons that will guide you through all application features and help you learn how to use them.',
+    icon: PlatformIcon,
+    href: GlobalConstants.DOCUMENTATION_URL
+  },
+  {
+    label: 'Frontend Documentation',
+    description:
+      'This documentation is intented for developers looking for references about frontend implementation of the platform as well as details on code structure, coding conventions, React component design patterns and overview of Components and Containers.',
+    icon: FrontedIcon,
+    href: GlobalConstants.FRONTEND_DOCUMENTATION_URL
+  },
+  {
+    label: 'Backend Documentation',
+    description:
+      'This documentation is intented for developers looking for references about backend implementation of the platform as well as details on code structure, and architecture of a backend service.',
+    icon: BackendIcon,
+    href: GlobalConstants.BACKEND_DOCUMENTATION_URL
+  }
+];
+
+const styles = theme => ({
   icon: {
     marginRight: theme.spacing(2)
   },
@@ -38,7 +76,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2)
   }
-}));
+});
 
 type Props = {
   classes: Object,
@@ -79,7 +117,7 @@ class AboutPageContainer extends PureComponent<Props> {
                 color="textPrimary"
                 gutterBottom
               >
-                Quick Start
+                FAQ
               </Typography>
               <Typography
                 variant="h6"
@@ -87,41 +125,21 @@ class AboutPageContainer extends PureComponent<Props> {
                 color="textSecondary"
                 paragraph
               >
-                Hop up on creating your own Applications based on LinkedData!
-                Choose one of our pre-defined templates for supported
-                visualizers or start by providing with your own data sources.
+                LinkedPipes Applications platform provide a detailed list of
+                documentations, tutorials for both developers and users. Refer
+                to details about each of the documentations below.
               </Typography>
-              <div className={classes.heroButtons}>
-                <Grid container spacing={2} justify="center">
-                  <Grid item>
-                    <Link
-                      style={{ textDecoration: 'none', color: 'transparent' }}
-                      to="/create-application"
-                    >
-                      <Button variant="contained" color="primary">
-                        Create Application
-                      </Button>
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      onClick={executeScroll}
-                      variant="outlined"
-                      color="primary"
-                    >
-                      Browse templates
-                    </Button>
-                  </Grid>
-                </Grid>
-              </div>
             </Container>
           </Paper>
           <Container className={classes.cardGrid} maxWidth="md">
             {/* End hero unit */}
-            <Grid {...scrollHtmlAttributes} container spacing={4}>
-              {quickStartSamples.map(sample => (
+            <Grid container spacing={4}>
+              {documentationCards.map(sample => (
                 <Grid item key={uuid()} xs={12} sm={6} md={4}>
                   <Card className={classes.card}>
+                    <div className={classes.cardMedia}>
+                      <sample.icon style={{ fontSize: '75px' }} />
+                    </div>
                     <CardContent className={classes.cardContent}>
                       <Typography gutterBottom variant="h5" component="h2">
                         {sample.label}
@@ -132,11 +150,12 @@ class AboutPageContainer extends PureComponent<Props> {
                       <Button
                         id={`${sample.label
                           .replace(/ /g, '-')
-                          .toLowerCase()}-home-button`}
+                          .toLowerCase()}-about-button`}
                         color="primary"
-                        onClick={onHandleSampleClick(sample)}
+                        target="_blank"
+                        href={sample.href}
                       >
-                        Choose
+                        Open
                       </Button>
                     </CardActions>
                   </Card>
@@ -145,22 +164,6 @@ class AboutPageContainer extends PureComponent<Props> {
             </Grid>
           </Container>
         </main>
-        {/* Footer */}
-        <Paper className={classes.footer}>
-          <Typography variant="h6" align="center" gutterBottom>
-            Any questions?
-          </Typography>
-          <Typography
-            variant="subtitle1"
-            align="center"
-            color="textSecondary"
-            component="p"
-          >
-            Check out the About section for guides, tutorials and documentation
-            :)
-          </Typography>
-        </Paper>
-        {/* End footer */}
       </React.Fragment>
     );
   }
