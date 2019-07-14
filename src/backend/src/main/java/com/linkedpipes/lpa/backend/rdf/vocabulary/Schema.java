@@ -12,5 +12,7 @@ public class Schema extends Vocabulary {
     public static final Property name = createProperty(uri, "name");
     public static final Property latitude = createProperty(uri, "latitude");
     public static final Property longitude = createProperty(uri, "longitude");
+    public static final Property startDate = createProperty(uri, "startDate");
+    public static final Property endDate = createProperty(uri, "endDate");
 
 }

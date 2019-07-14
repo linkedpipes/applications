@@ -4,6 +4,46 @@ import lpaAxios from './api.service';
 // the params that are null or undefined
 
 const VisualizersService = {
+  getFilters: async () => {
+    return lpaAxios.get('/map/properties');
+  },
+
+  getTimelineInstants: async resultGraphIri => {
+    return lpaAxios.get('/timeline/instants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsInstants: async resultGraphIri => {
+    return lpaAxios.get('/timeline/thingswithinstants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithThingsWithInstants: async resultGraphIri => {
+    return lpaAxios.get('/timeline/thingswiththingswithinstants', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineIntervals: async resultGraphIri => {
+    return lpaAxios.get('/timeline/intervals', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithIntervals: async resultGraphIri => {
+    return lpaAxios.get('/timeline/thingswithintervals', {
+      params: { resultGraphIri }
+    });
+  },
+
+  getTimelineThingsWithThingsWithIntervals: async resultGraphIri => {
+    return lpaAxios.get('/timeline/thingswiththingswithintervals', {
+      params: { resultGraphIri }
+    });
+  },
+
   // Map related
   getMarkers: async (resultGraphIri, filters) => {
     return lpaAxios.post('/map/markers', filters, {
