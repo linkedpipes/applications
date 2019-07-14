@@ -4,7 +4,8 @@ import HeaderControls from './HeaderControls';
 import {
   TreemapVisualizer,
   MapsVisualizer,
-  ChordVisualizer
+  ChordVisualizer,
+  TimelineVisualizer
 } from './Visualizers';
 import VisualizerIcon from './Icons';
 import {
@@ -22,6 +23,7 @@ export {
   LinearLoader,
   HeaderControls,
   TreemapVisualizer,
+  TimelineVisualizer,
   MapsVisualizer,
   VisualizerIcon,
   ChordVisualizer,

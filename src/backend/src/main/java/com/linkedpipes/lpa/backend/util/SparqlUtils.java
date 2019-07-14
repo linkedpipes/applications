@@ -3,6 +3,8 @@ package com.linkedpipes.lpa.backend.util;
 import com.linkedpipes.lpa.backend.Application;
 import com.linkedpipes.lpa.backend.constants.ApplicationPropertyKeys;
 import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.sparql.queries.ExtractGraphQueryProvider;
 import org.apache.jena.rdf.model.Property;
@@ -13,9 +15,10 @@ import org.apache.jena.query.*;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFDataMgr;
 
-
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
@@ -27,28 +30,40 @@ public class SparqlUtils {
         }
         return uri.endsWith(">") ? uri : uri + ">";
     }
+
     public static String formatLabel(String label) {
         return "'" + label + "'";
     }
 
+    public static String formatXSDDate(Date date) {
+        return "xsd:date(\"" + (new SimpleDateFormat("yyyy-MM-dd").format(date)) + "\")";
+    }
+
     public static LocalizedValue getCombinedLabel(Resource resource, Property... labelProperties) {
-        return Arrays.stream(labelProperties)
-                .map(resource::listProperties)
-                .flatMap(Streams::sequentialFromIterator)
-                .map(Statement::getLiteral)
-                .collect(collectingAndThen(toList(), LocalizedValue::new));
+        return Arrays.stream(labelProperties).map(resource::listProperties).flatMap(Streams::sequentialFromIterator)
+                .map(Statement::getLiteral).collect(collectingAndThen(toList(), LocalizedValue::new));
+    }
+
+    public static LocalizedValue getLabel(QuerySolution solution, String[] labelVariables) {
+        return Arrays.stream(labelVariables).filter(solution::contains)
+                .map(l -> localizedLabel(solution.get(l).asLiteral())).findAny().orElse(null);
     }
 
     public static String extractTTL(String namedGraph) {
         ConstructSparqlQueryProvider provider = new ExtractGraphQueryProvider();
         Query query = provider.get(namedGraph);
 
-        try (QueryExecution queryExecution = QueryExecutionFactory.sparqlService(Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), query)) {
+        try (QueryExecution queryExecution = QueryExecutionFactory.sparqlService(
+                Application.getConfig().getString(ApplicationPropertyKeys.VIRTUOSO_QUERY_ENDPOINT), query)) {
             Model model = queryExecution.execConstruct();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             RDFDataMgr.write(baos, model, RDFLanguages.TTL);
             return baos.toString(java.nio.charset.StandardCharsets.UTF_8);
         }
+    }
+
+    public static LocalizedValue localizedLabel(Literal literal) {
+        return new LocalizedValue(literal.getLanguage(), literal.getString());
     }
 
 }

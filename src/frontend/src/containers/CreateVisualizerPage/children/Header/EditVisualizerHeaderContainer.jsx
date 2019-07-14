@@ -537,7 +537,6 @@ const mapStateToProps = state => {
   return {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
-    filters: state.visualizers.filters,
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,

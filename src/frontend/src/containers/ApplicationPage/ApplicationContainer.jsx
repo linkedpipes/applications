@@ -16,7 +16,8 @@ import { Log, VisualizersService } from '@utils';
 import {
   MapsVisualizer,
   TreemapVisualizer,
-  ChordVisualizer
+  ChordVisualizer,
+  TimelineVisualizer
 } from '@components';
 // eslint-disable-next-line import/order
 import { VISUALIZER_TYPE } from '@constants';
@@ -186,6 +187,17 @@ class ApplicationContainer extends PureComponent<Props, State> {
           />
         );
       }
+      case VISUALIZER_TYPE.TIMELINE:
+      case VISUALIZER_TYPE.LABELED_TIMELINE:
+      case VISUALIZER_TYPE.TIMELINE_PERIODS:
+      case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
+        return (
+          <TimelineVisualizer
+            isPublished
+            visualizerCode={applicationType}
+            selectedResultGraphIri={applicationConfiguration.graphIri}
+          />
+        );
       case VISUALIZER_TYPE.UNDEFINED: {
         return (
           <Typography variant="h2" gutterBottom>
@@ -209,8 +221,13 @@ class ApplicationContainer extends PureComponent<Props, State> {
   render() {
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
-    const renderFilters =
-      visible && this.state.applicationType !== VISUALIZER_TYPE.MAP;
+    const renderFilters = ![
+      VISUALIZER_TYPE.MAP,
+      VISUALIZER_TYPE.LABELED_TIMELINE,
+      VISUALIZER_TYPE.TIMELINE,
+      VISUALIZER_TYPE.TIMELINE_PERIODS,
+      VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS
+    ].includes(this.state.applicationType);
 
     return (
       <Grid container className={this.props.classes.root} direction="row">
