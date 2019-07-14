@@ -38,7 +38,8 @@ type Props = {
   handleSetSelectedApplicationTitle: Function,
   handleSetSelectedApplicationMetadata: Function,
   handleUpdateAccessControlDialogState: Function,
-  webId: string
+  webId: string,
+  isShared: Boolean
 };
 
 type State = {
@@ -432,7 +433,8 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
       onRefreshSwitchChange,
       selectedVisualizer,
       selectedApplicationTitle,
-      selectedApplicationMetadata
+      selectedApplicationMetadata,
+      isShared
     } = this.props;
     const {
       handlePublishClicked,
@@ -526,6 +528,7 @@ class EditVisualizerHeaderContainer extends PureComponent<Props, State> {
           handleDataRefreshValueChange={handleDataRefreshValueChange}
           handleDataRefreshToggleClicked={handleDataRefreshToggleClicked}
           selectedPipelineExecution={selectedPipelineExecution}
+          isShared={isShared}
         />
         <StorageAccessControlDialog />
       </Fragment>
@@ -537,7 +540,6 @@ const mapStateToProps = state => {
   return {
     selectedVisualizer: state.globals.selectedVisualizer,
     headerParams: state.globals.headerParams,
-    filters: state.visualizers.filters,
     selectedResultGraphIri: state.globals.selectedResultGraphIri,
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,

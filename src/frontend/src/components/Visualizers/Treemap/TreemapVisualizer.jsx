@@ -4,7 +4,8 @@ import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import { VisualizersService, Log } from '@utils';
+import equal from 'fast-deep-equal';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   classes: {
@@ -25,7 +26,8 @@ type Props = {
     selected: boolean
   }>,
   width: number,
-  height: number
+  height: number,
+  selectedTopLevelConcepts: Array<{ selected: boolean, uri: string }>
 };
 
 type State = {
@@ -58,7 +60,10 @@ const styles = theme => ({
 const transformData = data => {
   return data.map(row => {
     return [
-      { v: row.id, f: row.label.languageMap.en },
+      {
+        v: row.id,
+        f: GlobalUtils.getLanguageLabel(row.label.languageMap, row.id)
+      },
       row.parentId,
       row.size,
       Math.floor(Math.random() * Math.floor(100))
@@ -166,19 +171,28 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     const currentSchemes = this.props.schemes;
     const currentSelectedScheme = currentSchemes.find(s => s.selected);
     const newSchemes = nextProps.schemes;
-    const newSelectedScheme = newSchemes.find(s => s.selected);
+    const newSelectedScheme: ?{
+      selected: boolean,
+      uri: string
+    } = newSchemes.find(s => s.selected);
     if (
-      newSelectedScheme &&
-      newSelectedScheme.uri !==
-        (currentSelectedScheme && currentSelectedScheme.uri)
+      (newSelectedScheme &&
+        newSelectedScheme.uri !==
+          (currentSelectedScheme && currentSelectedScheme.uri)) ||
+      !equal(
+        this.props.selectedTopLevelConcepts,
+        nextProps.selectedTopLevelConcepts
+      )
     ) {
-      // this aint been callfinded. ty vole
-      this.handleSchemeChange(newSelectedScheme.uri);
+      // Check
+      this.handleSchemeChange(newSelectedScheme && newSelectedScheme.uri);
     }
     return null;
   }
 
-  handleSchemeChange = async scheme => {
+  handleGoUpClick = () => {};
+
+  async handleSchemeChange(scheme) {
     if (!(scheme && this.props.selectedResultGraphIri)) {
       return;
     }
@@ -187,9 +201,18 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       scheme,
       this.props.selectedResultGraphIri
     );
-    const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.data;
-    const chartData = headers.concat(transformData(jsonData));
+
+    const checkedConcepts = this.props.selectedTopLevelConcepts
+      .filter(concept => concept.selected)
+      .map(concept => concept.uri);
+    const filteredResponse = checkedConcepts.length
+      ? jsonData.filter(e => checkedConcepts.includes(e.id) || !e.parentId)
+      : jsonData;
+
+    const headers = [['id', 'parentId', 'size', 'color']];
+
+    const chartData = headers.concat(transformData(filteredResponse));
     this.setState(
       {
         dataLoadingStatus: 'ready',
@@ -199,16 +222,12 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
-  };
-
-  handleGoUpClick = () => {};
+  }
 
   render() {
     const { classes, schemes, width, height } = this.props;
 
     const heightSize = `${Math.max(250, Math.min(width, height) - 250)}px`;
-
-    Log.info(heightSize);
 
     const selectedScheme = schemes.find(s => s.selected);
     return (

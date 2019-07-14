@@ -132,6 +132,24 @@ const useScroll = () => {
   return [executeScroll, htmlElementAttributes];
 };
 
+const getLanguageLabel = (
+  languageMap,
+  fallback = 'Label not available',
+  lang = null
+) => {
+  if (!!languageMap) {
+    const keys = Object.keys(languageMap);
+    if (lang && keys.includes(lang)) {
+      return languageMap[lang];
+    }
+    if (keys.includes('en')) {
+      return languageMap['en'];
+    }
+    return languageMap[keys[0]];
+  }
+  return fallback;
+};
+
 export default {
   randDarkColor,
   unixTimeConverter,
@@ -141,5 +159,7 @@ export default {
   extractUrlGroups,
   urlDomain,
   getBeautifiedVisualizerTitle,
-  useScroll
+  useScroll,
+  getLanguageLabel,
+  clearCookies
 };

@@ -232,6 +232,21 @@ class AppRouter extends React.PureComponent<Props, State> {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000
                   });
+                } else {
+                  setTimeout(() => {
+                    StorageToolbox.getValidAppFolder(session.webId).then(
+                      async newFolder => {
+                        Log.info(newFolder);
+                        Log.info(newFolder);
+                        if (newFolder) {
+                          Log.warn('Called internal global');
+                          handleUpdateApplicationsFolder(newFolder);
+                          await self.checkInbox();
+                          setInterval(self.checkInbox, 10000);
+                        }
+                      }
+                    );
+                  }, 5000);
                 }
               });
             });
@@ -497,6 +512,8 @@ class AppRouter extends React.PureComponent<Props, State> {
               <Route path="/treemap" component={ApplicationPage} />
 
               <Route path="/chord" component={ApplicationPage} />
+
+              <Route path="/timeline" component={ApplicationPage} />
 
               <Redirect from="/" to="/login" exact />
               <Redirect to="/404" />

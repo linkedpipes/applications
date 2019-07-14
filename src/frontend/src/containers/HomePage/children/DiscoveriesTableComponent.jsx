@@ -13,8 +13,9 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 // eslint-disable-next-line no-unused-vars
-import { CardHeader } from '@material-ui/core';
+import { CardHeader, Link } from '@material-ui/core';
 import moment from 'moment';
+import { GlobalConstants } from '@constants/';
 
 type Props = {
   classes: Object,
@@ -248,7 +249,13 @@ const DiscoveriesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to Discovery section in Docs.
+        Refer to Core Concepts section in&nbsp;
+        <Link
+          target="_blank"
+          href={GlobalConstants.PROVIDING_SOURCES_DOCUMENTATION_URL}
+        >
+          Docs.
+        </Link>
       </Typography>
     </Paper>
     {/* End footer */}

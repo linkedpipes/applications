@@ -29,7 +29,7 @@ After that navigate backend service will be available at [localhost:9005](localh
 This assumes that you are currently inside the root folder of the whole application's repository.
 
 ```bash
-
+$ cd docker
 $ docker-compose up --build --force-recreate
 
 ```
@@ -41,9 +41,11 @@ After that navigate to [localhost:9005](localhost:9005) to access the frontend, 
 If you use the default `docker-compose.yml` file you will notice that it does not specify the volumes for **PostgreSQL** and **Virtuoso** containers. Therefore, your data won't be lost upon every `docker-compose up` session. If you want to have persistend docker-compose setup, follow these steps instead:
 
 ```bash
-
+$ cd docker
 $ docker-compose -f docker-compose-persistent.yml up --build  --force-recreate
 
 ```
 
 This will create two folders named `data` and `appdata` inside the root folder of the repository. This is where your data is going to be stored for next `docker-compose up` sessions.
+
+Alternatively inspect, the `lpa-cli.sh` script for a simplified commands if you prefer not to interact with `docker-compose` directly.

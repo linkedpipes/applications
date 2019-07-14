@@ -8,7 +8,8 @@ import StorageAppsBrowserCardComponent from './children/StorageAppsBrowserCardCo
 import Emoji from 'react-emoji-render';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import uuid from 'uuid';
-import { Paper, Container } from '@material-ui/core';
+import { Paper, Container, Link } from '@material-ui/core';
+import { GlobalConstants } from '@constants/';
 
 const styles = theme => ({
   root: {
@@ -133,7 +134,14 @@ function StorageSharedAppsBrowserComponent(props: Props) {
           color="textSecondary"
           component="p"
         >
-          Refer here to learn more about sharing your applications with other
+          Refer&nbsp;
+          <Link
+            target="_blank"
+            href={GlobalConstants.SHARING_APPLICATIONS_DOCUMENTATION_URL}
+          >
+            here
+          </Link>
+          &nbsp;to learn more about sharing your applications with other
           platform users to collaborate.
         </Typography>
       </Paper>

@@ -5,13 +5,19 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
 import DiscoverInputSources from './DiscoverInputSources';
 import DiscoverVisualizerPicker from './DiscoverVisualizerPicker';
 import DiscoverPipelinesPicker from './DiscoverPipelinesPicker';
 import DiscoverPipelinesExecutor from './DiscoverPipelinesExecutor';
-import { Container, Typography, Paper } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Paper,
+  Link as MUILink
+} from '@material-ui/core';
 import { ETL_STATUS_TYPE, GoogleAnalyticsWrapper } from '@utils';
+import { GlobalConstants } from '@constants/';
 
 const styles = theme => ({
   stepperContainer: {
@@ -115,15 +121,15 @@ const Discover = ({
           >
             Follow the steps below to prepare the data to be visualized by your
             application. Simply point out where LinkedPipes should search for
-            LinkedData sources, sit back and relax. During the second step,
-            platform will automatically attempt to extract and identify how this
-            data can be visualized and propose you possible visualizers to be
-            used, if no multiple choises available it will pick one for your
-            automatically. After that, it will transform the LinkedData into a
-            format supported by that visualizer by executing a special data
-            transformation pipeline. Finally it will take you to the application
-            setup page where you will name your application and publish it to
-            share with anyone across the Web!
+            LinkedData sources, sit back and relax. To learn more information
+            about Data Preparation Workflow, tutorials and video lessons on
+            providing your LinkedData sources, refer to the&nbsp;
+            <MUILink
+              target="_blank"
+              href={GlobalConstants.CORE_CONCEPTS_DOCUMENTATION_URL}
+            >
+              Docs.
+            </MUILink>
           </Typography>
         </Container>
       </Paper>

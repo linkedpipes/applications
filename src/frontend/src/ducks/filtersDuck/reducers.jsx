@@ -101,11 +101,18 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
                   visible: true,
                   filterType: 'SCHEME_FILTER',
                   options: []
+                },
+                nodesFilter: {
+                  label: 'Nodes',
+                  enabled: true,
+                  visible: true,
+                  filterType: 'TREEMAP_NODES_FILTER',
+                  options: []
                 }
               }
             }
           };
-        case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
+        case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS:
           return {
             filtersState: {
               enabled: true,

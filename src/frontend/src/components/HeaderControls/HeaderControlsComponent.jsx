@@ -16,6 +16,7 @@ import {
   Tooltip,
   Typography
 } from '@material-ui/core';
+import { GlobalConstants } from '@constants/';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -78,9 +79,11 @@ const HeaderControls = ({
           </Hidden>
           <Grid item xs />
           <Grid item>
-            <Tooltip title="Documentation • Go to documentation">
+            <Tooltip title="Documentation • Go to platform documentation">
               <IconButton
                 color="inherit"
+                href={GlobalConstants.DOCUMENTATION_URL}
+                target="_blank"
                 // onClick={onHandleOpenSettings}
                 className={classes.iconButtonAvatar}
               >

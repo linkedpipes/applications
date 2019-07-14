@@ -168,7 +168,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
       handleSetFiltersState,
-      history
+      history,
+      isShared
     } = this.props;
 
     await setApplicationLoaderStatus(true);
@@ -198,7 +199,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/config-application'
+        pathname: '/config-application',
+        state: { isShared }
       });
     } else {
       toast.success(
@@ -326,16 +328,18 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
                 </Button>
               </React.Fragment>
             )}
-            <Button
-              id={`delete_button_${indexNumber.toString()}_${
-                applicationConfiguration.title
-              }`}
-              size="small"
-              onClick={handleDeleteApp}
-              color="primary"
-            >
-              Delete
-            </Button>
+            {!isShared && (
+              <Button
+                id={`delete_button_${indexNumber.toString()}_${
+                  applicationConfiguration.title
+                }`}
+                size="small"
+                onClick={handleDeleteApp}
+                color="primary"
+              >
+                Delete
+              </Button>
+            )}
           </CardActions>
         </Card>
 

@@ -10,6 +10,7 @@ import SolidProviderComponent from './children';
 import LpaLogo from '@assets/lpa_logo_small.svg';
 import LpaTitle from '@assets/lpa_svg_title.svg';
 import { Typography } from '@material-ui/core';
+import { GlobalConstants } from '@constants/';
 
 const styles = theme => ({
   main: {
@@ -104,6 +105,8 @@ const Authorization = ({
           variant="outlined"
           color="primary"
           className={classes.submit}
+          target="_blank"
+          href={GlobalConstants.SOLID_INFO_URL}
         >
           Learn more about WebID and SOLID
         </Button>

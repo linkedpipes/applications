@@ -29,14 +29,16 @@ type Props = {
 type State = {
   loadingIsActive: boolean,
   width: number,
-  height: number
+  height: number,
+  isShared: boolean
 };
 
 class CreateVisualizer extends PureComponent<Props, State> {
   state = {
     loadingIsActive: false,
     width: 0,
-    height: 0
+    height: 0,
+    isShared: false
   };
 
   constructor(props) {
@@ -67,6 +69,16 @@ class CreateVisualizer extends PureComponent<Props, State> {
       await this.props.handleSetDefaultFiltersState(
         selectedVisualizer.visualizer.visualizerCode
       );
+    }
+
+    if (this.props.location.state && this.props.location.state.isShared) {
+      this.setState({
+        isShared: this.props.location.state.isShared
+      });
+    } else {
+      this.setState({
+        isShared: false
+      });
     }
   }
 
@@ -101,6 +113,8 @@ class CreateVisualizer extends PureComponent<Props, State> {
       filtersState
     } = this.props;
 
+    const { isShared } = this.state;
+
     return (
       <CreateVisualizerComponent
         selectedVisualizer={selectedVisualizer}
@@ -116,6 +130,7 @@ class CreateVisualizer extends PureComponent<Props, State> {
         height={this.state.height}
         selectedNodes={selectedNodes}
         filtersState={filtersState}
+        isShared={isShared}
       />
     );
   }
