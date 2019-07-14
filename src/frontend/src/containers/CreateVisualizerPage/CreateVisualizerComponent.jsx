@@ -28,7 +28,8 @@ type Props = {
   width: number,
   height: number,
   selectedNodes?: Set<string>,
-  filtersState: {}
+  filtersState: {},
+  isShared: Boolean
 };
 
 const styles = theme => ({
@@ -61,7 +62,9 @@ const CreateVisualizer = ({
   selectedNodes,
   width,
   height,
-  filtersState
+  filtersState,
+
+  isShared
 }: Props) => (
   <LoadingOverlay active={loadingIsActive} spinner>
     <main>
@@ -71,6 +74,7 @@ const CreateVisualizer = ({
           onRefreshSwitchChange={() => {}}
           setApplicationLoaderStatus={setApplicationLoaderStatus}
           selectedApplicationMetadata={selectedApplicationMetadata}
+          isShared={isShared}
         />
       ) : (
         <VisualizerControllerHeader
