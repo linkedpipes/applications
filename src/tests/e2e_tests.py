@@ -186,7 +186,6 @@ class UntitledTestCase(unittest.TestCase):
         driver = self.driver
 
         driver.get("https://applications.linkedpipes.com/login")
-        driver.find_element_by_id("with-web-id-checkbox").click()
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
@@ -244,7 +243,6 @@ class UntitledTestCase(unittest.TestCase):
         driver = self.driver
 
         driver.get("https://applications.linkedpipes.com/login")
-        driver.find_element_by_id("with-web-id-checkbox").click()
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
         driver.find_element_by_id("webId").send_keys(
