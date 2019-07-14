@@ -1,3 +1,5 @@
+#!/bin/bash
+
 startDevelopment() {
   cd docker
 
