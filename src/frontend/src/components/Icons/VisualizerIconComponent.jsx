@@ -31,7 +31,7 @@ const Icon = ({ visualizerType, style, classes, colorThemeIsLight }: Props) => {
 
   switch (visualizerType.toUpperCase()) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
+    case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS:
       return <MapIcon className={iconClass} style={style} />;
 
     case VISUALIZER_TYPE.LABELED_TIMELINE:

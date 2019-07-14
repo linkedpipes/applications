@@ -80,7 +80,7 @@ class MapsVisualizer extends PureComponent<Props, State> {
     visualizerCode: string,
     filters: {}
   ) {
-    if (visualizerCode === VISUALIZER_TYPE.ADVANCED_FILTERS_MAP) {
+    if (visualizerCode === VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS) {
       const response = await VisualizersService.getMarkers(
         selectedResultGraphIri,
         filters

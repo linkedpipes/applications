@@ -62,7 +62,7 @@ const getVisualizer = (
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
+    case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS: {
       return (
         <MapsVisualizer
           isPublished={selectedApplicationMetadata !== undefined}

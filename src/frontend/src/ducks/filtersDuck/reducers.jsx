@@ -112,7 +112,7 @@ const filtersReducer = (state = INITIAL_STATE, action) => {
               }
             }
           };
-        case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP:
+        case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS:
           return {
             filtersState: {
               enabled: true,

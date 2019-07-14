@@ -138,7 +138,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
-      case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
+      case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS: {
         const selectedResultGraphIri = applicationConfiguration.graphIri;
         return (
           <MapsVisualizer
