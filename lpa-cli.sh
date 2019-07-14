@@ -63,6 +63,8 @@ cleanStorage() {
   rm -rf appData
   rm -rf data
   cd ..
+  rm -rf appData
+  rm -rf data
 }
 
 stopCompose() {
