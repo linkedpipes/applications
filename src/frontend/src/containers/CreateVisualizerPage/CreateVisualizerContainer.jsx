@@ -71,9 +71,9 @@ class CreateVisualizer extends PureComponent<Props, State> {
       );
     }
 
-    if (this.props.location.state) {
+    if (this.props.location.state && this.props.location.state.isShared) {
       this.setState({
-        isShared: this.props.location.state.isShared !== undefined
+        isShared: this.props.location.state.isShared
       });
     } else {
       this.setState({

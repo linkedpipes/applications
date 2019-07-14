@@ -5,7 +5,7 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 from concurrent.futures import ThreadPoolExecutor
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 from selenium import webdriver
@@ -19,8 +19,8 @@ from requests.auth import HTTPBasicAuth
 from slackclient import SlackClient
 
 desired_cap = {
-    'browserName': 'Chrome',
-    "browser_version": "73",
+    'browserName': 'Firefox',
+    "browser_version": "68",
     "browserstack.debug": True,
     "acceptSslCerts": True
 }
@@ -123,64 +123,63 @@ class UntitledTestCase(unittest.TestCase):
             except WebDriverException as e:
                 count = count + 1
 
-    # def test_google_maps_flow(self):
-    #     driver = self.driver
-    #
-    #     driver.get("https://applications.linkedpipes.com/login")
-    #     driver.find_element_by_id("with-web-id-checkbox").click()
-    #     driver.find_element_by_id("webId").click()
-    #     driver.find_element_by_id("webId").clear()
-    #     driver.find_element_by_id("webId").send_keys(
-    #         "https://seleniumlpa.inrupt.net/profile/card#me")
-    #     driver.find_element_by_id(
-    #         "sign-in-button").click()
-    #     driver.find_element_by_id("username").click()
-    #     driver.find_element_by_id("username").clear()
-    #     driver.find_element_by_id("username").send_keys("seleniumlpa1")
-    #     driver.find_element_by_id("password").click()
-    #     driver.find_element_by_id("password").clear()
-    #     driver.find_element_by_id("password").send_keys("Selenium123!")
-    #     driver.find_element_by_id("login").click()
-    #
-    #     self.custom_wait_clickable_and_click(
-    #         element_id="googlemaps-sample-home-button")
-    #
-    #     self.custom_wait_clickable_and_click(
-    #         element_id="start-discovery-button")
-    #
-    #     self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
-    #
-    #     self.custom_wait_clickable_and_click(element_id="create-app-button")
-    #
-    #     self.custom_wait_clickable_and_click("application-title-field")
-    #     driver.find_element_by_id("application-title-field").clear()
-    #     driver.find_element_by_id(
-    #         "application-title-field").send_keys("test_selenium_gmaps_app")
-    #     driver.find_element_by_id("create-app-publish-button").click()
-    #
-    #     self.custom_wait_clickable_and_click("browse-published-button")
-    #
-    #     self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
-    #
-    #     self.custom_wait_clickable_and_click("storage_navbar_button")
-    #
-    #
-    #     self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
-    #
-    #     self.custom_wait_clickable_and_click("dashboard_navbar_button")
-    #
-    #     self.custom_wait_clickable_and_click("discoveries_tab")
-    #
-    #     self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
-    #
-    #     self.custom_wait_clickable_and_click("dashboard_navbar_button")
-    #
-    #     self.custom_wait_clickable_and_click("pipeline_executions_tab")
-    #
-    #     self.custom_wait_clickable_and_click("delete_execution_session_button_0")
-    #
-    #
-    #     time.sleep(5)
+    def test_google_maps_flow(self):
+        driver = self.driver
+
+        driver.get("https://applications.linkedpipes.com/login")
+        driver.find_element_by_id("webId").click()
+        driver.find_element_by_id("webId").clear()
+        driver.find_element_by_id("webId").send_keys(
+            "https://seleniumlinked3.lpsolid.eu:8443/profile/card#me")
+        driver.find_element_by_id(
+            "sign-in-button").click()
+        driver.find_element_by_id("username").click()
+        driver.find_element_by_id("username").clear()
+        driver.find_element_by_id("username").send_keys("seleniumlinked3")
+        driver.find_element_by_id("password").click()
+        driver.find_element_by_id("password").clear()
+        driver.find_element_by_id("password").send_keys("Selenium123!")
+        driver.find_element_by_id("login").click()
+
+        self.custom_wait_clickable_and_click(
+            element_id="maps-sample-home-button")
+
+        self.custom_wait_clickable_and_click(
+            element_id="start-discovery-button")
+
+        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
+
+        self.custom_wait_clickable_and_click(element_id="create-app-button")
+
+        self.custom_wait_clickable_and_click("application-title-field")
+        driver.find_element_by_id("application-title-field").clear()
+        driver.find_element_by_id(
+            "application-title-field").send_keys("test_selenium_gmaps_app")
+        driver.find_element_by_id("create-app-publish-button").click()
+
+        self.custom_wait_clickable_and_click("browse-published-button")
+
+        self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
+
+        self.custom_wait_clickable_and_click("storage_navbar_button")
+
+        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        driver.execute_script("scrollBy(0,250);")
+
+        self.custom_wait_clickable_and_click("discoveries_tab")
+
+        self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
+
+        self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        self.custom_wait_clickable_and_click("pipeline_executions_tab")
+
+        self.custom_wait_clickable_and_click("delete_execution_session_button_0")
+
+        time.sleep(5)
 
     def test_treemap_flow(self):
         driver = self.driver
@@ -206,6 +205,8 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click(
             element_id="start-discovery-button")
 
+        self.custom_wait_clickable_and_click(element_id="visualizer-2-card")
+
         self.custom_wait_clickable_and_click(element_id="create-app-button")
 
         self.custom_wait_clickable_and_click("application-title-field")
@@ -224,6 +225,8 @@ class UntitledTestCase(unittest.TestCase):
             "delete_button_0_test_selenium_treemap_app")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        driver.execute_script("scrollBy(0,250);")
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
@@ -281,6 +284,8 @@ class UntitledTestCase(unittest.TestCase):
             "delete_button_0_test_selenium_chord_app")
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
+
+        driver.execute_script("scrollBy(0,250);")
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
