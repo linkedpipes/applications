@@ -12,13 +12,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { VisualizerIcon } from '@components';
 import { withRouter } from 'react-router-dom';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { GlobalUtils, VisualizersService, UserService } from '@utils';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
@@ -26,20 +20,22 @@ import { applicationActions } from '@ducks/applicationDuck';
 import { etlActions } from '@ducks/etlDuck';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import StorageToolbox from '../../../StorageToolbox';
-import ShareIcon from '@material-ui/icons/Share';
 import { filtersActions } from '@ducks/filtersDuck';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import moment from 'moment';
+import { Typography } from '@material-ui/core';
+import { UserService, VisualizersService, GlobalUtils } from '@utils';
+import { VisualizerIcon } from '@components/';
 
-const styles = {
+const styles = theme => ({
   card: {
     height: '100%',
     display: 'flex',
-    width: '190',
-    flexDirection: 'column',
-    marginRight: 5
+    flexDirection: 'column'
   },
 
   media: {
+    padding: theme.spacing(2),
     textAlign: 'center'
   },
 
@@ -56,7 +52,7 @@ const styles = {
   cardHeader: {
     height: '100px'
   }
-};
+});
 
 type Props = {
   classes: {
@@ -80,18 +76,46 @@ type Props = {
   history: Object,
   applicationsFolder: string,
   indexNumber: Number,
-  webId: string
+  webId: string,
+  isShared: Boolean
 };
 
 type State = {
   open: boolean,
-  anchorEl: any
+  graphExists: boolean
 };
 
 class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   state = {
     open: false,
-    anchorEl: undefined
+    graphExists: true
+  };
+
+  isMounted: boolean = false;
+
+  componentDidMount() {
+    this.isMounted = true;
+    this.fetchGraphStatus();
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
+  fetchGraphStatus = async () => {
+    const { applicationMetadata } = this.props;
+
+    const applicationConfiguration = applicationMetadata.configuration;
+
+    const resultGraphIri = applicationConfiguration.graphIri;
+
+    const self = this;
+
+    await VisualizersService.getGraphExists(resultGraphIri).catch(() => {
+      if (self.isMounted) {
+        self.setState({ graphExists: false });
+      }
+    });
   };
 
   handleClickOpen = () => {
@@ -123,14 +147,6 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
     await setApplicationLoaderStatus(false);
   };
 
-  handleMenuClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
-  };
-
   handleShareApp = () => {
     this.setState({ open: true });
   };
@@ -152,7 +168,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       handleSetSelectedApplicationData,
       handleSetSelectedApplicationMetadata,
       handleSetFiltersState,
-      history
+      history,
+      isShared
     } = this.props;
 
     await setApplicationLoaderStatus(true);
@@ -182,7 +199,8 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       await setApplicationLoaderStatus(false);
 
       history.push({
-        pathname: '/create-app'
+        pathname: '/config-application',
+        state: { isShared }
       });
     } else {
       toast.success(
@@ -197,15 +215,14 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
   };
 
   render() {
-    const { classes, applicationMetadata, indexNumber } = this.props;
-    const { anchorEl } = this.state;
+    const { classes, applicationMetadata, indexNumber, isShared } = this.props;
     const {
-      handleMenuClick,
       handleDeleteApp,
       handleShareApp,
       handleApplicationClicked,
       handleCopyLinkClicked
     } = this;
+    const { graphExists } = this.state;
 
     const applicationConfiguration = applicationMetadata.configuration;
 
@@ -213,30 +230,74 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
       <Fragment>
         <Card className={classes.card}>
           <CardHeader
-            className={classes.cardHeader}
-            noWrap
-            action={
-              <IconButton
-                aria-owns={anchorEl ? 'simple-menu' : undefined}
-                aria-haspopup="true"
-                id={`more_icon_${indexNumber.toString()}_${
-                  applicationConfiguration.title
-                }`}
-                onClick={handleMenuClick}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            }
             title={
-              applicationConfiguration.title.length >= 25
-                ? `${applicationConfiguration.title.substr(0, 25)}...`
-                : applicationConfiguration.title
+              <Typography
+                style={{
+                  whiteSpace: 'nowrap',
+                  width: '15rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                variant="subtitle1"
+              >
+                {applicationConfiguration.title}
+              </Typography>
             }
-            subheader={GlobalUtils.getBeautifiedVisualizerTitle(
-              applicationConfiguration.endpoint
-            )}
+            subheader={
+              <React.Fragment>
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Based on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {`${GlobalUtils.getBeautifiedVisualizerTitle(
+                    applicationConfiguration.endpoint
+                  )} visualizer`}
+                </Typography>
+                <br />
+                <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                  Published on:
+                </Typography>{' '}
+                <Typography variant="body2" style={{ display: 'inline' }}>
+                  {moment(applicationConfiguration.published).format('lll')}
+                </Typography>
+                {isShared && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Author:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      {applicationConfiguration.author}
+                    </Typography>
+                  </React.Fragment>
+                )}
+                {!graphExists && (
+                  <React.Fragment>
+                    <br />
+                    <Typography
+                      variant="subtitle2"
+                      style={{ display: 'inline' }}
+                    >
+                      Error:
+                    </Typography>{' '}
+                    <Typography variant="body2" style={{ display: 'inline' }}>
+                      The data associated with this application is either
+                      removed or corrupted. If you are using your own instance
+                      of LPApps, make sure that you are running all components
+                      of the platform and try refreshing this page.
+                    </Typography>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            }
           />
-          <CardActionArea onClick={handleApplicationClicked}>
+          <CardActionArea
+            disabled={!graphExists}
+            onClick={handleApplicationClicked}
+          >
             <div
               className={classes.media}
               id={`${indexNumber.toString()}_${applicationConfiguration.title}`}
@@ -245,32 +306,42 @@ class StorageAppsBrowserCardComponent extends PureComponent<Props, State> {
               }}
             >
               <VisualizerIcon
-                visualizerType={applicationConfiguration.endpoint}
-                style={{ color: 'white', fontSize: '85px' }}
+                visualizerType={
+                  graphExists ? applicationConfiguration.endpoint : 'Error'
+                }
+                style={{ fontSize: '85px' }}
               />
             </div>
           </CardActionArea>
-          <CardActions className={classes.spacing} disableSpacing>
-            <IconButton aria-label="Share" onClick={handleShareApp}>
-              <ShareIcon />
-            </IconButton>
+          <CardActions className={classes.spacing}>
+            {graphExists && (
+              <React.Fragment>
+                <Button
+                  size="small"
+                  onClick={handleApplicationClicked}
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button size="small" onClick={handleShareApp} color="primary">
+                  Share
+                </Button>
+              </React.Fragment>
+            )}
+            {!isShared && (
+              <Button
+                id={`delete_button_${indexNumber.toString()}_${
+                  applicationConfiguration.title
+                }`}
+                size="small"
+                onClick={handleDeleteApp}
+                color="primary"
+              >
+                Delete
+              </Button>
+            )}
           </CardActions>
         </Card>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleMenuClose}
-        >
-          <MenuItem
-            id={`delete_button_${indexNumber.toString()}_${
-              applicationConfiguration.title
-            }`}
-            onClick={handleDeleteApp}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
 
         <Dialog
           open={this.state.open}

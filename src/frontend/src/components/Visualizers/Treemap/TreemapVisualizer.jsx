@@ -2,9 +2,10 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
+import equal from 'fast-deep-equal';
+import { VisualizersService, GlobalUtils } from '@utils';
 
 type Props = {
   classes: {
@@ -23,7 +24,10 @@ type Props = {
     visible: boolean,
     enabled: boolean,
     selected: boolean
-  }>
+  }>,
+  width: number,
+  height: number,
+  selectedTopLevelConcepts: Array<{ selected: boolean, uri: string }>
 };
 
 type State = {
@@ -56,7 +60,10 @@ const styles = theme => ({
 const transformData = data => {
   return data.map(row => {
     return [
-      { v: row.id, f: row.label.languageMap.en },
+      {
+        v: row.id,
+        f: GlobalUtils.getLanguageLabel(row.label.languageMap, row.id)
+      },
       row.parentId,
       row.size,
       Math.floor(Math.random() * Math.floor(100))
@@ -77,13 +84,6 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     };
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   const newSelectedScheme = props.selectedScheme && props.selectedScheme.uri;
-  //   if (newSelectedScheme && newSelectedScheme !== state.selectedScheme.uri) {
-  //     this.handleSchemeChange(props.selectedScheme.uri);
-  //   }
-  // }
-
   async componentDidMount() {
     const {
       handleSetCurrentApplicationData,
@@ -103,6 +103,8 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
 
     this.conceptsFetched = new Set();
     const selectedScheme: Object = schemes.find(s => s.selected);
+    const self = this;
+
     this.chartEvents = [
       {
         eventName: 'ready',
@@ -124,22 +126,25 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
             visible: boolean,
             enabled: boolean,
             selected: boolean
-          } = this.state.chartData[index + 1];
+          } = self.state.chartData[index + 1];
           const iri = selectedItem[0].v;
+          const currentScheme: Object = self.props.schemes.find(
+            s => s.selected
+          );
 
           // If data for this conceptIri has been fetched, then return
-          if (this.conceptsFetched.has(iri)) return;
+          if (self.conceptsFetched.has(iri)) return;
 
           // Get the data of this item in hierarchy
           const response = await VisualizersService.getSkosScheme(
-            selectedScheme.uri,
-            this.props.selectedResultGraphIri,
+            currentScheme.uri,
+            self.props.selectedResultGraphIri,
             iri
           );
           const jsonData = await response.data;
 
           // Update state
-          this.setState(
+          self.setState(
             prevState => {
               return {
                 ...prevState,
@@ -150,7 +155,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
               // Set selection to where user was. Assuming concat keeps order
               chartWrapper.getChart().setSelection([{ row: index, col: null }]);
               // Add the id the set of fetched items
-              this.conceptsFetched.add(iri);
+              self.conceptsFetched.add(iri);
             }
           );
         }
@@ -166,19 +171,28 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
     const currentSchemes = this.props.schemes;
     const currentSelectedScheme = currentSchemes.find(s => s.selected);
     const newSchemes = nextProps.schemes;
-    const newSelectedScheme = newSchemes.find(s => s.selected);
+    const newSelectedScheme: ?{
+      selected: boolean,
+      uri: string
+    } = newSchemes.find(s => s.selected);
     if (
-      newSelectedScheme &&
-      newSelectedScheme.uri !==
-        (currentSelectedScheme && currentSelectedScheme.uri)
+      (newSelectedScheme &&
+        newSelectedScheme.uri !==
+          (currentSelectedScheme && currentSelectedScheme.uri)) ||
+      !equal(
+        this.props.selectedTopLevelConcepts,
+        nextProps.selectedTopLevelConcepts
+      )
     ) {
-      // this aint been callfinded. ty vole
-      this.handleSchemeChange(newSelectedScheme.uri);
+      // Check
+      this.handleSchemeChange(newSelectedScheme && newSelectedScheme.uri);
     }
     return null;
   }
 
-  handleSchemeChange = async scheme => {
+  handleGoUpClick = () => {};
+
+  async handleSchemeChange(scheme) {
     if (!(scheme && this.props.selectedResultGraphIri)) {
       return;
     }
@@ -187,9 +201,18 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
       scheme,
       this.props.selectedResultGraphIri
     );
-    const headers = [['id', 'parentId', 'size', 'color']];
     const jsonData = await response.data;
-    const chartData = headers.concat(transformData(jsonData));
+
+    const checkedConcepts = this.props.selectedTopLevelConcepts
+      .filter(concept => concept.selected)
+      .map(concept => concept.uri);
+    const filteredResponse = checkedConcepts.length
+      ? jsonData.filter(e => checkedConcepts.includes(e.id) || !e.parentId)
+      : jsonData;
+
+    const headers = [['id', 'parentId', 'size', 'color']];
+
+    const chartData = headers.concat(transformData(filteredResponse));
     this.setState(
       {
         dataLoadingStatus: 'ready',
@@ -199,12 +222,13 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
         this.conceptsFetched.add(scheme);
       }
     );
-  };
-
-  handleGoUpClick = () => {};
+  }
 
   render() {
-    const { classes, schemes } = this.props;
+    const { classes, schemes, width, height } = this.props;
+
+    const heightSize = `${Math.max(250, Math.min(width, height) - 250)}px`;
+
     const selectedScheme = schemes.find(s => s.selected);
     return (
       <div className={classes.wrapper}>
@@ -221,7 +245,7 @@ class TreemapVisualizer extends React.PureComponent<Props, State> {
                 Go up one level
               </Button>
               <Chart
-                height="99%"
+                height={heightSize}
                 chartType="TreeMap"
                 loader={<div>Loading Chart</div>}
                 data={this.state.chartData}

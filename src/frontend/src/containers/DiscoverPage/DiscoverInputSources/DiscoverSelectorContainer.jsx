@@ -3,6 +3,11 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
+import DiscoverSelectorComponent from './DiscoverSelectorComponent';
+import { discoverActions } from '../duck';
+import { globalActions } from '@ducks/globalDuck';
+import { etlActions } from '@ducks/etlDuck';
 import {
   DiscoveryService,
   GlobalUtils,
@@ -10,9 +15,6 @@ import {
   Log,
   GoogleAnalyticsWrapper
 } from '@utils';
-import { discoveryActions, discoverySelectors } from '@ducks/discoveryDuck';
-import DiscoverSelectorComponent from './DiscoverSelectorComponent';
-import { discoverActions } from '../duck';
 
 type Props = {
   dataSampleIri: string,
@@ -37,7 +39,17 @@ type Props = {
   rdfFile: Object,
   rdfDataSampleFile: Object,
   activeDiscoverTabIndex: Number,
-  handleSetActiveDiscoverTabIndex: Function
+  handleSetActiveDiscoverTabIndex: Function,
+  handleAddSelectedVisualizer: Function,
+  setPipelineExecutorStep: Function,
+  setPipelineSelectorStep: Function,
+  handleSetSelectedPipelineId: Function,
+  rdfUrlDataSampleIri: string,
+  handleSetRdfUrlDataSampleIriFieldValue: Function,
+  handleSetDataSampleSessionId: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoveryId: string,
+  rdfUrlDataSampleIri: string
 };
 
 type State = {
@@ -83,11 +95,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   };
 
   postStartFromRdfInputIri = async () => {
-    const { rdfInputIri, webId, dataSampleIri } = this.props;
+    const { rdfInputIri, webId, rdfUrlDataSampleIri } = this.props;
     return DiscoveryService.postDiscoverFromInputIri({
       rdfInputIri,
       webId,
-      dataSampleIri
+      dataSampleIri: rdfUrlDataSampleIri
     }).then(response => {
       return response;
     });
@@ -109,7 +121,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
 
   handleProcessStartDiscovery = () => {
     const self = this;
-    const { handleSetDiscoveryId } = this.props;
+    const { handleSetDiscoveryId, handleSetDataSampleSessionId } = this.props;
 
     self.setState({
       discoveryIsLoading: true,
@@ -121,9 +133,14 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       .then(response => {
         if (response !== undefined) {
           const discoveryResponse = response.data;
-          const discoveryId = discoveryResponse.id;
-          handleSetDiscoveryId(discoveryId);
-          self.startSocketListener(discoveryId);
+          const discoveryId = discoveryResponse.discoveryId;
+          if (discoveryId === null) {
+            const sessionId = discoveryResponse.sessionId;
+            handleSetDataSampleSessionId(sessionId);
+          } else {
+            handleSetDiscoveryId(discoveryId);
+          }
+          self.startSocketListener();
         }
       })
       .catch(error => {
@@ -143,7 +160,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       });
   };
 
-  startSocketListener = discoveryId => {
+  startSocketListener = () => {
     const { socket, onNextClicked } = this.props;
     const self = this;
 
@@ -165,7 +182,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         );
       } else {
         const parsedData = JSON.parse(data);
-        if (parsedData.discoveryId !== discoveryId) {
+        if (parsedData.discoveryId !== self.props.discoveryId) {
           return;
         }
         if (parsedData.status.isFinished) {
@@ -174,13 +191,20 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
             action: 'Processed discovery : step 1'
           });
 
-          self.loadPipelineGroups(discoveryId).then(() => {
+          self.loadPipelineGroups(self.props.discoveryId).then(response => {
             self.setState({
               discoveryIsLoading: false
             });
-            onNextClicked();
+
+            if (response.length === 1) {
+              self.selectVisualizer(response[0]);
+            } else {
+              onNextClicked();
+            }
           });
         }
+
+        socket.emit('leave', parsedData.discoveryId);
       }
     });
   };
@@ -198,8 +222,48 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       })
       .then(jsonResponse => {
         handleSetPipelineGroups(jsonResponse.pipelineGroups);
-        return jsonResponse;
+        return jsonResponse.pipelineGroups;
       });
+  };
+
+  addVisualizer = visualizerData => {
+    const { handleAddSelectedVisualizer } = this.props;
+    return new Promise(resolve => {
+      handleAddSelectedVisualizer(visualizerData);
+      resolve();
+    });
+  };
+
+  selectVisualizer = visualizerData => {
+    GoogleAnalyticsWrapper.trackEvent({
+      category: 'Discovery',
+      action: 'Automatically selected visualizer : step 2'
+    });
+
+    const { setPipelineSelectorStep } = this.props;
+
+    const dataSourceGroups = visualizerData.dataSourceGroups;
+
+    const self = this;
+
+    self.addVisualizer(visualizerData).then(() => {
+      if (dataSourceGroups.length === 1) {
+        self.handleSelectPipeline(dataSourceGroups[0]);
+      } else {
+        setPipelineSelectorStep();
+      }
+    });
+  };
+
+  handleSelectPipeline = datasourceAndPipelines => {
+    const { handleSetSelectedPipelineId, setPipelineExecutorStep } = this.props;
+    const pipelines = datasourceAndPipelines.pipelines;
+    pipelines.sort((a, b) => a.minimalIteration < b.minimalIteration);
+    const pipelineWithMinIterations = pipelines[0];
+    const pipelineId = pipelineWithMinIterations.id;
+
+    handleSetSelectedPipelineId(pipelineId);
+    setPipelineExecutorStep();
   };
 
   handleValidation = rawText => {
@@ -219,6 +283,11 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
   handleSetDataSampleIri = e => {
     const rawText = e.target.value;
     this.props.handleSetDataSampleIriFieldValue(rawText);
+  };
+
+  handleSetRdfUrlDataSampleIri = e => {
+    const rawText = e.target.value;
+    this.props.handleSetRdfUrlDataSampleIriFieldValue(rawText);
   };
 
   handleSetNamedGraph = e => {
@@ -272,7 +341,9 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
       namedGraph,
       rdfInputIri,
       inputType,
-      activeDiscoverTabIndex
+      rdfFile,
+      activeDiscoverTabIndex,
+      rdfUrlDataSampleIri
     } = this.props;
 
     const { discoveryIsLoading, discoveryLoadingLabel } = this.state;
@@ -281,7 +352,8 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         (sparqlEndpointIri === '' ||
           namedGraph === '' ||
           dataSampleIri === '')) ||
-      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '');
+      (inputType === 'RDF_INPUT_IRI' && rdfInputIri === '') ||
+      (inputType === 'RDF_INPUT_FILE' && rdfFile === undefined);
 
     return (
       <DiscoverSelectorComponent
@@ -292,6 +364,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         sparqlEndpointIri={sparqlEndpointIri}
         namedGraph={namedGraph}
         dataSampleIri={dataSampleIri}
+        rdfUrlDataSampleIri={rdfUrlDataSampleIri}
         onHandleClearInputsClicked={this.handleClearInputsClicked}
         onHandleProcessStartDiscovery={this.handleProcessStartDiscovery}
         onHandleSetNamedGraph={this.handleSetNamedGraph}
@@ -305,6 +378,7 @@ class DiscoverSelectorContainer extends PureComponent<Props, State> {
         rdfInputIri={rdfInputIri}
         tabIndex={activeDiscoverTabIndex}
         onHandleTabIndexChange={this.handleTabIndexChange}
+        onHandleSetRdfUrlDataSampleIri={this.handleSetRdfUrlDataSampleIri}
       />
     );
   }
@@ -322,16 +396,19 @@ const mapStateToProps = state => {
       state.discovery.datasources
     ),
     discoveryId: state.discovery.discoveryId,
+    dataSampleSessionId: state.discovery.dataSampleSessionId,
     dataSourcesUris: state.discover.dataSourcesUris,
     sparqlEndpointIri: state.discover.sparqlEndpointIri,
     dataSampleIri: state.discover.dataSampleIri,
+    rdfUrlDataSampleIri: state.discover.rdfUrlDataSampleIri,
     namedGraph: state.discover.namedGraph,
     webId: state.user.webId,
     rdfInputIri: state.discover.rdfInputIri,
     rdfFile: state.discover.rdfFile,
     rdfDataSampleFile: state.discover.rdfDataSampleFile,
     inputType: state.discover.inputType,
-    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex
+    activeDiscoverTabIndex: state.discover.activeDiscoverTabIndex,
+    visualizers: state.discovery.pipelineGroups
   };
 };
 
@@ -342,6 +419,20 @@ const mapDispatchToProps = dispatch => {
         id: discoveryId
       })
     );
+
+  const handleSetDataSampleSessionId = dataSampleSessionId =>
+    dispatch(
+      discoveryActions.addDataSampleSessionIdAction(dataSampleSessionId)
+    );
+
+  const setPipelineSelectorStep = () =>
+    dispatch(discoverActions.setActiveStep(2));
+
+  const setPipelineExecutorStep = () =>
+    dispatch(discoverActions.setActiveStep(3));
+
+  const handleSetSelectedPipelineId = pipelineId =>
+    dispatch(etlActions.setPipelineIdAction(pipelineId));
 
   const handleSetPipelineGroups = pipelineGroups =>
     dispatch(discoveryActions.setPipelineGroupsAction(pipelineGroups));
@@ -354,6 +445,9 @@ const mapDispatchToProps = dispatch => {
 
   const handleSetDataSampleIriFieldValue = dataSampleIri =>
     dispatch(discoverActions.setDataSampleIri(dataSampleIri));
+
+  const handleSetRdfUrlDataSampleIriFieldValue = rdfUrlDataSampleIri =>
+    dispatch(discoverActions.setRdfUrlDataSampleIri(rdfUrlDataSampleIri));
 
   const handleSetRdfInputIriUrlFieldValue = rdfInputIri =>
     dispatch(discoverActions.setRdfInputIri(rdfInputIri));
@@ -374,8 +468,17 @@ const mapDispatchToProps = dispatch => {
     dispatch(discoverActions.setActiveDiscoverTabIndexAsync(tabIndex));
   };
 
+  const handleAddSelectedVisualizer = visualizerData =>
+    dispatch(
+      globalActions.addSelectedVisualizerAction({
+        data: visualizerData
+      })
+    );
+
   return {
     handleSetDiscoveryId,
+    handleSetDataSampleSessionId,
+    handleSetRdfUrlDataSampleIriFieldValue,
     handleSetPipelineGroups,
     handleSetDataSampleIriFieldValue,
     handleSetNamedGraphFieldValue,
@@ -384,7 +487,11 @@ const mapDispatchToProps = dispatch => {
     resetFieldsAndExamples,
     handleSetRdfFile,
     handleSetRdfDataSampleFile,
-    handleSetActiveDiscoverTabIndex
+    handleSetActiveDiscoverTabIndex,
+    handleAddSelectedVisualizer,
+    handleSetSelectedPipelineId,
+    setPipelineExecutorStep,
+    setPipelineSelectorStep
   };
 };
 

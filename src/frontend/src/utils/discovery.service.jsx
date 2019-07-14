@@ -29,8 +29,12 @@ const DiscoveryService = {
   },
 
   async postDiscoverFromInputIri({ rdfInputIri, webId, dataSampleIri }) {
+    const params = { rdfInputIri, webId };
+    if (dataSampleIri !== '') {
+      params.dataSampleIri = dataSampleIri;
+    }
     return lpaAxios.post('/pipelines/discoverFromInputIri', null, {
-      params: { rdfInputIri, webId, dataSampleIri }
+      params
     });
   },
 

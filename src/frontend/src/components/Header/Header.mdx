@@ -1,0 +1,39 @@
+---
+name: Header
+menu: Components
+---
+
+import { Playground, Props } from 'docz';
+import { Header } from './HeaderContainer';
+
+# Header
+
+Headers are a set of simple components based on the navigation [AppBar](https://material-ui.com/components/app-bar/) inside LinkedPipes Applications frontend.
+
+# Structure
+
+The `HeaderComponent.jsx` and `HeaderContainer.jsx` are used for an example in this documentation. The actual header components are inside the folders corresponding to appropriate webpages.
+
+```.md
+├── HeaderComponent.jsx # Stateless react component, responsible for ui
+├── HeaderContainer.jsx # React PureComponent, responsible for states
+├── AboutHeader/ # Folder containing a header components specific to About page
+├── ApplicationHeader/ # Folder containing a header components specific to ApplicationHeader page
+├── ApplicationsBrowserHeader/ # Folder containing a header components specific to ApplicationsBrowserHeader page
+├── DashboardHeader/ # Folder containing a header components specific to DashboardHeader page
+├── DiscoverHeader/ # Folder containing a header components specific to DiscoverHeader page
+├── SettingsHeader/ # Folder containing a header components specific to SettingsHeader page
+└── index.js
+```
+
+## Properties
+
+This is a reference example of a navigation component that you will see on every single webpage of the platform. The titles of the sections, and functionality of the tabs will differ.
+
+<Props of={Header} />
+
+## Example
+
+<Playground>
+  <Header />
+</Playground>

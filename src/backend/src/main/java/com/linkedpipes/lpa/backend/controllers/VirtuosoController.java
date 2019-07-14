@@ -33,21 +33,23 @@ public class VirtuosoController {
      * Check if a named graph exists in our Virtuoso db
      * @param graphName - full URI identifying the named graph
      * @return 200 OK if graph exists or 404 otherwise
-     * @throws LpAppsException
+     * @throws LpAppsException if the request fails for any reason
      */
     @GetMapping("/api/virtuoso/graphExists")
     public ResponseEntity checkNamedGraphExists(@RequestParam(value = "graphName") String graphName) throws LpAppsException {
         boolean exists = VirtuosoService.checkNamedGraphExists(graphName);
-        if (exists)
+        if (exists) {
             return ResponseEntity.ok("");
+        }
 
         throw new LpAppsException(HttpStatus.NOT_FOUND, "Named graph does not exist.");
     }
 
     /**
      * Drop a named graph from our Virtuoso db
+     *
      * @param graphName - full URI identifying the named graph
-     * @return
+     * @return an empty response
      */
     @DeleteMapping("api/virtuoso/dropGraph")
     public ResponseEntity dropNamedGraph(@RequestParam(value = "graphName") String graphName) {

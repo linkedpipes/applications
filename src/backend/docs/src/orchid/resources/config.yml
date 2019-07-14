@@ -1,0 +1,65 @@
+javadoc:
+  sourceDirs:
+  - '../../../../src/main/java'
+  classPages:
+    menu:
+    - type: 'javadocClassLinks'
+  pages:
+    menu:
+    - type: 'javadocPackages'
+
+site:
+  about:
+    siteName: 'LinkedPipes Applications Backend'
+    siteDescription: Learn all about Backend service in LinkedPipes Applications platform.
+
+
+theme:
+  useSidebarSearch: true
+  social:
+    github: 'linkedpipes/applications'
+  primaryColor: '#fba333'
+  secondaryColor: '#00695c'
+  linkColor: '#7E80CF'
+  trianglifyOptions:
+    x_colors: 'BuPu'
+    cell_size: 55
+    seed: 1
+  menu:
+  - type: 'link'
+    title: 'Getting Started'
+    url: '/'
+
+  - type: 'submenu'
+    title: 'Chapters'
+    menu:
+    - type: 'page'
+      itemId: 'Installation'
+    - type: 'page'
+      itemId: 'Component overview'
+    - type: 'page'
+      itemId: 'Architecture'
+    - type: 'page'
+      itemId: 'Code Structure'
+    - type: 'page'
+      itemId: 'Configuring Discovery'
+
+  - type: 'link'
+    title: 'Javadoc'
+    url: '/com/linkedpipes/lpa/backend'
+
+  allPages:
+  extraCss:
+    - 'assets/css/sideNav.css'
+    - 'assets/css/color.css'
+  components:
+    - type: "pageContent"
+    - type: "prism"
+      githubTheme: 'duotone-light'
+      languages:
+        - kotlin
+        - java
+        - groovy
+        - yaml
+        - asciidoc
+        - markdown

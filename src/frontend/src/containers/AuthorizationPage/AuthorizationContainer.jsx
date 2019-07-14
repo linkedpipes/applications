@@ -1,11 +1,11 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { AuthorizationComponent } from './AuthorizationComponent';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Log, GoogleAnalyticsWrapper } from '@utils';
 import { connect } from 'react-redux';
 import Particles from 'react-particles-js';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 const providers = {
   // Inrupt: 'https://inrupt.net/auth',
@@ -100,7 +100,11 @@ class Authorization extends PureComponent<Props, State> {
 
   handleWebIdFieldChange = e => {
     const value = e.target.value;
-    this.setState({ webIdFieldValue: value });
+    this.setState({ webIdFieldValue: value, withWebIdStatus: true });
+
+    if (this.state.providerTitle !== '') {
+      this.setState({ providerTitle: '' });
+    }
   };
 
   onSetWithWebId = event => {
@@ -111,7 +115,10 @@ class Authorization extends PureComponent<Props, State> {
   };
 
   handleProviderChange = event => {
-    this.setState({ providerTitle: event.target.value });
+    this.setState({ providerTitle: event.target.value, withWebIdStatus: false });
+    if (this.state.webIdFieldValue !== '') {
+      this.setState({ webIdFieldValue: '' });
+    }
   };
 
   render() {
@@ -121,7 +128,7 @@ class Authorization extends PureComponent<Props, State> {
       onSetWithWebId,
       handleProviderChange
     } = this;
-    const { withWebIdStatus, providerTitle } = this.state;
+    const { providerTitle, webIdFieldValue } = this.state;
     return (
       <div
         className="container"
@@ -152,11 +159,10 @@ class Authorization extends PureComponent<Props, State> {
           onWebIdFieldChange={handleWebIdFieldChange}
           onSignInClick={handleSignIn}
           onSetWithWebId={onSetWithWebId}
-          withWebIdStatus={withWebIdStatus}
           providerTitle={providerTitle}
+          webIdFieldValue={webIdFieldValue}
           handleProviderChange={handleProviderChange}
         />
-        <ToastContainer />
       </div>
     );
   }

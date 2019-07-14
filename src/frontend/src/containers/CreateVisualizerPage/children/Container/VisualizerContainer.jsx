@@ -2,15 +2,17 @@
 import * as React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import FiltersComponent from '../Filters/FiltersComponent';
+import { pathOr } from 'rambda';
+import { VISUALIZER_TYPE } from '@constants';
 import {
   MapsVisualizer,
   TreemapVisualizer,
-  ChordVisualizer
+  ChordVisualizer,
+  TimelineVisualizer
 } from '@components';
-import { VISUALIZER_TYPE } from '@constants';
-import Typography from '@material-ui/core/Typography';
-import FiltersComponent from '../Filters/FiltersComponent';
-import { pathOr } from 'rambda';
 
 type Props = {
   classes: { root: {}, filterSideBar: {}, containerView: {}, vizdiv: {} },
@@ -31,7 +33,8 @@ const styles = theme => ({
     flex: 1
   },
   vizdiv: {
-    overflow: 'hidden'
+    overflow: 'hidden',
+    flexGrow: 1
   },
   containerView: {
     textAlign: 'center',
@@ -59,16 +62,34 @@ const getVisualizer = (
 ) => {
   switch (visualizerCode) {
     case VISUALIZER_TYPE.MAP:
-    case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
+    case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS: {
       return (
         <MapsVisualizer
           isPublished={selectedApplicationMetadata !== undefined}
           selectedResultGraphIri={selectedResultGraphIri}
           selectedPipelineExecution={selectedPipelineExecution}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
+          filters={pathOr([], 'filterGroups.mapFilters.filters', filtersState)}
+          visualizerCode={visualizerCode}
         />
       );
     }
+    case VISUALIZER_TYPE.TIMELINE:
+    case VISUALIZER_TYPE.LABELED_TIMELINE:
+    case VISUALIZER_TYPE.TIMELINE_PERIODS:
+    case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
+      return (
+        <TimelineVisualizer
+          isPublished={selectedApplicationMetadata !== undefined}
+          visualizerCode={visualizerCode}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
+        />
+      );
+
     case VISUALIZER_TYPE.TREEMAP:
       return (
         <TreemapVisualizer
@@ -76,6 +97,13 @@ const getVisualizer = (
           selectedPipelineExecution={selectedPipelineExecution}
           isPublished={selectedApplicationMetadata !== undefined}
           handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          height={height}
+          width={width}
+          selectedTopLevelConcepts={pathOr(
+            [],
+            'filterGroups.nodesFilter.options',
+            filtersState
+          )}
           schemes={pathOr(
             [],
             'filterGroups.schemeFilter.options',
@@ -109,37 +137,54 @@ const getVisualizer = (
 };
 
 const VisualizerControllerContainer = (props: Props) => {
+  const renderFilters = ![
+    VISUALIZER_TYPE.MAP,
+    VISUALIZER_TYPE.LABELED_TIMELINE,
+    VISUALIZER_TYPE.TIMELINE,
+    VISUALIZER_TYPE.TIMELINE_PERIODS,
+    VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS
+  ].includes(props.visualizer.visualizerCode);
   return (
     <Grid container className={props.classes.root} direction="row" spacing={10}>
-      <Grid item lg={4} md={5} xs={12} className={props.classes.filterSideBar}>
-        <FiltersComponent
-          editingMode
-          filtersState={props.filtersState}
-          selectedResultGraphIri={props.selectedResultGraphIri}
-        />
-      </Grid>
+      {renderFilters && (
+        <Grid
+          item
+          lg={4}
+          md={5}
+          xs={12}
+          className={props.classes.filterSideBar}
+        >
+          <FiltersComponent
+            editingMode
+            filtersState={props.filtersState}
+            selectedResultGraphIri={props.selectedResultGraphIri}
+          />
+        </Grid>
+      )}
 
       <Grid
         id="viz-div"
         className={props.classes.vizdiv}
         item
-        lg={8}
-        md={7}
+        lg={renderFilters ? 8 : 12}
+        md={renderFilters ? 7 : 12}
         xs={12}
       >
-        {getVisualizer(
-          props.visualizer.visualizerCode,
-          props.selectedResultGraphIri,
-          props.selectedPipelineExecution,
-          props.selectedApplication,
-          props.handleSetCurrentApplicationData,
-          props.selectedApplicationMetadata,
-          props.classes,
-          props.selectedNodes,
-          props.width,
-          props.height,
-          props.filtersState
-        )}
+        <Container maxWidth="xl">
+          {getVisualizer(
+            props.visualizer.visualizerCode,
+            props.selectedResultGraphIri,
+            props.selectedPipelineExecution,
+            props.selectedApplication,
+            props.handleSetCurrentApplicationData,
+            props.selectedApplicationMetadata,
+            props.classes,
+            props.selectedNodes,
+            props.width,
+            props.height,
+            props.filtersState
+          )}
+        </Container>
       </Grid>
     </Grid>
   );

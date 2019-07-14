@@ -16,12 +16,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { GlobalUtils } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
 import ShareIcon from '@material-ui/icons/ShareTwoTone';
 import SettingsIcon from '@material-ui/icons/SettingsTwoTone';
 import EditIcon from '@material-ui/icons/EditTwoTone';
 import { DataRefreshControlDialog } from './children';
+import { Container } from '@material-ui/core';
+import { GlobalUtils } from '@utils';
 
 type Props = {
   classes: {
@@ -32,7 +33,9 @@ type Props = {
     margin: {},
     formControl: {},
     dataRefreshTextField: {},
-    menu: {}
+    menu: {},
+    heroContent: {},
+    heroButtons: {}
   },
   handlePublishClicked: Function,
   handleEmbedClicked: Function,
@@ -73,11 +76,13 @@ type Props = {
   handleDataRefreshClicked: Function,
   handleDataRefreshDismissed: Function,
   selectedDataRefreshInterval: Function,
-  handleDataRefreshTypeChange: Function
+  handleDataRefreshTypeChange: Function,
+  isShared: boolean
 };
 
 const styles = theme => ({
   root: {},
+
   header: {
     marginBottom: '1rem',
     marginTop: '1rem',
@@ -87,7 +92,7 @@ const styles = theme => ({
   textField: {
     flexGrow: 1,
     width: '100%',
-    fontSize: 30,
+    fontSize: 40,
     marginTop: '1rem'
   },
 
@@ -111,6 +116,15 @@ const styles = theme => ({
 
   menu: {
     width: 200
+  },
+
+  heroContent: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(8, 0, 6)
+  },
+
+  heroButtons: {
+    marginTop: theme.spacing(4)
   }
 });
 
@@ -155,90 +169,77 @@ const EditVisualizerHeaderComponent = ({
   handleDataRefreshTypeChange,
   handleDataRefreshValueChange,
   handleDataRefreshToggleClicked,
-  selectedPipelineExecution
+  selectedPipelineExecution,
+  isShared
 }: Props) => (
-  <div className={classes.root}>
+  <React.Fragment>
     <Paper
       elevation={2}
-      className={classes.header}
+      className={classes.heroContent}
       position="static"
       color="default"
     >
-      <Grid
-        container
-        direction="column"
-        spacing={2}
-        justify="center"
-        alignItems="center"
-      >
-        <Grid
-          item
-          xs={12}
-          container
-          direction="column"
-          justify="center"
-          alignItems="stretch"
-        >
-          <Grid item xs>
-            <InputBase
-              label="App title"
-              inputProps={{
-                style: { textAlign: 'center' }
-              }}
-              value={selectedApplicationMetadata.configuration.title}
-              className={classes.textField}
-              readOnly
-              variant="outlined"
-              id="edit-application-title-field"
-              placeholder="Enter your application title..."
-              onChange={handleAppTitleChanged}
-              margin="dense"
-            />
+      <Container maxWidth="lg">
+        <InputBase
+          label="App title"
+          inputProps={{
+            style: { textAlign: 'center' }
+          }}
+          value={selectedApplicationMetadata.configuration.title}
+          className={classes.textField}
+          readOnly
+          variant="outlined"
+          id="edit-application-title-field"
+          placeholder="Enter your application title..."
+          onChange={handleAppTitleChanged}
+          margin="dense"
+        />
+        <Typography align="center" variant="h6">
+          {selectedVisualizer
+            ? `This is a published LinkedPipes Application based on ${GlobalUtils.getBeautifiedVisualizerTitle(
+                selectedApplicationMetadata.configuration.endpoint
+              )} visualizer`
+            : 'Unkown visualizer type'}
+        </Typography>
+
+        <div className={classes.heroButtons}>
+          <Grid container spacing={2} justify="center">
+            <Grid item>
+              <Button
+                id="edit-app-publish-button"
+                variant="outlined"
+                color="primary"
+                onClick={handleOpenRenameDialog}
+              >
+                <EditIcon className={classes.leftIcon} />
+                Rename
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleSharingMenuClick}
+              >
+                <ShareIcon className={classes.leftIcon} />
+                Share
+              </Button>
+            </Grid>
+            {!isShared && (
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleSettingsMenuClick}
+                >
+                  <SettingsIcon className={classes.leftIcon} />
+                  Settings
+                </Button>
+              </Grid>
+            )}
           </Grid>
-          <Grid item>
-            <Typography align="center" variant="h6">
-              {selectedVisualizer
-                ? GlobalUtils.getBeautifiedVisualizerTitle(
-                    selectedApplicationMetadata.configuration.endpoint
-                  )
-                : 'Unkown visualizer type'}
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} justify="center">
-          <Grid item>
-            <Button
-              id="edit-app-publish-button"
-              variant="outlined"
-              color="primary"
-              onClick={handleOpenRenameDialog}
-            >
-              <EditIcon className={classes.leftIcon} />
-              Rename
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleSharingMenuClick}
-            >
-              <ShareIcon className={classes.leftIcon} />
-              Share
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleSettingsMenuClick}
-            >
-              <SettingsIcon className={classes.leftIcon} />
-              Settings
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+        </div>
+      </Container>
     </Paper>
 
     <Menu
@@ -439,7 +440,7 @@ const EditVisualizerHeaderComponent = ({
       handleDataRefreshToggleClicked={handleDataRefreshToggleClicked}
       selectedPipelineExecution={selectedPipelineExecution}
     />
-  </div>
+  </React.Fragment>
 );
 
 export default withStyles(styles)(EditVisualizerHeaderComponent);

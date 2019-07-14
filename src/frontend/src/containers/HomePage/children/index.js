@@ -1,5 +1,11 @@
-import DiscoveriesTable from './DiscoveriesTableContainer';
+import DiscoveriesCollection from './DiscoveriesTableContainer';
 import ApplicationsTable from './ApplicationsTableComponent';
-import PipelinesTable from './PipelinesTableComponent';
+import PipelinesCollection from './PipelinesTableComponent';
+import { QuickStart } from './QuickStartComponent';
 
-export { DiscoveriesTable, ApplicationsTable, PipelinesTable };
+export {
+  DiscoveriesCollection,
+  ApplicationsTable,
+  PipelinesCollection,
+  QuickStart
+};

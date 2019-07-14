@@ -3,14 +3,14 @@
  */
 
 import * as $rdf from 'rdflib';
-import { GlobalUtils } from '@utils/';
 import uuid from 'uuid';
+import { GlobalUtils } from '@utils/';
 
 const LPA = $rdf.Namespace('https://w3id.org/def/lpapps#');
 const RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 
 const LPA_CONTEXT =
-  'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/040039739df65d21fe4bb14abe33eac0bce5878c/lapps-ontology.jsonld';
+  'https://gist.githubusercontent.com/aorumbayev/36a4d2d87b721a406f12eaaa7aac3128/raw/8707fd17f1231518a3353f29f904d349790f8ee2/lapps-ontology.jsonld';
 
 export default class ApplicationConfiguration {
   configurationId: string;
@@ -78,7 +78,7 @@ export default class ApplicationConfiguration {
     const filtersState = filtersConfiguration.filtersState;
 
     const { filterGroups } = filtersState;
-    const { nodesFilter, schemeFilter } = filterGroups;
+    const { nodesFilter, schemeFilter, mapFilters } = filterGroups;
 
     let nodesObject = { '@type': 'NodesFilter', options: [] };
     if (nodesFilter !== undefined) {
@@ -106,8 +106,6 @@ export default class ApplicationConfiguration {
 
       schemeItems = schemeFilter.options.map(item => {
         item['@type'] = 'FilterOption';
-        item.visible = true;
-        item.enabled = true;
         return item;
       });
 
@@ -121,6 +119,29 @@ export default class ApplicationConfiguration {
       };
     }
 
+    let mapObject = { '@type': 'MapFilters', filters: [] };
+    if (mapFilters !== undefined) {
+      let mapFilterItems = [];
+
+      mapFilterItems = mapFilters.filters.map(filter => {
+        filter['@type'] = 'MapFilterGroup';
+        filter.options = filter.options.map(filterOption => {
+          filterOption['@type'] = 'FilterOption';
+          return filterOption;
+        });
+        return filter;
+      });
+
+      mapObject = {
+        '@type': 'MapFilters',
+        label: mapFilters.label,
+        enabled: mapFilters.enabled,
+        visible: mapFilters.visible,
+        filterType: mapFilters.filterType,
+        filters: mapFilterItems
+      };
+    }
+
     const filterGroupsObject = { '@type': 'FilterGroup' };
 
     if (nodesFilter) {
@@ -128,6 +149,9 @@ export default class ApplicationConfiguration {
     }
     if (schemeFilter) {
       filterGroupsObject.schemeFilter = schemeObject;
+    }
+    if (mapFilters) {
+      filterGroupsObject.mapFilters = mapObject;
     }
 
     return {
@@ -174,15 +198,10 @@ export default class ApplicationConfiguration {
     doc,
     filterNode,
     filterGroupNode,
-    type
+    namespaceKeyword,
+    ontologyType,
+    typeFilter
   ) => {
-    const namespaceKeyword = type === 'node' ? 'nodesFilter' : 'schemeFilter';
-    const ontologyType = type === 'node' ? 'NodesFilter' : 'SchemeFilter';
-    const typeFilter =
-      type === 'node'
-        ? this.filterConfiguration.filterGroups.nodesFilter
-        : this.filterConfiguration.filterGroups.schemeFilter;
-
     if (typeFilter) {
       store.add(filterNode, RDF('type'), LPA(ontologyType), doc);
       store.add(filterNode, LPA('enabled'), $rdf.lit(typeFilter.enabled), doc);
@@ -195,35 +214,102 @@ export default class ApplicationConfiguration {
         doc
       );
 
-      if (typeFilter.options) {
-        const filterOptionStatements = typeFilter.options.map(option => {
-          const filterOption = $rdf.blankNode();
-          store.add(filterOption, RDF('type'), LPA('FilterOption'), doc);
-          store.add(filterOption, LPA('uri'), $rdf.lit(option.uri), doc);
-          store.add(filterOption, LPA('label'), $rdf.lit(option.label), doc);
-          store.add(
-            filterOption,
-            LPA('visible'),
-            $rdf.lit(option.visible),
-            doc
-          );
-          store.add(
-            filterOption,
-            LPA('enabled'),
-            $rdf.lit(option.enabled),
-            doc
-          );
-          store.add(
-            filterOption,
-            LPA('selected'),
-            $rdf.lit(option.selected),
-            doc
-          );
-          return filterOption;
-        });
-        store.add(filterNode, LPA('options'), filterOptionStatements, doc);
-      } else {
-        store.add(filterNode, LPA('options'), [], doc);
+      if (ontologyType === 'NodesFilter' || ontologyType === 'SchemeFilter') {
+        if (typeFilter.options) {
+          const filterOptionStatements = typeFilter.options.map(option => {
+            const filterOption = $rdf.blankNode();
+            store.add(filterOption, RDF('type'), LPA('FilterOption'), doc);
+            store.add(filterOption, LPA('uri'), $rdf.lit(option.uri), doc);
+            store.add(filterOption, LPA('label'), $rdf.lit(option.label), doc);
+            store.add(
+              filterOption,
+              LPA('visible'),
+              $rdf.lit(option.visible),
+              doc
+            );
+            store.add(
+              filterOption,
+              LPA('enabled'),
+              $rdf.lit(option.enabled),
+              doc
+            );
+            store.add(
+              filterOption,
+              LPA('selected'),
+              $rdf.lit(option.selected),
+              doc
+            );
+            return filterOption;
+          });
+          store.add(filterNode, LPA('options'), filterOptionStatements, doc);
+        } else {
+          store.add(filterNode, LPA('options'), [], doc);
+        }
+      }
+
+      if (ontologyType === 'MapFilters') {
+        if (typeFilter.filters) {
+          const filtersStatements = typeFilter.filters.map(filter => {
+            const filterGroup = $rdf.blankNode();
+            store.add(filterGroup, RDF('type'), LPA('MapFilterGroup'), doc);
+            store.add(
+              filterGroup,
+              LPA('filterUri'),
+              $rdf.lit(filter.filterUri),
+              doc
+            );
+            store.add(
+              filterGroup,
+              LPA('filterLabel'),
+              $rdf.lit(filter.filterLabel),
+              doc
+            );
+
+            if (filter.options) {
+              const filterOptionStatements = filter.options.map(option => {
+                const filterOption = $rdf.blankNode();
+                store.add(filterOption, RDF('type'), LPA('FilterOption'), doc);
+                store.add(filterOption, LPA('uri'), $rdf.lit(option.uri), doc);
+                store.add(
+                  filterOption,
+                  LPA('label'),
+                  $rdf.lit(option.label),
+                  doc
+                );
+                store.add(
+                  filterOption,
+                  LPA('visible'),
+                  $rdf.lit(option.visible),
+                  doc
+                );
+                store.add(
+                  filterOption,
+                  LPA('enabled'),
+                  $rdf.lit(option.enabled),
+                  doc
+                );
+                store.add(
+                  filterOption,
+                  LPA('selected'),
+                  $rdf.lit(option.selected),
+                  doc
+                );
+                return filterOption;
+              });
+              store.add(
+                filterGroup,
+                LPA('options'),
+                filterOptionStatements,
+                doc
+              );
+            }
+
+            return filterGroup;
+          });
+          store.add(filterNode, LPA('filters'), filtersStatements, doc);
+        } else {
+          store.add(filterNode, LPA('filters'), [], doc);
+        }
       }
 
       store.add(filterGroupNode, LPA(namespaceKeyword), filterNode, doc);
@@ -304,7 +390,9 @@ export default class ApplicationConfiguration {
           doc,
           nodesFilter,
           filterGroup,
-          'node'
+          'nodesFilter',
+          'NodesFilter',
+          this.filterConfiguration.filterGroups.nodesFilter
         );
 
         const schemeFilter = $rdf.blankNode();
@@ -313,7 +401,20 @@ export default class ApplicationConfiguration {
           doc,
           schemeFilter,
           filterGroup,
-          'scheme'
+          'schemeFilter',
+          'SchemeFilter',
+          this.filterConfiguration.filterGroups.schemeFilter
+        );
+
+        const mapFilters = $rdf.blankNode();
+        this.parseFilterConfiguration(
+          store,
+          doc,
+          mapFilters,
+          filterGroup,
+          'mapFilters',
+          'MapFilters',
+          this.filterConfiguration.filterGroups.mapFilters
         );
 
         store.add(filtersConfiguration, LPA('filterGroups'), filterGroup, doc);
@@ -337,10 +438,13 @@ export default class ApplicationConfiguration {
       : result;
   }
 
-  static getFilterStructureFromTurtle(store, file, filterGroupsNode, type) {
-    const namespaceKeyword = type === 'node' ? 'nodesFilter' : 'schemeFilter';
-    const ontologyType = type === 'node' ? 'NodesFilter' : 'SchemeFilter';
-
+  static getFilterStructureFromTurtle(
+    store,
+    file,
+    filterGroupsNode,
+    namespaceKeyword,
+    ontologyType
+  ) {
     const filter = store.any(
       filterGroupsNode,
       LPA(namespaceKeyword),
@@ -354,22 +458,6 @@ export default class ApplicationConfiguration {
 
     const filterParams = { store, fileUrl: filter, file };
 
-    const options = store.any(filter, LPA('options'), undefined, file);
-
-    const items =
-      options !== undefined && options.elements ? options.elements : [];
-
-    const selectedOptionsParsed = items.map(element => {
-      const itemParams = { store, fileUrl: element, file };
-      return {
-        '@type': 'FilterOption',
-        uri: ApplicationConfiguration.nodeToValue('uri', itemParams),
-        label: ApplicationConfiguration.nodeToValue('label', itemParams),
-        visible: ApplicationConfiguration.nodeToValue('visible', itemParams),
-        enabled: ApplicationConfiguration.nodeToValue('enabled', itemParams),
-        selected: ApplicationConfiguration.nodeToValue('selected', itemParams)
-      };
-    });
     const filterParsed = {
       '@type': ontologyType,
       label: ApplicationConfiguration.nodeToValue('label', filterParams),
@@ -378,11 +466,88 @@ export default class ApplicationConfiguration {
       filterType: ApplicationConfiguration.nodeToValue(
         'filterType',
         filterParams
-      ),
-      options: selectedOptionsParsed
+      )
     };
 
-    return filterParsed || { '@type': ontologyType, options: [] };
+    if (ontologyType === 'NodesFilter' || ontologyType === 'SchemeFilter') {
+      const options = store.any(filter, LPA('options'), undefined, file);
+
+      const items =
+        options !== undefined && options.elements ? options.elements : [];
+
+      const selectedOptionsParsed = items.map(element => {
+        const itemParams = { store, fileUrl: element, file };
+        return {
+          '@type': 'FilterOption',
+          uri: ApplicationConfiguration.nodeToValue('uri', itemParams),
+          label: ApplicationConfiguration.nodeToValue('label', itemParams),
+          visible: ApplicationConfiguration.nodeToValue('visible', itemParams),
+          enabled: ApplicationConfiguration.nodeToValue('enabled', itemParams),
+          selected: ApplicationConfiguration.nodeToValue('selected', itemParams)
+        };
+      });
+
+      filterParsed.options = selectedOptionsParsed;
+
+      return filterParsed || { '@type': ontologyType, options: [] };
+    }
+
+    const filters = store.any(filter, LPA('filters'), undefined, file);
+
+    const filterItems =
+      filters !== undefined && filters.elements ? filters.elements : [];
+
+    const selectedFiltersParsed = filterItems.map(element => {
+      const itemParams = { store, fileUrl: element, file };
+
+      const itemOptions = store.any(element, LPA('options'), undefined, file);
+
+      const optionItems =
+        itemOptions !== undefined && itemOptions.elements
+          ? itemOptions.elements
+          : [];
+
+      const selectedOptionsParsed = optionItems.map(optionElement => {
+        const optionItemParams = { store, fileUrl: optionElement, file };
+        return {
+          '@type': 'FilterOption',
+          uri: ApplicationConfiguration.nodeToValue('uri', optionItemParams),
+          label: ApplicationConfiguration.nodeToValue(
+            'label',
+            optionItemParams
+          ),
+          visible: ApplicationConfiguration.nodeToValue(
+            'visible',
+            optionItemParams
+          ),
+          enabled: ApplicationConfiguration.nodeToValue(
+            'enabled',
+            optionItemParams
+          ),
+          selected: ApplicationConfiguration.nodeToValue(
+            'selected',
+            optionItemParams
+          )
+        };
+      });
+
+      return {
+        '@type': 'MapFilterGroup',
+        filterLabel: ApplicationConfiguration.nodeToValue(
+          'filterLabel',
+          itemParams
+        ),
+        filterUri: ApplicationConfiguration.nodeToValue(
+          'filterUri',
+          itemParams
+        ),
+        options: selectedOptionsParsed
+      };
+    });
+
+    filterParsed.filters = selectedFiltersParsed;
+
+    return filterParsed || { '@type': ontologyType, filters: [] };
   }
 
   static fromTurtle(store, fileUrl, file) {
@@ -409,7 +574,8 @@ export default class ApplicationConfiguration {
         store,
         file,
         filterGroups,
-        'node'
+        'nodesFilter',
+        'NodesFilter'
       );
 
       if (nodesFilter) {
@@ -420,11 +586,24 @@ export default class ApplicationConfiguration {
         store,
         file,
         filterGroups,
-        'scheme'
+        'schemeFilter',
+        'SchemeFilter'
       );
 
       if (schemeFilter) {
         filterGroupsParsed.schemeFilter = schemeFilter;
+      }
+
+      const mapFilters = ApplicationConfiguration.getFilterStructureFromTurtle(
+        store,
+        file,
+        filterGroups,
+        'mapFilters',
+        'MapFilters'
+      );
+
+      if (mapFilters) {
+        filterGroupsParsed.mapFilters = mapFilters;
       }
 
       filterConfigurationParsed = {

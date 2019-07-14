@@ -4,7 +4,6 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import 'react-toastify/dist/ReactToastify.css';
-import { LinearLoader } from '@components';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -16,18 +15,20 @@ import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { Container } from '@material-ui/core';
+import { LinearLoader } from '@components';
 
 type Props = {
   classes: any,
   dataSampleIri: string,
   dataSampleTextFieldValue: string,
-  dataSourcesUris: string,
   discoveryIsLoading: boolean,
   discoveryLoadingLabel: string,
   namedGraph: string,
   namedTextFieldValue: string,
   onHandleProcessStartDiscovery: () => void,
   onHandleSetDataSampleIri: () => void,
+  onHandleSetRdfUrlDataSampleIri: () => void,
   onHandleSetNamedGraph: () => void,
   onHandleSetSparqlIri: () => void,
   onHandleClearInputsClicked(): Function,
@@ -39,7 +40,8 @@ type Props = {
   onHandleSetRdfFile: Function,
   onHandleSetRdfDataSampleFile: Function,
   onHandleTabIndexChange: Function,
-  tabIndex: Number
+  tabIndex: Number,
+  rdfUrlDataSampleIri: string
 };
 
 const styles = () => ({
@@ -64,13 +66,14 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
       classes,
       discoveryIsLoading,
       discoveryLoadingLabel,
-      dataSourcesUris,
       sparqlEndpointIri,
       dataSampleIri,
+      rdfUrlDataSampleIri,
       onHandleProcessStartDiscovery,
       onHandleClearInputsClicked,
       onHandleSetNamedGraph,
       onHandleSetDataSampleIri,
+      onHandleSetRdfUrlDataSampleIri,
       onHandleSetSparqlIri,
       namedGraph,
       sparqlTextFieldValue,
@@ -88,7 +91,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
     return (
       <Card className={classes.card}>
         <CardContent>
-          <div className={classes.gridRoot}>
+          <Container className={classes.gridRoot} maxWidth="xl">
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12}>
                 <AppBar
@@ -137,8 +140,10 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                       onHandleRdfInputIriTextFieldChange
                     }
                     rdfInputIri={rdfInputIri}
-                    handleDataSampleTextFieldChange={onHandleSetDataSampleIri}
-                    dataSampleIri={dataSampleIri}
+                    handleSetRdfUrlDataSampleIri={
+                      onHandleSetRdfUrlDataSampleIri
+                    }
+                    rdfUrlDataSampleIri={rdfUrlDataSampleIri}
                   />
                   <DiscoverRdfFileDropIn
                     discoveryIsLoading={discoveryIsLoading}
@@ -158,15 +163,9 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                     <Grid item xs={6} sm={6}>
                       <Button
                         className={classes.itemGrid}
-                        variant="contained"
+                        variant="outlined"
                         component="span"
                         color="primary"
-                        disabled={
-                          dataSourcesUris &&
-                          sparqlEndpointIri === '' &&
-                          dataSampleIri === '' &&
-                          namedGraph === ''
-                        }
                         onClick={onHandleClearInputsClicked}
                         size="small"
                       >
@@ -179,7 +178,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                         className={classes.itemGrid}
                         variant="contained"
                         component="span"
-                        color="secondary"
+                        color="primary"
                         id="start-discovery-button"
                         disabled={inputFieldsAreNotFilled}
                         onClick={onHandleProcessStartDiscovery}
@@ -192,7 +191,7 @@ class DiscoverSelectorComponent extends PureComponent<Props> {
                 )}
               </Grid>
             </Grid>
-          </div>
+          </Container>
         </CardContent>
       </Card>
     );

@@ -14,10 +14,17 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Container } from '@material-ui/core';
 import { GlobalUtils } from '@utils';
 
 type Props = {
-  classes: { root: {}, header: {}, textField: {} },
+  classes: {
+    root: {},
+    header: {},
+    textField: {},
+    heroContent: {},
+    heroButtons: {}
+  },
   handlePublishClicked: Function,
   handleEmbedClicked: Function,
   handleAppTitleChanged: Function,
@@ -38,19 +45,24 @@ type Props = {
 
 const styles = theme => ({
   root: {},
-  header: {
-    marginBottom: '1rem',
-    marginTop: '1rem',
-    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`
+
+  heroContent: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(8, 0, 6)
   },
+
   textField: {
     flexGrow: 1,
     width: '100%',
-    fontSize: 30,
+    fontSize: 40,
     marginTop: '1rem'
   },
   button: {
     margin: theme.spacing(1)
+  },
+
+  heroButtons: {
+    marginTop: theme.spacing(4)
   }
 });
 
@@ -73,76 +85,61 @@ const VisualizerHeaderComponent = ({
   handleChangeHeight,
   handleChangeWidth
 }: Props) => (
-  <div className={classes.root}>
+  <React.Fragment>
     <Paper
       elevation={2}
-      className={classes.header}
+      className={classes.heroContent}
       position="static"
       color="default"
     >
-      <Grid
-        container
-        direction="column"
-        spacing={2}
-        justify="center"
-        alignItems="center"
-      >
-        <Grid
-          item
-          xs={12}
-          container
-          direction="column"
-          justify="center"
-          alignItems="stretch"
-        >
-          <Grid item xs>
-            <InputBase
-              label="App title"
-              inputProps={{
-                style: { textAlign: 'center' }
-              }}
-              value={selectedApplicationTitle}
-              className={classes.textField}
-              variant="outlined"
-              id="application-title-field"
-              autoComplete="off"
-              placeholder="Enter your application title..."
-              onChange={handleAppTitleChanged}
-              margin="dense"
-            />
+      <Container maxWidth="lg">
+        <InputBase
+          label="App title"
+          inputProps={{
+            style: { textAlign: 'center' }
+          }}
+          value={selectedApplicationTitle}
+          className={classes.textField}
+          variant="outlined"
+          id="application-title-field"
+          autoComplete="off"
+          align="center"
+          placeholder="Enter your application title..."
+          onChange={handleAppTitleChanged}
+          margin="dense"
+          gutterBottom
+        />
+        <Typography align="center" variant="h6" color="textSecondary">
+          {selectedVisualizer
+            ? `This is a LinkedPipes Application based on ${GlobalUtils.getBeautifiedVisualizerTitle(
+                selectedVisualizer.visualizer.visualizerCode
+              )} visualizer`
+            : 'Unkown visualizer type'}
+        </Typography>
+        <div className={classes.heroButtons}>
+          <Grid container spacing={2} justify="center">
+            <Grid item>
+              <Button
+                id="create-app-publish-button"
+                variant="contained"
+                color="primary"
+                onClick={handlePublishClicked}
+              >
+                Publish
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleEmbedClicked}
+              >
+                Embed
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Typography align="center" variant="h6">
-              {selectedVisualizer
-                ? GlobalUtils.getBeautifiedVisualizerTitle(
-                    selectedVisualizer.visualizer.visualizerCode
-                  )
-                : 'Unkown visualizer type'}
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} justify="center">
-          <Grid item>
-            <Button
-              id="create-app-publish-button"
-              variant="contained"
-              color="primary"
-              onClick={handlePublishClicked}
-            >
-              Publish
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleEmbedClicked}
-            >
-              Embed
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+        </div>
+      </Container>
     </Paper>
     <Dialog
       open={publishDialogOpen}
@@ -257,7 +254,7 @@ const VisualizerHeaderComponent = ({
         </Button>
       </DialogActions>
     </Dialog>
-  </div>
+  </React.Fragment>
 );
 
 export default withStyles(styles)(VisualizerHeaderComponent);

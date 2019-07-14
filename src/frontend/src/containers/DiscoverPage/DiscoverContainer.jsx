@@ -3,8 +3,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { DiscoverComponent } from './DiscoverComponent';
 import { discoverActions } from './duck';
-import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 import { discoveryActions } from '@ducks/discoveryDuck';
+import globalUtils from '@utils/global.utils';
+import { DiscoveryService, Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   activeStep: Number,
@@ -16,7 +17,11 @@ type Props = {
   onNextClicked: Function,
   history: Object,
   onResetClicked: Function,
-  onResetSelectedInput: Function
+  onResetSelectedInput: Function,
+  sparqlEndpointIri: String,
+  dataSampleIri: String,
+  namedGraph: String,
+  selectedVisualizer: Object
 };
 class DiscoverContainer extends PureComponent<Props> {
   componentDidMount = () => {
@@ -59,12 +64,33 @@ class DiscoverContainer extends PureComponent<Props> {
   };
 
   render() {
-    const { activeStep, onBackClicked, etlExecutionStatus } = this.props;
+    const {
+      activeStep,
+      onBackClicked,
+      etlExecutionStatus,
+      sparqlEndpointIri,
+      dataSampleIri,
+      namedGraph,
+      selectedVisualizer
+    } = this.props;
+
+    let selectedVisualizerTitle = globalUtils.getBeautifiedVisualizerTitle(
+      selectedVisualizer.visualizer.visualizerCode
+    );
+    selectedVisualizerTitle =
+      selectedVisualizerTitle === 'Undefined'
+        ? 'Not selected yet'
+        : `${selectedVisualizerTitle} visualizer`;
+
     return (
       <DiscoverComponent
         activeStep={activeStep}
         onBackClicked={onBackClicked}
         etlExecutionStatus={etlExecutionStatus}
+        sparqlEndpointIri={sparqlEndpointIri}
+        dataSampleIri={dataSampleIri}
+        namedGraph={namedGraph}
+        selectedVisualizerTitle={selectedVisualizerTitle}
       />
     );
   }
@@ -99,7 +125,11 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = state => {
   return {
     activeStep: state.discover.activeStep,
-    etlExecutionStatus: state.discover.etlExecutionStatus
+    etlExecutionStatus: state.discover.etlExecutionStatus,
+    sparqlEndpointIri: state.discover.sparqlEndpointIri,
+    dataSampleIri: state.discover.dataSampleIri,
+    namedGraph: state.discover.namedGraph,
+    selectedVisualizer: state.globals.selectedVisualizer
   };
 };
 

@@ -2,10 +2,10 @@
 import React, { PureComponent } from 'react';
 import DiscoveriesTableComponent from './DiscoveriesTableComponent';
 import { DiscoveryInformationDialog } from './children';
-import { UserService, SocketContext } from '@utils';
 import { userActions } from '@ducks/userDuck';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import { UserService, SocketContext } from '@utils';
 
 type Props = {
   discoveriesList: Array<{ id: string, finished: boolean }>,
@@ -77,19 +77,19 @@ class DiscoveriesTableContainer extends PureComponent<Props, State> {
     } = this;
     const { selectedDiscovery, open } = this.state;
     return (
-      <div>
+      <React.Fragment>
+        <DiscoveryInformationDialog
+          selectedValue={selectedDiscovery}
+          open={open}
+          onClose={handleClose}
+        />
         <DiscoveriesTableComponent
           discoveriesList={discoveriesList}
           onHandleSelectDiscoveryClick={onHandleSelectDiscoveryClick}
           onHandleDiscoveryRowClicked={handleDiscoveryRowClicked}
           onHandleDiscoveryRowDeleteClicked={handleDiscoveryRowDeleteClicked}
         />
-        <DiscoveryInformationDialog
-          selectedValue={selectedDiscovery}
-          open={open}
-          onClose={handleClose}
-        />
-      </div>
+      </React.Fragment>
     );
   }
 }

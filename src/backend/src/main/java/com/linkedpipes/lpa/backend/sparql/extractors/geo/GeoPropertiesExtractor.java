@@ -1,26 +1,49 @@
 package com.linkedpipes.lpa.backend.sparql.extractors.geo;
 
+import com.linkedpipes.lpa.backend.entities.MarkerFilterSetup;
 import com.linkedpipes.lpa.backend.rdf.LocalizedValue;
-import com.linkedpipes.lpa.backend.rdf.Property;
-import com.linkedpipes.lpa.backend.sparql.extractors.SimpleQueryExecutionResultExtractor;
 import com.linkedpipes.lpa.backend.sparql.queries.geo.GeoPropertiesQueryProvider;
+import com.linkedpipes.lpa.backend.util.Streams;
+import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Resource;
+import org.jetbrains.annotations.NotNull;
 
-public class GeoPropertiesExtractor extends SimpleQueryExecutionResultExtractor<Property> {
+import java.util.Arrays;
+import java.util.function.Consumer;
 
-    protected String getPropertyVariableName(){
-        return GeoPropertiesQueryProvider.VAR_P;
+public class GeoPropertiesExtractor {
+
+    @NotNull
+    public MarkerFilterSetup extract(@NotNull QueryExecution queryExecution) {
+        MarkerFilterSetup markerFilterSetup = new MarkerFilterSetup();
+
+        Streams.sequentialFromIterator(queryExecution.execSelect())
+                .forEach(extractInto(markerFilterSetup));
+
+        return markerFilterSetup;
     }
 
-    public Property withResourceSolution(Resource res, QuerySolution qs){
-        LocalizedValue label = getLabel(qs, GeoPropertiesQueryProvider.LABEL_VARIABLES);
-        String schemeUri = qs.getResource(GeoPropertiesQueryProvider.VAR_SCHEME).getURI();
-        return new Property(label, res.getURI(), schemeUri);
+    @NotNull
+    private Consumer<? super QuerySolution> extractInto(@NotNull MarkerFilterSetup setup) {
+        return solution -> {
+            String predicateIri = solution.getResource(GeoPropertiesQueryProvider.VAR_P).getURI();
+            String schemeIri = solution.getResource(GeoPropertiesQueryProvider.VAR_SCHEME).getURI();
+            LocalizedValue conceptLabel = getLabel(solution, GeoPropertiesQueryProvider.CONCEPT_LABEL_VARIABLES);
+            String conceptIri = solution.getResource(GeoPropertiesQueryProvider.VAR_CONCEPT).getURI();
+            LocalizedValue schemeLabel = getLabel(solution, GeoPropertiesQueryProvider.SCHEME_LABEL_VARIABLES);
+
+            setup.put(predicateIri, schemeIri, schemeLabel, conceptIri, conceptLabel);
+        };
     }
 
-    public Property withLiteralSolution(Literal literal){
-        return new Property(localizedLabel(literal), null, null);
+    @NotNull
+    private LocalizedValue getLabel(@NotNull QuerySolution solution, String[] labelVariables) {
+        return Arrays.stream(labelVariables)
+                .filter(solution::contains)
+                .map(solution::getLiteral)
+                .map(LocalizedValue::new)
+                .reduce(LocalizedValue::withDefault)
+                .orElseGet(LocalizedValue::new);
     }
+
 }

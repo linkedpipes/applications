@@ -1,9 +1,9 @@
 package com.linkedpipes.lpa.backend.services.rgml;
 
+import com.linkedpipes.lpa.backend.entities.EdgeDirection;
 import com.linkedpipes.lpa.backend.entities.rgml.Edge;
 import com.linkedpipes.lpa.backend.entities.rgml.Graph;
 import com.linkedpipes.lpa.backend.entities.rgml.Node;
-import com.linkedpipes.lpa.backend.enums.EdgeDirection;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.EdgesExtractor;
 import com.linkedpipes.lpa.backend.sparql.extractors.rgml.GraphExtractor;
@@ -20,37 +20,40 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.DoubleStream;
 
 @Service
 public class RgmlService {
 
-    /** Get a graph resource (resource of type rgml:Graph).
+    /**
+     * Get a graph resource (resource of type rgml:Graph).
+     * <p>
+     *     If there are multiple resources of this type available, return an arbitrary one. For this reason, only one
+     *     graph should exist in the data set.
+     * </p>
      *
-     * If there are multiple resources of this type available, return an arbitrary one. For this
-     * reason, only one graph should exist in the data set.
-     *
+     * @param graphIri IRI of the result graph present in the Virtuoso
+     * @return an RGML Graph
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     public Graph getGraph(@Nullable String graphIri) throws LpAppsException {
         SelectSparqlQueryProvider provider = new GraphQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), GraphExtractor::extract);
     }
 
-    /** Get all edges (resources of type rgml:Edge). */
+    /**
+     * Get all edges (resources of type rgml:Edge).
+     *
+     * @param graphIri IRI of the result graph present in the Virtuoso
+     * @return a list of Edges
+     * @throws LpAppsException if the retrieval fails for any reason
+     */
     public List<Edge> getEdges(@Nullable String graphIri) throws LpAppsException {
         ConstructSparqlQueryProvider provider = new EdgesQueryProvider();
         return JenaUtils.withQueryExecution(provider.get(graphIri), EdgesExtractor::extract);
     }
 
-    private List<Edge> getIncidentEdges(@Nullable String graphIri, @NotNull Graph graph, String nodeUri, EdgeDirection direction) throws LpAppsException {
-        if (direction == null)
-            return fetchAllEdges(graphIri, nodeUri);
-
-        if (graph.directed) {
-            return fetchEdges(graphIri, nodeUri, direction);
-        }
-
+    private List<Edge> getIncidentEdges(@Nullable String graphIri, String nodeUri) throws LpAppsException {
         return fetchAllEdges(graphIri, nodeUri);
     }
 
@@ -79,8 +82,8 @@ public class RgmlService {
         Graph graph = getGraph(graphIri);
 
         List<Edge> edges = new ArrayList<>();
-        for(String nodeUri: nodeUris){
-            edges.addAll(getIncidentEdges(graphIri, graph, nodeUri, null));
+        for (String nodeUri : nodeUris) {
+            edges.addAll(getIncidentEdges(graphIri, nodeUri));
         }
 
         Map<String, Map<String, Double>> matrix = new HashMap<>();
@@ -102,13 +105,6 @@ public class RgmlService {
                                 .getOrDefault(target, 0.0)))
                 .map(DoubleStream::toArray)
                 .toArray(double[][]::new);
-    }
-
-    private <E> Collector<List<E>, ?, List<E>> joiningLists() {
-        return Collector.of(ArrayList::new, List::addAll, (l1, l2) -> {
-            l1.addAll(l2);
-            return l1;
-        });
     }
 
     private void addEdgeToMatrix(Map<String, Map<String, Double>> matrix, String source, String target, boolean useWeights, Double weight){

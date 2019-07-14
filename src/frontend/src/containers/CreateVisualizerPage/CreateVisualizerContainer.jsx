@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import { applicationActions } from '@ducks/applicationDuck';
 import { filtersActions } from '@ducks/filtersDuck';
 import { CreateVisualizerComponent } from './CreateVisualizerComponent';
-import { Log, GoogleAnalyticsWrapper } from '@utils';
 import ApplicationMetadata from '@storage/models/ApplicationMetadata';
+import { globalActions } from '@ducks/globalDuck';
+import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 type Props = {
   selectedVisualizer: Object,
@@ -28,14 +29,16 @@ type Props = {
 type State = {
   loadingIsActive: boolean,
   width: number,
-  height: number
+  height: number,
+  isShared: boolean
 };
 
 class CreateVisualizer extends PureComponent<Props, State> {
   state = {
     loadingIsActive: false,
     width: 0,
-    height: 0
+    height: 0,
+    isShared: false
   };
 
   constructor(props) {
@@ -66,6 +69,16 @@ class CreateVisualizer extends PureComponent<Props, State> {
       await this.props.handleSetDefaultFiltersState(
         selectedVisualizer.visualizer.visualizerCode
       );
+    }
+
+    if (this.props.location.state && this.props.location.state.isShared) {
+      this.setState({
+        isShared: this.props.location.state.isShared
+      });
+    } else {
+      this.setState({
+        isShared: false
+      });
     }
   }
 
@@ -100,6 +113,8 @@ class CreateVisualizer extends PureComponent<Props, State> {
       filtersState
     } = this.props;
 
+    const { isShared } = this.state;
+
     return (
       <CreateVisualizerComponent
         selectedVisualizer={selectedVisualizer}
@@ -115,6 +130,7 @@ class CreateVisualizer extends PureComponent<Props, State> {
         height={this.state.height}
         selectedNodes={selectedNodes}
         filtersState={filtersState}
+        isShared={isShared}
       />
     );
   }
@@ -129,7 +145,9 @@ const mapStateToProps = state => {
     selectedApplication: state.application.selectedApplication,
     selectedApplicationMetadata: state.application.selectedApplicationMetadata,
     selectedNodes: state.filters.nodes,
-    filtersState: state.filters.filtersState
+    filtersState: state.filters.filtersState,
+
+    selectedNavigationItem: state.globals.selectedNavigationItem
   };
 };
 
@@ -148,12 +166,17 @@ const mapDispatchToProps = dispatch => {
 
   const handleResetFilters = () => dispatch(filtersActions.resetFilters());
 
+  const handleSetSelectedNavigationItem = item => {
+    dispatch(globalActions.setSelectedNavigationItem(item));
+  };
+
   return {
     handleSetCurrentApplicationData,
     handleResetCurrentApplicationData,
     handleResetCurrentApplicationMetadata,
     handleSetDefaultFiltersState,
-    handleResetFilters
+    handleResetFilters,
+    handleSetSelectedNavigationItem
   };
 };
 

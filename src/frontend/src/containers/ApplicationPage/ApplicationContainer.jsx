@@ -1,14 +1,6 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { VISUALIZER_TYPE } from '@constants';
-import {
-  MapsVisualizer,
-  TreemapVisualizer,
-  ChordVisualizer
-} from '@components';
 import { withRouter } from 'react-router-dom';
-import { Log, VisualizersService } from '@utils';
-import { globalActions } from '@ducks/globalDuck';
 import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -19,7 +11,19 @@ import { ApplicationConfiguration } from '@storage/models';
 import { filtersActions } from '@ducks/filtersDuck';
 import { applicationActions } from '@ducks/applicationDuck';
 import StorageToolbox from '@storage/StorageToolbox';
+import { userActions } from '@ducks/userDuck';
+import { Log, VisualizersService } from '@utils';
+import {
+  MapsVisualizer,
+  TreemapVisualizer,
+  ChordVisualizer,
+  TimelineVisualizer
+} from '@components';
+// eslint-disable-next-line import/order
+import { VISUALIZER_TYPE } from '@constants';
 
+// eslint-disable-next-line import/newline-after-import
+const queryString = require('query-string');
 type Props = {
   location: Object,
   setColorTheme: Function,
@@ -43,7 +47,8 @@ type State = {
 
 const styles = theme => ({
   root: {
-    flex: 1
+    flex: 1,
+    height: '100vh'
   },
   vizdiv: {
     overflow: 'hidden'
@@ -84,10 +89,6 @@ class ApplicationContainer extends PureComponent<Props, State> {
   }
 
   loadApplicationMetadata = async () => {
-    const queryString = await import(
-      /* webpackChunkName: "query-string" */ 'query-string'
-    );
-
     const self = this;
 
     const parsed = queryString.parse(this.props.location.search);
@@ -133,15 +134,24 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
   getApplication = (applicationType, applicationConfiguration) => {
     const { filtersState } = this.props;
+    const { height, width } = this.state;
 
     switch (applicationType) {
       case VISUALIZER_TYPE.MAP:
-      case VISUALIZER_TYPE.ADVANCED_FILTERS_MAP: {
+      case VISUALIZER_TYPE.MAP_WITH_MARKER_FILTERS: {
         const selectedResultGraphIri = applicationConfiguration.graphIri;
         return (
           <MapsVisualizer
             selectedResultGraphIri={selectedResultGraphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
+            filters={pathOr(
+              [],
+              'filterGroups.mapFilters.filters',
+              filtersState
+            )}
+            visualizerCode={applicationType}
           />
         );
       }
@@ -151,6 +161,13 @@ class ApplicationContainer extends PureComponent<Props, State> {
           <TreemapVisualizer
             selectedResultGraphIri={graphIri}
             isPublished
+            height={height + 250}
+            width={width + 250}
+            selectedTopLevelConcepts={pathOr(
+              [],
+              'filterGroups.nodesFilter.options',
+              filtersState
+            )}
             schemes={pathOr(
               [],
               'filterGroups.schemeFilter.options',
@@ -163,12 +180,24 @@ class ApplicationContainer extends PureComponent<Props, State> {
         return (
           <ChordVisualizer
             selectedResultGraphIri={applicationConfiguration.graphIri}
-            size={this.state.height + this.state.width}
+            height={height + 200}
+            width={width + 200}
             nodes={pathOr([], 'filterGroups.nodesFilter.options', filtersState)}
             isPublished
           />
         );
       }
+      case VISUALIZER_TYPE.TIMELINE:
+      case VISUALIZER_TYPE.LABELED_TIMELINE:
+      case VISUALIZER_TYPE.TIMELINE_PERIODS:
+      case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
+        return (
+          <TimelineVisualizer
+            isPublished
+            visualizerCode={applicationType}
+            selectedResultGraphIri={applicationConfiguration.graphIri}
+          />
+        );
       case VISUALIZER_TYPE.UNDEFINED: {
         return (
           <Typography variant="h2" gutterBottom>
@@ -190,13 +219,19 @@ class ApplicationContainer extends PureComponent<Props, State> {
   };
 
   render() {
-    const { getApplication } = this;
     const visible =
       this.props.filtersState !== null && this.props.filtersState.visible;
+    const renderFilters = ![
+      VISUALIZER_TYPE.MAP,
+      VISUALIZER_TYPE.LABELED_TIMELINE,
+      VISUALIZER_TYPE.TIMELINE,
+      VISUALIZER_TYPE.TIMELINE_PERIODS,
+      VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS
+    ].includes(this.state.applicationType);
 
     return (
       <Grid container className={this.props.classes.root} direction="row">
-        {visible && this.state.applicationType !== 'Loading' && (
+        {renderFilters && this.state.applicationType !== 'Loading' && (
           <Grid
             item
             lg={4}
@@ -211,6 +246,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
             />
           </Grid>
         )}
+
         <Grid
           id="viz-div"
           className={this.props.classes.vizdiv}
@@ -228,7 +264,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
               textAlign: visible ? 'left' : 'center'
             }}
           >
-            {getApplication(
+            {this.getApplication(
               this.state.applicationType,
               this.props.selectedApplication
             )}
@@ -248,7 +284,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const setColorTheme = isLight =>
-    dispatch(globalActions.setLightColorTheme(isLight));
+    dispatch(userActions.setLightColorTheme(isLight));
 
   const handleSetFiltersState = filters =>
     dispatch(filtersActions.setFiltersState(filters));

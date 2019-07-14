@@ -1,9 +1,9 @@
 package com.linkedpipes.lpa.backend.controllers;
 
 import com.linkedpipes.lpa.backend.entities.MapQueryData;
+import com.linkedpipes.lpa.backend.entities.MarkerFilterSetup;
 import com.linkedpipes.lpa.backend.entities.geo.Marker;
 import com.linkedpipes.lpa.backend.exceptions.LpAppsException;
-import com.linkedpipes.lpa.backend.rdf.Property;
 import com.linkedpipes.lpa.backend.services.geo.GeoService;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
 import org.jetbrains.annotations.Nullable;
@@ -20,22 +20,25 @@ public class MapVisualizerController {
     private static final Logger logger = LoggerFactory.getLogger(MapVisualizerController.class);
 
     /**
-     * Get markers for displaying on map
-     * @param graphIri
-     * @param mapQueryData
-     * @return
+     * Get markers for displaying on map.
+     *
+     * @param graphIri     IRI of the result graph present in the Virtuoso
+     * @param mapQueryData object containing filters to filter the markers by
+     * @return a list of map markers
+     * @throws LpAppsException if the retrieval fails for any reason
      */
     @PostMapping("/api/map/markers")
     public ResponseEntity<List<Marker>> getMarkers(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri,
                                                    @RequestBody(required = false) MapQueryData mapQueryData) throws LpAppsException {
 
-        if(mapQueryData == null)
+        if (mapQueryData == null) {
             mapQueryData = new MapQueryData();
+        }
 
         logger.info("Get markers: listing filters");
         for (String key : mapQueryData.filters.keySet()) {
             for (ValueFilter vf : mapQueryData.filters.get(key)) {
-                logger.info("Key: " + key + ", label: " + vf.label + ", dataType: " + vf.dataType + ", uri: " + vf.uri + ", isActive: " + (vf.isActive?"yes":"no"));
+                logger.info("Key: " + key + ", uri: " + vf.uri + ", isActive: " + (vf.isActive ? "yes" : "no"));
             }
         }
         logger.info("Done listing filters");
@@ -43,7 +46,7 @@ public class MapVisualizerController {
     }
 
     @GetMapping("/api/map/properties")
-    public ResponseEntity<List<Property>> getProperties(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
+    public ResponseEntity<MarkerFilterSetup> getProperties(@Nullable @RequestParam(value = "resultGraphIri", required = false) String graphIri) throws LpAppsException {
         return ResponseEntity.ok(GeoService.getProperties(graphIri));
     }
 

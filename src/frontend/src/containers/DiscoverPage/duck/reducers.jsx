@@ -10,6 +10,7 @@ const INITIAL_STATE = {
   rdfInputIri: '',
   rdfFile: undefined,
   rdfDataSampleFile: undefined,
+  rdfUrlDataSampleIri: '',
   inputType: 'SPARQL_ENDPOINT',
   activeDiscoverTabIndex: 0
 };
@@ -54,10 +55,9 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
         dataSampleIri: '',
         namedGraph: '',
         rdfInputIri: '',
+        rdfUrlDataSampleIri: '',
         rdfFile: undefined,
-        rdfDataSampleFile: undefined,
-        inputType: 'SPARQL_ENDPOINT',
-        activeDiscoverTabIndex: 0
+        rdfDataSampleFile: undefined
       };
     }
 
@@ -99,6 +99,14 @@ const discoverReducer = (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, {
         ...state,
         dataSampleIri: value
+      });
+    }
+
+    case types.SET_RDF_URL_DATA_SAMPLE_IRI: {
+      const { value } = action;
+      return Object.assign({}, state, {
+        ...state,
+        rdfUrlDataSampleIri: value
       });
     }
 
