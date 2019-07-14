@@ -168,6 +168,7 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         driver.execute_script("scrollBy(0,250);")
+        driver.refresh()
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
@@ -213,6 +214,7 @@ class UntitledTestCase(unittest.TestCase):
         driver.find_element_by_id("application-title-field").clear()
         driver.find_element_by_id(
             "application-title-field").send_keys("test_selenium_treemap_app")
+
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
@@ -227,6 +229,7 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         driver.execute_script("scrollBy(0,250);")
+        driver.refresh()
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
@@ -286,6 +289,7 @@ class UntitledTestCase(unittest.TestCase):
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
         driver.execute_script("scrollBy(0,250);")
+        driver.refresh()
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
