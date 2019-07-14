@@ -16,9 +16,9 @@
 
 LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!
 
-• General user documentation and platform tutorials are available [here](docs.applications.linkedpipes.com) <br/>
-• Developer oriented frontend documentation and `React` component demos are available [here](docs.frontend.applications.linkedpipes.com) <br/>
-• Developer oriented backend documentation and architecture overview are available [here](docs.backend.applications.linkedpipes.com)
+• General user documentation and platform tutorials are available [here](http://docs.applications.linkedpipes.com) <br/>
+• Developer oriented frontend documentation and `React` component demos are available [here](http://docs.frontend.applications.linkedpipes.com) <br/>
+• Developer oriented backend documentation and architecture overview are available [here](http://docs.backend.applications.linkedpipes.com)
 
 ## 🚀 Quick start
 
