@@ -19,8 +19,8 @@ from requests.auth import HTTPBasicAuth
 from slackclient import SlackClient
 
 desired_cap = {
-    'browserName': 'Firefox',
-    "browser_version": "68",
+    'browserName': 'Chrome',
+    "browser_version": "75",
     "browserstack.debug": True,
     "acceptSslCerts": True
 }
