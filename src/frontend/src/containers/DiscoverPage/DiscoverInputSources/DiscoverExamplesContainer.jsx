@@ -48,11 +48,29 @@ export const samples = [
     id: uuid.v4(),
     inputType: 'SPARQL_ENDPOINT',
     label: 'Timeline Period Sample',
+    type: 'TIMELINE_PERIODS',
+    description:
+      'This is an example of timeline visualizer used to show periods over time.',
+    backgroundColor: '#5F7201',
     sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
     namedGraph:
       'https://ruian.linked.opendata.cz/zdroj/datová-sada/rúian/metadata',
     dataSampleIri:
       'https://gist.githubusercontent.com/Ponsietta/ab395246b14f7f4b9de2d0161fe9d42c/raw/9bcf705beeb0cda348e51840662cc270c4a38596/dcterms_timelineperiod_sample.ttl'
+  },
+  {
+    id: uuid.v4(),
+    inputType: 'SPARQL_ENDPOINT',
+    label: 'Timeline Instants Sample',
+    type: 'TIMELINE',
+    description:
+      'This is an example of timeline visualizer used to show instants in time.',
+    backgroundColor: '#6ed130',
+    sparqlEndpointIri: 'https://linked.opendata.cz/sparql',
+    namedGraph:
+      'https://ruian.linked.opendata.cz/zdroj/datová-sada/rúian/metadata',
+    dataSampleIri:
+      'https://gist.githubusercontent.com/Ponsietta/26bc1ac0e218d42c235600635bc9b351/raw/5e532dac9c3f03118aa50b957e5ec069a74187e6/objects_with_objects_with_timeline_sample.ttl'
   }
 ];
 

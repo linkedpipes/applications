@@ -2,11 +2,10 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 import { withStyles } from '@material-ui/core/styles';
-import { VisualizersService } from '@utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { VISUALIZER_TYPE } from '@constants';
-import uuid from 'uuid';
-import { connect } from 'react-redux';
+import { VisualizersService } from '@utils';
+// import {GlobalUtils} from '@utils';
 
 type Props = {
   classes: {
@@ -15,6 +14,7 @@ type Props = {
     selectEmpty: string,
     wrapper: any
   },
+  selectedPipelineExecution: string,
   selectedResultGraphIri: string,
   handleSetCurrentApplicationData: Function,
   isPublished: boolean,
@@ -26,7 +26,7 @@ type State = {
   chartData: Array<Array<any>>
 };
 
-const styles = theme => ({});
+const styles = () => ({});
 
 class TimelineVisualizer extends React.PureComponent<Props, State> {
   // Row label	Bar label (optional)	Tooltip (optional)	Start	End
@@ -34,6 +34,20 @@ class TimelineVisualizer extends React.PureComponent<Props, State> {
     switch (visualizerCode) {
       case VISUALIZER_TYPE.LABELED_TIMELINE:
       case VISUALIZER_TYPE.TIMELINE:
+        return [
+          [
+            { type: 'string', id: 'Label' },
+            { type: 'string', id: 'URI' },
+            { type: 'date', id: 'Start' },
+            { type: 'date', id: 'End' }
+          ],
+          ...apiData.map(i => [
+            i.uri,
+            i.uri,
+            new Date(i.date),
+            new Date(i.date)
+          ])
+        ];
       case VISUALIZER_TYPE.TIMELINE_PERIODS:
       case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
         return [
@@ -43,7 +57,12 @@ class TimelineVisualizer extends React.PureComponent<Props, State> {
             { type: 'date', id: 'Start' },
             { type: 'date', id: 'End' }
           ],
-          apiData.map(i => [i.uri, i.uri, new Date(i.start), new Date(i.end)])
+          ...apiData.map(i => [
+            i.uri,
+            i.uri,
+            new Date(i.start),
+            new Date(i.end)
+          ])
         ];
 
       default:
@@ -60,30 +79,51 @@ class TimelineVisualizer extends React.PureComponent<Props, State> {
   }
 
   async componentDidMount() {
-    const { selectedResultGraphIri } = this.props;
+    const {
+      handleSetCurrentApplicationData,
+      selectedResultGraphIri,
+      selectedPipelineExecution,
+      visualizerCode,
+      isPublished
+    } = this.props;
 
-    // if (!isPublished) {
-    //   handleSetCurrentApplicationData({
-    //     id: uuid.v4(),
-    //     applicationEndpoint: 'treemap',
-    //     selectedResultGraphIri,
-    //     visualizerCode: 'TIMELINE'
-    //   });
-    // }
+    if (!isPublished) {
+      handleSetCurrentApplicationData({
+        applicationEndpoint: 'timeline',
+        visualizerType: visualizerCode,
+        endpoint: 'timeline',
+        graphIri: selectedResultGraphIri,
+        etlExecutionIri: selectedPipelineExecution
+      });
+    }
 
-    const instantsRequest = await VisualizersService.getTimelineIntervals(
-      selectedResultGraphIri
-    );
+    let request: any;
+    switch (visualizerCode) {
+      // Instants
+      case VISUALIZER_TYPE.LABELED_TIMELINE:
+      case VISUALIZER_TYPE.TIMELINE:
+        request = await VisualizersService.getTimelineInstants(
+          selectedResultGraphIri
+        );
+        break;
+      // Periods
+      case VISUALIZER_TYPE.TIMELINE_PERIODS:
+      case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
+        request = await VisualizersService.getTimelineIntervals(
+          selectedResultGraphIri
+        );
+        break;
+      default:
+        request = { data: {} };
+    }
 
-    const instantsResponse = await instantsRequest.data;
+    const response = await request.data;
     const chartData = TimelineVisualizer.transformData(
-      VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS,
-      instantsResponse
+      visualizerCode,
+      response
     );
     this.setState({ dataLoadingStatus: 'ready', chartData });
   }
-
-  //   componentWillReceiveProps(nextProps) {}
 
   render() {
     return this.state.dataLoadingStatus !== 'ready' ? (

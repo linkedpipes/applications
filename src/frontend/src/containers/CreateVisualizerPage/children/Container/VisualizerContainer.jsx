@@ -81,7 +81,13 @@ const getVisualizer = (
     case VISUALIZER_TYPE.TIMELINE_PERIODS:
     case VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS:
       return (
-        <TimelineVisualizer selectedResultGraphIri={selectedResultGraphIri} />
+        <TimelineVisualizer
+          isPublished={selectedApplicationMetadata !== undefined}
+          visualizerCode={visualizerCode}
+          handleSetCurrentApplicationData={handleSetCurrentApplicationData}
+          selectedResultGraphIri={selectedResultGraphIri}
+          selectedPipelineExecution={selectedPipelineExecution}
+        />
       );
 
     case VISUALIZER_TYPE.TREEMAP:
@@ -126,7 +132,13 @@ const getVisualizer = (
 };
 
 const VisualizerControllerContainer = (props: Props) => {
-  const renderFilters = props.visualizer.visualizerCode !== VISUALIZER_TYPE.MAP;
+  const renderFilters = ![
+    VISUALIZER_TYPE.MAP,
+    VISUALIZER_TYPE.LABELED_TIMELINE,
+    VISUALIZER_TYPE.TIMELINE,
+    VISUALIZER_TYPE.TIMELINE_PERIODS,
+    VISUALIZER_TYPE.LABELED_TIMELINE_PERIODS
+  ].includes(props.visualizer.visualizerCode);
   return (
     <Grid container className={props.classes.root} direction="row" spacing={10}>
       {renderFilters && (

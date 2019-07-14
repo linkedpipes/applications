@@ -498,6 +498,8 @@ class AppRouter extends React.PureComponent<Props, State> {
 
               <Route path="/chord" component={ApplicationPage} />
 
+              <Route path="/timeline" component={ApplicationPage} />
+
               <Redirect from="/" to="/login" exact />
               <Redirect to="/404" />
             </Switch>
