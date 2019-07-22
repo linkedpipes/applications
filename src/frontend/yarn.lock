@@ -2445,12 +2445,12 @@
     prop-types "^15.7.2"
     react-is "^16.8.0"
 
-"@mdx-js/loader@1.0.27":
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.0.27.tgz#18f7fa593e76cef1355caee0c162f0151ee61873"
-  integrity sha512-pHlF37mKiPq6aPS2xTs3i/FJMLkRhXooYtNGnMtkIDicMKIKNiR2ab3cYsoiWCZqT/U/flg0e6DuqepXspiFuw==
+"@mdx-js/loader@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.1.0.tgz#1acc2b78ff30125f6c0ccf6d70c3cd4df8697cf4"
+  integrity sha512-RAofvZn4Ef3w+STolAzVBPujW8DXl7wj80bptXa7rp8NhBof6xU6TEy4HEbCpJtOGwt6uFI5AU37B7g24qw/IA==
   dependencies:
-    "@mdx-js/mdx" "^1.0.27"
+    "@mdx-js/mdx" "^1.1.0"
     "@mdx-js/react" "^1.0.27"
     loader-utils "^1.1.0"
 
@@ -2507,10 +2507,10 @@
     unist-builder "^1.0.1"
     unist-util-visit "^1.3.0"
 
-"@mdx-js/mdx@^1.0.27":
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/@mdx-js/mdx/-/mdx-1.0.27.tgz#a027ea67d0dfeb9156228e4fa2e42010f7bb7481"
-  integrity sha512-75Pd2oUSn8Oa/WWF4hpexG7e9e7Iz3RGgYr2ctxX2qwSsiU2CMWn0uhFLsAiv5Ycn1JcTsyUhYCX2AO6MfHezA==
+"@mdx-js/mdx@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mdx-js/mdx/-/mdx-1.1.0.tgz#9a7138e31e4933d53afca59e0460ab33771af5fe"
+  integrity sha512-WHWVPLStet4zc25nEDePNt7YUcCOgEa8q0F0QuE8Ddv5QphuXA7SNtRl2o+xMCm5r7Q5A1RrsG7lipMU4Pviqw==
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-syntax-jsx" "^7.2.0"
@@ -2518,12 +2518,12 @@
     detab "^2.0.0"
     hast-util-raw "^5.0.0"
     lodash.uniq "^4.5.0"
-    mdast-util-to-hast "^4.0.0"
-    remark-mdx "^1.0.26"
+    mdast-util-to-hast "^6.0.1"
+    remark-mdx "^1.1.0"
     remark-parse "^6.0.0"
     remark-squeeze-paragraphs "^3.0.1"
     to-style "^1.3.3"
-    unified "^7.0.0"
+    unified "^8.2.0"
     unist-builder "^1.0.1"
     unist-util-visit "^1.3.0"
 
@@ -9362,6 +9362,11 @@ is-plain-obj@^1.1, is-plain-obj@^1.1.0:
   resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-1.1.0.tgz#71a50c8429dfca773c92a390a4a03b39fcd51d3e"
   integrity sha1-caUMhCnfync8kqOQpKA7OfzVHT4=
 
+is-plain-obj@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-2.0.0.tgz#7fd1a7f1b69e160cde9181d2313f445c68aa2679"
+  integrity sha512-EYisGhpgSCwspmIuRHGjROWTon2Xp8Z7U03Wubk/bTL5TTRC5R1rGVgyjzBrk9+ULdH6cRD06KRcw/xfqhVYKQ==
+
 is-plain-object@^2.0.1, is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
@@ -10616,6 +10621,23 @@ mdast-util-to-hast@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/mdast-util-to-hast/-/mdast-util-to-hast-4.0.0.tgz#d8467ce28ea73b4648667bc389aa39dfa9f67f18"
   integrity sha512-yOTZSxR1aPvWRUxVeLaLZ1sCYrK87x2Wusp1bDM/Ao2jETBhYUKITI3nHvgy+HkZW54HuCAhHnS0mTcbECD5Ig==
+  dependencies:
+    collapse-white-space "^1.0.0"
+    detab "^2.0.0"
+    mdast-util-definitions "^1.2.0"
+    mdurl "^1.0.1"
+    trim "0.0.1"
+    trim-lines "^1.0.0"
+    unist-builder "^1.0.1"
+    unist-util-generated "^1.1.0"
+    unist-util-position "^3.0.0"
+    unist-util-visit "^1.1.0"
+    xtend "^4.0.1"
+
+mdast-util-to-hast@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/mdast-util-to-hast/-/mdast-util-to-hast-6.0.1.tgz#98d5ff6d3179d2bb95609a12c8b1e370249d73f2"
+  integrity sha512-KRh9wIYzUQk877JcV+8q4FqBUEouLpCKMObqeWg4dnL1/rh9vtSIq5mqQFwIK9YzSULl91F8FP5+EJ/xqRHaBw==
   dependencies:
     collapse-white-space "^1.0.0"
     detab "^2.0.0"
@@ -13791,10 +13813,10 @@ remark-mdx@^1.0.21:
     remark-parse "^6.0.0"
     unified "^7.0.0"
 
-remark-mdx@^1.0.26:
-  version "1.0.26"
-  resolved "https://registry.yarnpkg.com/remark-mdx/-/remark-mdx-1.0.26.tgz#b2081fbe072850eb4d9544df21c90d7dd92e4a7b"
-  integrity sha512-yiXSljhvq5Jt6LUZsQ8YoIB+ut0YBKLMGNM9aHmmWsWrAK3s+CW9lCtClSu1KxgRcWpgsEVvAok9z4mIgUI6cA==
+remark-mdx@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/remark-mdx/-/remark-mdx-1.1.0.tgz#35fde951866411ff1dde2a243f43ec7e90bc25e5"
+  integrity sha512-WW5WNg0NZnvCaXnrIMGwKG5HLwzCUkOtIMFLwTjB0vRE8QJRvhJUYykX3LrfS2EVIxVFTspZx9YzzV0BY/gfaQ==
   dependencies:
     "@babel/core" "^7.2.2"
     "@babel/helper-plugin-utils" "^7.0.0"
@@ -13802,7 +13824,7 @@ remark-mdx@^1.0.26:
     "@babel/plugin-syntax-jsx" "^7.2.0"
     is-alphabetical "^1.0.2"
     remark-parse "^6.0.0"
-    unified "^7.0.0"
+    unified "^8.2.0"
 
 remark-parse-yaml@^0.0.1:
   version "0.0.1"
@@ -15834,6 +15856,17 @@ unified@^7.0.0, unified@^7.1.0:
     trough "^1.0.0"
     vfile "^3.0.0"
     x-is-string "^0.1.0"
+
+unified@^8.2.0:
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/unified/-/unified-8.3.2.tgz#aed69d0e577d6ef27268431c63a10faef60e63ab"
+  integrity sha512-NDtUAXcd4c+mKppCbsZHzmhkKEQuhveZNBrFYmNgMIMk2K9bc8hmG3mLEGVtRmSNodobwyMePAnvIGVWZfPdzQ==
+  dependencies:
+    bail "^1.0.0"
+    extend "^3.0.0"
+    is-plain-obj "^2.0.0"
+    trough "^1.0.0"
+    vfile "^4.0.0"
 
 union-value@^1.0.0:
   version "1.0.1"
