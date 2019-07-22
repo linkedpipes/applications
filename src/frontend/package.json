@@ -102,7 +102,7 @@
     "babel-plugin-smart-webpack-import": "1.4.6",
     "babel-preset-flow": "6.23.0",
     "cross-env": "5.2.0",
-    "css-loader": "3.0.0",
+    "css-loader": "3.1.0",
     "docz": "1.2.0",
     "docz-plugin-css": "0.11.0",
     "docz-theme-default": "1.2.0",
