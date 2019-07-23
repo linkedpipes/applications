@@ -31,7 +31,7 @@ The faster way to start your own LinkedPipes Applications platform instance is t
 ### Running within `docker-compose`
 
 ```bash
-$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/lpa-cli.sh -o lpa-cli.sh && ./lpa-cli.sh --production-no-cloning
+$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/lpa-cli.sh -o lpa-cli.sh && chmod +x lpa-cli.sh && ./lpa-cli.sh --production-no-cloning
 ```
 
 ### Default container ports
