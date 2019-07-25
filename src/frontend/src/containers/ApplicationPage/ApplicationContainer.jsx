@@ -231,7 +231,7 @@ class ApplicationContainer extends PureComponent<Props, State> {
 
     return (
       <Grid container className={this.props.classes.root} direction="row">
-        {renderFilters && this.state.applicationType !== 'Loading' && (
+        {renderFilters && visible && this.state.applicationType !== 'Loading' && (
           <Grid
             item
             lg={4}
