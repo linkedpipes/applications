@@ -63,7 +63,7 @@
     "react-chord-diagram": "1.2.0",
     "react-copy-to-clipboard": "5.0.1",
     "react-dom": "16.8.6",
-    "react-emoji-render": "0.6.0",
+    "react-emoji-render": "1.0.0",
     "react-error-boundary": "1.2.5",
     "react-filepond": "^7.0.1",
     "react-ga": "^2.5.7",
