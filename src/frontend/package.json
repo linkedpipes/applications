@@ -56,7 +56,7 @@
     "pigeon-marker": "^0.3.4",
     "prop-types": "15.7.2",
     "q": "^1.5.1",
-    "query-string": "6.8.1",
+    "query-string": "6.8.2",
     "rambda": "^2.10.2",
     "rdflib": "git+https://github.com/aorumbayev/rdflib.js.git",
     "react": "16.8.6",
