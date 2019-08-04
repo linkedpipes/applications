@@ -129,7 +129,7 @@
     "react-hot-loader": "4.12.10",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
-    "webpack": "4.36.1",
+    "webpack": "4.39.1",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.6",
     "webpack-conditional-loader": "1.0.12",
