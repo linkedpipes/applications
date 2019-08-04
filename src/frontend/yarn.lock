@@ -2259,14 +2259,14 @@
     prop-types "^15.7.2"
     react-is "^16.8.6"
 
-"@mdx-js/loader@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.1.0.tgz#1acc2b78ff30125f6c0ccf6d70c3cd4df8697cf4"
-  integrity sha512-RAofvZn4Ef3w+STolAzVBPujW8DXl7wj80bptXa7rp8NhBof6xU6TEy4HEbCpJtOGwt6uFI5AU37B7g24qw/IA==
+"@mdx-js/loader@1.1.5", "@mdx-js/loader@^1.0.18":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.1.5.tgz#fd4f38d873a8557feb5d4326f92ba5200a6ab9b8"
+  integrity sha512-Dg2vHdntXjdf+bKfsOUE6RVGebZducC762JBbxeVr+NJun0c4ip+oenpD+cJj12WcYoR8vouEwijJkltThX9gg==
   dependencies:
-    "@mdx-js/mdx" "^1.1.0"
-    "@mdx-js/react" "^1.0.27"
-    loader-utils "^1.1.0"
+    "@mdx-js/mdx" "^1.1.5"
+    "@mdx-js/react" "^1.1.5"
+    loader-utils "1.2.3"
 
 "@mdx-js/loader@^0.15.0":
   version "0.15.7"
@@ -2276,15 +2276,6 @@
     "@mdx-js/mdx" "^0.15.7"
     "@mdx-js/tag" "^0.15.6"
     loader-utils "^1.1.0"
-
-"@mdx-js/loader@^1.0.18":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.1.5.tgz#fd4f38d873a8557feb5d4326f92ba5200a6ab9b8"
-  integrity sha512-Dg2vHdntXjdf+bKfsOUE6RVGebZducC762JBbxeVr+NJun0c4ip+oenpD+cJj12WcYoR8vouEwijJkltThX9gg==
-  dependencies:
-    "@mdx-js/mdx" "^1.1.5"
-    "@mdx-js/react" "^1.1.5"
-    loader-utils "1.2.3"
 
 "@mdx-js/mdx@^0.15.0", "@mdx-js/mdx@^0.15.7":
   version "0.15.7"
@@ -2300,7 +2291,7 @@
     unified "^6.1.6"
     unist-util-visit "^1.3.0"
 
-"@mdx-js/mdx@^1.1.0", "@mdx-js/mdx@^1.1.5":
+"@mdx-js/mdx@^1.1.5":
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/@mdx-js/mdx/-/mdx-1.1.5.tgz#1d9e091f942b3c7cdb1f33710601c8139d6e5a89"
   integrity sha512-BqUC3kY0v3fLWOakjPQ6jwDa1+C5ahY4RA2Kwu8rvApqCczAQOIsQ5ReZToPRPASx6LT7M9WQRH8s5VjOM5v5Q==
@@ -2328,7 +2319,7 @@
   dependencies:
     unist-util-visit "^1.3.0"
 
-"@mdx-js/react@^1.0.16", "@mdx-js/react@^1.0.27", "@mdx-js/react@^1.1.5":
+"@mdx-js/react@^1.0.16", "@mdx-js/react@^1.1.5":
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/@mdx-js/react/-/react-1.1.5.tgz#5e257debcdd0a60da992699385edef0abb891cb7"
   integrity sha512-c+tfNfvsInS5PRjTMGqxI+LyLrlxKyX/TNqeNG1DLKGjjf9cFlDshu7tnqZZhGa/VBu0c/XXkK8ZkXjpmfhweQ==
