@@ -133,6 +133,6 @@
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.6",
     "webpack-conditional-loader": "1.0.12",
-    "webpack-dev-server": "3.7.2"
+    "webpack-dev-server": "3.8.0"
   }
 }
