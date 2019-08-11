@@ -128,7 +128,7 @@
     "pretty-quick": "1.11.1",
     "react-hot-loader": "4.12.10",
     "sass-loader": "7.2.0",
-    "style-loader": "0.23.1",
+    "style-loader": "1.0.0",
     "webpack": "4.39.1",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.6",
