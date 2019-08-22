@@ -25,7 +25,6 @@ startDevelopmentPersistent() {
 startProductionNoCloning() {
 
   mkdir -p lpa_temp/docker
-  mkdir -p lpa_temp/nginx
 
   if [ -e "lpa_temp/docker/docker-compose.yml" ]; then
     echo 'docker-compose.yml already exists' >&2
@@ -36,7 +35,27 @@ startProductionNoCloning() {
   if [ -e "lpa_temp/docker/nginx-prod.conf" ]; then
     echo 'nginx-prod.conf already exists' >&2
   else
-    curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx/nginx-prod.conf -o lpa_temp/nginx/nginx-prod.conf
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker/nginx-prod.conf -o lpa_temp/docker/nginx-prod.conf
+  fi
+
+  if [ -e "lpa_temp/src/backend/src/main/resources/db/migration" ]; then
+    echo 'migrations already exist' >&2
+  else
+    mkdir -p lpa_temp/src/backend/src/main/resources/db/migration
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/R__Vacuum.sql -o lpa_temp/src/backend/src/main/resources/db/migration/R__Vacuum.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.0__Create_schema.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.0__Create_schema.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.1__Extended_user_profile_and_storing_discovery_and_ETL_parameters.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.1__Extended_user_profile_and_storing_discovery_and_ETL_parameters.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.2__Multiple_named_graphs.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.2__Multiple_named_graphs.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.3__Color_schemes_on_user%2C_drop_applications%2C_named_graphs_on_delete_cascade.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.3__Color_schemes_on_user%2C_drop_applications%2C_named_graphs_on_delete_cascade.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.4__Applications.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.4__Applications.sql
+
+    curl https://raw.githubusercontent.com/linkedpipes/applications/master/src/backend/src/main/resources/db/migration/V1.5__Repeated_executions.sql -o lpa_temp/src/backend/src/main/resources/db/migration/V1.5__Repeated_executions.sql
   fi
 
   cd lpa_temp/docker
