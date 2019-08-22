@@ -1,3 +1,5 @@
+import React from 'react';
+
 /* eslint-disable */
 function urlDomain(url) {
   let hostname;
@@ -120,6 +122,34 @@ const getBeautifiedVisualizerTitle = visualizerId => {
   return '';
 };
 
+const useScroll = () => {
+  const ref = React.useRef(null);
+  const executeScroll = () => {
+    window.scrollTo(0, ref.current.offsetTop);
+  };
+  const htmlElementAttributes = { ref };
+
+  return [executeScroll, htmlElementAttributes];
+};
+
+const getLanguageLabel = (
+  languageMap,
+  fallback = 'Label not available',
+  lang = null
+) => {
+  if (!!languageMap) {
+    const keys = Object.keys(languageMap);
+    if (lang && keys.includes(lang)) {
+      return languageMap[lang];
+    }
+    if (keys.includes('en')) {
+      return languageMap['en'];
+    }
+    return languageMap[keys[0]];
+  }
+  return fallback;
+};
+
 export default {
   randDarkColor,
   unixTimeConverter,
@@ -128,5 +158,8 @@ export default {
   getLocation,
   extractUrlGroups,
   urlDomain,
-  getBeautifiedVisualizerTitle
+  getBeautifiedVisualizerTitle,
+  useScroll,
+  getLanguageLabel,
+  clearCookies
 };

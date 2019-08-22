@@ -47,6 +47,7 @@ public abstract class SelectSparqlQueryProvider extends SparqlQueryProvider<Sele
             addWheres(builder);
             addOptionals(builder);
             addFilters(builder);
+            addGroupBy(builder);
             addAdditional(builder);
         } catch (ParseException e) {
             throw new RuntimeException(e);

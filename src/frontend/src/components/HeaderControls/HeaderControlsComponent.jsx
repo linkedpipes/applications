@@ -1,25 +1,22 @@
 // @flow
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import MenuItem from '@material-ui/core/MenuItem/MenuItem';
-import Menu from '@material-ui/core/Menu/Menu';
-import SettingsIcon from '@material-ui/icons/Settings';
-import RemoveIcon from '@material-ui/icons/Remove';
-import AccountCircle from '@material-ui/icons/AccountCircleTwoTone';
+import SettingsIcon from '@material-ui/icons/SettingsTwoTone';
+import LogoutIcon from '@material-ui/icons/ExitToAppTwoTone';
+import HelpIcon from '@material-ui/icons/HelpTwoTone';
 import NotificationsIcon from '@material-ui/icons/NotificationsTwoTone';
 import Badge from '@material-ui/core/Badge';
-import ListItemIcon from '@material-ui/core/ListItemIcon/ListItemIcon';
 import MenuIcon from '@material-ui/icons/Menu';
-import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Grid,
-  Typography,
   Hidden,
   Toolbar,
   AppBar,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core';
+import { GlobalConstants } from '@constants/';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -47,28 +44,22 @@ const styles = theme => ({
 
 type Props = {
   classes: Object,
-  anchorElement: Object,
   onHandleLogoutClicked: Function,
-  onHandleMenuClose: Function,
-  onHandleMenuOpen: Function,
-  profileMenuIsOpen: Function,
   onHandleOpenSettings: Function,
   onHandleSetInboxDialogOpen: Function,
   currentInboxInvitations: Array<Object>,
-  onDrawerToggle: Function
+  onDrawerToggle: Function,
+  headerTitle: string
 };
 
 const HeaderControls = ({
   classes,
-  anchorElement,
-  profileMenuIsOpen,
-  onHandleMenuClose,
-  onHandleMenuOpen,
   onHandleLogoutClicked,
   onHandleOpenSettings,
   onHandleSetInboxDialogOpen,
   currentInboxInvitations,
-  onDrawerToggle
+  onDrawerToggle,
+  headerTitle
 }: Props) => (
   <React.Fragment>
     <AppBar color="primary" position="sticky" elevation={0}>
@@ -88,16 +79,20 @@ const HeaderControls = ({
           </Hidden>
           <Grid item xs />
           <Grid item>
-            <Typography
-              className={classes.link}
-              component="a"
-              href="htts://www.google.com"
-            >
-              Go to docs
-            </Typography>
+            <Tooltip title="Documentation • Go to platform documentation">
+              <IconButton
+                color="inherit"
+                href={GlobalConstants.DOCUMENTATION_URL}
+                target="_blank"
+                // onClick={onHandleOpenSettings}
+                className={classes.iconButtonAvatar}
+              >
+                <HelpIcon className={classes.avatar} />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title="Alerts • No alters">
+            <Tooltip title="Notifications • No notifications">
               <IconButton color="inherit" onClick={onHandleSetInboxDialogOpen}>
                 <Badge
                   badgeContent={(currentInboxInvitations || []).length}
@@ -109,44 +104,39 @@ const HeaderControls = ({
             </Tooltip>
           </Grid>
           <Grid item>
-            <IconButton
-              color="inherit"
-              onClick={onHandleMenuOpen}
-              className={classes.iconButtonAvatar}
-            >
-              <AccountCircle className={classes.avatar} />
-            </IconButton>
+            <Tooltip title="Settings • Go to settings">
+              <IconButton
+                color="inherit"
+                onClick={onHandleOpenSettings}
+                className={classes.iconButtonAvatar}
+              >
+                <SettingsIcon className={classes.avatar} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+          <Grid item>
+            <Tooltip title="Logout • Logout from platform">
+              <IconButton
+                color="inherit"
+                onClick={onHandleLogoutClicked}
+                className={classes.iconButtonAvatar}
+              >
+                <LogoutIcon className={classes.avatar} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
+      </Toolbar>
+      <Toolbar>
+        <Grid container alignItems="center" spacing={1}>
+          <Grid item xs>
+            <Typography color="inherit" variant="h5" component="h1">
+              {headerTitle}
+            </Typography>
           </Grid>
         </Grid>
       </Toolbar>
     </AppBar>
-
-    <Menu
-      anchorEl={anchorElement}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'center'
-      }}
-      transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center'
-      }}
-      open={profileMenuIsOpen}
-      onClose={onHandleMenuClose}
-    >
-      <MenuItem onClick={onHandleOpenSettings}>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Settings" />
-      </MenuItem>
-      <MenuItem onClick={onHandleLogoutClicked}>
-        <ListItemIcon>
-          <RemoveIcon />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
-      </MenuItem>
-    </Menu>
   </React.Fragment>
 );
 

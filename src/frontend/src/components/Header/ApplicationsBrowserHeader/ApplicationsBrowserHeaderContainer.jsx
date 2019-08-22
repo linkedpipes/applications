@@ -14,8 +14,6 @@ const tabTitle = [
   { titleLabel: 'Shared Applications' }
 ];
 
-const sectionLabel = 'Applications Browser';
-
 class ApplicationsBrowserContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
     this.props.handleSetApplicationsBrowserTabIndex(tabIndex);
@@ -28,7 +26,6 @@ class ApplicationsBrowserContainer extends PureComponent<Props> {
     return (
       <ApplicationsBrowserHeaderComponent
         applicationsBrowserTabIndex={applicationsBrowserTabIndex}
-        sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
       />

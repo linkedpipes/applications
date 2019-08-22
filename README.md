@@ -5,61 +5,38 @@
     <a href="https://travis-ci.org/linkedpipes/applications"><img src="https://travis-ci.org/linkedpipes/applications.svg?branch=develop" alt="Travis status" /></a>
     <a href="https://app.codacy.com/app/LinkedPipes/applications?utm_source=github.com&utm_medium=referral&utm_content=linkedpipes/applications&utm_campaign=Badge_Grade_Settings"><img src="https://api.codacy.com/project/badge/Grade/87ac72b5a8d347b5a10a519323d71b6f" alt="Codacy" /></a>
     <a href="https://renovatebot.com/"><img src="https://img.shields.io/badge/renovate-enabled-brightgreen.svg" alt="Renovate Bot" /></a> </br>
-    <a href="https://linkedpipes.docs.apiary.io"><img src="https://img.shields.io/badge/Documentation-API-Blue.svg" alt="Apiary" /></a>
-    <a href="https://docs.frontend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Frontend-blue.svg" alt="Javadoc" /></a>
+    <a href="https://docs.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Guides-blue.svg" alt="Guides" /></a>
+    <a href="https://docs.frontend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Frontend-blue.svg" alt="Frontend" /></a>
     <a href="https://docs.backend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Backend-blue.svg" alt="Javadoc" /></a>
+    <a href="https://linkedpipes.docs.apiary.io"><img src="https://img.shields.io/badge/Documentation-Backend API-Blue.svg" alt="Apiary" /></a>
+
 </p>
 
-## About
+## 📃 About
 
 LinkedPipes Applications is a visualization web platform that allows the users to explore, visualize and publish LinkedData based visualizer applications. Applications created with these platforms can be easily published and integrated anywhere on the Web!
 
-## Quick start
+• General user documentation and platform tutorials are available [here](http://docs.applications.linkedpipes.com) <br/>
+• Developer oriented frontend documentation and `React` component demos are available [here](http://docs.frontend.applications.linkedpipes.com) <br/>
+• Developer oriented backend documentation and architecture overview are available [here](http://docs.backend.applications.linkedpipes.com)
 
-The whole app can be run using [docker compose](https://docs.docker.com/compose/install/):
+## 🚀 Quick start
 
-The production version can be run with:
+The faster way to start your own LinkedPipes Applications platform instance is to execute the production docker-compose setup.
 
-```bash
-$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose-master.yml -o docker-compose.yml &&
-curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx-prod.conf -o nginx-prod.conf && docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up
-```
+### Prerequisites
 
-The development version can be run with:
+• [Docker and Docker-compose](https://www.docker.com)
 
-```bash
-$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/docker-compose.yml -o docker-compose.yml &&
-curl https://raw.githubusercontent.com/linkedpipes/applications/master/nginx.conf -o nginx.conf && docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up
-```
-
-If it fails it can be because you already have some container with the same names running. You can delete these containers with the
-following command:s
+### Running within `docker-compose`
 
 ```bash
- $ docker rm $(docker ps -a -q -f name=lpa-*)
+$ curl https://raw.githubusercontent.com/linkedpipes/applications/master/lpa-cli.sh -o lpa-cli.sh && chmod +x lpa-cli.sh && ./lpa-cli.sh --production-no-cloning
 ```
 
-## Manual start
+### Default container ports
 
-You can also run the whole application by directly from the code in the repository.
-
-First download the whole repository into your computer by running
-
-```bash
-$ git clone https://github.com/linkedpipes/applications.git lpa
-```
-
-Then set your working directory to the one that you just downloaded:
-
-```bash
-$ cd lpa
-```
-
-Finally, execute
-
-```bash
-(lpa)$ docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up --build
-```
+Once you have started the instance of the platform in `docker-compose`, individual components will be accessible on the following ports by default:
 
 You should be able to access: <br/>
 • **Frontend** of LPA at `localhost:9001` <br/>
@@ -68,16 +45,25 @@ You should be able to access: <br/>
 • Local **ETL** at `localhost:8080` <br/>
 • Local **Virtuoso** at `localhost:8890`
 
-You can also customize some settings in the following files:
-
-- `docker-compose.yml` - for development builds
-- `nginx.conf`
-- `src/backend/src/main/config/com/linkedpipes/lpa/backend/config.properties`
+## 🧠 Advanced usage
 
 ---
 
-## Testing
+For more advanced scenarious and executions of development compose configurations it is recommended to clone the whole repository first and refer to documentation of `lpa-cli.sh` startup commands:
 
-<p align="center"><img img width=35% src="https://i.ibb.co/MnhHHBq/Browserstack-logo-2x.png" alt="Browserstack-logo-2x" border="0"><br /></p>
+```bash
+usage: ./lpa-cli.sh [-dc]|[--detailed-command]
+-d   | --development                  Start non persistent development setup (assumes repository is already cloned)
+-dp  | --development-persistent       Start non persistend development setup (assumes repository is already cloned)
+-p   | --production                   Start persistend production setup (assumes repository is already cloned)
+-pnc | --production-no-cloning        Start persistend production setup [NO CLONING REQUIRED ;-)]
+-cs  | --clean-storage                Remove 'appdata' and 'data' folders with database data and etc
+-sc  | --stop-compose                 Setup whatever configuration setup is currently running
+-h   | --help                         Print help documentation
+```
+
+## 🧪 Testing
 
 LinkedPipes Applications uses [BrowserStack](https://www.browserstack.com) for automated integration testing.
+
+<p align="center"><img img width=35% src="https://i.ibb.co/MnhHHBq/Browserstack-logo-2x.png" alt="Browserstack-logo-2x" border="0"><br /></p>

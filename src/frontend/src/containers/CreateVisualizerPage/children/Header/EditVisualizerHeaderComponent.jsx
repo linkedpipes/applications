@@ -76,7 +76,8 @@ type Props = {
   handleDataRefreshClicked: Function,
   handleDataRefreshDismissed: Function,
   selectedDataRefreshInterval: Function,
-  handleDataRefreshTypeChange: Function
+  handleDataRefreshTypeChange: Function,
+  isShared: boolean
 };
 
 const styles = theme => ({
@@ -168,7 +169,8 @@ const EditVisualizerHeaderComponent = ({
   handleDataRefreshTypeChange,
   handleDataRefreshValueChange,
   handleDataRefreshToggleClicked,
-  selectedPipelineExecution
+  selectedPipelineExecution,
+  isShared
 }: Props) => (
   <React.Fragment>
     <Paper
@@ -223,16 +225,18 @@ const EditVisualizerHeaderComponent = ({
                 Share
               </Button>
             </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={handleSettingsMenuClick}
-              >
-                <SettingsIcon className={classes.leftIcon} />
-                Settings
-              </Button>
-            </Grid>
+            {!isShared && (
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleSettingsMenuClick}
+                >
+                  <SettingsIcon className={classes.leftIcon} />
+                  Settings
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </div>
       </Container>

@@ -11,8 +11,6 @@ type Props = {
 
 const tabTitle = [];
 
-const sectionLabel = 'Create Application';
-
 class DiscoverHeaderContainer extends PureComponent<Props> {
   handleTabChange = (event, tabIndex) => {
     this.props.handleSetDiscoverTabIndex(tabIndex);
@@ -25,7 +23,6 @@ class DiscoverHeaderContainer extends PureComponent<Props> {
     return (
       <DiscoverHeaderComponent
         discoverTabIndex={discoverTabIndex}
-        sectionLabel={sectionLabel}
         tabTitles={tabTitle}
         onHandleTabChange={handleTabChange}
       />

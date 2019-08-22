@@ -72,9 +72,17 @@ public class PipelineController {
         return ResponseEntity.ok(pipelineExportService.exportPipeline(discoveryId, pipelineUri));
     }
 
+    /**
+     * Execute a pipeline once.
+     *
+     * @param webId user identifier
+     * @param etlPipelineIri IRI of the pipeline to execute
+     * @param selectedVisualiser visualiser that was selected by user on frontend (will be returned later)
+     * @return result of executePipeline operation
+     */
     @NotNull
     @PostMapping("/api/pipeline/execute")
-    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value="webId") String webId,
+    public ResponseEntity<Execution> executePipeline(@NotNull @RequestParam(value = "webId") String webId,
                                                      @NotNull @RequestParam(value = "etlPipelineIri") String etlPipelineIri,
                                                      @NotNull @RequestParam(value = "selectedVisualiser") String selectedVisualiser) throws LpAppsException {
         try {
@@ -87,6 +95,14 @@ public class PipelineController {
         }
     }
 
+    /**
+     * Set the pipeline to be executed periodically.
+     *
+     * @param frequencyHours interval (in hours) after which the pipeline will be executed once again
+     * @param webId user identifier
+     * @param executionIri IRI of first pipeline execution
+     * @param selectedVisualiser visualiser that was selected by user on frontend (will be returned later)
+     */
     @PostMapping("/api/pipeline/repeat")
     public void executePipeline(@RequestParam(value="frequencyHours") long frequencyHours,
                                 @NotNull @RequestParam(value="webId") String webId,
@@ -100,13 +116,24 @@ public class PipelineController {
         scheduledExecutionService.repeatExecution(frequencyHours, true, executionIri, webId, selectedVisualiser);
     }
 
-    @NotNull
+    /**
+     * Toggle a periodic execution of a pipeline on/off.
+     *
+     * @param repeat is the periodic execution on or off
+     * @param executionIri IRI of first pipeline execution
+     */
     @PutMapping("/api/pipeline/repeat")
-    public void executePipeline(@NotNull @RequestParam(value="repeat") boolean repeat,
+    public void executePipeline(@RequestParam(value = "repeat") boolean repeat,
                                 @NotNull @RequestParam(value = "executionIri") String executionIri) {
         scheduledExecutionService.stopScheduledExecution(repeat, executionIri);
     }
 
+    /**
+     * Get more information about this pipeline execution.
+     *
+     * @param executionIri IRI of first pipeline execution
+     * @return information about pipeline execution
+     */
     @NotNull
     @GetMapping("/api/pipeline/execution")
     public ResponseEntity<PipelineExecution> getExecution(@NotNull @RequestParam(value="executionIri") String executionIri) throws LpAppsException {

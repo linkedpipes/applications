@@ -14,8 +14,10 @@ import RemoveIcon from '@material-ui/icons/RemoveCircle';
 import uuid from 'uuid';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
+import { CardActionArea, Link } from '@material-ui/core';
 import { ETL_STATUS_MAP, GlobalUtils } from '@utils';
 import { VisualizerIcon } from '@components';
+import { GlobalConstants } from '@constants/';
 
 type Props = {
   pipelineExecutionsList: Array<{
@@ -100,8 +102,8 @@ const PipelinesTableComponent = ({
           {(pipelineExecutionsList === undefined ||
             pipelineExecutionsList.length === 0) && (
             <Typography component={'span'} variant="h6" gutterBottom>
-              No discovery sessions available, start with creating new app to
-              see sessions here...
+              No pipeline sessions available, start with creating new app to see
+              sessions here...
             </Typography>
           )}
           {pipelineExecutionsList.map((pipelineExecutionItem, index) => (
@@ -160,12 +162,25 @@ const PipelinesTableComponent = ({
                   }
                 />
 
-                <div className={classes.cardMedia}>
-                  <VisualizerIcon
-                    visualizerType={pipelineExecutionItem.selectedVisualiser}
-                    style={{ color: 'white', fontSize: '75px' }}
-                  />
-                </div>
+                <CardActionArea
+                  onClick={() => {
+                    onHandleSelectPipelineExecutionClick(pipelineExecutionItem);
+                  }}
+                  disabled={
+                    !(
+                      pipelineExecutionItem.status &&
+                      ETL_STATUS_MAP[pipelineExecutionItem.status['@id']] ===
+                        'Finished'
+                    )
+                  }
+                >
+                  <div className={classes.cardMedia}>
+                    <VisualizerIcon
+                      visualizerType={pipelineExecutionItem.selectedVisualiser}
+                      style={{ fontSize: '75px' }}
+                    />
+                  </div>
+                </CardActionArea>
 
                 <CardContent className={classes.cardContent}>
                   <Typography variant="subtitle2" style={{ display: 'inline' }}>
@@ -254,7 +269,13 @@ const PipelinesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to ETL section in Docs.
+        Refer to Core Concepts section in&nbsp;
+        <Link
+          target="_blank"
+          href={GlobalConstants.CORE_CONCEPTS_DOCUMENTATION_URL}
+        >
+          Docs.
+        </Link>
       </Typography>
     </Paper>
     {/* End footer */}

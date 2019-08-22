@@ -5,6 +5,7 @@ menu: Containers
 
 import { Playground, Props } from 'docz';
 import { HomePage } from './HomeController';
+import { QuickStart } from './children';
 
 # HomePage
 
@@ -25,20 +26,27 @@ HomePage is a container representing a `HomePage` webpage.
 ├── HomeController.jsx # React PureComponent, responsible for both UI and states
 ├── HomePage.mdx # Documentation markdown that you are currently looking at
 ├── children/ # Children components used within 'HomeComponent.jsx'
+    ├── QuickStartComponent.jsx # Children component responsible for displaying the demo templates
+    ├── PipelinesTableComponent.jsx # Children component responsible for components of Pipeline executions
+    ├── DiscoveriesTableContainer.jsx # Children component responsible for states of Discoveries sessions
+    ├── DiscoveriesTableComponent.jsx # Children component responsible for components of Discoveries sessions
+    └── index.js
 └── index.js
 ```
 
-## Properties
+## QuickStart
 
-### Component
+### Properties
 
-<Props of={HomePage} />
+#### Component
 
-## Example
+<Props of={QuickStart} />
+
+### Example
 
 Example demonstrates the combination of PureComponent responsible for states and stateless component
 responsible for UI working together in an isolated Playground.
 
 <Playground>
-  <HomePage location={{ pathname: '/' }} onHandleSampleClick={() => {}} />
+  <QuickStart displayName={''} onHandleSampleClick={() => {}} />
 </Playground>

@@ -1,6 +1,62 @@
 import types from './types';
 import StorageToolbox from '@storage/StorageToolbox';
 
+// Map
+
+const setSelectedMapOptions = filters => {
+  return {
+    type: types.SET_SELECTED_MAP_OPTIONS,
+    filters
+  };
+};
+
+const setSelectedMapOptionsWithSolid = (filters, isEditing) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    const oldFilters =
+      state.filters.filtersState.filterGroups.mapFilters.filters;
+
+    let oldOptions = [];
+    oldFilters.forEach(element => {
+      oldOptions = oldOptions.concat(element.options);
+    });
+
+    dispatch(setSelectedMapOptions(filters));
+
+    let newOptions = [];
+    filters.forEach(element => {
+      newOptions = newOptions.concat(element.options);
+    });
+
+    if (isEditing) {
+      const metadata = state.application.selectedApplicationMetadata;
+
+      if (metadata) {
+        const difference = [];
+        newOptions.forEach(newOption => {
+          if (
+            oldOptions.some(
+              e =>
+                e.uri === newOption.uri &&
+                (e.enabled !== newOption.enabled ||
+                  e.selected !== newOption.selected ||
+                  e.visible !== newOption.visible)
+            )
+          ) {
+            difference.push(newOption);
+          }
+        });
+        if (difference.length > 0 && oldFilters.length > 0) {
+          StorageToolbox.setSelectedFilterOptions(
+            metadata.solidFileUrl,
+            difference
+          );
+        }
+      }
+    }
+  };
+};
+
 const setSelectedScheme = (filterName, schemes) => {
   return {
     type: types.SET_SELECTED_SCHEME,
@@ -129,5 +185,7 @@ export default {
   toggleEnabledWithSolid,
   resetFilters,
   toggleVisibleWithSolid,
-  setSelectedNodesWithSolid
+  setSelectedNodesWithSolid,
+  setSelectedMapOptions,
+  setSelectedMapOptionsWithSolid
 };

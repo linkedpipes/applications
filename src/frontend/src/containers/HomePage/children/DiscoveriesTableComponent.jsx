@@ -13,16 +13,19 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 // eslint-disable-next-line no-unused-vars
-import { CardHeader } from '@material-ui/core';
+import { CardHeader, Link } from '@material-ui/core';
 import moment from 'moment';
+import { GlobalConstants } from '@constants/';
 
 type Props = {
   classes: Object,
   discoveriesList: Array<{
     discoveryId: string,
     isFinished: boolean,
-    sparqlEndpointIri: string,
     dataSampleIri: string,
+    sparqlEndpointIri: string,
+    namedGraphs: Array<string>,
+    namedGraph: string,
     started: number,
     finished: number
   }>,
@@ -39,12 +42,9 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(8, 0, 6)
   },
-  heroButtons: {
-    marginTop: theme.spacing(4)
-  },
   cardGrid: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8)
+    paddingTop: theme.spacing(6),
+    paddingBottom: theme.spacing(6)
   },
   card: {
     height: '100%',
@@ -56,7 +56,8 @@ const styles = theme => ({
     textAlign: 'center'
   },
   cardContent: {
-    flexGrow: 1
+    flexGrow: 1,
+    paddingRight: theme.spacing(4)
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
@@ -165,12 +166,38 @@ const DiscoveriesTableComponent = ({
                       : 'N/A'}
                   </Typography>
                   <br />
+                  <br />
                   <Typography variant="subtitle2" style={{ display: 'inline' }}>
                     Data sample IRI:
                   </Typography>{' '}
-                  <Typography variant="body2">
+                  <Typography
+                    style={{
+                      whiteSpace: 'nowrap',
+                      width: '18rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                    variant="body2"
+                  >
                     {discoveryItem.dataSampleIri
                       ? discoveryItem.dataSampleIri
+                      : 'N/A'}
+                  </Typography>
+                  <br />
+                  <Typography variant="subtitle2" style={{ display: 'inline' }}>
+                    Named graph IRI:
+                  </Typography>{' '}
+                  <Typography
+                    style={{
+                      whiteSpace: 'nowrap',
+                      width: '18rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                    variant="body2"
+                  >
+                    {discoveryItem.namedGraphs.length > 0
+                      ? discoveryItem.namedGraphs.join(',\n')
                       : 'N/A'}
                   </Typography>
                 </CardContent>
@@ -222,7 +249,13 @@ const DiscoveriesTableComponent = ({
         color="textSecondary"
         component="p"
       >
-        Refer to Discovery section in Docs.
+        Refer to Core Concepts section in&nbsp;
+        <Link
+          target="_blank"
+          href={GlobalConstants.PROVIDING_SOURCES_DOCUMENTATION_URL}
+        >
+          Docs.
+        </Link>
       </Typography>
     </Paper>
     {/* End footer */}

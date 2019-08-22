@@ -9,7 +9,11 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import ChordFiltersComponent from './children/ChordFilter';
-import TreemapFiltersComponent from './children/TreemapFilter';
+import {
+  TreemapFiltersComponent,
+  TreemapNodesFilterComponent
+} from './children/TreemapFilter';
+import MapSchemeFilterComponent from './children/MapFilter';
 import { connect } from 'react-redux';
 import { filtersActions } from '@ducks/filtersDuck';
 
@@ -52,15 +56,16 @@ type Props = {
   filtersState: {
     enabled: boolean,
     visible: boolean,
-    filterGroups: [
-      {
+    filterGroups: {
+      [key: string]: {
         label: string,
         enabled: boolean,
-        options: {},
+        options: Array<{ selected: boolean }>,
         filterType: string,
         visible: boolean
-      }
-    ]
+      },
+      schemeFilter: any
+    }
   },
   handleToggleEnabled: Function,
   handleToggleVisible: Function
@@ -77,16 +82,29 @@ class FiltersComponent extends React.Component<Props, State> {
     this.applyCallbacks.push(callback);
   };
 
-  getFilter = (filterType, filterLabel, options) => {
+  getFilter = (filterGroup, enabled) => {
+    const { filterType, filterLabel } = filterGroup;
     switch (filterType) {
       case 'NODES_FILTER':
         return (
           <ChordFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            nodes={options}
+            nodes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
+          />
+        );
+      case 'MAP_SCHEMES_FILTER':
+        return (
+          <MapSchemeFilterComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            filters={filterGroup.filters || []}
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+            enabled={enabled}
           />
         );
       case 'SCHEME_FILTER':
@@ -94,9 +112,26 @@ class FiltersComponent extends React.Component<Props, State> {
           <TreemapFiltersComponent
             editingMode={this.props.editingMode}
             registerCallback={this.registerCallback}
-            schemes={options}
+            schemes={filterGroup.options || []}
             selectedResultGraphIri={this.props.selectedResultGraphIri}
             name={filterLabel}
+            enabled={enabled}
+          />
+        );
+      case 'TREEMAP_NODES_FILTER':
+        return (
+          <TreemapNodesFilterComponent
+            editingMode={this.props.editingMode}
+            registerCallback={this.registerCallback}
+            concepts={filterGroup.options || []}
+            selectedScheme={
+              (
+                this.props.filtersState.filterGroups.schemeFilter.options || []
+              ).find(e => e.selected) || null
+            }
+            selectedResultGraphIri={this.props.selectedResultGraphIri}
+            name={filterLabel}
+            enabled={enabled}
           />
         );
       default:
@@ -116,6 +151,8 @@ class FiltersComponent extends React.Component<Props, State> {
     });
   };
 
+  // TODO: Component will unmount, reset all filters to default state
+
   render() {
     const {
       classes,
@@ -131,32 +168,6 @@ class FiltersComponent extends React.Component<Props, State> {
           <Typography variant="h4" className={classes.filterTitle}>
             Filters
             <span className={classes.filterSpan}>
-              {editingMode && (
-                <span>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleEnabled}
-                        checked={filtersState.enabled}
-                        value={filtersState.enabled}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.enabled ? 'Enabled' : 'Disabled'}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        onChange={handleToggleVisible}
-                        checked={filtersState.visible}
-                        value={filtersState.visible}
-                        color="primary"
-                      />
-                    }
-                    label={filtersState.visible ? 'Visible' : 'Hidden'}
-                  />
-                </span>
-              )}
               <Button
                 onClick={() => {
                   this.applyCallbacks.forEach(cb => {
@@ -170,6 +181,32 @@ class FiltersComponent extends React.Component<Props, State> {
                 Apply filters
               </Button>
             </span>
+            {editingMode && (
+              <div>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleEnabled}
+                      checked={filtersState.enabled}
+                      value={filtersState.enabled}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.enabled ? 'Enabled' : 'Disabled'}
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={handleToggleVisible}
+                      checked={filtersState.visible}
+                      value={filtersState.visible}
+                      color="primary"
+                    />
+                  }
+                  label={filtersState.visible ? 'Visible' : 'Hidden'}
+                />
+              </div>
+            )}
           </Typography>
 
           {(Object.values(filtersState.filterGroups) || []).map(
@@ -177,10 +214,7 @@ class FiltersComponent extends React.Component<Props, State> {
               filterGroup !== 'FilterGroup' &&
               (editingMode || filterGroup.visible) && (
                 <div className={classes.filterWrapper} key={filterGroup.label}>
-                  <ExpansionPanel
-                    key={filterGroup.label}
-                    disabled={!filterGroup.enabled && !editingMode}
-                  >
+                  <ExpansionPanel key={filterGroup.label}>
                     <ExpansionPanelSummary
                       id={filterGroup.label}
                       expandIcon={<ExpandMoreIcon />}
@@ -188,36 +222,8 @@ class FiltersComponent extends React.Component<Props, State> {
                       <Typography className={classes.heading}>
                         {filterGroup.label}
                       </Typography>
-                      {editingMode && (
-                        <div>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={filterGroup.enabled}
-                                value={filterGroup.enabled}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.enabled ? 'Enabled' : 'Disabled'}
-                          />
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={filterGroup.visible}
-                                value={filterGroup.visible}
-                                color="primary"
-                              />
-                            }
-                            label={filterGroup.visible ? 'Visible' : 'Hidden'}
-                          />
-                        </div>
-                      )}
                     </ExpansionPanelSummary>
-                    {this.getFilter(
-                      filterGroup.filterType,
-                      filterGroup.label,
-                      filterGroup.options
-                    )}
+                    {this.getFilter(filterGroup, filtersState.enabled)}
                   </ExpansionPanel>
                 </div>
               )

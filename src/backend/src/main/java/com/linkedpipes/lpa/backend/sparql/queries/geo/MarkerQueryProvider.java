@@ -3,12 +3,14 @@ package com.linkedpipes.lpa.backend.sparql.queries.geo;
 import com.linkedpipes.lpa.backend.rdf.Prefixes;
 import com.linkedpipes.lpa.backend.rdf.vocabulary.Schema;
 import com.linkedpipes.lpa.backend.sparql.ValueFilter;
-import com.linkedpipes.lpa.backend.sparql.VariableGenerator;
 import com.linkedpipes.lpa.backend.sparql.queries.ConstructSparqlQueryProvider;
 import com.linkedpipes.lpa.backend.util.SparqlUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.arq.querybuilder.AskBuilder;
 import org.apache.jena.arq.querybuilder.ConstructBuilder;
-import org.apache.jena.sparql.lang.sparql_11.ParseException;
+import org.apache.jena.arq.querybuilder.ExprFactory;
+import org.apache.jena.arq.querybuilder.clauses.WhereClause;
+import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 //ldvmi: https://github.com/ldvm/LDVMi/blob/master/src/app/model/rdf/sparql/geo/query/MarkerQuery.scala
 public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
+
+    private static final ExprFactory EXPR_FACTORY = new ExprFactory();
 
     private Map<String, List<ValueFilter>> filters;
 
@@ -32,13 +36,12 @@ public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
     public static final String VAR_NAME = var("st");
     public static final String VAR_DESCRIPTION = var("sd");
 
-    public MarkerQueryProvider(Map<String, List<ValueFilter>> filters){
+    public MarkerQueryProvider(Map<String, List<ValueFilter>> filters) {
         //remove "active" filters, as we want to filter out triples that satisfy non-active properties
         //keep only the ValueFilters that have isActive = false
-        Map<String, List<ValueFilter>> effectiveFilters = filters;
-        effectiveFilters.forEach((key, value) -> value.removeIf(vf -> (vf.isActive != null && vf.isActive)));
-        effectiveFilters.entrySet().removeIf(f -> f.getValue().size() == 0);
-        this.filters = effectiveFilters;
+        filters.forEach((key, value) -> value.removeIf(vf -> vf.isActive != null && vf.isActive));
+        filters.values().removeIf(List::isEmpty);
+        this.filters = filters;
     }
 
     @NotNull
@@ -86,31 +89,27 @@ public class MarkerQueryProvider extends ConstructSparqlQueryProvider {
 
     @NotNull
     @Override
-    protected ConstructBuilder addFilters(@NotNull ConstructBuilder builder) throws ParseException {
-        VariableGenerator varGen = new VariableGenerator();
+    protected ConstructBuilder addFilters(@NotNull ConstructBuilder builder) {
         for (Map.Entry<String, List<ValueFilter>> pair : filters.entrySet()) {
-            String v = varGen.getVariable();
-            builder.addWhere(VAR_SUBJECT, SparqlUtils.formatUri(pair.getKey()), v);
+            String predicate = pair.getKey();
 
             for (ValueFilter filter : pair.getValue()) {
-                String labelOrUri = getLabelOrUri(filter);
-                if (StringUtils.isNotEmpty(labelOrUri)) {
-                    builder.addFilter(v + " != " + labelOrUri);
+                if (StringUtils.isNotEmpty(filter.uri)) {
+                    builder.addFilter(notExists(where(VAR_SUBJECT, SparqlUtils.formatUri(predicate), SparqlUtils.formatUri(filter.uri))));
                 }
             }
         }
         return builder;
     }
 
-    private String getLabelOrUri(ValueFilter filter) {
-        if (StringUtils.isNotEmpty(filter.uri)) {
-            return SparqlUtils.formatUri(filter.uri);
-        }
-        else if (StringUtils.isNotEmpty(filter.label)) {
-            return SparqlUtils.formatLabel(filter.label);
-        }
+    @NotNull
+    private static Expr notExists(@NotNull WhereClause whereClause) {
+        return EXPR_FACTORY.notexists(whereClause);
+    }
 
-        return null;
+    @NotNull
+    private static WhereClause where(@NotNull Object s, @NotNull Object p, @NotNull Object o) {
+        return new AskBuilder().addWhere(s, p, o);
     }
 
 }

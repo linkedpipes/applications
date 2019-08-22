@@ -10,6 +10,7 @@ import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast, ToastContainer } from 'react-toastify';
 import { Invitation } from '@storage/models';
+import { discoveryActions } from '@ducks/discoveryDuck';
 import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
 import { SocketContext, Log, UserService } from '@utils';
 import { PrivateLayout, PublicLayout } from '@layouts';
@@ -26,9 +27,7 @@ import {
 import {
   DashboardHeader,
   ApplicationHeader,
-  DiscoverHeader,
   SettingsHeader,
-  AboutHeader,
   ApplicationsBrowserHeader
 } from '@components';
 
@@ -50,8 +49,11 @@ const startSocketClient = () => {
 };
 
 const stopSocketClient = () => {
+  socket.removeAllListeners();
   socket.disconnect();
 };
+
+let socketHasDisconnectedBefore = false;
 
 const styles = () => ({
   root: {}
@@ -74,7 +76,13 @@ type Props = {
   // eslint-disable-next-line react/no-unused-prop-types
   discoverySessions: Array<Object>,
   // eslint-disable-next-line react/no-unused-prop-types
-  pipelineExecutions: Array<Object>
+  pipelineExecutions: Array<Object>,
+  // eslint-disable-next-line react/no-unused-prop-types
+  dataSampleSessionId: string,
+  handleSetDataSampleSessionId: Function,
+  handleSetDiscoveryId: Function,
+  // eslint-disable-next-line react/no-unused-prop-types
+  discoveryId: string
 };
 
 type State = {
@@ -224,6 +232,21 @@ class AppRouter extends React.PureComponent<Props, State> {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000
                   });
+                } else {
+                  setTimeout(() => {
+                    StorageToolbox.getValidAppFolder(session.webId).then(
+                      async newFolder => {
+                        Log.info(newFolder);
+                        Log.info(newFolder);
+                        if (newFolder) {
+                          Log.warn('Called internal global');
+                          handleUpdateApplicationsFolder(newFolder);
+                          await self.checkInbox();
+                          setInterval(self.checkInbox, 10000);
+                        }
+                      }
+                    );
+                  }, 5000);
                 }
               });
             });
@@ -256,8 +279,13 @@ class AppRouter extends React.PureComponent<Props, State> {
       handleUpdateDiscoverySession,
       handleUpdateExecutionSession,
       handleDeleteDiscoverySession,
-      handleDeleteExecutionSession
+      handleDeleteExecutionSession,
+      handleSetDataSampleSessionId,
+      handleSetDiscoveryId,
+      webId
     } = this.props;
+
+    const self = this;
 
     if (socket) {
       // restart if there is an instance already
@@ -269,18 +297,32 @@ class AppRouter extends React.PureComponent<Props, State> {
       if (socket.connected) {
         Log.info('Client connected', 'AppRouter');
         Log.info(socket.id, 'AppRouter');
+        if (socket && socketHasDisconnectedBefore) {
+          // restart if there is an instance already
+          Log.info('Socket has disconnected before');
+          socketHasDisconnectedBefore = false;
+          self.startSocketListeners();
+          socket.emit('join', webId);
+        }
       }
     });
 
     socket.on('disconnect', () => {
       Log.info('Client disconnected', 'AppRouter');
       Log.info(socket.id, 'AppRouter');
+      socketHasDisconnectedBefore = true;
     });
 
     socket.on('reconnect', () => {
       if (socket.connected) {
         Log.info('Client reconnected', 'AppRouter');
         Log.info(socket.id, 'AppRouter');
+        if (socket && socketHasDisconnectedBefore) {
+          Log.info('Socket has disconnected before');
+          socketHasDisconnectedBefore = false;
+          self.startSocketListeners();
+          socket.emit('join', webId);
+        }
       }
     });
 
@@ -289,6 +331,11 @@ class AppRouter extends React.PureComponent<Props, State> {
         return;
       }
       const parsedData = JSON.parse(data);
+      const sessionId = parsedData.sessionId || undefined;
+      if (sessionId === self.props.dataSampleSessionId) {
+        handleSetDataSampleSessionId(undefined);
+        handleSetDiscoveryId(parsedData.discoveryId);
+      }
       socket.emit('join', parsedData.discoveryId);
       handleAddDiscoverySession(parsedData);
     });
@@ -307,8 +354,6 @@ class AppRouter extends React.PureComponent<Props, State> {
         handleDeleteDiscoverySession(discoveryId);
       }
     });
-
-    const self = this;
 
     socket.on('executionAdded', data => {
       if (data === undefined) {
@@ -355,7 +400,9 @@ class AppRouter extends React.PureComponent<Props, State> {
       }
       const parsedData = JSON.parse(data);
       if (parsedData.status.isFinished) {
-        socket.emit('leave', parsedData.discoveryId);
+        if (parsedData.discoveryId !== self.props.discoveryId) {
+          socket.emit('leave', parsedData.discoveryId);
+        }
         if (self.props.discoverySessions.length > 0) {
           const discoveryRecord = {};
 
@@ -416,20 +463,22 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/dashboard"
                 component={HomePage}
                 headerComponent={DashboardHeader}
+                headerTitle={'Dashboard'}
                 exact
               />
 
               <PrivateLayout
-                path="/create-app"
+                path="/config-application"
                 component={CreateVisualizerPage}
                 headerComponent={ApplicationHeader}
+                headerTitle={'Application Control & Setup'}
                 exact
               />
 
               <PrivateLayout
-                path="/discover"
+                path="/create-application"
                 component={DiscoverPage}
-                headerComponent={DiscoverHeader}
+                headerTitle={'Create Application'}
                 exact
               />
 
@@ -437,20 +486,22 @@ class AppRouter extends React.PureComponent<Props, State> {
                 path="/settings"
                 component={SettingsPage}
                 headerComponent={SettingsHeader}
+                headerTitle={'Settings'}
                 exact
               />
 
               <PrivateLayout
                 path="/about"
                 component={AboutPage}
-                headerComponent={AboutHeader}
+                headerTitle={'FAQ'}
                 exact
               />
 
               <PrivateLayout
-                path="/storage"
+                path="/applications"
                 component={StoragePage}
                 headerComponent={ApplicationsBrowserHeader}
+                headerTitle={'Applications Browser'}
                 exact
               />
 
@@ -461,6 +512,8 @@ class AppRouter extends React.PureComponent<Props, State> {
               <Route path="/treemap" component={ApplicationPage} />
 
               <Route path="/chord" component={ApplicationPage} />
+
+              <Route path="/timeline" component={ApplicationPage} />
 
               <Redirect from="/" to="/login" exact />
               <Redirect to="/404" />
@@ -479,11 +532,13 @@ const mapStateToProps = state => {
   return {
     webId: state.user.webId,
     userProfile: state.user,
-    colorThemeIsLight: state.globals.colorThemeIsLight,
+    colorThemeIsLight: state.user.colorThemeIsLight,
     chooseFolderDialogIsOpen: state.globals.chooseFolderDialogIsOpen,
     discoverySessions: state.user.discoverySessions,
     pipelineExecutions: state.user.pipelineExecutions,
-    currentInboxInvitations: state.user.inboxInvitations
+    currentInboxInvitations: state.user.inboxInvitations,
+    dataSampleSessionId: state.discovery.dataSampleSessionId,
+    discoveryId: state.discovery.discoveryId
   };
 };
 
@@ -533,6 +588,18 @@ const mapDispatchToProps = dispatch => {
   const handleSetUserInboxInvitations = inboxInvitations =>
     dispatch(userActions.setUserInboxInvitations(inboxInvitations));
 
+  const handleSetDiscoveryId = discoveryId =>
+    dispatch(
+      discoveryActions.addDiscoveryIdAction({
+        id: discoveryId
+      })
+    );
+
+  const handleSetDataSampleSessionId = dataSampleSessionId =>
+    dispatch(
+      discoveryActions.addDataSampleSessionIdAction(dataSampleSessionId)
+    );
+
   return {
     handleSetSolidUserProfileAsync,
     handleSetUserWebId,
@@ -544,7 +611,9 @@ const mapDispatchToProps = dispatch => {
     handleUpdateExecutionSession,
     handleUpdateApplicationsFolder,
     handleUpdateUserDetails,
-    handleSetUserInboxInvitations
+    handleSetUserInboxInvitations,
+    handleSetDiscoveryId,
+    handleSetDataSampleSessionId
   };
 };
 

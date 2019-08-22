@@ -1,7 +1,7 @@
 # Base image
 FROM node:8.16.1-alpine
 
-ENV YARN_VERSION 1.16.0
+ENV YARN_VERSION 1.17.0
 # Install packages using Yarn
 # References:
 # http://bitjudo.com/blog/2014/03/13/building-efficient-dockerfiles-node-dot-js/
