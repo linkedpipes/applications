@@ -25,7 +25,7 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl \
 # Install packages
 WORKDIR /tmp
 RUN yarn cache clean
-RUN yarn install --frozen-lockfile --network-concurrency 1 --ignore-engines
+RUN yarn install --frozen-lockfile --network-concurrency 1
 
 # Create a symlink to node_modules
 RUN mkdir -p /app
