@@ -1,5 +1,5 @@
 # build environment
-FROM node:8.16.0-alpine as builder
+FROM node:10.16.3-alpine as builder
 
 ENV YARN_VERSION 1.17.0
 # Install packages using Yarn
@@ -23,7 +23,7 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl \
     && apk del .build-deps-yarn
 
 # Install packages
-RUN cd /tmp && yarn install --frozen-lockfile --check-files --network-concurrency 1
+RUN cd /tmp && until yarn install --frozen-lockfile ; do echo "Retrying yarn install..."; done
 
 # Create a symlink to node_modules
 RUN mkdir -p /usr/src/app && cd /usr/src/app && ln -s /tmp/node_modules

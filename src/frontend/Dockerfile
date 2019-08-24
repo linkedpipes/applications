@@ -1,5 +1,5 @@
 # Base image
-FROM node:8.16.1-alpine
+FROM node:10.16.3-alpine
 
 ENV YARN_VERSION 1.17.0
 # Install packages using Yarn
@@ -24,8 +24,7 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl \
 
 # Install packages
 WORKDIR /tmp
-RUN yarn cache clean
-RUN yarn install --frozen-lockfile --network-concurrency 1
+RUN until yarn install --frozen-lockfile ; do echo "Retrying yarn install..."; done
 
 # Create a symlink to node_modules
 RUN mkdir -p /app
