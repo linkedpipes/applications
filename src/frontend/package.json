@@ -119,7 +119,7 @@
     "eslint-plugin-prettier": "3.1.0",
     "eslint-plugin-react": "7.14.3",
     "file-loader": "4.2.0",
-    "flow-bin": "0.105.2",
+    "flow-bin": "0.106.1",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
     "lint-staged": "9.2.3",
