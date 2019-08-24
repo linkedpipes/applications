@@ -1,10 +1,20 @@
 {
-  "extends": ["config:base"],
+  "extends": [
+    "config:base"
+  ],
   "schedule": "every weekend",
-  "assignees": ["aorumbayev"],
-  "baseBranches": ["dependency_updates"],
+  "assignees": [
+    "aorumbayev"
+  ],
+  "baseBranches": [
+    "dependency_updates"
+  ],
   "separateMajorMinor": true,
   "rebaseStalePrs": true,
+  "automerge": true,
+  "major": {
+    "automerge": false
+  },
   "minor": {
     "automerge": true
   },
