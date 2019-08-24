@@ -32,7 +32,7 @@ jobs:
           - src/frontend/node_modules
           - src/frontend/eslint
       script:
-        - yarn install --frozen-lockfile --check-files --network-concurrency 1
+        - until yarn install --frozen-lockfile ; do echo 'Retrying yarn build' ; done
         - yarn run eslint
         - yarn run build
 
@@ -67,7 +67,7 @@ jobs:
           - src/frontend/node_modules
           - src/frontend/eslint
       script:
-        - yarn install --frozen-lockfile --check-files --network-concurrency 1
+        - until yarn install --frozen-lockfile ; do echo 'Retrying yarn build' ; done
         - yarn run eslint
         - yarn run build
         - yarn run docz:build
