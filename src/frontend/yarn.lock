@@ -3958,9 +3958,10 @@ bitcore-lib@^0.13.7:
     inherits "=2.0.1"
     lodash "=3.10.1"
 
-"bitcore-message@github:comakery/bitcore-message#dist":
+"bitcore-message@github:CoMakery/bitcore-message#dist":
   version "1.0.2"
-  resolved "https://codeload.github.com/comakery/bitcore-message/tar.gz/8799cc327029c3d34fc725f05b2cf981363f6ebf"
+  uid "8799cc327029c3d34fc725f05b2cf981363f6ebf"
+  resolved "https://codeload.github.com/CoMakery/bitcore-message/tar.gz/8799cc327029c3d34fc725f05b2cf981363f6ebf"
   dependencies:
     bitcore-lib "^0.13.7"
 
@@ -9859,10 +9860,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lint-staged@9.2.3:
-  version "9.2.3"
-  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-9.2.3.tgz#a4ef2b7033f83e8dbc718556610e20e0098356c0"
-  integrity sha512-ovDmF0c0VJDTP0VmwLetJQ+lVGyNqOkTniwO9S0MOJxGxIExpSRTL56/ZmvXZ1tHNA53GBbXQbfS8RnNGRXFjg==
+lint-staged@9.2.4:
+  version "9.2.4"
+  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-9.2.4.tgz#7a35839c9c6103ec98eabf43e35657c209509345"
+  integrity sha512-RAt5ogbLRiKy9+T3dKbbPKP6tN2I9VjEtTXQFxdkauUdMjIBsS70ikwwSgsBR8xVVCUSX7sVDyWCyem5xB8YDw==
   dependencies:
     chalk "^2.4.2"
     commander "^2.20.0"
