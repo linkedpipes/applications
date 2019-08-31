@@ -67,7 +67,7 @@
         "react-error-boundary": "1.2.5",
         "react-filepond": "^7.0.1",
         "react-ga": "^2.5.7",
-        "react-google-charts": "3.0.14",
+        "react-google-charts": "3.0.15",
         "react-loading-overlay": "^1.0.1",
         "react-particles-js": "^2.6.0",
         "react-redux": "7.1.0",
