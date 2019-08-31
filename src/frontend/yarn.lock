@@ -11929,10 +11929,10 @@ pigeon-cluster@^0.0.6:
   dependencies:
     supercluster "^2.2.0"
 
-pigeon-maps@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/pigeon-maps/-/pigeon-maps-0.13.0.tgz#03bbf941c4a4e42bc7b13865f97c3d41d085ce8f"
-  integrity sha512-Zmog5CL38c+Rh5FupQGh/M+rIbEcjc9lPHHx38+jp2xP+r8uPDrDNsfgp7bM36cMJF2LGIVtqcB44B4RgPi4mQ==
+pigeon-maps@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/pigeon-maps/-/pigeon-maps-0.14.0.tgz#af5bc3fd32e701451db1ac999ec0eef5d89b1d61"
+  integrity sha512-ee7yceJpRH3Jpb5iooYn0oqykNs18P3zjO7zKvq+9nf109QoiYx9b6Tniy8LxxpG83uDez0+DrGJOOHiW7gXnw==
 
 pigeon-marker@^0.3.4:
   version "0.3.4"

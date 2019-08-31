@@ -52,7 +52,7 @@
         "n3": "^1.1.1",
         "normalize.css": "8.0.1",
         "pigeon-cluster": "^0.0.6",
-        "pigeon-maps": "^0.13.0",
+        "pigeon-maps": "^0.14.0",
         "pigeon-marker": "^0.3.4",
         "prop-types": "15.7.2",
         "q": "^1.5.1",
