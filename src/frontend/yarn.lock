@@ -2497,7 +2497,7 @@
     "@sentry/utils" "5.6.1"
     tslib "^1.9.3"
 
-"@sentry/cli@^1.44.4":
+"@sentry/cli@^1.47.1":
   version "1.47.1"
   resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-1.47.1.tgz#6a3238e5bfa4f618867bc0bc145b8e2ba191ff46"
   integrity sha512-WijaRu1lb99OL6rHee6uOSb1wDyNCbrWcTJoRCuZD83K2fw3U58p68nli/y8CoMwQ55Mrg6CgtY8pmBiuseG0A==
@@ -2551,12 +2551,12 @@
     "@sentry/types" "5.6.1"
     tslib "^1.9.3"
 
-"@sentry/webpack-plugin@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@sentry/webpack-plugin/-/webpack-plugin-1.8.0.tgz#eb41194a222789fcf27aebc7d7d453fe85af9dc2"
-  integrity sha512-cRNvk70o50q0P952f0rArzvjk8Qvzw40K4B8dziLdNjIIYBGQ3fV+JCY7dta72AdBWB13g8L8SPqCQr8C3PgoQ==
+"@sentry/webpack-plugin@1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@sentry/webpack-plugin/-/webpack-plugin-1.8.1.tgz#26d8acc854b2545d6057b2bb83417e1f89df4cc1"
+  integrity sha512-Y1NUPOTXWJ3b15+0HTWbH44seGQBYS4rQiI9NqTGvnb2a7U02jKkS6iqdP3boQO8mzd/yPaXEHwgeZ+vxk5E+A==
   dependencies:
-    "@sentry/cli" "^1.44.4"
+    "@sentry/cli" "^1.47.1"
 
 "@shellscape/koa-send@^4.1.0":
   version "4.1.3"
