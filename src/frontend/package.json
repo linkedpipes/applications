@@ -131,7 +131,7 @@
         "style-loader": "1.0.0",
         "webpack": "4.39.3",
         "webpack-bundle-analyzer": "3.4.1",
-        "webpack-cli": "3.3.7",
+        "webpack-cli": "3.3.8",
         "webpack-conditional-loader": "1.0.12",
         "webpack-dev-server": "3.8.0"
     }
