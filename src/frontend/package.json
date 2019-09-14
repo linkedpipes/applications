@@ -60,7 +60,7 @@
         "rambda": "^3.0.0",
         "rdflib": "git+https://github.com/aorumbayev/rdflib.js.git",
         "react": "16.9.0",
-        "react-chord-diagram": "1.4.0",
+        "react-chord-diagram": "1.5.0",
         "react-copy-to-clipboard": "5.0.1",
         "react-dom": "16.9.0",
         "react-emoji-render": "1.0.0",

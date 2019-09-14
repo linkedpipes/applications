@@ -13044,10 +13044,10 @@ re-resizable@^4.11.0:
   resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-4.11.0.tgz#d5df10bda445c4ec0945751a223bf195afb61890"
   integrity sha512-dye+7rERqNf/6mDT1iwps+4Gf42420xuZgygF33uX178DxffqcyeuHbBuJ382FIcB5iP6mMZOhfW7kI0uXwb/Q==
 
-react-chord-diagram@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/react-chord-diagram/-/react-chord-diagram-1.4.0.tgz#891c51cbdcbe6fa120f823cb6704192694456336"
-  integrity sha512-324xEzqNakIdlHV+mfZpV0USmQyDCbvjxz9lhAnPq7CSdu/9gK/ooylpZvIq7ANZFIEKstZhkDeAjP2rS/Lqdg==
+react-chord-diagram@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-chord-diagram/-/react-chord-diagram-1.5.0.tgz#1aff8a0b9ca3a48b5c8b8e7eefc1cfff17a5ae30"
+  integrity sha512-TYH09p3+XoBdEqOAc7xoSXmwmIpkLg3jgcR8cNeF/aT0V2AL52wxBAl2tRe4X/BBpyMjQ+bBS+VY52LVLZqfjg==
   dependencies:
     d3-array "^2.3.1"
     d3-chord "^1.0.6"
