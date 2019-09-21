@@ -130,7 +130,7 @@
         "sass-loader": "7.3.1",
         "style-loader": "1.0.0",
         "webpack": "4.40.2",
-        "webpack-bundle-analyzer": "3.5.0",
+        "webpack-bundle-analyzer": "3.5.1",
         "webpack-cli": "3.3.8",
         "webpack-conditional-loader": "1.0.12",
         "webpack-dev-server": "3.8.0"
