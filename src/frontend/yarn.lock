@@ -4215,7 +4215,6 @@ bitcore-lib@^0.13.7:
 
 "bitcore-message@github:CoMakery/bitcore-message#dist":
   version "1.0.2"
-  uid "8799cc327029c3d34fc725f05b2cf981363f6ebf"
   resolved "https://codeload.github.com/CoMakery/bitcore-message/tar.gz/8799cc327029c3d34fc725f05b2cf981363f6ebf"
   dependencies:
     bitcore-lib "^0.13.7"
@@ -14789,17 +14788,6 @@ solid-auth-client@2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.0.tgz#4bac06984b61981ad9d06f285b8ead6200f21aaa"
   integrity sha512-+9RfqC64oWpH4afoWYhCtieuAziFyWiiW/isB9XEV6N+yb2jZ69UCJxpX7iBCpxK0j36bDeisdbp0zHRp/F46A==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    "@solid/oidc-rp" "^0.8.0"
-    auth-header "^1.0.0"
-    commander "^2.11.0"
-    isomorphic-fetch "^2.2.1"
-
-solid-auth-client@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.3.1.tgz#bb388eccbee317a567d4530ecd4758682a3ba753"
-  integrity sha512-lWTdXW94agrwNmtH0KkO0QG6qjGN+QPKo9SHdN0pESqR/wehEF10HcD52pYMthcxjdK5k/Lw84qnCLrf5SN/6A==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@solid/oidc-rp" "^0.8.0"

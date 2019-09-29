@@ -44,7 +44,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
 
     let domain = GlobalUtils.urlDomain(webId);
 
-    if (domain.includes('lpsolid')) {
+    if (domain.includes('lpapps')) {
       domain = `${domain}:8443`;
     }
 
