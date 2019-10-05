@@ -3782,13 +3782,13 @@ babel-plugin-react-docgen@^2.0.0:
     react-docgen "^3.0.0"
     recast "^0.14.7"
 
-babel-plugin-smart-webpack-import@1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.5.0.tgz#99421db3f5d610e85109bd9187a6e9db979770db"
-  integrity sha512-kj6ee3RT40I5+NzPHDWSGqZiQJ938hsdhGN24lm4bsI31zSHrEqt5wyqq64XQwJituHkfFzQeeZy01h0H5Bg7Q==
+babel-plugin-smart-webpack-import@1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.5.1.tgz#cc761c1f64449bc357dbdc08275ab176dcc86aec"
+  integrity sha512-LyIQmDc1ZojNpRMtXH9EwPmLY5AYPw2ksciRRYrydbMZVepcl4efpzIVBewo/1J2n3c74sXYFTKKItafZtYdDQ==
   dependencies:
     app-root-dir "^1.0.2"
-    base-x "^3.0.6"
+    base-x "^3.0.7"
     json5 "^2.1.0"
 
 "babel-plugin-styled-components@>= 1":
@@ -3967,7 +3967,7 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
-base-x@^3.0.6:
+base-x@^3.0.7:
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/base-x/-/base-x-3.0.7.tgz#1c5a7fafe8f66b4114063e8da102799d4e7c408f"
   integrity sha512-zAKJGuQPihXW22fkrfOclUUZXM2g92z5GzlSMHxhO6r6Qj+Nm0ccaGNBzDZojzwOMkpjAv4J0fOv1U4go+a4iw==
