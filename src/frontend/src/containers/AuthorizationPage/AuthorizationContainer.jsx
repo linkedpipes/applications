@@ -9,7 +9,7 @@ import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 const providers = {
   // Inrupt: 'https://inrupt.net/auth',
-  'LinkedPipes PODs': 'https://lpsolid.eu:8443/auth',
+  'LinkedPipes PODs': 'https://lpapps.co:8443/auth',
   '': ''
 };
 
@@ -115,7 +115,10 @@ class Authorization extends PureComponent<Props, State> {
   };
 
   handleProviderChange = event => {
-    this.setState({ providerTitle: event.target.value, withWebIdStatus: false });
+    this.setState({
+      providerTitle: event.target.value,
+      withWebIdStatus: false
+    });
     if (this.state.webIdFieldValue !== '') {
       this.setState({ webIdFieldValue: '' });
     }
