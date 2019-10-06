@@ -172,6 +172,22 @@ class StorageFileClient {
     return this.createItem(path, itemName, content, contentType);
   };
 
+  updateACL = async (path, itemName, content, contentType) => {
+    await this.removeItem(path, itemName);
+    const request = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType
+      },
+      body: content
+    };
+
+    const authClient = await import(
+      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    );
+    return authClient.fetch(`${path}${itemName}`, request);
+  };
+
   copyFile = async (
     originPath,
     originName,

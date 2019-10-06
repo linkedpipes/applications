@@ -12,6 +12,7 @@ import {
   AcceptedInvitation,
   AccessControl
 } from './models';
+import { AccessControlList } from '@inrupt/solid-react-components';
 import StorageFileClient from './StorageFileClient';
 import StorageSparqlClient from './StorageSparqlClient';
 import { Log } from '@utils';
@@ -199,18 +200,18 @@ class SolidBackend {
         Log.info(`Created folder ${folderUrl}.`);
       });
 
-      await StorageFileClient.updateItem(
-        `${folderUrl}`,
+      await StorageFileClient.updateACL(
+        `${folderUrl}/`,
         '.acl',
         await this.createFolderAccessList(
           webId,
           `${folderUrl}/`,
-          [READ],
+          [READ, WRITE],
           true,
           null
         ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
+        'text/turtle'
+      ).then(response => {
         Log.info(`Created access list ${folderUrl}/.acl`);
       });
 
@@ -221,18 +222,18 @@ class SolidBackend {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
 
-      await StorageFileClient.updateItem(
-        `${folderUrl}/configurations`,
+      await StorageFileClient.updateACL(
+        `${folderUrl}/configurations/`,
         '.acl',
         await this.createFolderAccessList(
           webId,
           `${folderUrl}/configurations/`,
-          [READ],
+          [READ, WRITE],
           true,
           null
         ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
+        'text/turtle'
+      ).then(response => {
         Log.info(`Created access list ${folderUrl}/configurations/.acl`);
       });
 
@@ -243,18 +244,18 @@ class SolidBackend {
         Log.info(`Created folder ${configurationsUrl}.`);
       });
 
-      await StorageFileClient.updateItem(
-        `${folderUrl}/sharedConfigurations`,
+      await StorageFileClient.updateACL(
+        `${folderUrl}/sharedConfigurations/`,
         '.acl',
         await this.createFolderAccessList(
           webId,
           `${folderUrl}/sharedConfigurations/`,
-          [READ],
+          [READ, WRITE],
           true,
           null
         ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
+        'text/turtle'
+      ).then(response => {
         Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
       });
 
