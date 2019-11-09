@@ -61,7 +61,7 @@
         "rdflib": "git+https://github.com/aorumbayev/rdflib.js.git",
         "react": "16.11.0",
         "react-chord-diagram": "1.5.0",
-        "react-copy-to-clipboard": "5.0.1",
+        "react-copy-to-clipboard": "5.0.2",
         "react-dom": "16.11.0",
         "react-emoji-render": "1.0.0",
         "react-error-boundary": "1.2.5",
