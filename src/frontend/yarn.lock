@@ -15139,10 +15139,10 @@ solid-auth-cli@^1.0.8:
     n3 "^1.0.3"
     solid-rest "^1.0.7"
 
-solid-auth-client@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.4.0.tgz#fd91a4147cc0cf1f5551ac0e0c77b8e262912f43"
-  integrity sha512-k2fCdv/4YyHubVHnZ8ChWVddEHjFFZT/+rsnFX/fQayrT2YVPYrX3rP2t8CaCUeFoNZBAkmM6aNI1SEZ0gRaKg==
+solid-auth-client@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/solid-auth-client/-/solid-auth-client-2.4.1.tgz#744939fce565f7c2913605fb23eee7e1e706de7d"
+  integrity sha512-IkwuTpJz6WSJNxKy57V1zJdkjAgZue3DLzHhDSz6Rs/9TS4CZFAZJRUUS3Y5KjJw9R3k1TayiQDB21/kAtidFw==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@solid/oidc-rp" "^0.8.0"
