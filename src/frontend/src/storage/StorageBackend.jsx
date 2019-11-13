@@ -15,6 +15,12 @@ import {
 import { AccessControlList } from '@inrupt/solid-react-components';
 import StorageFileClient from './StorageFileClient';
 import StorageSparqlClient from './StorageSparqlClient';
+import {
+  StorageFileManager,
+  SolidResourceType,
+  StorageAuthenticationManager,
+  ResourceConfig
+} from 'linkedpipes-storage';
 import { Log } from '@utils';
 // eslint-disable-next-line import/newline-after-import
 const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
@@ -129,7 +135,7 @@ class SolidBackend {
     } catch (err) {
       return Promise.reject(err);
     }
-    const folder = this.store.any(user, SOLID('timeline'), null, doc);
+    const folder = this.store.any(user, LPA('lpStorage'), null, doc);
     return folder
       ? folder.value.toString()
       : Promise.reject(new Error('No application folder.'));
@@ -192,76 +198,83 @@ class SolidBackend {
    */
   async createAppFolders(webId: string, folderTitle: string): Promise<boolean> {
     const url = `${Utils.getBaseUrlConcat(webId)}`;
-    const folderUrl = `${url}/${folderTitle}`;
-    const configurationsUrl = `${url}/${folderTitle}`;
+    const folderUrl = `${url}/${folderTitle}/`;
+    const configurationsUrl = `${url}/${folderTitle}/configurations`;
+    const sharedConfigurationsUrl = `${url}/${folderTitle}/sharedConfigurations/`;
 
     try {
-      await StorageFileClient.createFolder(url, folderTitle).then(() => {
-        Log.info(`Created folder ${folderUrl}.`);
+      const resourceConfig: ResourceConfig = new ResourceConfig(
+        { path: url, title: folderTitle, type: SolidResourceType.Folder },
+        webId
+      );
+
+      await StorageFileManager.createResource(resourceConfig).then(response => {
+        Log.info(response);
       });
 
-      await StorageFileClient.updateACL(
-        `${folderUrl}/`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/`,
-          [READ, WRITE],
-          true,
-          null
-        ),
-        'text/turtle'
-      ).then(response => {
-        Log.info(`Created access list ${folderUrl}/.acl`);
-      });
+      // await StorageFileManager.updateACL({
+      //   webID: webId,
+      //   controlModes: [READ, WRITE],
+      //   resource: {
+      //     type: SolidResourceType.Folder,
+      //     path: `${folderUrl}`,
+      //     isPublic: true
+      //   }
+      // }).then(response => {
+      //   Log.info(response);
+      // });
 
-      await StorageFileClient.createFolder(
-        configurationsUrl,
-        'configurations'
-      ).then(() => {
-        Log.info(`Created folder ${configurationsUrl}.`);
-      });
+      // const configurationsFolderConfig: ResourceConfig = {
+      //   resource: {
+      //     path: configurationsUrl,
+      //     type: SolidResourceType.Folder
+      //   },
+      //   webID: webId
+      // };
 
-      await StorageFileClient.updateACL(
-        `${folderUrl}/configurations/`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/configurations/`,
-          [READ, WRITE],
-          true,
-          null
-        ),
-        'text/turtle'
-      ).then(response => {
-        Log.info(`Created access list ${folderUrl}/configurations/.acl`);
-      });
+      // await StorageFileManager.createResource(configurationsFolderConfig).then(
+      //   response => {
+      //     Log.info(response);
+      //   }
+      // );
 
-      await StorageFileClient.createFolder(
-        configurationsUrl,
-        'sharedConfigurations'
-      ).then(() => {
-        Log.info(`Created folder ${configurationsUrl}.`);
-      });
+      // await StorageFileManager.updateACL({
+      //   webID: webId,
+      //   controlModes: [READ, WRITE],
+      //   resource: {
+      //     type: SolidResourceType.Folder,
+      //     path: `${configurationsUrl}/`,
+      //     isPublic: true
+      //   }
+      // });
 
-      await StorageFileClient.updateACL(
-        `${folderUrl}/sharedConfigurations/`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/sharedConfigurations/`,
-          [READ, WRITE],
-          true,
-          null
-        ),
-        'text/turtle'
-      ).then(response => {
-        Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
-      });
+      // const sharedConfigurationsFolderConfig: ResourceConfig = {
+      //   resource: {
+      //     path: sharedConfigurationsUrl,
+      //     type: SolidResourceType.Folder
+      //   },
+      //   webID: webId
+      // };
 
-      await this.updateAppFolder(webId, folderUrl).then(() => {
-        Log.info(`Updated app folder in profile.`);
-      });
+      // await StorageFileManager.createResource(
+      //   sharedConfigurationsFolderConfig
+      // ).then(response => {
+      //   Log.info(response);
+      // });
+
+      // await StorageFileManager.updateACL({
+      //   webID: webId,
+      //   controlModes: [READ, WRITE],
+      //   resource: {
+      //     type: SolidResourceType.Folder,
+      //     path: sharedConfigurationsUrl,
+      //     isPublic: true
+      //   }
+      // });
+
+      // await this.updateAppFolder(webId, folderUrl).then(() => {
+      //   Log.info(`Updated app folder in profile.`);
+      // });
     } catch (err) {
       Log.error(err);
       return false;
@@ -274,14 +287,10 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const copyFolderResult = await this.fetcher
       .recursiveCopy(originalFolder, destinationFolder, {
         copyACL: true,
-        fetch: authClient.fetch
+        fetch: StorageAuthenticationManager.fetch
       })
       .then(
         res => {
@@ -308,14 +317,10 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const copySuccess = await this.fetcher
       .recursiveCopy(originalFolder, destinationFolder, {
         copyACL: true,
-        fetch: authClient.fetch
+        fetch: StorageAuthenticationManager.fetch
       })
       .then(
         () => {
@@ -515,7 +520,7 @@ class SolidBackend {
    */
   async updateAppFolder(webId: string, folderUrl: string): Promise<boolean> {
     const user = $rdf.sym(webId);
-    const predicate = $rdf.sym(SOLID('timeline'));
+    const predicate = $rdf.sym(LPA('lpStorage'));
     const folder = $rdf.sym(folderUrl);
     const profile = user.doc();
     try {
@@ -1090,13 +1095,12 @@ class SolidBackend {
   }
 
   async checkSharedConfigurationsFolder(folderUrl) {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const deferred = Q.defer();
     const newResources = [];
-    const rdfjsSource = await rdfjsSourceFromUrl(folderUrl, authClient.fetch);
+    const rdfjsSource = await rdfjsSourceFromUrl(
+      folderUrl,
+      StorageAuthenticationManager.fetch
+    );
     const engine = newEngine();
 
     engine
@@ -1124,13 +1128,12 @@ class SolidBackend {
   }
 
   async checkInboxFolder(inboxUrl) {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const deferred = Q.defer();
     const newResources = [];
-    const rdfjsSource = await rdfjsSourceFromUrl(inboxUrl, authClient.fetch);
+    const rdfjsSource = await rdfjsSourceFromUrl(
+      inboxUrl,
+      StorageAuthenticationManager.fetch
+    );
     const self = this;
     const engine = newEngine();
 

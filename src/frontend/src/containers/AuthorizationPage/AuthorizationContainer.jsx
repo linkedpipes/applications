@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from 'react-redux';
 import Particles from 'react-particles-js';
+import { StorageAuthenticationManager } from 'linkedpipes-storage';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 const providers = {
@@ -48,13 +49,9 @@ class Authorization extends PureComponent<Props, State> {
   };
 
   login = async (idp, callbackUri) => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    const session = await authClient.currentSession();
+    const session = await StorageAuthenticationManager.currentSession();
     if (!session)
-      await authClient.login(idp, {
-        // callbackUri,
+      await StorageAuthenticationManager.login(idp, {
         storage: localStorage
       });
     else {

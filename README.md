@@ -9,7 +9,6 @@
     <a href="https://docs.frontend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Frontend-blue.svg" alt="Frontend" /></a>
     <a href="https://docs.backend.applications.linkedpipes.com"><img src="https://img.shields.io/badge/Documentation-Backend-blue.svg" alt="Javadoc" /></a>
     <a href="https://linkedpipes.docs.apiary.io"><img src="https://img.shields.io/badge/Documentation-Backend API-Blue.svg" alt="Apiary" /></a>
-
 </p>
 
 ## 📃 About

@@ -1,16 +1,16 @@
 version: "3.3"
 services:
-  nginx:
-    image: nginx:stable
-    container_name: lpa-reverse-proxy
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - "9001:80"
-    restart: on-failure
-    depends_on:
-      - backend
-      - frontend
+  # nginx:
+  #   image: nginx:stable
+  #   container_name: lpa-reverse-proxy
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   ports:
+  #     - "9001:80"
+  #   restart: on-failure
+  #   depends_on:
+  #     - backend
+  #     - frontend
 
   backend:
     image: linkedpipes/applications:backend
@@ -30,15 +30,15 @@ services:
       - discovery
       - flyway
 
-  frontend:
-    image: linkedpipes/applications:frontend
-    container_name: lpa-frontend
-    build:
-      context: ../src/frontend/
-      dockerfile: Dockerfile
-    restart: on-failure
-    depends_on:
-      - backend
+  # frontend:
+  #   image: linkedpipes/applications:frontend
+  #   container_name: lpa-frontend
+  #   build:
+  #     context: ../src/frontend/
+  #     dockerfile: Dockerfile
+  #   restart: on-failure
+  #   depends_on:
+  #     - backend
 
   # Refer to http://vos.openlinksw.com/owiki/wiki/VOS/VirtRDFPerformanceTuning
   # For adjusting the NumberOfButters and MaxDirtyBuffers according to your RAM size

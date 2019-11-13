@@ -1,4 +1,5 @@
 import { Utils } from './utils';
+import { StorageAuthenticationManager } from 'linkedpipes-storage';
 import { Log } from '@utils';
 
 class StorageFileClient {
@@ -14,36 +15,32 @@ class StorageFileClient {
   };
 
   fetchJsonLDFromUrl = async url => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient.fetch(url).then(this.assertSuccessfulResponseWithJson);
+    return StorageAuthenticationManager.default
+      .fetch(url)
+      .then(this.assertSuccessfulResponseWithJson);
   };
 
   fetchFileFromUrl = async (url, headers = {}) => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient
+    return StorageAuthenticationManager.default
       .fetch(url, { headers })
       .then(this.assertSuccessfulResponseWithText);
   };
 
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient.fetch(url).then(this.assertSuccessfulResponse);
+
+    return StorageAuthenticationManager.default
+      .fetch(url)
+      .then(this.assertSuccessfulResponse);
   };
 
   fetchFolder = async (path, folderName = '') => {
     const url = `${path}/${folderName}`;
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient
-      .fetch(url, { headers: { Accept: 'text/turtle' } })
+
+    return StorageAuthenticationManager.default
+      .fetch(url, {
+        headers: { Accept: 'text/turtle' }
+      })
       .then(this.assertSuccessfulResponse);
   };
 
@@ -81,18 +78,13 @@ class StorageFileClient {
       body: content
     };
 
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient.fetch(path, request);
+    return StorageAuthenticationManager.fetch(path, request);
   };
 
   removeFile = async (path, itemName) => {
     const url = `${path}${itemName}`;
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    const response = await authClient.fetch(url, {
+
+    const response = await StorageAuthenticationManager.fetch(url, {
       method: 'DELETE'
     });
     Log.info(response);
@@ -112,10 +104,8 @@ class StorageFileClient {
 
   removeItem = async (path, itemName) => {
     const url = `${path}/${itemName}`;
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    const response = await authClient.fetch(url, {
+
+    const response = await StorageAuthenticationManager.fetch(url, {
       method: 'DELETE'
     });
     if (response.status === 409 || response.status === 301) {
@@ -182,10 +172,7 @@ class StorageFileClient {
       body: content
     };
 
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    return authClient.fetch(`${path}${itemName}`, request);
+    return StorageAuthenticationManager.fetch(`${path}${itemName}`, request);
   };
 
   copyFile = async (
@@ -202,11 +189,7 @@ class StorageFileClient {
         : await fileResponse.blob();
     Log.info(content);
 
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
-    return authClient
+    return StorageAuthenticationManager.default
       .fetch(destinationUrl, {
         method: 'PUT',
         body: content
@@ -258,11 +241,7 @@ class StorageFileClient {
   };
 
   sendFileToUrl = async (url, data, type) => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
-    return authClient.fetch(url, {
+    return StorageAuthenticationManager.fetch(url, {
       method: 'POST',
       body: data,
       headers: {
@@ -287,11 +266,7 @@ class StorageFileClient {
   };
 
   executeSPARQLUpdateForUser = async (url, query) => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
-    return authClient.fetch(url, {
+    return StorageAuthenticationManager.fetch(url, {
       method: 'PATCH',
       body: query,
       headers: {

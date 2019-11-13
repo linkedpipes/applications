@@ -1,9 +1,8 @@
+import { StorageAuthenticationManager } from 'linkedpipes-storage';
+
 const getWebIdIfSessionValid = async () => {
   return new Promise(async resolve => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-    const session = await authClient.currentSession();
+    const session = await StorageAuthenticationManager.currentSession();
 
     if (!session) {
       resolve(undefined);

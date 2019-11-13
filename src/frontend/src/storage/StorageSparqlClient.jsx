@@ -1,11 +1,9 @@
+import { StorageAuthenticationManager } from 'linkedpipes-storage';
+
 class StorageSparqlClient {
   patchFileWithQuery = async (url, query) => {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     try {
-      await authClient.fetch(url, {
+      await StorageAuthenticationManager.fetch(url, {
         method: 'PATCH',
         body: query,
         headers: {
