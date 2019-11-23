@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    def orchid_version = '0.17.1'
+    def orchid_version = '0.17.7'
     compile "io.github.javaeden.orchid:OrchidCore:${orchid_version}"
     orchidCompile "io.github.javaeden.orchid:OrchidCore:${orchid_version}"
     orchidRuntime "io.github.javaeden.orchid:OrchidPages:${orchid_version}"
