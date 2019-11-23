@@ -49,7 +49,7 @@ dependencies {
 
     compile 'org.apache.jena:apache-jena-libs:3.10.0'
     compile 'org.apache.jena:jena-querybuilder:3.10.0'
-    compile 'com.typesafe:config:1.3.3'
+    compile 'com.typesafe:config:1.4.0'
     compile 'commons-validator:commons-validator:1.6'
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 
