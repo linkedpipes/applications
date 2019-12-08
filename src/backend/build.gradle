@@ -54,7 +54,7 @@ dependencies {
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'org.postgresql:postgresql:42.2.8'
+    compile 'org.postgresql:postgresql:42.2.9'
     runtime 'javax.xml.bind:jaxb-api:2.3.1'
 
     compile 'io.sentry:sentry-spring:1.7.28'
