@@ -13373,10 +13373,10 @@ react-dom@16.12.0, react-dom@^16.8.6:
     prop-types "^15.6.2"
     scheduler "^0.18.0"
 
-react-emoji-render@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/react-emoji-render/-/react-emoji-render-1.1.0.tgz#af494619bf1012083bc20ad18eb0a6d92d04228c"
-  integrity sha512-HIHIrtWd8Jel4qDgIBRQnPPFChJakuRkMFl5N5wObYjYsL7a4pkwK5P9wrEKxQWqlbviTrjGOANAfFldnVuRIQ==
+react-emoji-render@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-emoji-render/-/react-emoji-render-1.2.0.tgz#56a2a65841504aa23aad4b08747806608e8ee1d1"
+  integrity sha512-sOTMAmRDJ5WR3MPFh8cz6opC8JliPiopknyHVJzt0r8GykYwTCoANVGFSoGyNAhARgCVYQVZ6B7nI/CHmdQaOQ==
   dependencies:
     classnames "^2.2.5"
     emoji-regex "^6.4.1"
