@@ -4053,14 +4053,14 @@ babel-plugin-react-docgen@^2.0.0:
     react-docgen "^3.0.0"
     recast "^0.14.7"
 
-babel-plugin-smart-webpack-import@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.5.1.tgz#cc761c1f64449bc357dbdc08275ab176dcc86aec"
-  integrity sha512-LyIQmDc1ZojNpRMtXH9EwPmLY5AYPw2ksciRRYrydbMZVepcl4efpzIVBewo/1J2n3c74sXYFTKKItafZtYdDQ==
+babel-plugin-smart-webpack-import@1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-smart-webpack-import/-/babel-plugin-smart-webpack-import-1.5.2.tgz#5f7f00e1e03dcea630a37fb6587df5225b33d4e0"
+  integrity sha512-uA8+pv/RuljDHomtJ+h0joOFfoVZob5mxXl619edVNAHlxgqK8njHSKABaxKhUAWtHMw26Jq2iiAfRYVSK7MGw==
   dependencies:
     app-root-dir "^1.0.2"
     base-x "^3.0.7"
-    json5 "^2.1.0"
+    json5 "^2.1.1"
 
 "babel-plugin-styled-components@>= 1":
   version "1.10.6"
@@ -9931,7 +9931,7 @@ json5@^1.0.1:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.1.0:
+json5@^2.1.0, json5@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.1.1.tgz#81b6cb04e9ba496f1c7005d07b4368a2638f90b6"
   integrity sha512-l+3HXD0GEI3huGq1njuqtzYK8OYJyXMkOLtQ53pjWh89tvWS2h6l+1zMkYWqlb57+SiQodKZyvMEFb2X+KrFhQ==
