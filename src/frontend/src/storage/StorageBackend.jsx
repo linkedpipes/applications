@@ -19,7 +19,9 @@ import {
   StorageFileManager,
   SolidResourceType,
   StorageAuthenticationManager,
-  ResourceConfig
+  AccessControlNamespace,
+  ResourceConfig,
+  AccessControlConfig
 } from 'linkedpipes-storage';
 import { Log } from '@utils';
 // eslint-disable-next-line import/newline-after-import
@@ -198,9 +200,9 @@ class SolidBackend {
    */
   async createAppFolders(webId: string, folderTitle: string): Promise<boolean> {
     const url = `${Utils.getBaseUrlConcat(webId)}`;
-    const folderUrl = `${url}/${folderTitle}/`;
+    const folderUrl = `${url}/${folderTitle}`;
     const configurationsUrl = `${url}/${folderTitle}/configurations`;
-    const sharedConfigurationsUrl = `${url}/${folderTitle}/sharedConfigurations/`;
+    const sharedConfigurationsUrl = `${url}/${folderTitle}/sharedConfigurations`;
 
     try {
       const resourceConfig: ResourceConfig = new ResourceConfig(
@@ -208,73 +210,81 @@ class SolidBackend {
         webId
       );
 
-      await StorageFileManager.createResource(resourceConfig).then(response => {
+      await StorageFileManager.createResource(resourceConfig).then(
+        async response => {
+          Log.info(response);
+
+          const resourceConfigACL = new AccessControlConfig(
+            resourceConfig.resource,
+            [
+              AccessControlNamespace.Read,
+              AccessControlNamespace.Write,
+              AccessControlNamespace.Control
+            ],
+            resourceConfig.webID
+          );
+
+          await StorageFileManager.updateACL(resourceConfigACL);
+        }
+      );
+
+      const configurationsFolderConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: `${url}/${folderTitle}`,
+          title: 'configurations',
+          type: SolidResourceType.Folder
+        },
+        webId
+      );
+
+      await StorageFileManager.createResource(configurationsFolderConfig).then(
+        async response => {
+          Log.info(response);
+
+          const configurationsFolderConfigACL = new AccessControlConfig(
+            configurationsFolderConfig.resource,
+            [
+              AccessControlNamespace.Read,
+              AccessControlNamespace.Write,
+              AccessControlNamespace.Control
+            ],
+            configurationsFolderConfig.webID
+          );
+
+          await StorageFileManager.updateACL(configurationsFolderConfigACL);
+        }
+      );
+
+      const sharedConfigurationsFolderConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: `${url}/${folderTitle}`,
+          title: 'sharedConfigurations',
+          type: SolidResourceType.Folder
+        },
+        webId
+      );
+
+      await StorageFileManager.createResource(
+        sharedConfigurationsFolderConfig
+      ).then(async response => {
         Log.info(response);
+
+        const sharedConfigurationsFolderConfigACL = new AccessControlConfig(
+          sharedConfigurationsFolderConfig.resource,
+          [
+            AccessControlNamespace.Read,
+            AccessControlNamespace.Write,
+            AccessControlNamespace.Control
+          ],
+          sharedConfigurationsFolderConfig.webID
+        );
+
+        await StorageFileManager.updateACL(sharedConfigurationsFolderConfigACL);
       });
 
-      // await StorageFileManager.updateACL({
-      //   webID: webId,
-      //   controlModes: [READ, WRITE],
-      //   resource: {
-      //     type: SolidResourceType.Folder,
-      //     path: `${folderUrl}`,
-      //     isPublic: true
-      //   }
-      // }).then(response => {
-      //   Log.info(response);
-      // });
-
-      // const configurationsFolderConfig: ResourceConfig = {
-      //   resource: {
-      //     path: configurationsUrl,
-      //     type: SolidResourceType.Folder
-      //   },
-      //   webID: webId
-      // };
-
-      // await StorageFileManager.createResource(configurationsFolderConfig).then(
-      //   response => {
-      //     Log.info(response);
-      //   }
-      // );
-
-      // await StorageFileManager.updateACL({
-      //   webID: webId,
-      //   controlModes: [READ, WRITE],
-      //   resource: {
-      //     type: SolidResourceType.Folder,
-      //     path: `${configurationsUrl}/`,
-      //     isPublic: true
-      //   }
-      // });
-
-      // const sharedConfigurationsFolderConfig: ResourceConfig = {
-      //   resource: {
-      //     path: sharedConfigurationsUrl,
-      //     type: SolidResourceType.Folder
-      //   },
-      //   webID: webId
-      // };
-
-      // await StorageFileManager.createResource(
-      //   sharedConfigurationsFolderConfig
-      // ).then(response => {
-      //   Log.info(response);
-      // });
-
-      // await StorageFileManager.updateACL({
-      //   webID: webId,
-      //   controlModes: [READ, WRITE],
-      //   resource: {
-      //     type: SolidResourceType.Folder,
-      //     path: sharedConfigurationsUrl,
-      //     isPublic: true
-      //   }
-      // });
-
-      // await this.updateAppFolder(webId, folderUrl).then(() => {
-      //   Log.info(`Updated app folder in profile.`);
-      // });
+      await this.updateAppFolder(webId, folderUrl).then(() => {
+        Log.info(`Updated app folder in profile.`);
+      });
     } catch (err) {
       Log.error(err);
       return false;
@@ -673,34 +683,36 @@ class SolidBackend {
     Log.info(applicationConfigurationTurtle, 'StorageBackend');
 
     try {
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.ttl`,
-        applicationConfigurationTurtle
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-          this.load($rdf.sym(appConfigurationFullPath).doc());
-        }
-      });
+      const visualizerResourceConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: appConfigurationFilePath,
+          title: `${appConfigurationFileTitle}.ttl`,
+          type: SolidResourceType.File,
+          body: applicationConfigurationTurtle,
+          isPublic: true
+        },
+        webId
+      );
 
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.ttl.acl`,
-        await this.createFileAccessList(
-          webId,
-          appConfigurationFullPath,
-          [READ],
-          true,
-          []
-        )
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
+      await StorageFileManager.createResource(visualizerResourceConfig).then(
+        async response => {
+          Log.info(response);
+
+          this.load($rdf.sym(appConfigurationFullPath).doc());
+
+          const visualizerResourceConfigACL = new AccessControlConfig(
+            visualizerResourceConfig.resource,
+            [
+              AccessControlNamespace.Read,
+              AccessControlNamespace.Write,
+              AccessControlNamespace.Control
+            ],
+            visualizerResourceConfig.webID
+          );
+
+          await StorageFileManager.updateACL(visualizerResourceConfigACL);
         }
-      });
+      );
 
       this.requiresForceReload = true;
 
