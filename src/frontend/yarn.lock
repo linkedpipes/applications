@@ -10468,10 +10468,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-linkedpipes-storage@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/linkedpipes-storage/-/linkedpipes-storage-1.0.8.tgz#89d158f69abec08761cd1180894479cca4f2aba8"
-  integrity sha512-wuphfar/J1y2IvoNYkBBjcpjqCu3N2yTX4NlUnzc3H/A4tsaNfoTaTxiQ0yvp2PK0ihWY25cV7F6puT/WtTyRw==
+linkedpipes-storage@1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/linkedpipes-storage/-/linkedpipes-storage-1.0.10.tgz#fc5c8b22ef537986158e02e08b3bde887c7860b9"
+  integrity sha512-ebn5ENi0MXU4sauNWZe2yugPasSl5HObsIXuIVWrF+aZyf7NfwCR/Ii4J2jrT8lNpIpOmq4ElyIIL1lLw8R0rQ==
   dependencies:
     "@rdfjs/data-model" "^1.1.2"
     "@solid/query-ldflex" "^2.8.1"

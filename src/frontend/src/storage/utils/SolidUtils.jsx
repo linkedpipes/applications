@@ -1,4 +1,4 @@
-import * as rdflib from 'rdflib';
+import { rdflib } from 'linkedpipes-storage';
 import { FolderItem, FileItem } from '../models';
 
 export default class Utils {

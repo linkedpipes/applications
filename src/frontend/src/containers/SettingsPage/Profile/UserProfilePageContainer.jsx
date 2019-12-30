@@ -4,7 +4,7 @@ import { UserProfilePage } from './UserProfilePageComponent';
 import { connect } from 'react-redux';
 import UserService from '@utils/user.service';
 import { userActions } from '@ducks/userDuck';
-import { StorageAuthenticationManager } from 'linkedpipes-storage';
+import { solidAuthClient } from 'linkedpipes-storage';
 import { withAuthorization, GlobalUtils, Log } from '@utils';
 
 type Props = {
@@ -25,7 +25,7 @@ class UserProfilePageContainer extends PureComponent<Props> {
     await this.props.resetReduxStore();
 
     try {
-      await StorageAuthenticationManager.logout();
+      await solidAuthClient.logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');
       // Clear cookies

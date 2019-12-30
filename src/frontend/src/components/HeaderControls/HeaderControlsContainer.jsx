@@ -4,7 +4,7 @@ import { HeaderControlsComponent } from './HeaderControlsComponent';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { globalActions } from '@ducks/globalDuck';
-import { StorageAuthenticationManager } from 'linkedpipes-storage';
+import { solidAuthClient } from 'linkedpipes-storage';
 import { SocketContext, GlobalUtils, Log } from '@utils';
 
 type Props = {
@@ -30,7 +30,7 @@ class HeaderControlsContainer extends PureComponent<Props, State> {
 
   performLogout = async () => {
     try {
-      await StorageAuthenticationManager.logout();
+      await solidAuthClient.logout();
       // Remove localStorage
       localStorage.removeItem('solid-auth-client');
       // Clear cookies

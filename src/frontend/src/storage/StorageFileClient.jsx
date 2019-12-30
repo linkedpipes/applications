@@ -15,33 +15,31 @@ class StorageFileClient {
   };
 
   fetchJsonLDFromUrl = async url => {
-    return StorageAuthenticationManager.default
-      .fetch(url)
-      .then(this.assertSuccessfulResponseWithJson);
+    return StorageAuthenticationManager.fetch(url).then(
+      this.assertSuccessfulResponseWithJson
+    );
   };
 
   fetchFileFromUrl = async (url, headers = {}) => {
-    return StorageAuthenticationManager.default
-      .fetch(url, { headers })
-      .then(this.assertSuccessfulResponseWithText);
+    return StorageAuthenticationManager.fetch(url, { headers }).then(
+      this.assertSuccessfulResponseWithText
+    );
   };
 
   fetchFile = async (path, fileName = '') => {
     const url = `${path}/${fileName}`;
 
-    return StorageAuthenticationManager.default
-      .fetch(url)
-      .then(this.assertSuccessfulResponse);
+    return StorageAuthenticationManager.fetch(url).then(
+      this.assertSuccessfulResponse
+    );
   };
 
   fetchFolder = async (path, folderName = '') => {
     const url = `${path}/${folderName}`;
 
-    return StorageAuthenticationManager.default
-      .fetch(url, {
-        headers: { Accept: 'text/turtle' }
-      })
-      .then(this.assertSuccessfulResponse);
+    return StorageAuthenticationManager.fetch(url, {
+      headers: { Accept: 'text/turtle' }
+    }).then(this.assertSuccessfulResponse);
   };
 
   createFolder = async (path, folderName) => {
@@ -189,12 +187,10 @@ class StorageFileClient {
         : await fileResponse.blob();
     Log.info(content);
 
-    return StorageAuthenticationManager.default
-      .fetch(destinationUrl, {
-        method: 'PUT',
-        body: content
-      })
-      .then(this.assertSuccessfulResponse);
+    return StorageAuthenticationManager.fetch(destinationUrl, {
+      method: 'PUT',
+      body: content
+    }).then(this.assertSuccessfulResponse);
   };
 
   renameFile = async (path, oldName, newName) => {

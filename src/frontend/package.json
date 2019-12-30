@@ -50,7 +50,7 @@
     "immutability-helper": "^3.0.0",
     "json-form-data": "^1.4.1",
     "jsonld": "^1.6.2",
-    "linkedpipes-storage": "1.0.8",
+    "linkedpipes-storage": "1.0.10",
     "moment": "^2.24.0",
     "normalize.css": "8.0.1",
     "pigeon-cluster": "^0.0.6",

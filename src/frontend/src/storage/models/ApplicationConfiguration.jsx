@@ -2,7 +2,7 @@
  * Model class for storing application configuration.
  */
 
-import * as $rdf from 'rdflib';
+import { rdflib as $rdf } from 'linkedpipes-storage';
 import uuid from 'uuid';
 import { GlobalUtils } from '@utils/';
 

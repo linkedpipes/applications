@@ -44,7 +44,8 @@ const SolidProviderComponent = ({
         <MenuItem value={''}>
           <em>None</em>
         </MenuItem>
-        {/* <MenuItem value={'Inrupt'}>Inrupt</MenuItem> */}
+        <MenuItem value={'Inrupt'}>Inrupt</MenuItem>
+        <MenuItem value={'Solid Community'}>Solid Community</MenuItem>
         <MenuItem value={'LinkedPipes PODs'}>LinkedPipes PODs</MenuItem>
         <MenuItem disabled value={''}>
           Stay tuned for more supported providers...

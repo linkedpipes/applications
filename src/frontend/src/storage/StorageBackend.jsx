@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unused-vars */
 /* eslint-disable-next-line no-await-in-loop */
-import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
   ApplicationMetadata,
@@ -21,7 +20,9 @@ import {
   StorageAuthenticationManager,
   AccessControlNamespace,
   ResourceConfig,
-  AccessControlConfig
+  StorageRdfManager,
+  AccessControlConfig,
+  rdflib as $rdf
 } from 'linkedpipes-storage';
 import { Log } from '@utils';
 // eslint-disable-next-line import/newline-after-import
@@ -216,11 +217,7 @@ class SolidBackend {
 
           const resourceConfigACL = new AccessControlConfig(
             resourceConfig.resource,
-            [
-              AccessControlNamespace.Read,
-              AccessControlNamespace.Write,
-              AccessControlNamespace.Control
-            ],
+            [],
             resourceConfig.webID
           );
 
@@ -243,11 +240,7 @@ class SolidBackend {
 
           const configurationsFolderConfigACL = new AccessControlConfig(
             configurationsFolderConfig.resource,
-            [
-              AccessControlNamespace.Read,
-              AccessControlNamespace.Write,
-              AccessControlNamespace.Control
-            ],
+            [],
             configurationsFolderConfig.webID
           );
 
@@ -271,18 +264,14 @@ class SolidBackend {
 
         const sharedConfigurationsFolderConfigACL = new AccessControlConfig(
           sharedConfigurationsFolderConfig.resource,
-          [
-            AccessControlNamespace.Read,
-            AccessControlNamespace.Write,
-            AccessControlNamespace.Control
-          ],
+          [],
           sharedConfigurationsFolderConfig.webID
         );
 
         await StorageFileManager.updateACL(sharedConfigurationsFolderConfigACL);
       });
 
-      await this.updateAppFolder(webId, folderUrl).then(() => {
+      await StorageRdfManager.updateAppFolder(webId, folderUrl).then(() => {
         Log.info(`Updated app folder in profile.`);
       });
     } catch (err) {
@@ -297,29 +286,37 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const copyFolderResult = await this.fetcher
-      .recursiveCopy(originalFolder, destinationFolder, {
-        copyACL: true,
-        fetch: StorageAuthenticationManager.fetch
-      })
-      .then(
-        res => {
-          return true;
-        },
-        e => {
-          Log.error(`Error copying : ${e}`);
-          return false;
-        }
-      );
+    const oldFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(originalFolder),
+        title: Utils.getFilenameFromPathUrl(originalFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
 
-    const updateProfileLinkResult = await this.updateAppFolder(
+    const newFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(destinationFolder),
+        title: Utils.getFilenameFromPathUrl(destinationFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const copyFolder = await StorageFileManager.copyResource(
+      oldFolder,
+      newFolder
+    );
+
+    const updateProfileLinkResult = await StorageRdfManager.updateAppFolder(
       webId,
       destinationFolder
     ).then(() => {
       return true;
     });
 
-    return updateProfileLinkResult && copyFolderResult;
+    return updateProfileLinkResult && copyFolder;
   }
 
   async moveFolderRecursively(
@@ -327,42 +324,47 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const copySuccess = await this.fetcher
-      .recursiveCopy(originalFolder, destinationFolder, {
-        copyACL: true,
-        fetch: StorageAuthenticationManager.fetch
-      })
-      .then(
-        () => {
-          return true;
-        },
-        e => {
-          Log.err(`Error copying : ${e}`);
-          return false;
-        }
-      );
-
-    const removeOldSuccess = await StorageFileClient.removeFolderContents(
-      Utils.getFolderUrlFromPathUrl(originalFolder),
-      Utils.getFilenameFromPathUrl(originalFolder)
-    ).then(
-      res => {
-        return true;
+    const oldFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(originalFolder),
+        title: Utils.getFilenameFromPathUrl(originalFolder),
+        type: SolidResourceType.Folder
       },
-      e => {
-        Log.err(`Error copying : ${e}`);
-        return false;
-      }
+      webId
     );
 
-    const updateProfileLinkResult = await this.updateAppFolder(
+    const newFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(destinationFolder),
+        title: Utils.getFilenameFromPathUrl(destinationFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const copyFolder = await StorageFileManager.copyResource(
+      oldFolder,
+      newFolder
+    );
+
+    const newFolderAclDefault = new AccessControlConfig(
+      newFolder.resource,
+      [],
+      newFolder.webID
+    );
+
+    await StorageFileManager.updateACL(newFolderAclDefault);
+
+    const updateProfileLinkResult = await StorageRdfManager.updateAppFolder(
       webId,
       destinationFolder
     ).then(() => {
       return true;
     });
 
-    return removeOldSuccess && copySuccess && updateProfileLinkResult;
+    await StorageFileManager.deleteResource(oldFolder);
+
+    return copyFolder && updateProfileLinkResult;
   }
 
   /**
@@ -523,34 +525,6 @@ class SolidBackend {
   }
 
   /**
-   * Updates a user's profile with the new application folder location.
-   * @param {string} webId A user's WebID.
-   * @param {string} folderUrl An URL of the new application folder.
-   * @return {boolean} True if updated, false otherwise.
-   */
-  async updateAppFolder(webId: string, folderUrl: string): Promise<boolean> {
-    const user = $rdf.sym(webId);
-    const predicate = $rdf.sym(LPA('lpStorage'));
-    const folder = $rdf.sym(folderUrl);
-    const profile = user.doc();
-    try {
-      await this.load(profile);
-    } catch (err) {
-      Log.error('Could not load a profile document.', 'StorageBackend');
-      return false;
-    }
-    const ins = [$rdf.st(user, predicate, folder, profile)];
-    const del = this.store.statementsMatching(user, predicate, null, profile);
-    try {
-      await this.updateResource(profile.value, ins, del);
-    } catch (err) {
-      return false;
-    }
-    // this.registerChanges(profile);
-    return true;
-  }
-
-  /**
    * Fetches images posted by the given user from his POD.
    * @param {string} webId A user's WebID.
    * @param {string} appFolder An URL of the user's application folder.
@@ -702,11 +676,7 @@ class SolidBackend {
 
           const visualizerResourceConfigACL = new AccessControlConfig(
             visualizerResourceConfig.resource,
-            [
-              AccessControlNamespace.Read,
-              AccessControlNamespace.Write,
-              AccessControlNamespace.Control
-            ],
+            [],
             visualizerResourceConfig.webID
           );
 
@@ -738,25 +708,39 @@ class SolidBackend {
       const folderPath = `${Utils.getFolderUrlFromPathUrl(
         appMetadata.solidFileUrl
       )}`;
-      const metadataFileTitle = appMetadata.solidFileTitle;
+      const metadataFileTitle = `${appMetadata.solidFileTitle}.ttl`;
 
-      await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${metadataFileTitle} at ${filePath}.`);
-          }
-        }
+      const visualizerResource = new ResourceConfig(
+        {
+          path: folderPath,
+          title: metadataFileTitle,
+          type: SolidResourceType.File
+        },
+        ''
       );
-      await StorageFileClient.removeItem(
-        folderPath,
-        `${metadataFileTitle}.acl`
-      ).then(response => {
-        if (response.status === 200) {
-          const filePath = response.url;
-          Log.info(`Removed ${metadataFileTitle}.acl at ${filePath}.`);
-        }
-      });
+
+      const visualizerACLResource = new ResourceConfig(
+        {
+          path: folderPath,
+          title: metadataFileTitle,
+          type: SolidResourceType.File
+        },
+        ''
+      );
+
+      const resourceResponse = await StorageFileManager.deleteResource(
+        visualizerResource
+      );
+      const aclResourceResponse = await StorageFileManager.deleteResource(
+        visualizerACLResource
+      );
+
+      if (
+        resourceResponse.status === 200 &&
+        aclResourceResponse.status === 200
+      ) {
+        Log.info('Deleted the visualizer');
+      }
     } catch (err) {
       Log.error('Could not delete a profile document.', 'StorageBackend');
       return Promise.reject(err);
@@ -1057,16 +1041,27 @@ class SolidBackend {
 
   sendFileToInbox(recipientWebId, data, type) {
     const inboxUrl = `${Utils.getBaseUrlConcat(recipientWebId)}/inbox`;
-    StorageFileClient.sendFileToUrl(inboxUrl, data, type);
+    return StorageAuthenticationManager.fetch(inboxUrl, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Content-Type': type
+      }
+    });
   }
 
   rejectInvitation(invitation) {
-    const folderTitle = Utils.getFolderUrlFromPathUrl(invitation.invitationUrl);
-    const inviteTitle = Utils.getFilenameFromPathUrl(invitation.invitationUrl);
-
-    StorageFileClient.removeItem(folderTitle, inviteTitle).then(response => {
+    const inviteResource = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(invitation.invitationUrl),
+        title: Utils.getFilenameFromPathUrl(invitation.invitationUrl),
+        type: SolidResourceType.File
+      },
+      ''
+    );
+    StorageFileManager.deleteResource(inviteResource).then(response => {
       if (response.status === 200) {
-        Log.info(`Removed ${inviteTitle}.`);
+        Log.info(`Removed ${invitation.invitationUrl}.`);
       }
     });
   }
@@ -1194,8 +1189,8 @@ class SolidBackend {
   }
 
   async parseSharedConfiguration(configurationUrl) {
-    const sharedAppConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
-      configurationUrl
+    const sharedAppConfiguration = JSON.parse(
+      await StorageFileManager.getResource(configurationUrl)
     );
 
     const appMetadataUrl = sharedAppConfiguration.url;
@@ -1270,22 +1265,33 @@ class SolidBackend {
           if (err) throw err;
           else {
             const uniqueFileName = `${Utils.getName()}.jsonld`;
-            await StorageFileClient.createFile(
-              destinationPath,
-              uniqueFileName,
-              doc
+            const inviteResource = new ResourceConfig(
+              {
+                path: destinationPath,
+                title: uniqueFileName,
+                type: SolidResourceType.File,
+                contentType: 'application/ld+json',
+                body: doc
+              },
+              webId
             );
-            await StorageFileClient.createFile(
-              destinationPath,
-              `${uniqueFileName}.acl`,
-              await self.createFileAccessList(
-                webId,
-                `${destinationPath}/${uniqueFileName}`,
-                [READ],
-                false,
-                undefined
-              )
+            const inviteACLResource = new AccessControlConfig(
+              {
+                path: destinationPath,
+                title: uniqueFileName,
+                type: SolidResourceType.File
+              },
+              [
+                {
+                  agents: [invitation.recipientWebId],
+                  modes: ['Read', 'Write']
+                }
+              ],
+              webId
             );
+            await StorageFileManager.createResource(inviteResource);
+            await StorageFileManager.updateACL(inviteACLResource);
+
             resolve(true);
           }
         });
@@ -1293,14 +1299,23 @@ class SolidBackend {
   }
 
   async removeInvitation(invitationUrl) {
-    return StorageFileClient.removeItem(
-      Utils.getFolderUrlFromPathUrl(invitationUrl),
-      Utils.getFilenameFromPathUrl(invitationUrl)
+    const inviteResource = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(invitationUrl),
+        title: Utils.getFilenameFromPathUrl(invitationUrl),
+        type: SolidResourceType.File
+      },
+      ''
     );
+    StorageFileManager.deleteResource(inviteResource).then(response => {
+      if (response.status === 200) {
+        Log.info(`Removed ${invitationUrl}.`);
+      }
+    });
   }
 
   async fetchAccessControlFile(aclUrl) {
-    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl, {
+    const fetchResponse = await StorageFileManager.getResource(aclUrl, {
       Accept: 'application/ld+json'
     });
 
@@ -1318,24 +1333,19 @@ class SolidBackend {
     const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
     const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
 
-    const accessListConfiguration = await this.createFileAccessList(
-      webId,
-      metadataUrl,
-      [READ, WRITE],
-      isPublic,
+    const aclConfiguration = new AccessControlConfig(
+      {
+        path: fileMetadataFolder,
+        title: fileMetadataTitle,
+        type: SolidResourceType.File
+      },
       contacts.map(contact => {
-        return contact.webId;
-      })
+        return { agents: [contact.webId], modes: ['Read', 'Write'] };
+      }),
+      webId
     );
 
-    return StorageFileClient.updateFile(
-      `${fileMetadataFolder}/`,
-      `${fileMetadataTitle}.acl`,
-      accessListConfiguration,
-      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(() => {
-      Log.info(`Updated access list ${fileMetadataTitle}.acl`);
-    });
+    return StorageFileManager.updateACL(aclConfiguration);
   }
 }
 

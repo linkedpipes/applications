@@ -9,7 +9,8 @@ import { StorageAuthenticationManager } from 'linkedpipes-storage';
 import { Log, GoogleAnalyticsWrapper } from '@utils';
 
 const providers = {
-  // Inrupt: 'https://inrupt.net/auth',
+  Inrupt: 'https://inrupt.net/auth',
+  'Solid Community': 'https://solid.community/auth',
   'LinkedPipes PODs': 'https://lpapps.co:8443/auth',
   '': ''
 };
