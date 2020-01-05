@@ -11,8 +11,6 @@ import {
   AcceptedInvitation,
   AccessControl
 } from './models';
-import { AccessControlList } from '@inrupt/solid-react-components';
-import StorageFileClient from './StorageFileClient';
 import StorageSparqlClient from './StorageSparqlClient';
 import {
   StorageFileManager,
@@ -134,6 +132,7 @@ class SolidBackend {
     const user = $rdf.sym(webId);
     const doc = user.doc();
     try {
+      this.requiresForceReload = true;
       await this.load(doc);
     } catch (err) {
       return Promise.reject(err);
@@ -362,7 +361,30 @@ class SolidBackend {
       return true;
     });
 
-    await StorageFileManager.deleteResource(oldFolder);
+    const oldFolderConfigurations = new ResourceConfig(
+      {
+        path: originalFolder,
+        title: 'configurations',
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const oldFolderSharedConfigurations = new ResourceConfig(
+      {
+        path: originalFolder,
+        title: 'sharedConfigurations',
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const response = await StorageFileManager.deleteResource(
+      oldFolderConfigurations
+    );
+    const response2 = await StorageFileManager.deleteResource(
+      oldFolderSharedConfigurations
+    );
 
     return copyFolder && updateProfileLinkResult;
   }
@@ -708,7 +730,7 @@ class SolidBackend {
       const folderPath = `${Utils.getFolderUrlFromPathUrl(
         appMetadata.solidFileUrl
       )}`;
-      const metadataFileTitle = `${appMetadata.solidFileTitle}.ttl`;
+      const metadataFileTitle = appMetadata.solidFileTitle;
 
       const visualizerResource = new ResourceConfig(
         {
@@ -1170,9 +1192,9 @@ class SolidBackend {
   }
 
   async parseInvite(invitationUrl, userWebId) {
-    const invitation = await StorageFileClient.fetchJsonLDFromUrl(
-      invitationUrl
-    );
+    const response = await StorageAuthenticationManager.fetch(invitationUrl);
+    if (!response.ok) throw response;
+    const invitation = await response.json();
 
     const sender = await this.getPerson(invitation.actor);
     const recipient = await this.getPerson(invitation.target);
@@ -1212,27 +1234,26 @@ class SolidBackend {
     const currentAccessControl = await this.fetchAccessControlFile(
       `${metadataUrl}.acl`
     );
-    const collaboratorWebIds = currentAccessControl.getCollaborators();
+    let collaboratorWebIds = currentAccessControl.getCollaborators();
+    collaboratorWebIds = collaboratorWebIds.filter(element => {
+      return element !== webId;
+    });
     const isPublic = currentAccessControl.isPublic();
     if (!collaboratorWebIds.includes(collaboratorWebId)) {
       collaboratorWebIds.push(collaboratorWebId);
     }
 
-    const accessListConfiguration = await this.createFileAccessList(
-      webId,
-      metadataUrl,
-      [READ, WRITE],
-      isPublic,
-      collaboratorWebIds
-    );
-    await StorageFileClient.updateFile(
-      `${fileMetadataFolder}/`,
-      `${fileMetadataTitle}.acl`,
-      accessListConfiguration,
-      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(() => {
-      Log.info(`Created access list ${fileMetadataTitle}.acl`);
+    const assembledIds = collaboratorWebIds.map(element => {
+      return { agents: [element], modes: ['Read', 'Write'] };
     });
+
+    const resourceConfigACL = new AccessControlConfig(
+      { title: fileMetadataTitle, path: fileMetadataFolder, isPublic },
+      assembledIds,
+      webId
+    );
+
+    await StorageFileManager.updateACL(resourceConfigACL);
 
     await this.removeInvitation(sharedInvitation.invitationUrl).then(
       response => {
@@ -1307,16 +1328,12 @@ class SolidBackend {
       },
       ''
     );
-    StorageFileManager.deleteResource(inviteResource).then(response => {
-      if (response.status === 200) {
-        Log.info(`Removed ${invitationUrl}.`);
-      }
-    });
+    return StorageFileManager.deleteResource(inviteResource);
   }
 
   async fetchAccessControlFile(aclUrl) {
     const fetchResponse = await StorageFileManager.getResource(aclUrl, {
-      Accept: 'application/ld+json'
+      headers: { Accept: 'application/ld+json' }
     });
 
     const response = JSON.parse(fetchResponse);
@@ -1337,7 +1354,8 @@ class SolidBackend {
       {
         path: fileMetadataFolder,
         title: fileMetadataTitle,
-        type: SolidResourceType.File
+        type: SolidResourceType.File,
+        isPublic
       },
       contacts.map(contact => {
         return { agents: [contact.webId], modes: ['Read', 'Write'] };

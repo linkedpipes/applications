@@ -1,6 +1,3 @@
-import { rdflib } from 'linkedpipes-storage';
-import { FolderItem, FileItem } from '../models';
-
 export default class Utils {
   /**
    * Generates a new name.
@@ -22,82 +19,6 @@ export default class Utils {
     const newUrl = url ? url.match(/^(([a-z]+:)?(\/\/)?[^/]+\/).*$/)[1] : '';
     return newUrl.substring(0, newUrl.length - 1);
   }
-
-  static text2graph(
-    text: string,
-    baseUrl: string,
-    contentType: string = ''
-  ): Promise<rdflib.IndexedFormula> {
-    contentType = contentType || this.guessFileType(baseUrl);
-    const graph = rdflib.graph();
-
-    // eslint-disable-next-line no-unused-vars
-    return new Promise((resolve, reject) => {
-      rdflib.parse(text, graph, baseUrl, contentType, () => {});
-      resolve(graph);
-    });
-  }
-
-  static getSizeByGraph = async (
-    graph: rdflib.IndexedFormula,
-    subjectName: string
-  ) => {
-    const subjectNode = rdflib.sym(subjectName);
-    const nsSize = rdflib.sym('http://www.w3.org/ns/posix/stat#size');
-    const size = graph.any(subjectNode, nsSize, undefined, undefined);
-
-    return size && 'value' in size ? size.value : undefined;
-  };
-
-  static async isFolder(
-    graph: rdflib.IndexedFormula,
-    baseUrl: string
-  ): boolean {
-    const folderNode = rdflib.sym(baseUrl);
-    const isAnInstanceOfClass = rdflib.sym(
-      'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-    );
-    const types = graph.each(
-      folderNode,
-      isAnInstanceOfClass,
-      undefined,
-      undefined
-    );
-    return Object.values(types).some(
-      ({ value }) => value.match('ldp#BasicContainer') !== null
-    );
-  }
-
-  static getFolderItems = async (
-    graph: rdflib.IndexedFormula,
-    subj: string
-  ) => {
-    const files: FileItem[] = [];
-    const folders: FolderItem[] = [];
-
-    graph
-      .each(
-        rdflib.sym(subj),
-        rdflib.sym('http://www.w3.org/ns/ldp#contains'),
-        undefined,
-        undefined
-      )
-      .forEach(async item => {
-        const url = item.value;
-        const size = this.getSizeByGraph(graph, url);
-
-        const isFolder = await this.isFolder(graph, url);
-
-        if (isFolder) {
-          folders.push(new FolderItem(url, size));
-        } else {
-          files.push(new FileItem(url, size));
-          files.push(new FileItem(`${url}.acl`, size));
-        }
-      });
-
-    return { files, folders };
-  };
 
   static getFolderUrlFromPathUrl(url): String {
     const newUrl = url
@@ -138,21 +59,6 @@ export default class Utils {
     if (ext.match(/(avi|mp4|mpeg)/)) return 'video';
     /* default */
     return 'text/turtle';
-  }
-
-  /**
-   * Determines whether the URL string is a valid URL.
-   * @param {String} url A given URL.
-   */
-  static isValidUrl(url): Boolean {
-    // Copyright (c) 2010-2013 Diego Perini, MIT licensed
-    // https://gist.github.com/dperini/729294
-    // see also https://mathiasbynens.be/demo/url-regex
-    // modified to allow protocol-relative URLs
-    // eslint-disable-next-line max-len
-    return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})).?)(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(
-      url
-    );
   }
 
   /**
