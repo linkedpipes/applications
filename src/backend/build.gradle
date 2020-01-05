@@ -41,7 +41,7 @@ dependencies {
     runtime 'org.springframework.boot:spring-boot-devtools'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
-    compile 'org.jetbrains:annotations:17.0.0'
+    compile 'org.jetbrains:annotations:18.0.0'
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.10.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
