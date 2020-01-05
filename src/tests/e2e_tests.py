@@ -25,7 +25,7 @@ desired_cap = {
     "acceptSslCerts": True
 }
 
-# slack_token = os.environ["SLACK_API_TOKEN"]
+slack_token = os.environ["SLACK_API_TOKEN"]
 solid_webid = os.environ["SOLID_WEBID"]
 solid_username = os.environ["SOLID_USERNAME"]
 solid_password = os.environ["SOLID_PASSWORD"]
