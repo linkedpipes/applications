@@ -81,3 +81,5 @@ appdata/
 src/frontend/eslint/
 
 src/frontend/docs/
+
+src/tests/.venv/
