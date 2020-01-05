@@ -25,11 +25,10 @@ export default class AccessControl {
     const self = this;
 
     accessControl.forEach(element => {
-      if (element['@id'] === `${aclUrl}#public`) {
-        self.public = element;
-      } else if (element['@id'] === `${aclUrl}#owner`) {
-        self.owner = element;
-      } else {
+      if (element['@id'] === `${aclUrl}#Read`) {
+        self.public = ACL('agentClass') in element;
+      }
+      if (!self.collaborators.includes(element)) {
         self.collaborators.push(element);
       }
     });
@@ -40,24 +39,11 @@ export default class AccessControl {
   };
 
   getCollaborators = (): Array<string> => {
-    return this.collaborators.map(object => {
+    const filteredCollaborators = this.collaborators.filter(object => {
+      return ACL('agent') in object;
+    });
+    return filteredCollaborators.map(object => {
       return object[ACL('agent')][0]['@id'];
     });
   };
-
-  //   exportWithOptions = (isPublic, contacts) => {
-  //     const jsonLdObject = [this.owner];
-  //     contacts.forEach(contact => {
-  //       const contactObject = this.collaborators.filter(object => {
-  //         return object[ACL('agent')][0]['@id'] === contact.webId;
-  //       });
-  //       if (contactObject.length === 1) {
-  //         jsonLdObject.push(contactObject.pop());
-  //       }
-  //     });
-  //     if (isPublic && this.public) {
-  //       jsonLdObject.push(this.public);
-  //     }
-  //     return jsonLdObject;
-  //   };
 }

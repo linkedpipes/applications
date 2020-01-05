@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unused-vars */
 /* eslint-disable-next-line no-await-in-loop */
-import * as $rdf from 'rdflib';
 import { Utils } from './utils';
 import {
   ApplicationMetadata,
@@ -12,8 +11,17 @@ import {
   AcceptedInvitation,
   AccessControl
 } from './models';
-import StorageFileClient from './StorageFileClient';
 import StorageSparqlClient from './StorageSparqlClient';
+import {
+  StorageFileManager,
+  SolidResourceType,
+  StorageAuthenticationManager,
+  AccessControlNamespace,
+  ResourceConfig,
+  StorageRdfManager,
+  AccessControlConfig,
+  rdflib as $rdf
+} from 'linkedpipes-storage';
 import { Log } from '@utils';
 // eslint-disable-next-line import/newline-after-import
 const rdfjsSourceFromUrl = require('./utils/rdfjssourcefactory').fromUrl;
@@ -86,23 +94,6 @@ class SolidBackend {
   }
 
   /**
-   * Updates the involving documents with given insertions and deletions.
-   * @param {$rdf.Statement[]} deletions Statements to delete.
-   * @param {$rdf.Statement[]} insertions Statements to insert.
-   */
-  async update(deletions: $rdf.Statement[], insertions: $rdf.Statement[]) {
-    try {
-      return this.updater.update(deletions, insertions, (uri, ok, message) => {
-        if (ok) Log.info('Resource updated.', 'StorageBackend');
-        else Log.warn(message);
-        return Promise.resolve(message);
-      });
-    } catch (err) {
-      return Promise.reject(new Error('Could not update the document.'));
-    }
-  }
-
-  /**
    * Registers a given document for the updater to listen to the remote
    * changes of the document.
    * @param {string} URL to a given resource.
@@ -124,11 +115,12 @@ class SolidBackend {
     const user = $rdf.sym(webId);
     const doc = user.doc();
     try {
+      this.requiresForceReload = true;
       await this.load(doc);
     } catch (err) {
       return Promise.reject(err);
     }
-    const folder = this.store.any(user, SOLID('timeline'), null, doc);
+    const folder = this.store.any(user, LPA('lpStorage'), null, doc);
     return folder
       ? folder.value.toString()
       : Promise.reject(new Error('No application folder.'));
@@ -192,73 +184,76 @@ class SolidBackend {
   async createAppFolders(webId: string, folderTitle: string): Promise<boolean> {
     const url = `${Utils.getBaseUrlConcat(webId)}`;
     const folderUrl = `${url}/${folderTitle}`;
-    const configurationsUrl = `${url}/${folderTitle}`;
+    const configurationsUrl = `${url}/${folderTitle}/configurations`;
+    const sharedConfigurationsUrl = `${url}/${folderTitle}/sharedConfigurations`;
 
     try {
-      await StorageFileClient.createFolder(url, folderTitle).then(() => {
-        Log.info(`Created folder ${folderUrl}.`);
+      const resourceConfig: ResourceConfig = new ResourceConfig(
+        { path: url, title: folderTitle, type: SolidResourceType.Folder },
+        webId
+      );
+
+      await StorageFileManager.createResource(resourceConfig).then(
+        async response => {
+          Log.info(response);
+
+          const resourceConfigACL = new AccessControlConfig(
+            resourceConfig.resource,
+            [],
+            resourceConfig.webID
+          );
+
+          await StorageFileManager.updateACL(resourceConfigACL);
+        }
+      );
+
+      const configurationsFolderConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: `${url}/${folderTitle}`,
+          title: 'configurations',
+          type: SolidResourceType.Folder
+        },
+        webId
+      );
+
+      await StorageFileManager.createResource(configurationsFolderConfig).then(
+        async response => {
+          Log.info(response);
+
+          const configurationsFolderConfigACL = new AccessControlConfig(
+            configurationsFolderConfig.resource,
+            [],
+            configurationsFolderConfig.webID
+          );
+
+          await StorageFileManager.updateACL(configurationsFolderConfigACL);
+        }
+      );
+
+      const sharedConfigurationsFolderConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: `${url}/${folderTitle}`,
+          title: 'sharedConfigurations',
+          type: SolidResourceType.Folder
+        },
+        webId
+      );
+
+      await StorageFileManager.createResource(
+        sharedConfigurationsFolderConfig
+      ).then(async response => {
+        Log.info(response);
+
+        const sharedConfigurationsFolderConfigACL = new AccessControlConfig(
+          sharedConfigurationsFolderConfig.resource,
+          [],
+          sharedConfigurationsFolderConfig.webID
+        );
+
+        await StorageFileManager.updateACL(sharedConfigurationsFolderConfigACL);
       });
 
-      await StorageFileClient.updateItem(
-        `${folderUrl}`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/`,
-          [READ],
-          true,
-          null
-        ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
-        Log.info(`Created access list ${folderUrl}/.acl`);
-      });
-
-      await StorageFileClient.createFolder(
-        configurationsUrl,
-        'configurations'
-      ).then(() => {
-        Log.info(`Created folder ${configurationsUrl}.`);
-      });
-
-      await StorageFileClient.updateItem(
-        `${folderUrl}/configurations`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/configurations/`,
-          [READ],
-          true,
-          null
-        ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
-        Log.info(`Created access list ${folderUrl}/configurations/.acl`);
-      });
-
-      await StorageFileClient.createFolder(
-        configurationsUrl,
-        'sharedConfigurations'
-      ).then(() => {
-        Log.info(`Created folder ${configurationsUrl}.`);
-      });
-
-      await StorageFileClient.updateItem(
-        `${folderUrl}/sharedConfigurations`,
-        '.acl',
-        await this.createFolderAccessList(
-          webId,
-          `${folderUrl}/sharedConfigurations/`,
-          [READ],
-          true,
-          null
-        ),
-        '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-      ).then(() => {
-        Log.info(`Created access list ${folderUrl}/sharedConfigurations/.acl`);
-      });
-
-      await this.updateAppFolder(webId, folderUrl).then(() => {
+      await StorageRdfManager.updateAppFolder(webId, folderUrl).then(() => {
         Log.info(`Updated app folder in profile.`);
       });
     } catch (err) {
@@ -273,33 +268,37 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
+    const oldFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(originalFolder),
+        title: Utils.getFilenameFromPathUrl(originalFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
     );
 
-    const copyFolderResult = await this.fetcher
-      .recursiveCopy(originalFolder, destinationFolder, {
-        copyACL: true,
-        fetch: authClient.fetch
-      })
-      .then(
-        res => {
-          return true;
-        },
-        e => {
-          Log.error(`Error copying : ${e}`);
-          return false;
-        }
-      );
+    const newFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(destinationFolder),
+        title: Utils.getFilenameFromPathUrl(destinationFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
 
-    const updateProfileLinkResult = await this.updateAppFolder(
+    const copyFolder = await StorageFileManager.copyResource(
+      oldFolder,
+      newFolder
+    );
+
+    const updateProfileLinkResult = await StorageRdfManager.updateAppFolder(
       webId,
       destinationFolder
     ).then(() => {
       return true;
     });
 
-    return updateProfileLinkResult && copyFolderResult;
+    return updateProfileLinkResult && copyFolder;
   }
 
   async moveFolderRecursively(
@@ -307,46 +306,70 @@ class SolidBackend {
     originalFolder: string,
     destinationFolder: string
   ): Promise<boolean> {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
-    const copySuccess = await this.fetcher
-      .recursiveCopy(originalFolder, destinationFolder, {
-        copyACL: true,
-        fetch: authClient.fetch
-      })
-      .then(
-        () => {
-          return true;
-        },
-        e => {
-          Log.err(`Error copying : ${e}`);
-          return false;
-        }
-      );
-
-    const removeOldSuccess = await StorageFileClient.removeFolderContents(
-      Utils.getFolderUrlFromPathUrl(originalFolder),
-      Utils.getFilenameFromPathUrl(originalFolder)
-    ).then(
-      res => {
-        return true;
+    const oldFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(originalFolder),
+        title: Utils.getFilenameFromPathUrl(originalFolder),
+        type: SolidResourceType.Folder
       },
-      e => {
-        Log.err(`Error copying : ${e}`);
-        return false;
-      }
+      webId
     );
 
-    const updateProfileLinkResult = await this.updateAppFolder(
+    const newFolder = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(destinationFolder),
+        title: Utils.getFilenameFromPathUrl(destinationFolder),
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const copyFolder = await StorageFileManager.copyResource(
+      oldFolder,
+      newFolder
+    );
+
+    const newFolderAclDefault = new AccessControlConfig(
+      newFolder.resource,
+      [],
+      newFolder.webID
+    );
+
+    await StorageFileManager.updateACL(newFolderAclDefault);
+
+    const updateProfileLinkResult = await StorageRdfManager.updateAppFolder(
       webId,
       destinationFolder
     ).then(() => {
       return true;
     });
 
-    return removeOldSuccess && copySuccess && updateProfileLinkResult;
+    const oldFolderConfigurations = new ResourceConfig(
+      {
+        path: originalFolder,
+        title: 'configurations',
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const oldFolderSharedConfigurations = new ResourceConfig(
+      {
+        path: originalFolder,
+        title: 'sharedConfigurations',
+        type: SolidResourceType.Folder
+      },
+      webId
+    );
+
+    const response = await StorageFileManager.deleteResource(
+      oldFolderConfigurations
+    );
+    const response2 = await StorageFileManager.deleteResource(
+      oldFolderSharedConfigurations
+    );
+
+    return copyFolder && updateProfileLinkResult;
   }
 
   /**
@@ -507,34 +530,6 @@ class SolidBackend {
   }
 
   /**
-   * Updates a user's profile with the new application folder location.
-   * @param {string} webId A user's WebID.
-   * @param {string} folderUrl An URL of the new application folder.
-   * @return {boolean} True if updated, false otherwise.
-   */
-  async updateAppFolder(webId: string, folderUrl: string): Promise<boolean> {
-    const user = $rdf.sym(webId);
-    const predicate = $rdf.sym(SOLID('timeline'));
-    const folder = $rdf.sym(folderUrl);
-    const profile = user.doc();
-    try {
-      await this.load(profile);
-    } catch (err) {
-      Log.error('Could not load a profile document.', 'StorageBackend');
-      return false;
-    }
-    const ins = [$rdf.st(user, predicate, folder, profile)];
-    const del = this.store.statementsMatching(user, predicate, null, profile);
-    try {
-      await this.updateResource(profile.value, ins, del);
-    } catch (err) {
-      return false;
-    }
-    // this.registerChanges(profile);
-    return true;
-  }
-
-  /**
    * Fetches images posted by the given user from his POD.
    * @param {string} webId A user's WebID.
    * @param {string} appFolder An URL of the user's application folder.
@@ -667,34 +662,32 @@ class SolidBackend {
     Log.info(applicationConfigurationTurtle, 'StorageBackend');
 
     try {
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.ttl`,
-        applicationConfigurationTurtle
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
-          this.load($rdf.sym(appConfigurationFullPath).doc());
-        }
-      });
+      const visualizerResourceConfig: ResourceConfig = new ResourceConfig(
+        {
+          path: appConfigurationFilePath,
+          title: `${appConfigurationFileTitle}.ttl`,
+          type: SolidResourceType.File,
+          body: applicationConfigurationTurtle,
+          isPublic: true
+        },
+        webId
+      );
 
-      await StorageFileClient.createFile(
-        appConfigurationFilePath,
-        `${appConfigurationFileTitle}.ttl.acl`,
-        await this.createFileAccessList(
-          webId,
-          appConfigurationFullPath,
-          [READ],
-          true,
-          []
-        )
-      ).then(response => {
-        if (response.status === 201) {
-          const filePath = response.url;
-          Log.info(`Created file at ${filePath}.`);
+      await StorageFileManager.createResource(visualizerResourceConfig).then(
+        async response => {
+          Log.info(response);
+
+          this.load($rdf.sym(appConfigurationFullPath).doc());
+
+          const visualizerResourceConfigACL = new AccessControlConfig(
+            visualizerResourceConfig.resource,
+            [],
+            visualizerResourceConfig.webID
+          );
+
+          await StorageFileManager.updateACL(visualizerResourceConfigACL);
         }
-      });
+      );
 
       this.requiresForceReload = true;
 
@@ -722,23 +715,37 @@ class SolidBackend {
       )}`;
       const metadataFileTitle = appMetadata.solidFileTitle;
 
-      await StorageFileClient.removeItem(folderPath, metadataFileTitle).then(
-        response => {
-          if (response.status === 200) {
-            const filePath = response.url;
-            Log.info(`Removed ${metadataFileTitle} at ${filePath}.`);
-          }
-        }
+      const visualizerResource = new ResourceConfig(
+        {
+          path: folderPath,
+          title: metadataFileTitle,
+          type: SolidResourceType.File
+        },
+        ''
       );
-      await StorageFileClient.removeItem(
-        folderPath,
-        `${metadataFileTitle}.acl`
-      ).then(response => {
-        if (response.status === 200) {
-          const filePath = response.url;
-          Log.info(`Removed ${metadataFileTitle}.acl at ${filePath}.`);
-        }
-      });
+
+      const visualizerACLResource = new ResourceConfig(
+        {
+          path: folderPath,
+          title: metadataFileTitle,
+          type: SolidResourceType.File
+        },
+        ''
+      );
+
+      const resourceResponse = await StorageFileManager.deleteResource(
+        visualizerResource
+      );
+      const aclResourceResponse = await StorageFileManager.deleteResource(
+        visualizerACLResource
+      );
+
+      if (
+        resourceResponse.status === 200 &&
+        aclResourceResponse.status === 200
+      ) {
+        Log.info('Deleted the visualizer');
+      }
     } catch (err) {
       Log.error('Could not delete a profile document.', 'StorageBackend');
       return Promise.reject(err);
@@ -839,216 +846,29 @@ class SolidBackend {
       .sort((a, b) => Utils.sortByDateAsc(a.createdAt, b.createdAt));
   }
 
-  /**
-   * Creates appropriate RDF statements for the access list for the given folder.
-   * @param {string} webId A WebID of the user.
-   * @param {string} folderUrl An URL of the folder.
-   * @param {$rdf.NamedNode[]} modes Access List modes (READ, WRITE, etc.).
-   * @param {boolean} isPublic Whether the folder is public or private.
-   * @param {string[]} allowedUsers An array of the user's which are allowed to access the folder.
-   * @return {$rdf.Statement[]} An array of the access list RDF statements.
-   */
-  async createFolderAccessList(
-    webId: string,
-    folderUrl: string,
-    modes: $rdf.NamedNode[],
-    isPublic: boolean,
-    allowedUsers: string[]
-  ): $rdf.Statement[] {
-    const folderAcl = this.createAccessList(
-      webId,
-      folderUrl,
-      modes,
-      isPublic,
-      allowedUsers,
-      true
-    )
-      .join('\n')
-      .toString();
-
-    const newStore = $rdf.graph();
-
-    $rdf.parse(folderAcl, newStore, folderUrl);
-    const response = await $rdf.serialize(
-      null,
-      newStore,
-      `${folderUrl}.acl`,
-      'text/turtle'
-    );
-
-    return response;
-  }
-
-  /**
-   * Creates appropriate RDF statements for the access list for the given file.
-   * @param {string} webId A WebID of the user.
-   * @param {string} fileUrl An URL of the file.
-   * @param {$rdf.NamedNode[]} modes Access List modes (READ, WRITE, etc.).
-   * @param {boolean} isPublic Whether the file is public or private.
-   * @param {string[]} allowedUsers An array of the user's which are allowed to access the file.
-   * @return {$rdf.Statement[]} An array of the access list RDF statements.
-   */
-  async createFileAccessList(
-    webId: string,
-    fileUrl: string,
-    modes: $rdf.NamedNode[],
-    isPublic: boolean,
-    allowedUsers: string[]
-  ): $rdf.Statement[] {
-    const fileAcl = this.createAccessList(
-      webId,
-      fileUrl,
-      modes,
-      isPublic,
-      allowedUsers,
-      false
-    )
-      .join('\n')
-      .toString();
-
-    const newStore = $rdf.graph();
-
-    $rdf.parse(fileAcl, newStore, fileUrl);
-    const response = await $rdf.serialize(
-      null,
-      newStore,
-      `${fileUrl}.acl`,
-      'text/turtle'
-    );
-
-    return response;
-  }
-
-  /**
-   * Creates appropriate RDF statements for the access list for the given resource.
-   * @param {string} webId A WebID of the user.
-   * @param {string} resourceUrl An URL of the resource.
-   * @param {$rdf.NamedNode[]} modes Access List modes (READ, WRITE, etc.).
-   * @param {boolean} isPublic Whether the resource is public or private.
-   * @param {string[]} allowedUsers An array of the user's which are allowed to access the resource.
-   * @param {boolean} isFolder Whether the resource is a folder or a file.
-   * @return {$rdf.Statement[]} An array of the access list RDF statements.
-   */
-  createAccessList(
-    webId: string,
-    resourceUrl: string,
-    modes: $rdf.NamedNode[],
-    isPublic: boolean,
-    allowedUsers: string[],
-    isFolder: boolean
-  ): $rdf.Statement[] {
-    const resource = $rdf.sym(resourceUrl);
-    const accessListUrl = `${resourceUrl}.acl`;
-    const doc = $rdf.sym(accessListUrl);
-    const user = $rdf.sym(webId);
-    const owner = $rdf.sym(`${accessListUrl}#owner`);
-    let acl = this.createAccessStatement(owner, resource, user, isFolder, doc, [
-      CONTROL,
-      READ,
-      WRITE
-    ]);
-    if (isPublic === true) {
-      const publicGroup = $rdf.sym(`${accessListUrl}#public`);
-      acl = acl.concat(
-        this.createAccessStatement(
-          publicGroup,
-          resource,
-          null,
-          isFolder,
-          doc,
-          modes
-        )
-      );
-    } else if (allowedUsers) {
-      allowedUsers.forEach(userId => {
-        const userGroup = $rdf.sym(accessListUrl);
-        const friendWebId = $rdf.sym(userId);
-        acl = acl.concat(
-          this.createAccessStatement(
-            userGroup,
-            resource,
-            friendWebId,
-            isFolder,
-            doc,
-            modes
-          )
-        );
-      });
-    }
-
-    return acl;
-  }
-
-  /**
-   * Creates appropriate RDF statements for the access list for the given resource and user group.
-   * @param {$rdf.NamedNode} groupNode A user group node to be used in an Access list.
-   * @param {$rdf.NamedNode} resource A node containing an URL of the resource.
-   * @param {$rdf.NamedNode} user A node containing the WebID of the user.
-   * @param {boolean} isFolder Whether the resource is a folder or a file.
-   * @param {$rdf.NamedNode} doc A node containing an URL of the Access list.
-   * @param {$rdf.NamedNode[]} modes Access List modes (READ, WRITE, etc.).
-   * @return {$rdf.Statement[]} An array of the access list group RDF statements.
-   */
-  createAccessStatement(
-    groupNode: $rdf.NamedNode,
-    resource: $rdf.NamedNode,
-    user: $rdf.NamedNode,
-    isFolder: boolean,
-    doc: $rdf.NamedNode,
-    modes: $rdf.NamedNode[]
-  ): $rdf.Statement[] {
-    const acl = [
-      $rdf.st(groupNode, RDF('type'), ACL('Authorization'), doc),
-      $rdf.st(groupNode, ACL('accessTo'), resource, doc)
-    ];
-    if (user) {
-      acl.push($rdf.st(groupNode, ACL('agent'), user, doc));
-    } else {
-      acl.push($rdf.st(groupNode, ACL('agentClass'), FOAF('Agent'), doc));
-    }
-    modes.forEach(mode => {
-      acl.push($rdf.st(groupNode, ACL('mode'), mode, doc));
-    });
-    if (isFolder === true) {
-      acl.push($rdf.st(groupNode, ACL('defaultForNew'), resource, doc));
-    }
-    return acl;
-  }
-
-  /**
-   * Updates a given resource with the given deletion and insertion statements.
-   * @param {string} resourceUrl An URL of the resource to be updated.
-   * @param {$rdf.Statement[]} insertions Statements to insert.
-   * @param {$rdf.Statement[]} deletions Statements to delete.
-   * @return {Promise<void>} void
-   */
-  async updateResource(
-    resourceUrl: string,
-    insertions: $rdf.Statement[],
-    deletions: $rdf.Statement[]
-  ): Promise<void> {
-    const resource = $rdf.sym(resourceUrl);
-    try {
-      await this.load(resource);
-      await this.update(deletions, insertions);
-      return Promise.resolve('Resource updated!');
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }
-
   sendFileToInbox(recipientWebId, data, type) {
     const inboxUrl = `${Utils.getBaseUrlConcat(recipientWebId)}/inbox`;
-    StorageFileClient.sendFileToUrl(inboxUrl, data, type);
+    return StorageAuthenticationManager.fetch(inboxUrl, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Content-Type': type
+      }
+    });
   }
 
   rejectInvitation(invitation) {
-    const folderTitle = Utils.getFolderUrlFromPathUrl(invitation.invitationUrl);
-    const inviteTitle = Utils.getFilenameFromPathUrl(invitation.invitationUrl);
-
-    StorageFileClient.removeItem(folderTitle, inviteTitle).then(response => {
+    const inviteResource = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(invitation.invitationUrl),
+        title: Utils.getFilenameFromPathUrl(invitation.invitationUrl),
+        type: SolidResourceType.File
+      },
+      ''
+    );
+    StorageFileManager.deleteResource(inviteResource).then(response => {
       if (response.status === 200) {
-        Log.info(`Removed ${inviteTitle}.`);
+        Log.info(`Removed ${invitation.invitationUrl}.`);
       }
     });
   }
@@ -1089,13 +909,12 @@ class SolidBackend {
   }
 
   async checkSharedConfigurationsFolder(folderUrl) {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const deferred = Q.defer();
     const newResources = [];
-    const rdfjsSource = await rdfjsSourceFromUrl(folderUrl, authClient.fetch);
+    const rdfjsSource = await rdfjsSourceFromUrl(
+      folderUrl,
+      StorageAuthenticationManager.fetch
+    );
     const engine = newEngine();
 
     engine
@@ -1123,13 +942,12 @@ class SolidBackend {
   }
 
   async checkInboxFolder(inboxUrl) {
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
     const deferred = Q.defer();
     const newResources = [];
-    const rdfjsSource = await rdfjsSourceFromUrl(inboxUrl, authClient.fetch);
+    const rdfjsSource = await rdfjsSourceFromUrl(
+      inboxUrl,
+      StorageAuthenticationManager.fetch
+    );
     const self = this;
     const engine = newEngine();
 
@@ -1159,9 +977,9 @@ class SolidBackend {
   }
 
   async parseInvite(invitationUrl, userWebId) {
-    const invitation = await StorageFileClient.fetchJsonLDFromUrl(
-      invitationUrl
-    );
+    const response = await StorageAuthenticationManager.fetch(invitationUrl);
+    if (!response.ok) throw response;
+    const invitation = await response.json();
 
     const sender = await this.getPerson(invitation.actor);
     const recipient = await this.getPerson(invitation.target);
@@ -1178,8 +996,8 @@ class SolidBackend {
   }
 
   async parseSharedConfiguration(configurationUrl) {
-    const sharedAppConfiguration = await StorageFileClient.fetchJsonLDFromUrl(
-      configurationUrl
+    const sharedAppConfiguration = JSON.parse(
+      await StorageFileManager.getResource(configurationUrl)
     );
 
     const appMetadataUrl = sharedAppConfiguration.url;
@@ -1201,27 +1019,26 @@ class SolidBackend {
     const currentAccessControl = await this.fetchAccessControlFile(
       `${metadataUrl}.acl`
     );
-    const collaboratorWebIds = currentAccessControl.getCollaborators();
+    let collaboratorWebIds = currentAccessControl.getCollaborators();
+    collaboratorWebIds = collaboratorWebIds.filter(element => {
+      return element !== webId;
+    });
     const isPublic = currentAccessControl.isPublic();
     if (!collaboratorWebIds.includes(collaboratorWebId)) {
       collaboratorWebIds.push(collaboratorWebId);
     }
 
-    const accessListConfiguration = await this.createFileAccessList(
-      webId,
-      metadataUrl,
-      [READ, WRITE],
-      isPublic,
-      collaboratorWebIds
-    );
-    await StorageFileClient.updateFile(
-      `${fileMetadataFolder}/`,
-      `${fileMetadataTitle}.acl`,
-      accessListConfiguration,
-      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(() => {
-      Log.info(`Created access list ${fileMetadataTitle}.acl`);
+    const assembledIds = collaboratorWebIds.map(element => {
+      return { agents: [element], modes: ['Read', 'Write'] };
     });
+
+    const resourceConfigACL = new AccessControlConfig(
+      { title: fileMetadataTitle, path: fileMetadataFolder, isPublic },
+      assembledIds,
+      webId
+    );
+
+    await StorageFileManager.updateACL(resourceConfigACL);
 
     await this.removeInvitation(sharedInvitation.invitationUrl).then(
       response => {
@@ -1254,22 +1071,33 @@ class SolidBackend {
           if (err) throw err;
           else {
             const uniqueFileName = `${Utils.getName()}.jsonld`;
-            await StorageFileClient.createFile(
-              destinationPath,
-              uniqueFileName,
-              doc
+            const inviteResource = new ResourceConfig(
+              {
+                path: destinationPath,
+                title: uniqueFileName,
+                type: SolidResourceType.File,
+                contentType: 'application/ld+json',
+                body: doc
+              },
+              webId
             );
-            await StorageFileClient.createFile(
-              destinationPath,
-              `${uniqueFileName}.acl`,
-              await self.createFileAccessList(
-                webId,
-                `${destinationPath}/${uniqueFileName}`,
-                [READ],
-                false,
-                undefined
-              )
+            const inviteACLResource = new AccessControlConfig(
+              {
+                path: destinationPath,
+                title: uniqueFileName,
+                type: SolidResourceType.File
+              },
+              [
+                {
+                  agents: [invitation.recipientWebId],
+                  modes: ['Read', 'Write']
+                }
+              ],
+              webId
             );
+            await StorageFileManager.createResource(inviteResource);
+            await StorageFileManager.updateACL(inviteACLResource);
+
             resolve(true);
           }
         });
@@ -1277,15 +1105,20 @@ class SolidBackend {
   }
 
   async removeInvitation(invitationUrl) {
-    return StorageFileClient.removeItem(
-      Utils.getFolderUrlFromPathUrl(invitationUrl),
-      Utils.getFilenameFromPathUrl(invitationUrl)
+    const inviteResource = new ResourceConfig(
+      {
+        path: Utils.getFolderUrlFromPathUrl(invitationUrl),
+        title: Utils.getFilenameFromPathUrl(invitationUrl),
+        type: SolidResourceType.File
+      },
+      ''
     );
+    return StorageFileManager.deleteResource(inviteResource);
   }
 
   async fetchAccessControlFile(aclUrl) {
-    const fetchResponse = await StorageFileClient.fetchFileFromUrl(aclUrl, {
-      Accept: 'application/ld+json'
+    const fetchResponse = await StorageFileManager.getResource(aclUrl, {
+      headers: { Accept: 'application/ld+json' }
     });
 
     const response = JSON.parse(fetchResponse);
@@ -1302,24 +1135,20 @@ class SolidBackend {
     const fileMetadataFolder = Utils.getFolderUrlFromPathUrl(metadataUrl);
     const fileMetadataTitle = Utils.getFilenameFromPathUrl(metadataUrl);
 
-    const accessListConfiguration = await this.createFileAccessList(
-      webId,
-      metadataUrl,
-      [READ, WRITE],
-      isPublic,
+    const aclConfiguration = new AccessControlConfig(
+      {
+        path: fileMetadataFolder,
+        title: fileMetadataTitle,
+        type: SolidResourceType.File,
+        isPublic
+      },
       contacts.map(contact => {
-        return contact.webId;
-      })
+        return { agents: [contact.webId], modes: ['Read', 'Write'] };
+      }),
+      webId
     );
 
-    return StorageFileClient.updateFile(
-      `${fileMetadataFolder}/`,
-      `${fileMetadataTitle}.acl`,
-      accessListConfiguration,
-      '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
-    ).then(() => {
-      Log.info(`Updated access list ${fileMetadataTitle}.acl`);
-    });
+    return StorageFileManager.updateACL(aclConfiguration);
   }
 }
 

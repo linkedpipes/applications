@@ -1,5 +1,5 @@
 # Using OpenJDK 11
-FROM gradle:5.6.2-jdk11 as builder
+FROM gradle:5.6.4-jdk11 as builder
 
 # Tomcat will eventually create directories here
 VOLUME /tmp

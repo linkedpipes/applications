@@ -1,5 +1,5 @@
 # Base image
-FROM node:10.16.3-alpine
+FROM node:10.18.0-alpine
 
 ENV YARN_VERSION 1.17.0
 # Install packages using Yarn
