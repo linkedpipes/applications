@@ -5,11 +5,11 @@ import sys
 import requests
 import browserstack_plugins.fast_selenium
 from concurrent.futures import ThreadPoolExecutor
-from webdriver_manager.firefox import GeckoDriverManager
-
+from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
@@ -26,11 +26,17 @@ desired_cap = {
 }
 
 slack_token = os.environ["SLACK_API_TOKEN"]
+solid_webid = os.environ["SOLID_WEBID"]
+solid_username = os.environ["SOLID_USERNAME"]
+solid_password = os.environ["SOLID_PASSWORD"]
+solid_webid_2 = os.environ["SOLID_WEBID_2"]
+solid_username_2 = os.environ["SOLID_USERNAME_2"]
+solid_password_2 = os.environ["SOLID_PASSWORD_2"]
+lpa_instance_url = os.environ["LPA_INSTANCE_URL"]
 sc = SlackClient(slack_token)
 
 
 class Runner():
-
     @staticmethod
     def parallel_execution(*name, options='by_module'):
         """
@@ -59,8 +65,9 @@ class Runner():
                 suite.addTest(
                     unittest.TestLoader().loadTestsFromModule(module))
         else:
-            raise ValueError("Parameter 'options' is incorrect."
-                             "Available options: 'by_method', 'by_class', 'by_module'")
+            raise ValueError(
+                "Parameter 'options' is incorrect."
+                "Available options: 'by_method', 'by_class', 'by_module'")
 
         with ThreadPoolExecutor(max_workers=10) as executor:
             list_of_suites = list(suite)
@@ -83,10 +90,10 @@ class UntitledTestCase(unittest.TestCase):
         desired_cap['build'] = self.build_travis_number
         desired_cap['project'] = self.pr_repo_title
 
-        # self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        # self.driver = webdriver.Chrome(ChromeDriverManager().install())
         self.driver = webdriver.Remote(
-            command_executor='http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(self.browserstack_username,
-                                                                                    self.browserstack_access_key),
+            command_executor='http://{0}:{1}@hub.browserstack.com:80/wd/hub'.
+            format(self.browserstack_username, self.browserstack_access_key),
             desired_capabilities=desired_cap)
         self.driver.implicitly_wait(30)
         self.accept_next_alert = True
@@ -94,8 +101,8 @@ class UntitledTestCase(unittest.TestCase):
 
     def wait_for_element_to_be_clickable(self, element_id, timeout=10):
         wd_wait = WebDriverWait(self.driver, timeout)
-        element = wd_wait.until(
-            EC.element_to_be_clickable((By.ID, element_id)))
+        element = wd_wait.until(EC.element_to_be_clickable(
+            (By.ID, element_id)))
         print('WAITING for {0}'.format(element_id))
         return element
 
@@ -123,81 +130,20 @@ class UntitledTestCase(unittest.TestCase):
             except WebDriverException as e:
                 count = count + 1
 
-    def test_google_maps_flow(self):
-        driver = self.driver
-
-        driver.get("https://applications.linkedpipes.com/login")
-        driver.find_element_by_id("webId").click()
-        driver.find_element_by_id("webId").clear()
-        driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlinked3.lpsolid.eu:8443/profile/card#me")
-        driver.find_element_by_id(
-            "sign-in-button").click()
-        driver.find_element_by_id("username").click()
-        driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlinked3")
-        driver.find_element_by_id("password").click()
-        driver.find_element_by_id("password").clear()
-        driver.find_element_by_id("password").send_keys("Selenium123!")
-        driver.find_element_by_id("login").click()
-
-        self.custom_wait_clickable_and_click(
-            element_id="maps-sample-home-button")
-
-        self.custom_wait_clickable_and_click(
-            element_id="start-discovery-button")
-
-        self.custom_wait_clickable_and_click(element_id="visualizer-0-card")
-
-        self.custom_wait_clickable_and_click(element_id="create-app-button")
-
-        self.custom_wait_clickable_and_click("application-title-field")
-        driver.find_element_by_id("application-title-field").clear()
-        driver.find_element_by_id(
-            "application-title-field").send_keys("test_selenium_gmaps_app")
-        driver.find_element_by_id("create-app-publish-button").click()
-
-        self.custom_wait_clickable_and_click("browse-published-button")
-
-        self.custom_wait_clickable_and_click("0_test_selenium_gmaps_app")
-
-        self.custom_wait_clickable_and_click("storage_navbar_button")
-
-        self.custom_wait_clickable_and_click("delete_button_0_test_selenium_gmaps_app")
-
-        self.custom_wait_clickable_and_click("dashboard_navbar_button")
-
-        driver.execute_script("scrollBy(0,250);")
-        driver.refresh()
-
-        self.custom_wait_clickable_and_click("discoveries_tab")
-
-        self.custom_wait_clickable_and_click("delete_discovery_session_button_0")
-
-        self.custom_wait_clickable_and_click("dashboard_navbar_button")
-
-        self.custom_wait_clickable_and_click("pipeline_executions_tab")
-
-        self.custom_wait_clickable_and_click("delete_execution_session_button_0")
-
-        time.sleep(5)
-
     def test_treemap_flow(self):
         driver = self.driver
 
-        driver.get("https://applications.linkedpipes.com/login")
+        driver.get(lpa_instance_url)
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
-        driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlinked2.lpsolid.eu:8443/profile/card#me")
-        driver.find_element_by_id(
-            "sign-in-button").click()
+        driver.find_element_by_id("webId").send_keys(solid_webid)
+        driver.find_element_by_id("sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlinked2")
+        driver.find_element_by_id("username").send_keys(solid_username)
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
-        driver.find_element_by_id("password").send_keys("Selenium123!")
+        driver.find_element_by_id("password").send_keys(solid_password)
         driver.find_element_by_id("login").click()
 
         self.custom_wait_clickable_and_click(
@@ -212,8 +158,8 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
-        driver.find_element_by_id(
-            "application-title-field").send_keys("test_selenium_treemap_app")
+        driver.find_element_by_id("application-title-field").send_keys(
+            "test_selenium_treemap_app")
 
         driver.find_element_by_id("create-app-publish-button").click()
 
@@ -228,8 +174,8 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
-        driver.execute_script("scrollBy(0,250);")
-        driver.refresh()
+        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL +
+                                                          Keys.HOME)
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
@@ -248,19 +194,17 @@ class UntitledTestCase(unittest.TestCase):
     def test_chord_flow(self):
         driver = self.driver
 
-        driver.get("https://applications.linkedpipes.com/login")
+        driver.get(lpa_instance_url)
         driver.find_element_by_id("webId").click()
         driver.find_element_by_id("webId").clear()
-        driver.find_element_by_id("webId").send_keys(
-            "https://seleniumlinked1.lpsolid.eu:8443/profile/card#me")
-        driver.find_element_by_id(
-            "sign-in-button").click()
+        driver.find_element_by_id("webId").send_keys(solid_webid_2)
+        driver.find_element_by_id("sign-in-button").click()
         driver.find_element_by_id("username").click()
         driver.find_element_by_id("username").clear()
-        driver.find_element_by_id("username").send_keys("seleniumlinked1")
+        driver.find_element_by_id("username").send_keys(solid_username_2)
         driver.find_element_by_id("password").click()
         driver.find_element_by_id("password").clear()
-        driver.find_element_by_id("password").send_keys("Selenium123!")
+        driver.find_element_by_id("password").send_keys(solid_password_2)
         driver.find_element_by_id("login").click()
 
         self.custom_wait_clickable_and_click(
@@ -273,8 +217,8 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("application-title-field")
         driver.find_element_by_id("application-title-field").clear()
-        driver.find_element_by_id(
-            "application-title-field").send_keys("test_selenium_chord_app")
+        driver.find_element_by_id("application-title-field").send_keys(
+            "test_selenium_chord_app")
         driver.find_element_by_id("create-app-publish-button").click()
 
         self.custom_wait_clickable_and_click("browse-published-button")
@@ -288,8 +232,8 @@ class UntitledTestCase(unittest.TestCase):
 
         self.custom_wait_clickable_and_click("dashboard_navbar_button")
 
-        driver.execute_script("scrollBy(0,250);")
-        driver.refresh()
+        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL +
+                                                          Keys.HOME)
 
         self.custom_wait_clickable_and_click("discoveries_tab")
 
@@ -336,8 +280,11 @@ class UntitledTestCase(unittest.TestCase):
         self.driver.quit()
 
         session_id = self.driver.session_id
-        session_info = requests.get(url='https://api.browserstack.com/automate/sessions/{0}.json'.format(session_id),
-                                    auth=HTTPBasicAuth(self.browserstack_username, self.browserstack_access_key)).json()
+        session_info = requests.get(
+            url='https://api.browserstack.com/automate/sessions/{0}.json'.
+            format(session_id),
+            auth=HTTPBasicAuth(self.browserstack_username,
+                               self.browserstack_access_key)).json()
 
         project_name = session_info['automation_session']['project_name']
         build_name = session_info['automation_session']['build_name']
@@ -351,13 +298,13 @@ class UntitledTestCase(unittest.TestCase):
             "chat.postMessage",
             channel="CGGD5F3FY",
             text="E2E tests on LPA were performed :tada: \n\n See results:\n"
-                 "```project_name: {0}\n"
-                 "build_name: {1}\n"
-                 "browser: {2} {3}\n"
-                 "os: {4} {5}\n"
-                 "url: {6}```".format(project_name, build_name, browser,
-                                      browser_version, os_name, os_version, public_url)
-        )
+            "```project_name: {0}\n"
+            "build_name: {1}\n"
+            "browser: {2} {3}\n"
+            "os: {4} {5}\n"
+            "url: {6}```".format(project_name, build_name, browser,
+                                 browser_version, os_name, os_version,
+                                 public_url))
 
         self.assertEqual([], self.verificationErrors)
 

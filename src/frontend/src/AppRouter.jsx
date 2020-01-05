@@ -9,6 +9,7 @@ import * as Sentry from '@sentry/browser';
 import { userActions } from '@ducks/userDuck';
 import ErrorBoundary from 'react-error-boundary';
 import { toast, ToastContainer } from 'react-toastify';
+import { StorageAuthenticationManager } from 'linkedpipes-storage';
 import { Invitation } from '@storage/models';
 import { discoveryActions } from '@ducks/discoveryDuck';
 import { StoragePage, StorageToolbox, StorageInboxDialog } from '@storage';
@@ -195,11 +196,7 @@ class AppRouter extends React.PureComponent<Props, State> {
   setupSessionTracker = async () => {
     const { handleSetUserWebId, handleUpdateApplicationsFolder } = this.props;
     const self = this;
-    const authClient = await import(
-      /* webpackChunkName: "solid-auth-client" */ 'solid-auth-client'
-    );
-
-    authClient.trackSession(session => {
+    StorageAuthenticationManager.trackSession(session => {
       if (session) {
         handleSetUserWebId(session.webId);
 
@@ -236,7 +233,6 @@ class AppRouter extends React.PureComponent<Props, State> {
                   setTimeout(() => {
                     StorageToolbox.getValidAppFolder(session.webId).then(
                       async newFolder => {
-                        Log.info(newFolder);
                         Log.info(newFolder);
                         if (newFolder) {
                           Log.warn('Called internal global');

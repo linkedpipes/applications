@@ -204,7 +204,6 @@ class HomeController extends PureComponent<Props, State> {
     };
   };
 
-  // TODO: Refactor
   handleSelectDiscoveryClick = async discovery => {
     const {
       history,

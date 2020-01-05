@@ -151,8 +151,6 @@ class FiltersComponent extends React.Component<Props, State> {
     });
   };
 
-  // TODO: Component will unmount, reset all filters to default state
-
   render() {
     const {
       classes,
