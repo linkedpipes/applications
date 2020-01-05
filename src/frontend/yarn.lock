@@ -12966,10 +12966,10 @@ quick-lru@^1.0.0:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
 
-rambda@^3.0.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/rambda/-/rambda-3.3.0.tgz#ac8cc5f979b7bc3c91e6a52895214b6f6aa2381d"
-  integrity sha512-Tlf+GAG/LIG/c9ksHyo+89K7/m5/FT9LOXYNcwiL5GNM2MM/wrwljEN9an6eaBavQwJoLJiBy8iuFKo4p848yg==
+rambda@^4.0.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/rambda/-/rambda-4.4.0.tgz#c300335e2c0a560f0d6334c200728cd753c5cce4"
+  integrity sha512-NbQBX5LOfSIHnLQww+QPiHqllTTnKqPLs0pqwBcVctkPh+o0AHCJ985rwGVS9OgaT+GGKI1lOIX3aTQnqXjoPA==
 
 randomatic@^3.0.0:
   version "3.1.1"
