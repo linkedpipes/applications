@@ -46,7 +46,7 @@
         "google-palette": "1.1.0",
         "immutability-helper": "^3.0.0",
         "json-form-data": "^1.4.1",
-        "jsonld": "^1.6.2",
+        "jsonld": "^2.0.0",
         "ldflex": "^2.2.1",
         "moment": "^2.24.0",
         "n3": "^1.1.1",
