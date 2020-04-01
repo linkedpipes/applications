@@ -59,7 +59,7 @@ dependencies {
 
     compile 'io.sentry:sentry-spring:1.7.29'
 
-    compile 'com.corundumstudio.socketio:netty-socketio:1.7.17'
+    compile 'com.corundumstudio.socketio:netty-socketio:1.7.18'
 
     compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
 
