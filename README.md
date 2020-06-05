@@ -17,7 +17,8 @@ LinkedPipes Applications is a visualization web platform that allows the users t
 
 • General user documentation and platform tutorials are available [here](http://docs.applications.linkedpipes.com) <br/>
 • Developer oriented frontend documentation and `React` component demos are available [here](http://docs.frontend.applications.linkedpipes.com) <br/>
-• Developer oriented backend documentation and architecture overview are available [here](http://docs.backend.applications.linkedpipes.com)
+• Developer oriented backend documentation and architecture overview are available [here](http://docs.backend.applications.linkedpipes.com) <br/>
+• [ESWC 2020](https://2020.eswc-conferences.org/) Best demo paper [LinkedPipes Applications – Automated Discovery of Configurable Linked Data Applications](https://preprints.2020.eswc-conferences.org/posters_demos/paper_286.pdf) and accompanying [poster](https://preprints.2020.eswc-conferences.org/posters_demos/286-Kl%d0%b1mek.pdf)
 
 ## 🚀 Quick start
 
