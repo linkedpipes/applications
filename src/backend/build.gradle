@@ -45,7 +45,7 @@ dependencies {
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.10.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.10.2'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
 
     compile 'org.apache.jena:apache-jena-libs:3.13.1'
     compile 'org.apache.jena:jena-querybuilder:3.13.1'
