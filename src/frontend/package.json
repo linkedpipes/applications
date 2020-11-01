@@ -93,7 +93,7 @@
         "@babel/preset-env": "7.12.1",
         "@babel/preset-flow": "7.12.1",
         "@babel/preset-react": "7.12.1",
-        "@mdx-js/loader": "1.6.16",
+        "@mdx-js/loader": "1.6.19",
         "@sentry/webpack-plugin": "1.12.1",
         "babel-cli": "6.26.0",
         "babel-eslint": "10.1.0",
