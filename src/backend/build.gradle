@@ -43,7 +43,7 @@ dependencies {
 
     compile 'org.jetbrains:annotations:17.0.0'
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.11.2'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.11.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.11.3'
 
