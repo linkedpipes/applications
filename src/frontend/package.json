@@ -28,7 +28,7 @@
     },
     "flow:status": "flow status --quiet",
     "dependencies": {
-        "@babel/core": "7.12.9",
+        "@babel/core": "7.12.10",
         "@babel/runtime": "7.12.5",
         "@comunica/actor-init-sparql-rdfjs": "^1.7.2",
         "@mapbox/geo-viewport": "^0.4.0",
@@ -85,14 +85,14 @@
         "uuid": "3.3.3"
     },
     "devDependencies": {
-        "@babel/cli": "7.12.8",
+        "@babel/cli": "7.12.10",
         "@babel/plugin-proposal-class-properties": "7.12.1",
         "@babel/plugin-proposal-object-rest-spread": "7.12.1",
         "@babel/plugin-syntax-dynamic-import": "7.8.3",
-        "@babel/plugin-transform-runtime": "7.12.1",
-        "@babel/preset-env": "7.12.7",
+        "@babel/plugin-transform-runtime": "7.12.10",
+        "@babel/preset-env": "7.12.11",
         "@babel/preset-flow": "7.12.1",
-        "@babel/preset-react": "7.12.7",
+        "@babel/preset-react": "7.12.10",
         "@mdx-js/loader": "1.6.21",
         "@sentry/webpack-plugin": "1.14.0",
         "babel-cli": "6.26.0",
