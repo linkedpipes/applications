@@ -50,7 +50,7 @@ dependencies {
     compile 'org.apache.jena:apache-jena-libs:3.13.1'
     compile 'org.apache.jena:jena-querybuilder:3.13.1'
     compile 'com.typesafe:config:1.4.1'
-    compile 'commons-validator:commons-validator:1.6'
+    compile 'commons-validator:commons-validator:1.7'
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
