@@ -1,6 +1,6 @@
 astroid==2.2.5
 autopep8==1.4.3
-certifi==2019.3.9
+certifi==2022.12.7
 chardet==3.0.4
 colorama==0.4.1
 configparser==3.7.4
