@@ -38,7 +38,7 @@
         "@turf/bbox": "^6.0.1",
         "@turf/helpers": "^6.1.4",
         "activitystrea.ms": "^2.1.3",
-        "axios": "0.21.1",
+        "axios": "0.21.2",
         "classnames": "2.2.6",
         "fast-deep-equal": "^2.0.1",
         "filepond": "^4.4.9",
