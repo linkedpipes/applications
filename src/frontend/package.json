@@ -28,7 +28,7 @@
     },
     "flow:status": "flow status --quiet",
     "dependencies": {
-        "@babel/core": "7.12.10",
+        "@babel/core": "7.29.6",
         "@babel/runtime": "7.12.5",
         "@comunica/actor-init-sparql-rdfjs": "^1.7.2",
         "@mapbox/geo-viewport": "^0.4.0",
